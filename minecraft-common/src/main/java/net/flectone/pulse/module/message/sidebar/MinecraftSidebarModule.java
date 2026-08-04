@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.sidebar;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisplayScoreboard;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerResetScore;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerScoreboardObjective;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
 import com.google.inject.Inject;
@@ -32,15 +33,15 @@ import java.util.UUID;
 public class MinecraftSidebarModule extends SidebarModule {
 
     private final List<UUID> playerSidebars = new ObjectArrayList<>();
-    private final Map<UUID, List<String>> playerLegacySidebarContent = new Object2ObjectOpenHashMap<>();
+    private final Map<UUID, List<String>> playerSidebarContent = new Object2ObjectOpenHashMap<>();
 
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final MinecraftPacketSender packetSender;
-    private final MinecraftPacketProvider packetProvider;
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
     private final SocialService socialService;
+    private final boolean isNewerThanOrEqualsV_1_20_3;
 
     @Inject
     public MinecraftSidebarModule(FileFacade fileFacade,
@@ -59,10 +60,10 @@ public class MinecraftSidebarModule extends SidebarModule {
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
-        this.packetProvider = packetProvider;
         this.permissionChecker = permissionChecker;
         this.moduleController = moduleController;
         this.socialService = socialService;
+        this.isNewerThanOrEqualsV_1_20_3 = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3);
     }
 
     @Override
@@ -132,19 +133,41 @@ public class MinecraftSidebarModule extends SidebarModule {
                     objectiveName
             ));
 
-            if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-                modernSidebarLines(fPlayer, objectiveName, lines);
-            } else {
-                legacySidebarLines(fPlayer, objectiveName, lines);
+            List<String> oldContent = playerSidebarContent.get(fPlayer.uuid());
+            List<String> content = isNewerThanOrEqualsV_1_20_3
+                    ? modernSidebarLines(fPlayer, objectiveName, lines)
+                    : legacySidebarLines(fPlayer, objectiveName, lines);
+
+            if (oldContent != null && oldContent.size() > content.size()) {
+                for (int i = content.size(); i < oldContent.size(); i++) {
+                    String oldLine = oldContent.get(i);
+                    if (isNewerThanOrEqualsV_1_20_3) {
+                        packetSender.send(fPlayer, new WrapperPlayServerResetScore(oldLine, objectiveName));
+                    } else {
+                        packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
+                                oldLine,
+                                WrapperPlayServerUpdateScore.Action.REMOVE_ITEM,
+                                objectiveName,
+                                lines.length - i,
+                                null,
+                                null
+                        ));
+                    }
+                }
             }
+
+            playerSidebarContent.put(fPlayer.uuid(), content);
         });
     }
 
-    private void modernSidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
-        for (int i = 1; i < lines.length; i++) {
+    private List<String> modernSidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
+        List<String> content = new ObjectArrayList<>(15);
+
+        for (int i = 1; i < lines.length && i < 16; i++) {
             int lineIndex = i - 1;
 
             String lineId = getLineId(lineIndex, fPlayer);
+
             Component line = messagePipeline.build(MessageContext.builder()
                     .sender(fPlayer)
                     .message(lines[i])
@@ -159,25 +182,17 @@ public class MinecraftSidebarModule extends SidebarModule {
                     line,
                     ScoreFormat.blankScore()
             ));
+
+            content.add(lineId);
         }
+
+        return content;
     }
 
-    private void legacySidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
-        List<String> content = playerLegacySidebarContent.getOrDefault(fPlayer.uuid(), new ObjectArrayList<>(15));
+    private List<String> legacySidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
+        List<String> content = new ObjectArrayList<>(15);
 
-        for (int i = 0; i < content.size(); i++) {
-            String oldLine = content.get(i);
-            packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
-                    oldLine,
-                    WrapperPlayServerUpdateScore.Action.REMOVE_ITEM,
-                    objectiveName,
-                    lines.length - i,
-                    null,
-                    null
-            ));
-        }
-
-        for (int i = 1; i < lines.length; i++) {
+        for (int i = 1; i < lines.length && i < 16; i++) {
             int lineIndex = i - 1;
 
             String line = messagePipeline.buildLegacy(MessageContext.builder()
@@ -195,13 +210,9 @@ public class MinecraftSidebarModule extends SidebarModule {
                     null
             ));
 
-            if (lineIndex < content.size()) {
-                content.set(lineIndex, line);
-            } else {
-                content.add(line);
-            }
+            content.add(line);
         }
 
-        playerLegacySidebarContent.put(fPlayer.uuid(), content);
+        return content;
     }
 }
