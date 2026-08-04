@@ -20,8 +20,8 @@ include "minecraft-bukkit"
 include 'minecraft-bukkit:loader'
 include "minecraft-paper"
 include "minecraft-velocity"
+include "minecraft-velocity:loader"
 include "minecraft-bungeecord"
+include "minecraft-bungeecord:loader"
 include "minecraft-neoforge"
 include "minecraft-neoforge:loader"
-include 'minecraft-velocity:loader'
-include 'minecraft-bungeecord:loader'
