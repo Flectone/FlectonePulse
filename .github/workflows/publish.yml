@@ -84,6 +84,9 @@ jobs:
             echo "is_release=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
       - name: Publish to Maven Central
         run: ./gradlew publishToMavenCentral --no-daemon
         env:
