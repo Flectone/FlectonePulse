@@ -331,6 +331,7 @@ public interface PermissionMerger {
 
     @Mapping(target = "animation", expression = "java(mergeMessageFormatAnimation(target.build().animation().toBuilder(), source.animation()))")
     @Mapping(target = "condition", expression = "java(mergeMessageFormatCondition(target.build().condition().toBuilder(), source.condition()))")
+    @Mapping(target = "fading", expression = "java(mergeMessageFormatFading(target.build().fading().toBuilder(), source.fading()))")
     @Mapping(target = "fcolor", expression = "java(mergeMessageFormatFColor(target.build().fcolor().toBuilder(), source.fcolor()))")
     @Mapping(target = "fixation", expression = "java(mergeMessageFormatFixation(target.build().fixation().toBuilder(), source.fixation()))")
     @Mapping(target = "mention", expression = "java(mergeMessageFormatMention(target.build().mention().toBuilder(), source.mention()))")
@@ -347,6 +348,8 @@ public interface PermissionMerger {
     Permission.Message.Format.Animation mergeMessageFormatAnimation(@MappingTarget Permission.Message.Format.Animation.AnimationBuilder target, Permission.Message.Format.Animation source);
 
     Permission.Message.Format.Condition mergeMessageFormatCondition(@MappingTarget Permission.Message.Format.Condition.ConditionBuilder target, Permission.Message.Format.Condition source);
+
+    Permission.Message.Format.Fading mergeMessageFormatFading(@MappingTarget Permission.Message.Format.Fading.FadingBuilder target, Permission.Message.Format.Fading source);
 
     Permission.Message.Format.FColor mergeMessageFormatFColor(@MappingTarget Permission.Message.Format.FColor.FColorBuilder target, Permission.Message.Format.FColor source);
 

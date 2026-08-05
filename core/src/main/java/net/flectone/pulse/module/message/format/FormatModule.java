@@ -17,6 +17,7 @@ import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.animation.AnimationModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
+import net.flectone.pulse.module.message.format.fading.FadingModule;
 import net.flectone.pulse.module.message.format.fcolor.FColorModule;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
 import net.flectone.pulse.module.message.format.listener.PulseFormatListener;
@@ -68,6 +69,7 @@ public class FormatModule implements ModuleLocalization {
         return ModuleLocalization.super.childrenBuilder().add(
                 AnimationModule.class,
                 ConditionModule.class,
+                FadingModule.class,
                 FColorModule.class,
                 FixationModule.class,
                 MentionModule.class,

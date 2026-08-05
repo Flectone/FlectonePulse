@@ -1170,6 +1170,9 @@ public record Localization(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/condition")
                 Condition condition,
 
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/fading")
+                Fading fading,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object")
                 Object object,
 
@@ -1209,6 +1212,14 @@ public record Localization(
             @Jacksonized
             public record Condition(
                     Map<String, Map<String, String>> values
+            ) implements LocalizationSetting {
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Fading(
+                    String symbol
             ) implements LocalizationSetting {
             }
 

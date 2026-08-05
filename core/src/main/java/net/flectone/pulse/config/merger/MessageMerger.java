@@ -65,6 +65,7 @@ public interface MessageMerger {
 
     @Mapping(target = "animation", expression = "java(mergeFormatAnimation(target.build().animation().toBuilder(), source.animation()))")
     @Mapping(target = "condition", expression = "java(mergeFormatCondition(target.build().condition().toBuilder(), source.condition()))")
+    @Mapping(target = "fading", expression = "java(mergeFormatFading(target.build().fading().toBuilder(), source.fading()))")
     @Mapping(target = "fcolor", expression = "java(mergeFormatFColor(target.build().fcolor().toBuilder(), source.fcolor()))")
     @Mapping(target = "fixation", expression = "java(mergeFormatFixation(target.build().fixation().toBuilder(), source.fixation()))")
     @Mapping(target = "mention", expression = "java(mergeFormatMention(target.build().mention().toBuilder(), source.mention()))")
@@ -81,6 +82,8 @@ public interface MessageMerger {
     Message.Format.Animation mergeFormatAnimation(@MappingTarget Message.Format.Animation.AnimationBuilder target, Message.Format.Animation source);
 
     Message.Format.Condition mergeFormatCondition(@MappingTarget Message.Format.Condition.ConditionBuilder target, Message.Format.Condition source);
+
+    Message.Format.Fading mergeFormatFading(@MappingTarget Message.Format.Fading.FadingBuilder target, Message.Format.Fading source);
 
     Message.Format.FColor mergeFormatFColor(@MappingTarget Message.Format.FColor.FColorBuilder target, Message.Format.FColor source);
 

@@ -280,6 +280,9 @@ public record Message(
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/condition")
             Condition condition,
 
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/fading")
+            Fading fading,
+
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/fcolor")
             FColor fcolor,
 
@@ -358,6 +361,17 @@ public record Message(
 
             }
 
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Fading(
+                Boolean enable,
+                Boolean hideDifferentWorld,
+                Double minDistance,
+                Double maxDistance
+        ) implements EnableSetting {
         }
 
         @With

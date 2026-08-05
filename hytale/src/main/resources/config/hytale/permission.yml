@@ -804,6 +804,15 @@ message:
         is_admin:
           name: "flectonepulse.module.message.format.condition.is_admin"
           type: "TRUE"
+    fading:
+      name: "flectonepulse.module.message.format.fading"
+      type: "TRUE"
+      bypass_send:
+        name: "flectonepulse.module.message.format.fading.bypass_send"
+        type: "OP"
+      bypass_view:
+        name: "flectonepulse.module.message.format.fading.bypass_view"
+        type: "OP"
     fcolor:
       name: "flectonepulse.module.message.format.fcolor"
       type: "TRUE"

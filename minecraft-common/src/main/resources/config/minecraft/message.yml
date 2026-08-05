@@ -160,6 +160,11 @@ format:
       is_admin:
         value: "minecraft.admin"
         type: "PERMISSION"
+  fading:
+    enable: true
+    hide_different_world: true
+    min_distance: 10.0
+    max_distance: 50.0
   fcolor:
     enable: true
     default_colors:

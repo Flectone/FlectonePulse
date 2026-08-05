@@ -151,12 +151,16 @@ public class MessagePipeline {
     }
 
     public TagResolver messageTag(FEntity sender, FPlayer receiver, String message) {
-        return messageTag(build(MessageContext.builder()
+        return messageTag(messageComponent(sender, receiver, message));
+    }
+
+    public Component messageComponent(FEntity sender, FPlayer receiver, String message) {
+        return build(MessageContext.builder()
                 .sender(sender)
                 .receiver(receiver)
                 .message(message)
                 .flag(MessageFlag.PLAYER_MESSAGE, true)
-                .build())
+                .build()
         );
     }
 
@@ -294,6 +298,7 @@ public class MessagePipeline {
         SPRITE_OR,
         TEXTURE,
         TEXTURE_OR,
+        FADING,
         FCOLOR;
 
         public static TagResolver emptyResolver(@TagPattern String tag) {

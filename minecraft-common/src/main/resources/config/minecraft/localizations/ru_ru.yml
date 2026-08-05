@@ -625,6 +625,8 @@ message:
         is_admin:
           "true": "Админ"
           "false": "Игрок"
+    fading:
+      symbol: "▓"
     object:
       default_symbol: "☐"
     padding:

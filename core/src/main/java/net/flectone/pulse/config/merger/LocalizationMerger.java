@@ -251,6 +251,7 @@ public interface LocalizationMerger {
 
     @Mapping(target = "animation", expression = "java(mergeMessageFormatAnimation(target.build().animation().toBuilder(), source.animation()))")
     @Mapping(target = "condition", expression = "java(mergeMessageFormatCondition(target.build().condition().toBuilder(), source.condition()))")
+    @Mapping(target = "fading", expression = "java(mergeMessageFormatFading(target.build().fading().toBuilder(), source.fading()))")
     @Mapping(target = "object", expression = "java(mergeMessageFormatObject(target.build().object().toBuilder(), source.object()))")
     @Mapping(target = "padding", expression = "java(mergeMessageFormatPadding(target.build().padding().toBuilder(), source.padding()))")
     @Mapping(target = "replacement", expression = "java(mergeMessageFormatReplacement(target.build().replacement().toBuilder(), source.replacement()))")
@@ -264,6 +265,8 @@ public interface LocalizationMerger {
     Localization.Message.Format.Animation mergeMessageFormatAnimation(@MappingTarget Localization.Message.Format.Animation.AnimationBuilder target, Localization.Message.Format.Animation source);
 
     Localization.Message.Format.Condition mergeMessageFormatCondition(@MappingTarget Localization.Message.Format.Condition.ConditionBuilder target, Localization.Message.Format.Condition source);
+
+    Localization.Message.Format.Fading mergeMessageFormatFading(@MappingTarget Localization.Message.Format.Fading.FadingBuilder target, Localization.Message.Format.Fading source);
 
     Localization.Message.Format.Object mergeMessageFormatObject(@MappingTarget Localization.Message.Format.Object.ObjectBuilder target, Localization.Message.Format.Object source);
 

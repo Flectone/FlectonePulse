@@ -1288,6 +1288,9 @@ public record Permission(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/condition")
                 Condition condition,
 
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/fading")
+                Fading fading,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/fcolor")
                 FColor fcolor,
 
@@ -1340,6 +1343,17 @@ public record Permission(
                     String name,
                     Permission.Type type,
                     Map<String, PermissionEntry> values
+            ) implements PermissionSetting {
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Fading(
+                    String name,
+                    Permission.Type type,
+                    PermissionEntry bypassSend,
+                    PermissionEntry bypassView
             ) implements PermissionSetting {
             }
 
