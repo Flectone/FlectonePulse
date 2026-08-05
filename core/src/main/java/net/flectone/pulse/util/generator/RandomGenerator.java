@@ -38,4 +38,44 @@ public class RandomGenerator {
         return ThreadLocalRandom.current().nextInt(bound);
     }
 
+    /**
+     * Returns a random integer across the entire int range, including negative values.
+     *
+     * @return a random integer
+     */
+    public int nextInt() {
+        return ThreadLocalRandom.current().nextInt();
+    }
+
+    /**
+     * Returns a random double between the specified start (inclusive) and end (exclusive).
+     *
+     * @param start the lower bound (inclusive)
+     * @param end the upper bound (exclusive)
+     * @return a random double in range [start, end), or 0 if start > end
+     */
+    public double nextDouble(double start, double end) {
+        if (start > end) return 0;
+        return start == end ? start : ThreadLocalRandom.current().nextDouble(start, end);
+    }
+
+    /**
+     * Returns a random double between 0.0 (inclusive) and the specified bound (exclusive).
+     *
+     * @param bound the upper bound (exclusive)
+     * @return a random double in range [0, bound)
+     */
+    public double nextDouble(double bound) {
+        return ThreadLocalRandom.current().nextDouble(bound);
+    }
+
+    /**
+     * Returns a random double between 0.0 (inclusive) and 1.0 (exclusive).
+     *
+     * @return a random double in range [0, 1)
+     */
+    public double nextDouble() {
+        return ThreadLocalRandom.current().nextDouble();
+    }
+
 }
