@@ -19,9 +19,9 @@ public class BukkitLibraryResolver extends LibraryResolver {
     @Override
     public List<String> getPacketEventsArtifactIds() {
         return List.of(
-                "packetevents-spigot",
-                "packetevents-api",
-                "packetevents-netty-common"
+                "packeteventsmodern-spigot",
+                "packeteventsmodern-api",
+                "packeteventsmodern-netty-common"
         );
     }
 
@@ -51,7 +51,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
         getPacketEventsArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
                 .groupId("net{}flectone")
                 .artifactId(artifactId)
-                .version("2.13.0") // TODO always upload PacketEvents to net.flectone maven repository
+                .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .fallbackRepository(BuildConfig.CODEMC_REPOSITORY)
                 .relocate(Relocation.builder()

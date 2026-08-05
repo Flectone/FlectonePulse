@@ -43,11 +43,11 @@ public class FabricLibraryResolver extends LibraryResolver {
     @Override
     public List<String> getPacketEventsArtifactIds() {
         return List.of(
-                "packetevents-fabric",
-                "packetevents-fabric-common",
-                "packetevents-fabric-official",
-                "packetevents-api",
-                "packetevents-netty-common"
+                "packeteventsmodern-fabric",
+                "packeteventsmodern-fabric-common",
+                "packeteventsmodern-fabric-official",
+                "packeteventsmodern-api",
+                "packeteventsmodern-netty-common"
         );
     }
 
@@ -75,9 +75,9 @@ public class FabricLibraryResolver extends LibraryResolver {
         ));
 
         getPacketEventsArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
-                .groupId("com{}github{}retrooper")
+                .groupId("net{}flectone")
                 .artifactId(artifactId)
-                .version("2.13.0") // TODO always upload PacketEvents to net.flectone maven repository
+                .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
                 .repository(BuildConfig.CODEMC_REPOSITORY)
                 .fallbackRepository(BuildConfig.CODEMC_REPOSITORY)
                 .relocate(Relocation.builder()

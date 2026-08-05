@@ -11,6 +11,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.util.List;
+
 @Singleton
 public class NeoForgeLibraryResolver extends LibraryResolver {
 
@@ -39,6 +41,15 @@ public class NeoForgeLibraryResolver extends LibraryResolver {
     }
 
     @Override
+    public List<String> getPacketEventsArtifactIds() {
+        return List.of(
+                "packeteventsmodern-neoforge",
+                "packeteventsmodern-api",
+                "packeteventsmodern-netty-common"
+        );
+    }
+
+    @Override
     public void addLibraries() {
         super.addLibraries();
 
@@ -48,6 +59,35 @@ public class NeoForgeLibraryResolver extends LibraryResolver {
                 .version(BuildConfig.ADVENTURE_API)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN)
+                        .build()
+                )
+                .relocate(Relocation.builder()
+                        .pattern("com{}google{}gson")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".gson")
+                        .build()
+                )
+                .build()
+        ));
+
+        getPacketEventsArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
+                .groupId("net{}flectone")
+                .artifactId(artifactId)
+                .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
+                .repository(BuildConfig.CODEMC_REPOSITORY)
+                .fallbackRepository(BuildConfig.CODEMC_REPOSITORY)
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}retrooper")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN)
+                        .build()
+                )
+                .relocate(Relocation.builder()
+                        .pattern("io{}github{}retrooper{}packetevents")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".packetevents.impl")
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern(BuildConfig.RELOCATED_PATTERN)

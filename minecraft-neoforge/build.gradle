@@ -23,9 +23,11 @@ dependencies {
     compileOnly project(":minecraft-neoforge:loader")
     compileOnly "org.incendo:cloud-neoforge:${cloud_neoforge_version}"
 
+    compileOnlyApi "net.flectone:packeteventsmodern-netty-common:$packetevents_spigot_version"
+    compileOnlyApi "net.flectone:packeteventsmodern-neoforge:$packetevents_spigot_version"
+
     shadow project(":core")
     shadow project(":minecraft-common")
-    shadow files("libs/packetevents-neoforge-2.13.0.jar")
 }
 
 shadowJar {
