@@ -709,6 +709,8 @@ spy:
     - "send"
     - "m"
     - "anon"
+    - "r"
+    - "reply"
     action:
     - "anvil"
     - "book"

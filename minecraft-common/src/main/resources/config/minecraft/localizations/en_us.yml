@@ -378,6 +378,8 @@ command:
       message: "private message"
       send: "private message"
       m: "private message"
+      r: "private message"
+      reply: "private message"
       anon: "anonymous message"
       anvil: "item name"
       book: "book text"
