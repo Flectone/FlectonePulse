@@ -47,7 +47,7 @@ FlectonePulse was the subject of a **university thesis** and received top marks 
 |--------------------------------------------------------------------------------|:-------------:|:-----------------------------:|
 | Fully async – no main thread impact                                            |       ✅       |               ❌               |
 | Supports 1.8.8 up to the latest Minecraft version                              |       ✅       |      ⚠️ (often limited)       |
-| Works on Bukkit, Spigot, Paper, Purpur, Folia, and Fabric                      |       ✅       |   ❌ (usually one platform)    |
+| Works on Bukkit, Spigot, Paper, Purpur, Folia, Fabric and NeoForge             |       ✅       |   ❌ (usually one platform)    |
 | Built‑in proxy support (BungeeCord, Velocity)                                  |       ✅       | ❌ (requires separate plugin)  |
 | Cross‑server message synchronization (via proxy or Redis)                      |       ✅       |               ❌               |
 | [Hytale support](https://github.com/Flectone/FlectonePulse/tree/master/hytale) |       ✅       |               ❌               |
