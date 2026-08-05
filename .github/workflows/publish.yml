@@ -5,18 +5,25 @@ on:
     branches:
       - master
 
-jobs:
-  build-and-publish:
-    runs-on: ubuntu-latest
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Setup JDK 21
+      - name: Setup JDK 25
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '25'
 
       - name: Setup Gradle
@@ -25,24 +32,57 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      - name: Build Bukkit version
-        run: ./gradlew clean :minecraft-bukkit:buildFinalJar --no-daemon
+      - name: Build minecraft-bukkit
+        run: ./gradlew :minecraft-bukkit:buildFinalJar
 
-      - name: Build Fabric version
-        run: ./gradlew :minecraft-fabric:buildFinalJar --no-daemon
+      - name: Build minecraft-fabric
+        run: ./gradlew :minecraft-fabric:buildFinalJar
 
-      - name: Build NeoForge version
-        run: ./gradlew :minecraft-neoforge:buildFinalJar --no-daemon
+      - name: Build minecraft-neoforge
+        run: ./gradlew :minecraft-neoforge:buildFinalJar
 
-      - name: Build Hytale version
-        run: ./gradlew :hytale:buildFinalJar -PadventureVersion=5.2.0 --no-daemon
+      - name: Build hytale
+        run: ./gradlew :hytale:buildFinalJar -PadventureVersion=5.2.0
 
-      - name: Publish artifact to GitHub
+      - name: Upload artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: FlectonePulse
           path: build/libs
           if-no-files-found: warn
+          retention-days: 14
+
+  publish-maven:
+    name: Publish to Maven Central
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is_release: ${{ steps.version.outputs.is_release }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Setup JDK 25
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
+
+      - name: Resolve project version
+        id: version
+        run: |
+          VERSION=$(grep '^project_version' gradle.properties | cut -d= -f2 | tr -d ' ')
+          echo "Resolved version: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" == *SNAPSHOT* ]]; then
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Publish to Maven Central
         run: ./gradlew publishToMavenCentral --no-daemon
@@ -52,3 +92,23 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_IN_MEMORY_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_IN_MEMORY_KEY_PASSWORD }}
+
+  release:
+    name: Create GitHub Release
+    needs: [build, publish-maven]
+    if: needs.publish-maven.outputs.is_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all built jars
+        uses: actions/download-artifact@v5
+        with:
+          name: jars
+          path: build/libs
+
+      - name: Create release and attach jars
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.publish-maven.outputs.version }}
+          name: v${{ needs.publish-maven.outputs.version }}
+          files: build/libs/**/*.jar
+          generate_release_notes: true
