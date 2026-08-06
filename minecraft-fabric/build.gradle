@@ -20,6 +20,19 @@ dependencies {
 	compileOnlyApi "com.github.retrooper:packetevents-fabric-official:$packetevents_spigot_version"
 	compileOnlyApi "org.incendo:cloud-fabric:${cloud_fabric_version}"
 
+	// Bundle adventure so the mod is standalone on Fabric. The root build.gradle
+	// declares adventure as compileOnlyApi, which shadow's `include(dependency("net.kyori:.*"))`
+	// cannot resolve against the runtime classpath - published fabric jars ended up
+	// with zero net/kyori classes while core bytecode still references the unrelocated
+	// package, causing IncompatibleClassChangeError/NoSuchMethodError at runtime when
+	// another mod (e.g. SkinsRestorer) ships a different adventure version.
+	implementation "net.kyori:adventure-api:${adventure_api}"
+	implementation "net.kyori:adventure-text-minimessage:${adventure_api}"
+	implementation "net.kyori:adventure-text-serializer-ansi:${adventure_api}"
+	implementation "net.kyori:adventure-text-serializer-plain:${adventure_api}"
+	implementation "net.kyori:adventure-text-serializer-legacy:${adventure_api}"
+	implementation "net.kyori:adventure-text-serializer-gson:${adventure_api}"
+
 	// integrations
 	compileOnly "eu.pb4:placeholder-api:$text_placeholder_api_version"
 	compileOnly "maven.modrinth:vanish:$vanish_version"
@@ -38,6 +51,7 @@ shadowJar {
 		include(dependency("com.alessiodp.libby:.*"))
 		include(dependency("org.xerial:.*"))
 		include(dependency("net.kyori:.*"))
+		include(dependency("com.google.code.gson:.*"))
 		include(dependency("org.incendo:.*"))
 		include(dependency("net.flectone:.*"))
 		include(project(":core"))
