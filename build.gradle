@@ -80,9 +80,7 @@ subprojects {
     dependencies {
         api "org.jspecify:jspecify:$jspecify_version"
 
-        compileOnlyApi "org.mapstruct:mapstruct:$mapstruct_version"
         compileOnlyApi "org.projectlombok:lombok:$lombok_version"
-        annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
         annotationProcessor "org.projectlombok:lombok:$lombok_version"
     }
 
