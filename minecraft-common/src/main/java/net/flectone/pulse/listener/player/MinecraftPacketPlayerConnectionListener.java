@@ -95,16 +95,16 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
                 UUID userUUID = user.getUUID();
                 if (userUUID == null) return;
 
-                Pair<Component, Boolean> triplet = optionalPair.get();
+                Pair<Component, Boolean> pair = optionalPair.get();
 
                 // skip minecraft warning
-                if (triplet.getLeft() instanceof TranslatableComponent translatableComponent && translatableComponent.key().equals("multiplayer.message_not_delivered")) {
+                if (pair.getLeft() instanceof TranslatableComponent translatableComponent && translatableComponent.key().equals("multiplayer.message_not_delivered")) {
                     event.setCancelled(true);
                     return;
                 }
 
                 FPlayer fPlayer = fPlayerService.getFPlayer(userUUID);
-                MessageReceiveEvent messageReceiveEvent = eventDispatcher.dispatch(new MessageReceiveEvent(fPlayer, triplet.getLeft(), triplet.getRight()));
+                MessageReceiveEvent messageReceiveEvent = eventDispatcher.dispatch(new MessageReceiveEvent(fPlayer, pair.getLeft(), pair.getRight()));
                 if (messageReceiveEvent.cancelled()) {
                     event.setCancelled(true);
                 }

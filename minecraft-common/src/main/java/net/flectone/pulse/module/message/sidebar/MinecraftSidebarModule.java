@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Singleton
-public class MinecraftSidebarModule extends SidebarModule {
+public class MinecraftSidebarModule extends SidebarModuleImpl {
 
     private final List<UUID> playerSidebars = new ObjectArrayList<>();
     private final Map<UUID, List<String>> playerSidebarContent = new Object2ObjectOpenHashMap<>();

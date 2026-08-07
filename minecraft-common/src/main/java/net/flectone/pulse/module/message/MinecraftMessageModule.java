@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.ModuleSimple;
@@ -8,8 +7,12 @@ import net.flectone.pulse.module.message.serverlink.MinecraftServerlinkModule;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Singleton
-public class MinecraftMessageModule extends MessageModule {
+public class MinecraftMessageModule extends MessageModuleImpl {
 
     @Inject
     public MinecraftMessageModule(FileFacade fileFacade) {
@@ -17,8 +20,10 @@ public class MinecraftMessageModule extends MessageModule {
     }
 
     @Override
-    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        return super.childrenBuilder().add(MinecraftServerlinkModule.class);
+    public Set<@NonNull Class<? extends ModuleSimple>> children() {
+        Set<Class<? extends ModuleSimple>> children = new LinkedHashSet<>(super.children());
+        children.add(MinecraftServerlinkModule.class);
+        return Collections.unmodifiableSet(children);
     }
 
 }

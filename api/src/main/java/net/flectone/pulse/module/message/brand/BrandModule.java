@@ -1,0 +1,35 @@
+package net.flectone.pulse.module.message.brand;
+
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.ModuleListLocalization;
+import net.flectone.pulse.util.constant.ModuleName;
+
+/**
+ * Replaces the server brand shown in the client's debug screen.
+ * @author TheFaser
+ */
+public interface BrandModule extends ModuleListLocalization {
+
+    @Override
+    ModuleName name();
+
+    @Override
+    Message.Brand config();
+
+    @Override
+    Permission.Message.Brand permission();
+
+    @Override
+    Localization.Message.Brand localization(FPlayer fPlayer);
+
+    /**
+     * Sends the current brand to a player.
+     *
+     * @param fPlayer the reader
+     */
+    void send(FPlayer fPlayer);
+
+}

@@ -5,15 +5,13 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.platform.proxy.NeoForgeProxy;
+import net.flectone.pulse.platform.regitry.ProxyRegistryImpl;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
-/**
- * NeoForge-specific proxy registry that handles BungeeCord/Velocity proxy integration.
- */
 @Singleton
-public class NeoForgeProxyRegistry extends ProxyRegistry {
+public class NeoForgeProxyRegistry extends ProxyRegistryImpl {
 
     private final FileFacade fileFacade;
     private final Injector injector;

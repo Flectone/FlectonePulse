@@ -24,7 +24,7 @@ import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class MinecraftChatModule extends ChatModule {
+public class MinecraftChatModule extends ChatModuleImpl {
 
     private final ListenerRegistry listenerRegistry;
     private final PlatformServerAdapter platformServerAdapter;

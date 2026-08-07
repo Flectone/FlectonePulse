@@ -13,12 +13,6 @@ import org.incendo.cloud.parser.standard.StringParser;
 
 public interface BrigadierCommandRegistry extends CommandRegistry {
 
-    /**
-     * Configures Brigadier mappings for custom argument parsers.
-     * This method sets up mappings between FlectonePulse parsers and Brigadier argument types.
-     *
-     * @param brigadierManager the CloudBrigadierManager to configure
-     */
     default void setupBrigadierManager(CloudBrigadierManager<FPlayer, ?> brigadierManager) {
         brigadierManager.setNativeSuggestions(new TypeToken<StringParser<FPlayer>>() {}, true);
 

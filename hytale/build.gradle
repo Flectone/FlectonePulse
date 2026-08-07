@@ -1,15 +1,15 @@
 dependencies {
-    implementation project(":core")
+    implementation project(":common")
 
-    compileOnlyApi project(":hytale:loader")
+    compileOnly project(":hytale:loader")
+    compileOnly project(":api")
 
-    compileOnlyApi "net.flectone:libby-core:$libby_version"
-    compileOnlyApi "org.incendo:cloud-core:$cloud_core_version"
-    compileOnlyApi "eu.mikart.adventure:adventure-platform-hytale:$adventure_platform_hytale_version"
-    compileOnlyApi "curse.maven:hyui-1431415:$hyui_version"
+    compileOnly libraries.platform
+    compileOnly libraries.adventure
 
+    compileOnly "eu.mikart.adventure:adventure-platform-hytale:$adventure_platform_hytale_version"
+    compileOnly "curse.maven:hyui-1431415:$hyui_version"
     compileOnly "com.hypixel.hytale:Server:$hytale_server_version"
-    compileOnly "org.apache.logging.log4j:log4j-core:$apache_logging_log4j_version"
     compileOnly "at.helpch:placeholderapi-hytale:$placeholderapi_hytale_version"
 }
 

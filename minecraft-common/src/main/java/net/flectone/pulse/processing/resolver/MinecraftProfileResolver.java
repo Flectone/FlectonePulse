@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftProfileResolver extends ProfileResolver {
+public class MinecraftProfileResolver extends ProfileResolverImpl {
 
     private static final String MOJANG_API_WITH_NAME = "https://api.mojang.com/users/profiles/minecraft/";
     private static final String MOJANG_API_WITH_UUID = "https://sessionserver.mojang.com/session/minecraft/profile/";

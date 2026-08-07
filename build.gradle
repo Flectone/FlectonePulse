@@ -2,10 +2,10 @@ plugins {
     id "java"
     id "java-library"
     id "com.gradleup.shadow" version "9.6.1"
-    id "com.github.gmazzo.buildconfig" version "6.0.10"
     id "xyz.wagyourtail.jvmdowngrader" version "1.3.6"
-    id "com.vanniktech.maven.publish" version "0.37.0"
     id "io.freefair.lombok" version "9.5.0"
+    id "com.github.gmazzo.buildconfig" version "6.0.10" apply false
+    id "com.vanniktech.maven.publish" version "0.37.0" apply false
 }
 
 group = maven_group
@@ -18,16 +18,20 @@ repositories {
 subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
-    apply plugin: "com.github.gmazzo.buildconfig"
     apply plugin: "com.gradleup.shadow"
     apply plugin: "xyz.wagyourtail.jvmdowngrader"
-    apply plugin: "com.vanniktech.maven.publish"
     apply plugin: "io.freefair.lombok"
+    apply from: "$rootDir/gradle/libraries.gradle"
 
     java {
         sourceCompatibility = java_version
         targetCompatibility = java_version
-        withSourcesJar()
+    }
+
+    configurations.configureEach {
+        resolutionStrategy {
+            force "com.google.code.gson:gson:$gson_version"
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {
@@ -80,26 +84,6 @@ subprojects {
         compileOnlyApi "org.projectlombok:lombok:$lombok_version"
         annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
         annotationProcessor "org.projectlombok:lombok:$lombok_version"
-
-        compileOnlyApi "com.google.inject:guice:$guice_version"
-        compileOnlyApi "tools.jackson.dataformat:jackson-dataformat-yaml:$jackson_dataformat_version"
-        compileOnlyApi "org.apache.commons:commons-text:$apache_commons_text_version"
-        compileOnlyApi "it.unimi.dsi:fastutil:$fastutil_version"
-
-        def adventureVersion = project.hasProperty("adventureVersion") ? project.property("adventureVersion") : "$adventure_api"
-        compileOnlyApi "net.kyori:adventure-api:${adventureVersion}"
-        compileOnlyApi "net.kyori:adventure-text-minimessage:${adventureVersion}"
-        compileOnlyApi "net.kyori:adventure-text-serializer-legacy:${adventureVersion}"
-        compileOnlyApi "net.kyori:adventure-text-serializer-gson:${adventureVersion}"
-        compileOnlyApi "net.kyori:adventure-text-serializer-plain:${adventureVersion}"
-        compileOnlyApi "net.kyori:adventure-text-serializer-ansi:${adventureVersion}"
-    }
-
-    buildConfig {
-        className("BuildConfig")
-        packageName(maven_group)
-        rootProject.ext.properties.findAll { key, value -> !key.contains(".") }
-                .each { key, value -> buildConfigField(String, key.toString().toUpperCase(), value) }
     }
 
     downgradeJar {
@@ -128,7 +112,7 @@ subprojects {
         relocate("org.incendo", "${relocated_pattern}.cloud")
 
         if (project.name != "minecraft-paper") {
-            relocate("net.kyori.adventure", "${relocated_pattern}.adventure")
+            relocate("net.kyori", "${relocated_pattern}")
             relocate("com.google.gson", "${relocated_pattern}.gson")
         }
 
@@ -142,19 +126,32 @@ subprojects {
         }
 
         outputs.cacheIf { true }
-        minimize()
+    }
+
+}
+
+configure(project(":api")) {
+    apply plugin: "com.github.gmazzo.buildconfig"
+    apply plugin: "com.vanniktech.maven.publish"
+
+    java {
+        withSourcesJar()
+    }
+
+    buildConfig {
+        className("BuildConfig")
+        packageName(maven_group)
+        rootProject.ext.properties.findAll { key, value -> !key.contains(".") }
+                .each { key, value -> buildConfigField(String, key.toString().toUpperCase(), value) }
     }
 
     mavenPublishing {
         publishToMavenCentral(true)
 
-        def artifactId = project.parent.name == rootProject.name
-                ? "${project.name}"
-                : "${project.parent.name}-${project.name}"
-        coordinates(maven_group, artifactId, project_version)
+        coordinates(maven_group, project.name, project_version)
 
         pom {
-            name = "FlectonePulse ${artifactId.capitalize()}"
+            name = "FlectonePulse API"
             description = "Every Message Under Your Control!"
             url = "https://github.com/Flectone/FlectonePulse"
 

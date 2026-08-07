@@ -12,7 +12,7 @@ public class HytaleFlectonePulseLoader extends JavaPlugin implements Supplier<Ja
     private static final String BOOTSTRAP_CLASS = "net.flectone.pulse.HytaleFlectonePulse";
 
     private JarInJarClassLoader loader;
-    private LoaderBoostrap loaderBoostrap;
+    private LoaderBootstrap loaderBootstrap;
 
     public HytaleFlectonePulseLoader(@NonNull JavaPluginInit init) {
         super(init);
@@ -21,18 +21,18 @@ public class HytaleFlectonePulseLoader extends JavaPlugin implements Supplier<Ja
     @Override
     protected void setup() {
         this.loader = new JarInJarClassLoader(getClass().getClassLoader(), JAR_NAME);
-        this.loaderBoostrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
-        this.loaderBoostrap.onLoad();
+        this.loaderBootstrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
+        this.loaderBootstrap.onLoad();
     }
 
     @Override
     protected void start() {
-        this.loaderBoostrap.onEnable();
+        this.loaderBootstrap.onEnable();
     }
 
     @Override
     protected void shutdown() {
-        this.loaderBoostrap.onDisable();
+        this.loaderBootstrap.onDisable();
     }
 
     @Override

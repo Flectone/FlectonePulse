@@ -7,10 +7,14 @@ neoForge {
 }
 
 configurations.configureEach {
+    exclude group: "com.github.retrooper", module: "adventure-text-serializer-gson"
+    exclude group: "com.github.retrooper", module: "adventure-text-serializer-legacy"
     resolutionStrategy {
         force "org.jspecify:jspecify:1.0.1"
         force "it.unimi.dsi:fastutil:8.5.19"
         force "commons-io:commons-io:2.22.0"
+        force "org.apache.logging.log4j:log4j-core:2.26.1"
+        force "org.apache.logging.log4j:log4j-api:2.22.1"
     }
 }
 
@@ -20,20 +24,25 @@ configurations {
 }
 
 dependencies {
+    shadow project(":common")
+    shadow project(":minecraft-common")
+
+    compileOnly project(":api")
     compileOnly project(":minecraft-neoforge:loader")
+
+    compileOnly libraries.platform
+    compileOnly libraries.adventure
+
     compileOnly "org.incendo:cloud-neoforge:${cloud_neoforge_version}"
 
-    compileOnlyApi "net.flectone:packeteventsmodern-netty-common:$packetevents_spigot_version"
-    compileOnlyApi "net.flectone:packeteventsmodern-neoforge:$packetevents_spigot_version"
-
-    shadow project(":core")
-    shadow project(":minecraft-common")
+    compileOnly "net.flectone:packeteventsmodern-api:$packetevents_spigot_version"
+    compileOnly "net.flectone:packeteventsmodern-netty-common:$packetevents_spigot_version"
+    compileOnly "net.flectone:packeteventsmodern-neoforge:$packetevents_spigot_version"
 }
 
 shadowJar {
     archiveFileName = "flectonepulse-neoforge.jarinjar"
     configurations = [project.configurations.shadow]
-    minimize()
 }
 
 tasks.named("buildFinalJar", Jar) {

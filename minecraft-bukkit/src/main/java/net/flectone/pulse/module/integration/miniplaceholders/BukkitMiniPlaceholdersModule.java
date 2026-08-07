@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.integration.miniplaceholders;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,10 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -44,8 +47,10 @@ public class BukkitMiniPlaceholdersModule implements ModuleSimple {
     }
 
     @Override
-    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
-        return ModuleSimple.super.permissionBuilder().add(permission().use());
+    public Set<PermissionSetting> permissions() {
+        Set<PermissionSetting> permissions = new LinkedHashSet<>(ModuleSimple.super.permissions());
+        permissions.add(permission().use());
+        return Collections.unmodifiableSet(permissions);
     }
 
     @Override

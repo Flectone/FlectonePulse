@@ -11,7 +11,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
-public class MinecraftBubbleModule extends BubbleModule {
+public class MinecraftBubbleModule extends BubbleModuleImpl {
 
     private final ListenerRegistry listenerRegistry;
 

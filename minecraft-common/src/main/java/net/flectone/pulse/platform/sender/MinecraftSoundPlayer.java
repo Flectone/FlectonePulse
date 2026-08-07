@@ -15,7 +15,7 @@ import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import org.apache.commons.lang3.tuple.Pair;
+import net.flectone.pulse.model.util.Pair;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

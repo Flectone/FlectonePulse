@@ -13,10 +13,6 @@ import net.minecraft.server.level.ServerPlayer;
 import org.incendo.cloud.SenderMapper;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Mapper that converts between NeoForge CommandSourceStack and FPlayer entities.
- * Used by the Cloud command framework to map command senders to FPlayer objects.
- */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NeoForgeFPlayerMapper implements SenderMapper<CommandSourceStack, FPlayer> {

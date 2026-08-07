@@ -22,7 +22,7 @@ public class NeoForgeFlectonePulseLoader implements Supplier<NeoForgeFlectonePul
     private final IEventBus eventBus;
 
     @Getter
-    private static LoaderBoostrap loaderBootstrap;
+    private static LoaderBootstrap loaderBootstrap;
 
     private JarInJarClassLoader loader;
 

@@ -14,7 +14,7 @@ import org.bukkit.entity.Entity;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-public class BukkitTaskScheduler extends TaskScheduler {
+public class BukkitTaskScheduler extends TaskSchedulerImpl {
 
     private final com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler taskScheduler;
     private final Provider<FPlayerService> fPlayerServiceProvider;

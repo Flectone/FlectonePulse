@@ -21,7 +21,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class HytaleChatModule extends ChatModule {
+public class HytaleChatModule extends ChatModuleImpl {
 
     private final ListenerRegistry listenerRegistry;
 

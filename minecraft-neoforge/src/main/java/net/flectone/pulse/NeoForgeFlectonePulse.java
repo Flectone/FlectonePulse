@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Supplier;
+import net.flectone.pulse.exception.InjectorNotInitializedException;
 
 @Getter
 @Singleton
@@ -63,9 +64,17 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
 
         // set up library resolver for dependency loading
         libraryResolver = new NeoForgeLibraryResolver(logger);
-        libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
-        libraryResolver.loadLibraries();
+
+        try {
+            libraryResolver.loadLibraries();
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Failed to download library")) {
+                logger.error("\n\n====================\n A problem occurred while downloading the libraries, perhaps you do not have access to repository. \n Try downloading the libraries manually from https://flectone.net/files/r/FlectonePulse-libraries.zip and extract them into FlectonePulse folder \n====================\n");
+            }
+
+            throw e;
+        }
 
         // load PacketEvents
         packetEventsAdapter = new NeoForgePacketEventsAdapter();
@@ -94,7 +103,7 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
         // update tick
         NeoForge.EVENT_BUS.addListener(ServerTickEvent.Pre.class, _ -> taskScheduler.onTick());
 
-        injector.getInstance(FlectonePulseAPI.class).onEnable();
+        injector.getInstance(FlectonePulseAPIImpl.class).onEnable();
     }
 
     private void removeDefaultFabricCommands() {
@@ -114,19 +123,33 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
             return;
         }
 
-        get(FlectonePulseAPI.class).onDisable();
+        get(FlectonePulseAPIImpl.class).onDisable();
     }
 
     @Override
     public void reload() throws ReloadException {
         if (!isReady()) return;
 
-        get(FlectonePulseAPI.class).reload();
+        get(FlectonePulseAPIImpl.class).reload();
     }
 
     @Override
     public @NonNull NeoForgeFlectonePulseLoader getLoader() {
         return loader.get();
+    }
+
+    @Override
+    public <T> T get(Class<T> type) {
+        if (!isReady()) {
+            throw new InjectorNotInitializedException();
+        }
+
+        return injector.getInstance(type);
+    }
+
+    @Override
+    public boolean isReady() {
+        return injector != null;
     }
 
     @Override

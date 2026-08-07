@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(":loader")
+    implementation project(":api")
 
     compileOnly "com.hypixel.hytale:Server:$hytale_server_version"
 }

@@ -1,0 +1,24 @@
+dependencies {
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson_annotations_version"
+    implementation "org.incendo:cloud-core:$cloud_core_version"
+    implementation "net.flectone:libby-core:$libby_version"
+
+    def adventureVersion = project.hasProperty("adventureVersion") ? project.property("adventureVersion") : "$adventure_api"
+    implementation "net.kyori:adventure-api:${adventureVersion}"
+    implementation "net.kyori:adventure-text-minimessage:${adventureVersion}"
+
+    // required by the MapStruct-generated mappers (componentModel = JAKARTA)
+    compileOnly "jakarta.inject:jakarta.inject-api:$jakarta_inject_version"
+
+    // required by the Lombok @Jacksonized
+    compileOnly "tools.jackson.dataformat:jackson-dataformat-yaml:$jackson_dataformat_version"
+}
+
+shadowJar {
+    minimize()
+}
+
+tasks.named("buildFinalJar", Jar) {
+    from(zipTree(tasks.shadeDowngradedApi.archiveFile))
+    dependsOn tasks.shadeDowngradedApi
+}

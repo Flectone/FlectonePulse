@@ -14,7 +14,7 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class MinecraftRightClickModule extends RightclickModule {
+public class MinecraftRightClickModule extends RightclickModuleImpl {
 
     private final ListenerRegistry listenerRegistry;
 

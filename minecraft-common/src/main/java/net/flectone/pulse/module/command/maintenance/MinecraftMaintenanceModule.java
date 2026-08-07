@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerServerData;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -38,7 +39,7 @@ import net.kyori.adventure.text.Component;
 import java.nio.file.Path;
 
 @Singleton
-public class MinecraftMaintenanceModule extends MaintenanceModule {
+public class MinecraftMaintenanceModule extends MaintenanceModuleImpl {
 
     private final FPlayerService fPlayerService;
     private final ModuleController moduleController;
@@ -67,10 +68,11 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       MinecraftServerStatusFormatter serverStatusFormatter,
                                       ProxyRegistry proxyRegistry,
                                       SocialService socialService,
-                                      FLogger fLogger) {
+                                      FLogger fLogger,
+                                      Gson gson) {
         super(fileFacade, permissionChecker, listenerRegistry, projectPath, iconPath, platformServerAdapter, platformPlayerAdapter,
                 fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconConverter,
-                commandParserProvider, taskScheduler, moderationService, proxySender, moderationMessageFormatter, proxyRegistry, socialService, fLogger);
+                commandParserProvider, taskScheduler, moderationService, proxySender, moderationMessageFormatter, proxyRegistry, socialService, fLogger, gson);
 
         this.fPlayerService = fPlayerService;
         this.moduleController = moduleController;

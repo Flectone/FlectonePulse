@@ -1,0 +1,135 @@
+package net.flectone.pulse.module.message.update;
+
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.message.update.listener.PulseUpdateListener;
+import net.flectone.pulse.module.message.update.model.UpdateMessageContext;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.comparator.VersionComparator;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class UpdateModuleImpl implements UpdateModule {
+
+    private final FileFacade fileFacade;
+    private final MessageDispatcher messageDispatcher;
+    private final VersionComparator versionComparator;
+    private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
+    private final ModuleController moduleController;
+    private final Gson gson;
+    private final HttpClient httpClient;
+    private final SocialService socialService;
+
+    private String latestVersion;
+
+    @Override
+    public void onEnable() {
+        listenerRegistry.register(PulseUpdateListener.class);
+
+        checkAndUpdateLatestVersion();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_UPDATE;
+    }
+
+    @Override
+    public Message.Update config() {
+        return fileFacade.message().update();
+    }
+
+    @Override
+    public Permission.Message.Update permission() {
+        return fileFacade.permission().message().update();
+    }
+
+    @Override
+    public Localization.Message.Update localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().update();
+    }
+
+    @Override
+    public void send(FPlayer fPlayer) {
+        taskScheduler.runAsync(() -> {
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
+            if (latestVersion == null) return;
+
+            String currentVersion = fileFacade.config().version();
+            if (!versionComparator.isOlderThan(currentVersion, latestVersion)) return;
+
+            messageDispatcher.dispatch(this, EventMetadata.builder()
+                    .destination(config().destination())
+                    .sound(soundOrThrow())
+                    .messageContext(fResolver -> UpdateMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(StringUtils.replaceEach(
+                                            fResolver.isUnknown() || fResolver.isConsole() ? localization(fResolver).formatConsole() : localization(fResolver).formatPlayer(),
+                                            new String[]{"<current_version>", "<latest_version>"},
+                                            new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
+                                    ))
+                                    .build()
+                            )
+                            .currentVersion(currentVersion)
+                            .latestVersion(latestVersion)
+                            .build()
+                    )
+                    .build()
+            );
+        });
+    }
+
+    private void checkAndUpdateLatestVersion() {
+        taskScheduler.runAsync(() -> {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("https://api.github.com/repos/Flectone/FlectonePulse/releases/latest"))
+                        .build();
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() != 200) return;
+
+                LatestRelease latestRelease = gson.fromJson(response.body(), LatestRelease.class);
+                latestVersion = Strings.CS.replace(latestRelease.tagName(), "v", "");
+
+                // send to console
+                send(FPlayer.UNKNOWN);
+            } catch (IOException | InterruptedException _) {
+                // ignore exception
+            }
+        });
+    }
+
+    private record LatestRelease(
+            @SerializedName("tag_name")
+            String tagName
+    ) {
+    }
+
+}

@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class HytaleProfileResolver extends ProfileResolver {
+public class HytaleProfileResolver extends ProfileResolverImpl {
 
     private static final String HYTALE_API = "https://playerdb.co/api/player/hytale/";
 

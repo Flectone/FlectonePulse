@@ -6,6 +6,7 @@ import net.flectone.pulse.module.integration.FabricIntegrationModule;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.platform.adapter.*;
 import net.flectone.pulse.platform.registry.*;
+import net.flectone.pulse.platform.regitry.ProxyRegistryImpl;
 import net.flectone.pulse.platform.sender.FabricMessageSender;
 import net.flectone.pulse.platform.sender.MinecraftMessageSender;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
@@ -43,7 +44,7 @@ public class FabricInjector extends MinecraftPlatformInjector {
 
         // registries
         bind(PermissionRegistry.class).to(FabricPermissionRegistry.class);
-        bind(ProxyRegistry.class).to(FabricProxyRegistry.class);
+        bind(ProxyRegistryImpl.class).to(FabricProxyRegistry.class);
         bind(MinecraftListenerRegistry.class).to(FabricListenerRegistry.class);
         bind(CommandRegistry.class).to(FabricCommandRegistry.class);
 

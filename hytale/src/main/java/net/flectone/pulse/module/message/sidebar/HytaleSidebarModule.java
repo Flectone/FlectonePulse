@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
-public class HytaleSidebarModule extends SidebarModule {
+public class HytaleSidebarModule extends SidebarModuleImpl {
 
     private final Map<UUID, HyUIHud> playerSidebars = new ConcurrentHashMap<>();
 

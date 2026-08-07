@@ -12,7 +12,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.event.block.SignChangeEvent;
 
 @Singleton
-public class BukkitSignModule extends SignModule {
+public class BukkitSignModule extends SignModuleImpl {
 
     private final ReflectionResolver reflectionResolver;
     private final BukkitListenerRegistry listenerRegistry;

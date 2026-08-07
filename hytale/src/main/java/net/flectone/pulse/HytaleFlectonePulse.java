@@ -19,6 +19,7 @@ import org.jspecify.annotations.NonNull;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import net.flectone.pulse.exception.InjectorNotInitializedException;
 
 @Getter
 @Singleton
@@ -47,9 +48,18 @@ public class HytaleFlectonePulse implements FlectonePulse {
 
         // set up library resolver for dependency loading
         LibraryResolver libraryResolver = new HytaleLibraryResolver(hytaleLogger, projectPath);
-        libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
-        libraryResolver.loadLibraries();
+
+        try {
+            libraryResolver.loadLibraries();
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Failed to download library")) {
+                hytaleLogger.atSevere().log("\n\n====================\n A problem occurred while downloading the libraries, perhaps you do not have access to repository. \n Try downloading the libraries manually from https://flectone.net/files/r/FlectonePulse-libraries.zip and extract them into FlectonePulse folder \n====================\n");
+            }
+
+            throw e;
+        }
+
 
         try {
             // create guice injector for dependency injection
@@ -72,14 +82,14 @@ public class HytaleFlectonePulse implements FlectonePulse {
         // update tick
         HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(taskScheduler::onTick, 50L, 50L, TimeUnit.MILLISECONDS);
 
-        get(FlectonePulseAPI.class).onEnable();
+        get(FlectonePulseAPIImpl.class).onEnable();
     }
 
     @Override
     public void onDisable() {
         if (!isReady()) return;
 
-        get(FlectonePulseAPI.class).onDisable();
+        get(FlectonePulseAPIImpl.class).onDisable();
     }
 
     @Override
@@ -92,10 +102,24 @@ public class HytaleFlectonePulse implements FlectonePulse {
     }
 
     @Override
+    public <T> T get(Class<T> type) {
+        if (!isReady()) {
+            throw new InjectorNotInitializedException();
+        }
+
+        return injector.getInstance(type);
+    }
+
+    @Override
+    public boolean isReady() {
+        return injector != null;
+    }
+
+    @Override
     public void reload() throws ReloadException {
         if (!isReady()) return;
 
-        get(FlectonePulseAPI.class).reload();
+        get(FlectonePulseAPIImpl.class).reload();
     }
 
 }

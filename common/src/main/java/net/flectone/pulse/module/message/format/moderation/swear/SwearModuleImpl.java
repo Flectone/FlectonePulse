@@ -1,0 +1,220 @@
+package net.flectone.pulse.module.message.format.moderation.swear;
+
+import java.util.LinkedHashSet;
+import java.util.Collections;
+import java.util.Set;
+import com.google.common.cache.Cache;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.message.format.moderation.swear.listener.PulseSwearListener;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Locale;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class SwearModuleImpl implements SwearModule {
+
+    private final @Named("swearMessage") Cache<String, String> messageCache;
+    private final FileFacade fileFacade;
+    private final FLogger fLogger;
+    private final ListenerRegistry listenerRegistry;
+    private final PermissionChecker permissionChecker;
+    private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
+    private final ModerationService moderationService;
+    private final SocialService socialService;
+
+    @Getter private Pattern combinedPattern;
+
+    @Override
+    public void onEnable() {
+        try {
+            combinedPattern = Pattern.compile(String.join("|", config().trigger()));
+        } catch (PatternSyntaxException e) {
+            fLogger.warning(e);
+        }
+
+        listenerRegistry.register(PulseSwearListener.class);
+    }
+
+    @Override
+    public Set<PermissionSetting> permissions() {
+        Set<PermissionSetting> permissions = new LinkedHashSet<>(SwearModule.super.permissions());
+        permissions.add(permission().see());
+        permissions.add(permission().bypass());
+        return Collections.unmodifiableSet(permissions);
+    }
+
+    @Override
+    public void onDisable() {
+        messageCache.invalidateAll();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_MODERATION_SWEAR;
+    }
+
+    @Override
+    public Message.Format.Moderation.Swear config() {
+        return fileFacade.message().format().moderation().swear();
+    }
+
+    @Override
+    public Permission.Message.Format.Moderation.Swear permission() {
+        return fileFacade.permission().message().format().moderation().swear();
+    }
+
+    @Override
+    public Localization.Message.Format.Moderation.Swear localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().moderation().swear();
+    }
+
+    @Override
+    public MessageContext format(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
+
+        String message = messageContext.message();
+        if (StringUtils.isEmpty(message)) return messageContext;
+        if (permissionChecker.check(sender, permission().bypass())) return messageContext;
+
+        String formattedMessage;
+        try {
+            formattedMessage = messageCache.get(message, () -> replace(message));
+        } catch (ExecutionException e) {
+            fLogger.warning(e);
+            formattedMessage = replace(message);
+        }
+
+        if (messageContext.isFlag(MessageFlag.VIOLATION_PROCESSING) && config().violationLimit() > 0
+                && messageContext.receiver().equals(messageContext.sender()) && !formattedMessage.trim().equals(message)) {
+            moderationService.addViolation(sender.uuid(), this, config());
+        }
+
+        return messageContext.withMessage(formattedMessage);
+    }
+
+    @Override
+    public MessageContext addTag(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
+
+        FPlayer receiver = messageContext.receiver();
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.SWEAR.getTagName(), (argumentQueue, _) -> {
+            Tag.Argument swearTag = argumentQueue.peek();
+            if (swearTag == null) return MessagePipeline.ReplacementTag.emptyTag();
+
+            String swear = swearTag.value();
+            if (swear.isBlank()) return MessagePipeline.ReplacementTag.emptyTag();
+
+            Localization.Message.Format.Moderation.Swear localization = localization(receiver);
+            String symbols = localization.symbol().repeat(swear.length());
+
+            Component component;
+            if (permissionChecker.check(receiver, permission().see())) {
+                component = messagePipeline.build(MessageContext.builder()
+                        .sender(sender)
+                        .receiver(receiver)
+                        .message(localization.formatSee())
+                        .flags(messageContext.flags())
+                        .flag(MessageFlag.PLAYER_MESSAGE, false)
+                        .tagResolvers(Placeholder.unparsed("swear", swear), Placeholder.parsed("symbols", symbols))
+                        .build()
+                );
+            } else {
+                component = messagePipeline.build(MessageContext.builder()
+                        .sender(sender)
+                        .receiver(receiver)
+                        .message(symbols)
+                        .flags(messageContext.flags())
+                        .flag(MessageFlag.PLAYER_MESSAGE, false)
+                        .build()
+                );
+            }
+
+            return Tag.selfClosingInserting(component);
+        }));
+    }
+
+    @Override
+    public boolean isRestricted(UUID uuid) {
+        return moduleController.isEnable(this) && moderationService.isViolationRestricted(uuid, this, config());
+    }
+
+    private String replace(String string) {
+        if (combinedPattern == null) return string;
+
+        StringBuilder result = new StringBuilder();
+        Matcher matcher = combinedPattern.matcher(string);
+        while (matcher.find()) {
+            String word = matcher.group(0);
+            if (isIgnored(word)) continue;
+
+            int start = matcher.start();
+            String fullWord = getFullWord(string, start);
+            if (!StringUtils.isEmpty(fullWord) && isIgnored(fullWord)) continue;
+
+            matcher.appendReplacement(result, "<swear:'" + word + "'>");
+        }
+
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
+    private boolean isIgnored(String word) {
+        if (StringUtils.isEmpty(word)) return true;
+        if (config().ignore().isEmpty()) return false;
+
+        String fullWord = word.trim().toLowerCase(Locale.ROOT);
+
+        return config().ignore().contains(fullWord);
+    }
+
+    private String getFullWord(String text, int position) {
+        if (position < 0 || position >= text.length()) return text;
+
+        int start = position;
+        while (start > 0 && Character.isLetterOrDigit(text.charAt(start - 1))) {
+            start--;
+        }
+
+        int end = position;
+        while (end < text.length() && Character.isLetterOrDigit(text.charAt(end))) {
+            end++;
+        }
+
+        return text.substring(start, end);
+    }
+}

@@ -52,9 +52,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Predicate;
 
-/**
- * Responsible for rendering bubbles above players' heads
- */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftBubbleRender implements BubbleRender {

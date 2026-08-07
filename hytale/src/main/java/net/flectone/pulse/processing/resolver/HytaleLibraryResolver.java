@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.util.logging.Level;
 
 @Singleton
-public class HytaleLibraryResolver extends LibraryResolver {
+public class HytaleLibraryResolver extends LibraryResolverImpl {
 
     public HytaleLibraryResolver(HytaleLogger hytaleLogger, Path projectPath) {
         super(new LogAdapter() {
@@ -39,10 +39,10 @@ public class HytaleLibraryResolver extends LibraryResolver {
     }
 
     @Override
-    public void addLibraries() {
-        super.addLibraries();
+    public void loadLibraries() {
+        super.loadLibraries();
 
-        getAdventureArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
+        getAdventureArtifactIds().forEach(artifactId -> loadLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId(artifactId)
                 .version(BuildConfig.NEW_ADVENTURE_API)
@@ -61,7 +61,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
                 .build()
         ));
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("eu{}mikart{}adventure")
                 .artifactId("adventure-platform-hytale")
                 .version(BuildConfig.ADVENTURE_PLATFORM_HYTALE_VERSION)
@@ -79,7 +79,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("curse{}maven")
                 .artifactId("hyui-1431415")
                 .version(BuildConfig.HYUI_VERSION)
@@ -88,7 +88,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("org{}incendo")
                 .artifactId("cloud-core")
                 .version(BuildConfig.CLOUD_CORE_VERSION)
@@ -102,7 +102,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("org{}apache{}logging{}log4j")
                 .artifactId("log4j-core")
                 .version(BuildConfig.APACHE_LOGGING_LOG4J_VERSION)
@@ -111,7 +111,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("org{}apache{}logging{}log4j")
                 .artifactId("log4j-slf4j2-impl")
                 .version(BuildConfig.APACHE_LOGGING_LOG4J_VERSION)

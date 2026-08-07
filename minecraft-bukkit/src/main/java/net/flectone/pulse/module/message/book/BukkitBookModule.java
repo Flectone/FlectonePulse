@@ -13,7 +13,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.inventory.meta.BookMeta;
 
 @Singleton
-public class BukkitBookModule extends BookModule {
+public class BukkitBookModule extends BookModuleImpl {
 
     private final ReflectionResolver reflectionResolver;
     private final ListenerRegistry listenerRegistry;

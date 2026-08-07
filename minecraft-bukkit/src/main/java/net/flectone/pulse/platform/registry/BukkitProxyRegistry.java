@@ -5,12 +5,13 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.platform.proxy.BukkitProxy;
+import net.flectone.pulse.platform.regitry.ProxyRegistryImpl;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
-public class BukkitProxyRegistry extends ProxyRegistry {
+public class BukkitProxyRegistry extends ProxyRegistryImpl {
 
     private final FileFacade fileFacade;
     private final Injector injector;

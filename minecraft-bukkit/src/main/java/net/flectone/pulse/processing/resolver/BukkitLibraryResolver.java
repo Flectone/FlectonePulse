@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.List;
 
 @Singleton
-public class BukkitLibraryResolver extends LibraryResolver {
+public class BukkitLibraryResolver extends LibraryResolverImpl {
 
     public BukkitLibraryResolver(Plugin plugin) {
         super(new JDKLogAdapter(plugin.getLogger()), plugin.getDataFolder().toPath());
@@ -26,10 +26,10 @@ public class BukkitLibraryResolver extends LibraryResolver {
     }
 
     @Override
-    public void addLibraries() {
-        super.addLibraries();
+    public void loadLibraries() {
+        super.loadLibraries();
 
-        getAdventureArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
+        getAdventureArtifactIds().forEach(artifactId -> loadLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId(artifactId)
                 .version(BuildConfig.ADVENTURE_API)
@@ -48,7 +48,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .build()
         ));
 
-        getPacketEventsArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
+        getPacketEventsArtifactIds().forEach(artifactId -> loadLibrary(Library.builder()
                 .groupId("net{}flectone")
                 .artifactId(artifactId)
                 .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
@@ -77,7 +77,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .build()
         ));
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("com{}github{}Anon8281")
                 .artifactId("UniversalScheduler")
                 .version(BuildConfig.UNIVERSALSCHEDULER_VERSION)
@@ -91,21 +91,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-        addLibrary(Library.builder()
-                .groupId("org{}incendo")
-                .artifactId("cloud-core")
-                .version(BuildConfig.CLOUD_CORE_VERSION)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("org{}incendo")
-                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".cloud")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("org{}incendo")
                 .artifactId("cloud-paper")
                 .resolveTransitiveDependencies(true)

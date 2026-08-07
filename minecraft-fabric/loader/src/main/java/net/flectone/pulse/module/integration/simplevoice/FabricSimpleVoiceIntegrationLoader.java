@@ -6,12 +6,12 @@ import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.FabricFlectonePulseLoader;
-import net.flectone.pulse.LoaderBoostrap;
+import net.flectone.pulse.LoaderBootstrap;
 import net.flectone.pulse.util.constant.HookType;
 
 public class FabricSimpleVoiceIntegrationLoader implements VoicechatPlugin {
 
-    private LoaderBoostrap loaderBoostrap;
+    private LoaderBootstrap loaderBootstrap;
 
     @Override
     public String getPluginId() {

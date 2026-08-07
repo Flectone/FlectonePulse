@@ -1,7 +1,6 @@
 dependencies {
-    implementation project(":core")
-
-    compileOnlyApi project(":minecraft-bungeecord:loader")
+    compileOnly project(":api")
+    compileOnly project(":minecraft-bungeecord:loader")
 
     compileOnly "net.md-5:bungeecord-api:$bungeecord_version"
 }

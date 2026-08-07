@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.vanilla;
 
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDeathCombatEvent;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
@@ -41,7 +42,7 @@ import java.util.OptionalInt;
 import java.util.Set;
 
 @Singleton
-public class MinecraftVanillaModule extends VanillaModule {
+public class MinecraftVanillaModule extends VanillaModuleImpl {
 
     private final MinecraftComponentExtractor extractor;
     private final ListenerRegistry listenerRegistry;
@@ -52,6 +53,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     private final MinecraftPacketSender packetSender;
     private final ModuleController moduleController;
     private final SocialService socialService;
+    private final Gson gson;
 
     @Inject
     public MinecraftVanillaModule(FileFacade fileFacade,
@@ -64,7 +66,8 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   TaskScheduler taskScheduler,
                                   MinecraftPacketSender packetSender,
                                   ModuleController moduleController,
-                                  SocialService socialService) {
+                                  SocialService socialService,
+                                  Gson gson) {
         super(fileFacade, proxyRegistry, listenerRegistry, socialService);
 
         this.extractor = extractor;
@@ -76,6 +79,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         this.packetSender = packetSender;
         this.moduleController = moduleController;
         this.socialService = socialService;
+        this.gson = gson;
     }
 
     @Override
@@ -150,8 +154,8 @@ public class MinecraftVanillaModule extends VanillaModule {
                         .build()
                 )
                 .proxy(dataOutputStream -> {
-                    dataOutputStream.writeString(parsedComponent.translationKey());
-                    dataOutputStream.writeAsJson(parsedComponent.arguments());
+                    dataOutputStream.writeUTF(parsedComponent.translationKey());
+                    dataOutputStream.writeUTF(gson.toJson(parsedComponent.arguments()));
                     dataOutputStream.writeBoolean(vanished);
                 })
                 .build()

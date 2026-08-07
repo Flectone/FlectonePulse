@@ -12,7 +12,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
-public class BukkitAnvilModule extends AnvilModule {
+public class BukkitAnvilModule extends AnvilModuleImpl {
 
     private final ReflectionResolver reflectionResolver;
     private final BukkitListenerRegistry listenerRegistry;

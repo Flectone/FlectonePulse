@@ -59,10 +59,10 @@ public class MinecraftServerStatusFormatter {
 
     @NonNull
     public JsonElement formatDescription(@Nullable Component motd) {
-        if (motd == null) return platformServerAdapter.getMOTD();
+        if (motd == null) return (JsonElement) platformServerAdapter.getMOTD();
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-            return componentSerializer.toJsonTree(motd);
+            return (JsonElement) componentSerializer.toJsonTree(motd);
         } else {
             String serializedText =  componentSerializer.toLegacy(motd);
             JsonObject jsonObject = new JsonObject();

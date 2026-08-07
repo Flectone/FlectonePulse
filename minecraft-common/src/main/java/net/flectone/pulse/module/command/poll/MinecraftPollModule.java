@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.poll;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -22,7 +23,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
-public class MinecraftPollModule extends PollModule {
+public class MinecraftPollModule extends PollModuleImpl {
 
     private final ModuleCommandController commandModuleController;
     private final MinecraftPacketProvider packetProvider;
@@ -44,8 +45,9 @@ public class MinecraftPollModule extends PollModule {
                                Provider<MinecraftDialogPollBuilder> dialogPollBuilderProvider,
                                ListenerRegistry listenerRegistry,
                                ProxyRegistry proxyRegistry,
-                               SocialService socialService) {
-        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, commandModuleController, componentSerializer, fLogger, proxyRegistry, listenerRegistry, socialService);
+                               SocialService socialService,
+                               Gson gson) {
+        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, commandModuleController, componentSerializer, fLogger, proxyRegistry, listenerRegistry, socialService, gson);
 
         this.commandModuleController = commandModuleController;
         this.packetProvider = packetProvider;

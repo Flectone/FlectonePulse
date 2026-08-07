@@ -1,0 +1,321 @@
+package net.flectone.pulse.module.command.emit;
+
+import com.google.gson.Gson;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.StringMessageContext;
+import net.flectone.pulse.model.util.Destination;
+import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.module.command.emit.listener.EmitProxyMessageListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
+import org.jspecify.annotations.NonNull;
+
+import java.util.*;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class EmitModuleImpl implements EmitModule {
+
+    private final FileFacade fileFacade;
+    private final CommandParserProvider commandParserProvider;
+    private final FPlayerService fPlayerService;
+    private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
+    private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
+    private final ProxySender proxySender;
+    private final SocialService socialService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final Gson gson;
+
+    @Override
+    public void onEnable() {
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptType = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::type);
+        String promptMessage = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
+                .permission(permission().name())
+                .required(promptPlayer, commandParserProvider.playerParser())
+                .required(promptType, commandParserProvider.messageParser(), typeWithMessageSuggestion())
+                .optional(promptMessage, commandParserProvider.messageParser()) // not used, only for better message help
+        );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(EmitProxyMessageListener.class);
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
+
+        String targetName = commandModuleController.getArgument(this, commandContext, 0);
+        String typeWithMessage = commandModuleController.getArgument(this, commandContext, 1);
+
+        Destination destination = parseDestination(typeWithMessage);
+        String message = parseMessage(destination, typeWithMessage);
+
+        Range range = targetName.equalsIgnoreCase("all")
+                ? Range.get(Range.Type.PROXY)
+                : Range.fromString(targetName).orElse(null);
+        if (range != null) {
+            messageDispatcher.dispatch(this, EventMetadata.builder()
+                    .range(range)
+                    .destination(destination)
+                    .sound(soundOrThrow())
+                    .messageContext(fResolver -> StringMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+                                    .message(localization(fResolver).format())
+                                    .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                                    .build()
+                            )
+                            .string(message)
+                            .build()
+                    )
+                    .proxy(dataOutputStream -> {
+                        // same format as 1 player
+                        dataOutputStream.writeUTF(gson.toJson(fPlayerService.getConsole())); // proxy indicator
+                        dataOutputStream.writeUTF(gson.toJson(destination));
+                        dataOutputStream.writeUTF(message);
+                    })
+                    .integration()
+                    .build()
+            );
+            return;
+        }
+
+        FPlayer fTarget = fPlayerService.getFPlayer(targetName);
+        if (!fTarget.isOnline()) {
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
+                    .build()
+            );
+
+            return;
+        }
+
+        if (!platformPlayerAdapter.isOnline(fTarget) && proxyRegistry.hasEnabledProxy()) {
+            proxySender.send(fPlayer, name(), dataOutputStream -> {
+                dataOutputStream.writeUTF(gson.toJson(fTarget));
+                dataOutputStream.writeUTF(gson.toJson(destination));
+                dataOutputStream.writeUTF(message);
+            });
+            return;
+        }
+
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .filter(fTarget)
+                .destination(destination)
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> StringMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).format())
+                                .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+                                .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, message), messagePipeline.targetTag(fResolver, fTarget))
+                                .build()
+                        )
+                        .string(message)
+                        .build()
+                )
+                .integration()
+                .build()
+        );
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.COMMAND_EMIT;
+    }
+
+    @Override
+    public Command.Emit config() {
+        return fileFacade.command().emit();
+    }
+
+    @Override
+    public Permission.Command.Emit permission() {
+        return fileFacade.permission().command().emit();
+    }
+
+    @Override
+    public Localization.Command.Emit localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().emit();
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> typeWithMessageSuggestion() {
+        return (_, input) -> {
+            String[] words = input.input().split(" ");
+            String string = words.length < 3 ? "" : words[2];
+
+            int indexStartBracket = string.indexOf("{");
+            int indexEndBracket = string.lastIndexOf("}");
+
+            if (indexStartBracket == -1 && indexEndBracket == -1) {
+                return Arrays.stream(Destination.Type.values())
+                        .map(type -> Suggestion.suggestion(type.name()))
+                        .toList();
+            }
+
+            return List.of();
+        };
+    }
+
+    private Destination parseDestination(String string) {
+        try {
+            int startIndexBracket = string.indexOf("{");
+            if (startIndexBracket == -1) {
+                String type = string.split(" ")[0];
+                return Destination.fromJson(Map.of("type", type));
+            }
+
+            int endIndexBracket = findMatchingBracket(string, startIndexBracket);
+            if (endIndexBracket == -1) {
+                String type = string.split(" ")[0];
+                return Destination.fromJson(Map.of("type", type));
+            }
+
+            String type = string.substring(0, startIndexBracket);
+            Map<String, Object> destination = new LinkedHashMap<>();
+            destination.put("type", type);
+
+            String content = string.substring(startIndexBracket + 1, endIndexBracket);
+            parseContent(content, destination);
+
+            return Destination.fromJson(destination);
+        } catch (Exception _) {
+            return Destination.EMPTY_CHAT;
+        }
+    }
+
+    private void parseContent(String content, Map<String, Object> map) {
+        List<String> pairs = splitKeyValuePairs(content);
+
+        for (String pair : pairs) {
+            String[] keyValue = pair.split("=", 2);
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+
+                if (value.startsWith("{") && value.endsWith("}")) {
+                    Map<String, Object> nestedMap = new LinkedHashMap<>();
+                    parseContent(value.substring(1, value.length() - 1), nestedMap);
+                    map.put(key, nestedMap);
+                } else if (value.startsWith("\"") && value.endsWith("\"")) {
+                    map.put(key, value.substring(1, value.length() - 1));
+                } else {
+                    map.put(key, value);
+                }
+            }
+        }
+    }
+
+    private int findMatchingBracket(String string, int startIndex) {
+        int depth = 1;
+        for (int i = startIndex + 1; i < string.length(); i++) {
+            char symbol = string.charAt(i);
+            if (symbol == '{') {
+                depth++;
+            }
+
+            if (symbol == '}') {
+                depth--;
+            }
+
+            if (depth == 0) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private List<String> splitKeyValuePairs(String content) {
+        List<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+
+        int depth = 0;
+        for (char symbol : content.toCharArray()) {
+            if (symbol == '{') {
+                depth++;
+            }
+
+            if (symbol == '}') {
+                depth--;
+            }
+
+            if (symbol == ',' && depth == 0) {
+                result.add(current.toString().trim());
+                current = new StringBuilder();
+            } else {
+                current.append(symbol);
+            }
+        }
+
+        if (!current.isEmpty()) {
+            result.add(current.toString().trim());
+        }
+
+        return result;
+    }
+
+    @Override
+    public String parseMessage(Destination destination, String string) {
+        int startIndexBracket = string.indexOf("{");
+        if (startIndexBracket == -1) {
+            String typeName = destination.type().name();
+            if (string.startsWith(typeName + " ")) {
+                return string.substring(typeName.length()).trim();
+            }
+
+            return string;
+        }
+
+        int endIndexBracket = findMatchingBracket(string, startIndexBracket);
+        if (endIndexBracket == -1 || endIndexBracket == string.length() - 1) {
+            return "";
+        }
+
+        return string.substring(endIndexBracket + 1).trim();
+    }
+}

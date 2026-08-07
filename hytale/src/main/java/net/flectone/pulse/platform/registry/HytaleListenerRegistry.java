@@ -19,6 +19,7 @@ import net.flectone.pulse.listener.module.HytalePulseModuleEnableListener;
 import net.flectone.pulse.listener.player.HytalePlayerConnectionListener;
 import net.flectone.pulse.listener.player.HytalePlayerLoginListener;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.platform.regitry.ListenerRegistryImpl;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -34,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 @Singleton
-public class HytaleListenerRegistry extends ListenerRegistry {
+public class HytaleListenerRegistry extends ListenerRegistryImpl {
 
     // don't clear these listeners
     private final List<HytaleListener> listeners = new ObjectArrayList<>();

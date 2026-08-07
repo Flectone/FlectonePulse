@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.status.players;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,10 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -43,8 +45,10 @@ public class MinecraftPlayersModule implements ModuleLocalization {
     }
 
     @Override
-    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
-        return ModuleLocalization.super.permissionBuilder().add(permission().bypass());
+    public Set<PermissionSetting> permissions() {
+        Set<PermissionSetting> permissions = new LinkedHashSet<>(ModuleLocalization.super.permissions());
+        permissions.add(permission().bypass());
+        return Collections.unmodifiableSet(permissions);
     }
 
     @Override

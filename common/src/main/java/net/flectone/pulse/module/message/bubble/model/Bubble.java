@@ -1,0 +1,50 @@
+package net.flectone.pulse.module.message.bubble.model;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import net.flectone.pulse.model.entity.FPlayer;
+
+import java.util.Set;
+import java.util.UUID;
+
+@Getter
+@SuperBuilder
+public class Bubble {
+
+    private final int id;
+
+    private final UUID uuid;
+
+    private final FPlayer sender;
+
+    private final String rawMessage;
+
+    private final long duration;
+
+    private final float elevation;
+
+    private final float interactionHeight;
+
+    private final boolean interactionRiding;
+
+    private final long creationTime = System.currentTimeMillis();
+
+    private final Set<FPlayer> viewers;
+
+    @Setter
+    private boolean created;
+
+    public boolean isExpired() {
+        return System.currentTimeMillis() > getExpireTime();
+    }
+
+    public long getExpireTime() {
+        return creationTime + duration;
+    }
+
+    public boolean equals(Bubble bubble) {
+        return this.id == bubble.getId();
+    }
+
+}

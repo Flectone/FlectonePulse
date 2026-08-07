@@ -21,7 +21,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class MinecraftChatSettingModule extends ChatsettingModule {
+public class MinecraftChatSettingModule extends ChatsettingModuleImpl {
 
     private final Provider<MinecraftDialogMenuBuilder> dialogMenuBuilderProvider;
     private final Provider<MinecraftInventoryMenuBuilder> inventoryMenuBuilderProvider;

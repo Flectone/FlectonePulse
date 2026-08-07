@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class MinecraftComponentSerializer extends ComponentSerializer {
+public class MinecraftComponentSerializer extends ComponentSerializerImpl {
 
     @Inject
     public MinecraftComponentSerializer() {

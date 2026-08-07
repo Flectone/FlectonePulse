@@ -8,7 +8,7 @@ import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 
 @Singleton
-public class HytaleComponentSerializer extends ComponentSerializer {
+public class HytaleComponentSerializer extends ComponentSerializerImpl {
 
     @Inject
     public HytaleComponentSerializer(Gson gson) {

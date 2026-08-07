@@ -15,7 +15,7 @@ public class FabricFlectonePulseLoader implements DedicatedServerModInitializer,
     private static final String BOOTSTRAP_CLASS = "net.flectone.pulse.FabricFlectonePulse";
 
     @Getter
-    private static LoaderBoostrap loaderBootstrap;
+    private static LoaderBootstrap loaderBootstrap;
 
     @Override
     public void onInitializeServer() {

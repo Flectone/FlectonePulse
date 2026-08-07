@@ -3,8 +3,9 @@ package net.flectone.pulse;
 import com.google.gson.Gson;
 import com.google.inject.TypeLiteral;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import java.nio.file.Path;
 import net.flectone.pulse.execution.pipeline.HytaleMessagePipeline;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.pipeline.MessagePipelineImpl;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.HytaleChatsettingModule;
 import net.flectone.pulse.module.integration.HytaleIntegrationModule;
@@ -50,8 +51,6 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
-import java.nio.file.Path;
-
 public class HytaleInjector extends PlatformInjector {
 
     private final HytaleFlectonePulse flectonePulse;
@@ -83,26 +82,20 @@ public class HytaleInjector extends PlatformInjector {
 
         // checkers and utilities
         bind(PermissionChecker.class).to(HytalePermissionChecker.class);
-        bind(MessagePipeline.class).to(HytaleMessagePipeline.class);
+        bind(MessagePipelineImpl.class).to(HytaleMessagePipeline.class);
 
         // integrations
         bind(IntegrationModule.class).to(HytaleIntegrationModule.class);
 
         // commands
         bind(ChatsettingModule.class).to(HytaleChatsettingModule.class);
-//        bind(PollModule.class).to(MinecraftPollModule.class);
 
         // messages
         bind(BubbleModule.class).to(HytaleBubbleModule.class);
         bind(ChatModule.class).to(HytaleChatModule.class);
-//        bind(ObjectModule.class).to(MinecraftObjectModule.class);
         bind(ScoreboardModule.class).to(HytaleScoreboardModule.class);
-        bind(WorldModule.class).to(HytaleWorldModule.class);
-//        bind(ObjectModule.class).to(MinecraftObjectModule.class);
-//        bind(RightclickModule.class).to(MinecraftRightClickModule.class);
         bind(SidebarModule.class).to(HytaleSidebarModule.class);
-//        bind(StatusModule.class).to(MinecraftStatusModule.class);
-//        bind(TabModule.class).to(MinecraftTabModule.class);
+        bind(WorldModule.class).to(HytaleWorldModule.class);
         bind(VanillaModule.class).to(HytaleVanillaModule.class);
 
         // renders

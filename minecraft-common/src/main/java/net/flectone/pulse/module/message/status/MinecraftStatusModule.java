@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.status;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,11 +31,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Singleton
-public class MinecraftStatusModule extends StatusModule {
+public class MinecraftStatusModule extends StatusModuleImpl {
 
     private final MinecraftMOTDModule MOTDModule;
     private final MinecraftIconModule iconModule;
@@ -82,13 +80,13 @@ public class MinecraftStatusModule extends StatusModule {
     }
 
     @Override
-    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        return super.childrenBuilder().add(
-                MinecraftMOTDModule.class,
-                MinecraftIconModule.class,
-                MinecraftPlayersModule.class,
-                MinecraftVersionModule.class
-        );
+    public Set<@NonNull Class<? extends ModuleSimple>> children() {
+        Set<Class<? extends ModuleSimple>> children = new LinkedHashSet<>(super.children());
+        children.add(MinecraftMOTDModule.class);
+        children.add(MinecraftIconModule.class);
+        children.add(MinecraftPlayersModule.class);
+        children.add(MinecraftVersionModule.class);
+        return Collections.unmodifiableSet(children);
     }
 
     @Override

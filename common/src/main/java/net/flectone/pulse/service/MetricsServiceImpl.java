@@ -1,0 +1,92 @@
+package net.flectone.pulse.service;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Config;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.dto.MetricsDTO;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.sender.MetricsSender;
+import net.flectone.pulse.util.file.FileFacade;
+
+import java.time.Instant;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class MetricsServiceImpl implements MetricsService {
+
+    private final TaskScheduler taskScheduler;
+    private final MetricsSender metricsSender;
+    private final PlatformServerAdapter platformServerAdapter;
+    private final FileFacade fileFacade;
+    private final ModuleController moduleController;
+
+    @Override
+    public void start() {
+        taskScheduler.runAsyncTimer(this::send, 20L * 60 * 60);
+    }
+
+    @Override
+    public MetricsDTO createMetrics() {
+        Config config = fileFacade.config();
+
+        return MetricsDTO.builder()
+                // we need to understand different servers, so don't use the serverUUID from FileFacade
+                // due to the user tending to copy config.yml to different servers
+                .serverUUID(platformServerAdapter.getServerUUID())
+                .serverCore(platformServerAdapter.getServerCore())
+                .serverVersion(platformServerAdapter.getServerVersionName())
+                .osName(getOsName())
+                .osArchitecture(getOsArch())
+                .osVersion(getOsVersion())
+                .javaVersion(getJavaVersion())
+                .cpuCores(Runtime.getRuntime().availableProcessors())
+                .totalRAM(Runtime.getRuntime().maxMemory())
+                .projectVersion(config.version())
+                .projectLanguage(config.language().type())
+                .onlineMode(booleanToString(platformServerAdapter.isOnlineMode()))
+                .proxyMode(getProxyMode())
+                .databaseMode(config.database().type().name())
+                .playerCount(platformServerAdapter.getOnlinePlayerCount())
+                .modules(moduleController.collectModuleStatuses())
+                .createdAt(Instant.now().toString())
+                .build();
+    }
+
+    @Override
+    public void send() {
+        metricsSender.sendMetrics(createMetrics());
+    }
+
+    private String booleanToString(boolean value) {
+        return value ? "True" : "False";
+    }
+
+    private String getProxyMode() {
+        Config.Proxy config = fileFacade.config().proxy();
+        if (config.bungeecord()) return "BungeeCord";
+        if (config.velocity()) return "Velocity";
+        if (config.redis().enable()) return "Redis";
+
+        return "None";
+    }
+
+    private String getOsName() {
+        return System.getProperty("os.name");
+    }
+
+    private String getOsArch() {
+        return System.getProperty("os.arch");
+    }
+
+    private String getOsVersion() {
+        return System.getProperty("os.version");
+    }
+
+    private String getJavaVersion() {
+        return System.getProperty("java.version");
+    }
+
+}

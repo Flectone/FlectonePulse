@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(":loader")
+    implementation project(":api")
 
     compileOnly "org.spigotmc:spigot-api:$spigot_version"
 }

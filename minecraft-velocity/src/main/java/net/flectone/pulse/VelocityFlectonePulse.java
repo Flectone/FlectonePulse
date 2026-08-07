@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class VelocityFlectonePulse implements LoaderBoostrap {
+public class VelocityFlectonePulse implements LoaderBootstrap {
 
     private static final String UNKNOWN_SERVER_NAME = "Unknown";
     private static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("flectonepulse:main");
@@ -67,11 +67,6 @@ public class VelocityFlectonePulse implements LoaderBoostrap {
         proxyServer.getEventManager().unregisterListeners(loader.get());
 
         fLogger.logDisabled();
-    }
-
-    @Override
-    public <T> T get(Class<T> type) {
-        return null;
     }
 
     @Override

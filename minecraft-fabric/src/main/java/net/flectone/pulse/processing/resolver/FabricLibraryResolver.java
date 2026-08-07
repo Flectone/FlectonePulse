@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import java.util.List;
 
 @Singleton
-public class FabricLibraryResolver extends LibraryResolver {
+public class FabricLibraryResolver extends LibraryResolverImpl {
 
     public FabricLibraryResolver(Logger logger) {
         super(new LogAdapter() {
@@ -52,10 +52,10 @@ public class FabricLibraryResolver extends LibraryResolver {
     }
 
     @Override
-    public void addLibraries() {
-        super.addLibraries();
+    public void loadLibraries() {
+        super.loadLibraries();
 
-        getAdventureArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
+        getAdventureArtifactIds().forEach(artifactId -> loadLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId(artifactId)
                 .version(BuildConfig.ADVENTURE_API)
@@ -74,7 +74,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .build()
         ));
 
-        getPacketEventsArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
+        getPacketEventsArtifactIds().forEach(artifactId -> loadLibrary(Library.builder()
                 .groupId("net{}flectone")
                 .artifactId(artifactId)
                 .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
@@ -103,7 +103,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .build()
         ));
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("org{}incendo")
                 .artifactId("cloud-core")
                 .version(BuildConfig.CLOUD_CORE_VERSION)
@@ -117,7 +117,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("org{}incendo")
                 .artifactId("cloud-brigadier")
                 .version(BuildConfig.CLOUD_PAPER_VERSION)
@@ -131,7 +131,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("org{}incendo")
                 .artifactId("cloud-minecraft-modded-common")
                 .version(BuildConfig.CLOUD_FABRIC_VERSION)
@@ -145,7 +145,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-        addLibrary(Library.builder()
+        loadLibrary(Library.builder()
                 .groupId("org{}incendo")
                 .artifactId("cloud-fabric")
                 .version(BuildConfig.CLOUD_FABRIC_VERSION)

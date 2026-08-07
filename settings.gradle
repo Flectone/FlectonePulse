@@ -9,8 +9,8 @@ pluginManagement {
     }
 }
 
-include "core"
-include "loader"
+include "api"
+include "common"
 include "hytale"
 include 'hytale:loader'
 include "minecraft-common"

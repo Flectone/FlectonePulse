@@ -40,7 +40,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 @Singleton
-public class MinecraftObjectModule extends ObjectModule {
+public class MinecraftObjectModule extends ObjectModuleImpl {
 
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;

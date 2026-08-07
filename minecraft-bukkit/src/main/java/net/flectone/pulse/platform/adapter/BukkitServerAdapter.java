@@ -47,6 +47,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import net.flectone.pulse.exception.ReflectionException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -113,7 +114,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 Field recentTpsField = minecraftServer.getClass().getSuperclass().getDeclaredField("recentTps");
                 getTPS = reflectionResolver.unreflect(lookup -> lookup.unreflectGetter(recentTpsField));
             } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e);
+                throw new ReflectionException("Cannot read the server TPS field", e);
             }
         }
 

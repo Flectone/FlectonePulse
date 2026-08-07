@@ -25,12 +25,12 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.commons.lang3.tuple.Pair;
+import net.flectone.pulse.model.util.Pair;
 
 import java.util.UUID;
 
 @Singleton
-public class MinecraftBossbarModule extends BossbarModule {
+public class MinecraftBossbarModule extends BossbarModuleImpl {
 
     private static final String RAIDERS_REMAINING_KEY = "event.minecraft.raid.raiders_remaining";
     private static final String RAIDERS_PLACEHOLDER = "<raiders>";

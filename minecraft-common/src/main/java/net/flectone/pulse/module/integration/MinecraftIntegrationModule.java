@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.integration;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
 import net.flectone.pulse.model.entity.FEntity;
@@ -16,13 +15,18 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.jspecify.annotations.NonNull;
 
-public abstract class MinecraftIntegrationModule extends IntegrationModule {
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+public abstract class MinecraftIntegrationModule extends IntegrationModuleImpl {
 
     private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
     private final ReflectionResolver reflectionResolver;
@@ -47,8 +51,8 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
+    public Set<@NonNull Class<? extends ModuleSimple>> children() {
+        Set<@NonNull Class<? extends ModuleSimple>> builder = new LinkedHashSet<>(super.children());
 
         PlatformServerAdapter platformServerAdapter = platformServerAdapterProvider.get();
         if (platformServerAdapter.hasProject("SkinsRestorer")) {
@@ -85,7 +89,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
             }
         }
 
-        return builder;
+        return Collections.unmodifiableSet(builder);
     }
 
     private boolean hasGeyser(PlatformServerAdapter platformServerAdapter) {
@@ -99,11 +103,11 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     public boolean isBedrockPlayer(FEntity fPlayer) {
         if (!moduleController.isEnable(this)) return false;
 
-        if (containsEnabledChild(MinecraftFloodgateModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_FLOODGATE)) {
             return injector.getInstance(MinecraftFloodgateModule.class).isBedrockPlayer(fPlayer);
         }
 
-        if (containsEnabledChild(MinecraftGeyserModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_GEYSER)) {
             return injector.getInstance(MinecraftGeyserModule.class).isBedrockPlayer(fPlayer);
         }
 
@@ -115,7 +119,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
 
     public String getTextureUrl(FEntity sender) {
         if (!moduleController.isEnable(this)) return null;
-        if (!containsEnabledChild(MinecraftSkinsRestorerModule.class)) return null;
+        if (!containsEnabledChild(ModuleName.INTEGRATION_SKINSRESTORER)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
         return injector.getInstance(MinecraftSkinsRestorerModule.class).getTextureUrl(fPlayer);
@@ -123,7 +127,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
 
     public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FEntity sender) {
         if (!moduleController.isEnable(this)) return null;
-        if (!containsEnabledChild(MinecraftSkinsRestorerModule.class)) return null;
+        if (!containsEnabledChild(ModuleName.INTEGRATION_SKINSRESTORER)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
         return injector.getInstance(MinecraftSkinsRestorerModule.class).getProfileProperty(fPlayer);

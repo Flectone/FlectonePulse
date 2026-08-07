@@ -10,19 +10,19 @@ public class BungeecordFlectonePulseLoader extends Plugin implements Supplier<Bu
     private static final String BOOTSTRAP_CLASS = "net.flectone.pulse.BungeecordFlectonePulse";
 
     private JarInJarClassLoader loader;
-    private LoaderBoostrap loaderBoostrap;
+    private LoaderBootstrap loaderBootstrap;
 
     @Override
     public void onEnable() {
         this.loader = new JarInJarClassLoader(getClass().getClassLoader(), JAR_NAME);
-        this.loaderBoostrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
-        this.loaderBoostrap.onLoad();
-        this.loaderBoostrap.onEnable();
+        this.loaderBootstrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
+        this.loaderBootstrap.onLoad();
+        this.loaderBootstrap.onEnable();
     }
 
     @Override
     public void onDisable() {
-        this.loaderBoostrap.onDisable();
+        this.loaderBootstrap.onDisable();
     }
 
     @Override

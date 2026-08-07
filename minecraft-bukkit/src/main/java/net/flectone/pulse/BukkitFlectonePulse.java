@@ -21,6 +21,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import net.flectone.pulse.exception.InjectorNotInitializedException;
 
 @Getter
 @Singleton
@@ -51,9 +52,18 @@ public class BukkitFlectonePulse implements FlectonePulse {
 
         // set up library resolver for dependency loading
         libraryResolver = new BukkitLibraryResolver(plugin);
-        libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
-        libraryResolver.loadLibraries();
+
+        try {
+            libraryResolver.loadLibraries();
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Failed to download library")) {
+                logger.severe("\n\n====================\n A problem occurred while downloading the libraries, perhaps you do not have access to repository. \n Try downloading the libraries manually from https://flectone.net/files/r/FlectonePulse-libraries.zip and extract them into FlectonePulse folder \n====================\n");
+            }
+
+            throw e;
+        }
+
 
         // load PacketEvents
         packetEventsAdapter = new BukkitPacketEventsAdapter(plugin);
@@ -83,7 +93,7 @@ public class BukkitFlectonePulse implements FlectonePulse {
         // update tick
         injector.getInstance(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).runTaskTimer(taskScheduler::onTick, 1L, 1L);
 
-        get(FlectonePulseAPI.class).onEnable();
+        get(FlectonePulseAPIImpl.class).onEnable();
     }
 
     @Override
@@ -93,7 +103,7 @@ public class BukkitFlectonePulse implements FlectonePulse {
             return;
         }
 
-        get(FlectonePulseAPI.class).onDisable();
+        get(FlectonePulseAPIImpl.class).onDisable();
 
         // cancel custom tasks
         injector.getInstance(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).cancelTasks(loader.get());
@@ -120,12 +130,26 @@ public class BukkitFlectonePulse implements FlectonePulse {
     public void reload() throws ReloadException {
         if (!isReady()) return;
 
-        get(FlectonePulseAPI.class).reload();
+        get(FlectonePulseAPIImpl.class).reload();
     }
 
     @Override
     public @NonNull BukkitFlectonePulseLoader getLoader() {
         return loader.get();
+    }
+
+    @Override
+    public <T> T get(Class<T> type) {
+        if (!isReady()) {
+            throw new InjectorNotInitializedException();
+        }
+
+        return injector.getInstance(type);
+    }
+
+    @Override
+    public boolean isReady() {
+        return injector != null;
     }
 
 }

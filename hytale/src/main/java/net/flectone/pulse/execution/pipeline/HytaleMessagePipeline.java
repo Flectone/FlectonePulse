@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
-public class HytaleMessagePipeline extends MessagePipeline {
+public class HytaleMessagePipeline extends MessagePipelineImpl {
 
     private static final Map<String, Locale> LOCALE_CACHE = new ConcurrentHashMap<>();
 

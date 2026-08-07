@@ -757,7 +757,7 @@ message:
       server.commands.teleport.notFurther: "<fcolor:1>Cannot teleport further in this direction!<fcolor:1>"
       server.commands.teleport.setHome: "<fcolor:1>Home has been set to your current location.<fcolor:1>"
       server.commands.teleport.worldNotLoaded: "<fcolor:1>This world is no longer loaded!<fcolor:1>"
-      server.commands.teleport.failedBecauseCancelled: "<fcolor:1>Failed to teleport because the teleport was cancelled!<fcolor:1>"
+      server.commands.teleport.failedBecausecancelled: "<fcolor:1>Failed to teleport because the teleport was cancelled!<fcolor:1>"
       server.commands.teleport.teleportedToWaypoint: "<fcolor:1>You have been teleported to <fcolor:2><argument:0><fcolor:1>.<fcolor:1>"
       server.commands.teleport.teleportedToCoordinates: "<fcolor:1>You have been teleported to (<fcolor:2><argument:0><fcolor:1>, <fcolor:2><argument:1><fcolor:1>, <fcolor:2><argument:2><fcolor:1>).<fcolor:1>"
       server.commands.teleport.teleportedToCoordinatesWithLook: "<fcolor:1>You have been teleported to (<fcolor:2><argument:0><fcolor:1>, <fcolor:2><argument:1><fcolor:1>, <fcolor:2><argument:2><fcolor:1>, <fcolor:2><argument:3><fcolor:1>, <fcolor:2><argument:4><fcolor:1>, <fcolor:2><argument:5><fcolor:1>).<fcolor:1>"

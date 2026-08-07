@@ -3,18 +3,18 @@ package net.flectone.pulse;
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.execution.scheduler.TaskSchedulerImpl;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.command.spy.MinecraftSpyModule;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.module.integration.simplevoice.BukkitSimpleVoiceModule;
 import net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceModule;
-import net.flectone.pulse.module.message.afk.AfkModule;
+import net.flectone.pulse.module.message.afk.AfkModuleImpl;
 import net.flectone.pulse.module.message.afk.BukkitAfkModule;
-import net.flectone.pulse.module.message.anvil.AnvilModule;
+import net.flectone.pulse.module.message.anvil.AnvilModuleImpl;
 import net.flectone.pulse.module.message.anvil.BukkitAnvilModule;
-import net.flectone.pulse.module.message.book.BookModule;
+import net.flectone.pulse.module.message.book.BookModuleImpl;
 import net.flectone.pulse.module.message.book.BukkitBookModule;
 import net.flectone.pulse.module.message.chat.BukkitChatModule;
 import net.flectone.pulse.module.message.chat.MinecraftChatModule;
@@ -23,10 +23,11 @@ import net.flectone.pulse.module.message.join.MinecraftJoinModule;
 import net.flectone.pulse.module.message.quit.BukkitQuitModule;
 import net.flectone.pulse.module.message.quit.MinecraftQuitModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
-import net.flectone.pulse.module.message.sign.SignModule;
+import net.flectone.pulse.module.message.sign.SignModuleImpl;
 import net.flectone.pulse.platform.adapter.*;
 import net.flectone.pulse.platform.provider.*;
 import net.flectone.pulse.platform.registry.*;
+import net.flectone.pulse.platform.regitry.ProxyRegistryImpl;
 import net.flectone.pulse.platform.sender.BukkitMessageSender;
 import net.flectone.pulse.platform.sender.MinecraftMessageSender;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
@@ -82,7 +83,7 @@ public class BukkitInjector extends MinecraftPlatformInjector {
         // Registries
         bind(PermissionRegistry.class).to(BukkitPermissionRegistry.class);
         bind(MinecraftListenerRegistry.class).to(BukkitListenerRegistry.class);
-        bind(ProxyRegistry.class).to(BukkitProxyRegistry.class);
+        bind(ProxyRegistryImpl.class).to(BukkitProxyRegistry.class);
 
         if (reflectionResolver.hasClass("com.mojang.brigadier.arguments.ArgumentType")) {
             bind(CommandRegistry.class).to(ModernBukkitCommandRegistry.class);
@@ -92,7 +93,7 @@ public class BukkitInjector extends MinecraftPlatformInjector {
 
         // Checkers and utilities
         bind(PermissionChecker.class).to(BukkitPermissionChecker.class);
-        bind(TaskScheduler.class).to(BukkitTaskScheduler.class);
+        bind(TaskSchedulerImpl.class).to(BukkitTaskScheduler.class);
 
         // Modules
         bind(MinecraftIntegrationModule.class).to(BukkitIntegrationModule.class);
@@ -104,11 +105,11 @@ public class BukkitInjector extends MinecraftPlatformInjector {
         // sender
         bind(MinecraftMessageSender.class).to(BukkitMessageSender.class);
 
-        bind(AnvilModule.class).to(BukkitAnvilModule.class);
-        bind(BookModule.class).to(BukkitBookModule.class);
-        bind(AfkModule.class).to(BukkitAfkModule.class);
+        bind(AnvilModuleImpl.class).to(BukkitAnvilModule.class);
+        bind(BookModuleImpl.class).to(BukkitBookModule.class);
+        bind(AfkModuleImpl.class).to(BukkitAfkModule.class);
         bind(MinecraftChatModule.class).to(BukkitChatModule.class);
-        bind(SignModule.class).to(BukkitSignModule.class);
+        bind(SignModuleImpl.class).to(BukkitSignModule.class);
         bind(MinecraftSpyModule.class).to(BukkitSpyModule.class);
         bind(MinecraftJoinModule.class).to(BukkitJoinModule.class);
         bind(MinecraftQuitModule.class).to(BukkitQuitModule.class);

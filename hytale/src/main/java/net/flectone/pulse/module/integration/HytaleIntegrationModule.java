@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.integration;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
@@ -17,8 +16,12 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Singleton
-public class HytaleIntegrationModule extends IntegrationModule {
+public class HytaleIntegrationModule extends IntegrationModuleImpl {
 
     private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
 
@@ -34,14 +37,14 @@ public class HytaleIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
+    public Set<@NonNull Class<? extends ModuleSimple>> children() {
+        Set<@NonNull Class<? extends ModuleSimple>> builder = new LinkedHashSet<>(super.children());
 
         if (platformServerAdapterProvider.get().hasProject("HelpChat:PlaceholderAPI")) {
             builder.add(HytalePlaceholderAPIModule.class);
         }
 
-        return builder;
+        return Collections.unmodifiableSet(builder);
     }
 
     @Override

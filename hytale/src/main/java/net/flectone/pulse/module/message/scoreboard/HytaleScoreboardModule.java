@@ -26,7 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
-public class HytaleScoreboardModule extends ScoreboardModule {
+public class HytaleScoreboardModule extends ScoreboardModuleImpl {
 
     private final Map<UUID, CustomName> teamMap = new ConcurrentHashMap<>();
 

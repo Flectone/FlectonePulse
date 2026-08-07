@@ -19,8 +19,8 @@ configurations {
 }
 
 dependencies {
-    shade project(":loader")
-    implementation project(":loader")
+    shade project(":api")
+    implementation project(":api")
 
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
 }

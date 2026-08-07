@@ -2,23 +2,32 @@ plugins {
 	id "net.fabricmc.fabric-loom" version "${fabric_loom_version}"
 }
 
+configurations {
+	shadow
+	implementation.extendsFrom shadow
+}
+
 dependencies {
 	minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
 
-	implementation project(":core")
-	implementation project(":minecraft-common")
+	shadow project(":common")
+	shadow project(":minecraft-common")
 
-	compileOnlyApi project(":minecraft-fabric:loader")
-	compileOnlyApi "net.fabricmc:fabric-loader:${fabric_loader_version}"
+	compileOnly project(":api")
+	compileOnly project(":minecraft-fabric:loader")
 
-	compileOnlyApi fabricApi.module("fabric-api-base", fabric_api_version)
-	compileOnlyApi fabricApi.module("fabric-command-api-v2", fabric_api_version)
-	compileOnlyApi fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
-	compileOnlyApi fabricApi.module("fabric-networking-api-v1", fabric_api_version)
+	compileOnly libraries.platform
+	compileOnly libraries.adventure
 
-	compileOnlyApi "net.flectone:libby-core:$libby_version"
-	compileOnlyApi "com.github.retrooper:packetevents-fabric-official:$packetevents_spigot_version"
-	compileOnlyApi "org.incendo:cloud-fabric:${cloud_fabric_version}"
+	compileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
+
+	compileOnly fabricApi.module("fabric-api-base", fabric_api_version)
+	compileOnly fabricApi.module("fabric-command-api-v2", fabric_api_version)
+	compileOnly fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
+	compileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
+
+	compileOnly "org.incendo:cloud-fabric:${cloud_fabric_version}"
+	compileOnly "com.github.retrooper:packetevents-fabric-official:$packetevents_spigot_version"
 
 	// integrations
 	compileOnly "eu.pb4:placeholder-api:$text_placeholder_api_version"
@@ -28,23 +37,7 @@ dependencies {
 
 shadowJar {
 	archiveFileName = "flectonepulse-fabric.jarinjar"
-	archiveBaseName.set("${project_name}-${project.name}")
-	archiveVersion.set("${project_version}")
-
-	dependencies {
-		exclude("net.fabricmc:.*")
-		exclude "/mappings/*"
-
-		include(dependency("com.alessiodp.libby:.*"))
-		include(dependency("org.xerial:.*"))
-		include(dependency("net.kyori:.*"))
-		include(dependency("org.incendo:.*"))
-		include(dependency("net.flectone:.*"))
-		include(project(":core"))
-		include(project(":minecraft-common"))
-	}
-
-	minimize()
+	configurations = [project.configurations.shadow]
 }
 
 tasks.named("buildFinalJar", Jar) {

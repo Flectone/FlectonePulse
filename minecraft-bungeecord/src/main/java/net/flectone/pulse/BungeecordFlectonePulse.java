@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public final class BungeecordFlectonePulse implements LoaderBoostrap, Listener {
+public final class BungeecordFlectonePulse implements LoaderBootstrap, Listener {
 
     private static final String UNKNOWN_SERVER_NAME = "Unknown";
     private static final String CHANNEL = "BungeeCord";
@@ -64,11 +64,6 @@ public final class BungeecordFlectonePulse implements LoaderBoostrap, Listener {
         plugin.getProxy().getPluginManager().unregisterListener(bungeeDisconnectListener);
 
         fLogger.logDisabled();
-    }
-
-    @Override
-    public <T> T get(Class<T> type) {
-        return null;
     }
 
     @Override

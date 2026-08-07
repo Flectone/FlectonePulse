@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.integration;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
@@ -17,10 +16,15 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Singleton
 public class FabricIntegrationModule extends MinecraftIntegrationModule {
@@ -44,8 +48,8 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
     }
 
     @Override
-    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
+    public Set<@NonNull Class<? extends ModuleSimple>> children() {
+        Set<@NonNull Class<? extends ModuleSimple>> builder = new LinkedHashSet<>(super.children());
 
         PlatformServerAdapter platformServerAdapter = platformServerAdapterProvider.get();
         if (platformServerAdapter.hasProject("melius-vanish")) {
@@ -60,7 +64,7 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
             builder.add(FabricPlaceholderAPIModule.class);
         }
 
-        return builder;
+        return Collections.unmodifiableSet(builder);
     }
 
     @Override
@@ -70,7 +74,7 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean isVanished(FEntity sender) {
-        if (containsEnabledChild(FabricVanishModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_SUPERVANISH)) {
             return getInstance(FabricVanishModule.class).isVanished(sender);
         }
 
@@ -79,7 +83,7 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean hasVanishIntegration() {
-        if (containsEnabledChild(FabricIntegrationModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_SUPERVANISH)) {
             return getInstance(FabricVanishModule.class).isHooked();
         }
 

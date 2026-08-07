@@ -6,19 +6,20 @@ import com.google.gson.Gson;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
+import java.nio.file.Path;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.MinecraftChatSettingModule;
-import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
+import net.flectone.pulse.module.command.maintenance.MaintenanceModuleImpl;
 import net.flectone.pulse.module.command.maintenance.MinecraftMaintenanceModule;
 import net.flectone.pulse.module.command.poll.MinecraftPollModule;
-import net.flectone.pulse.module.command.poll.PollModule;
+import net.flectone.pulse.module.command.poll.PollModuleImpl;
 import net.flectone.pulse.module.command.spy.MinecraftSpyModule;
-import net.flectone.pulse.module.command.spy.SpyModule;
+import net.flectone.pulse.module.command.spy.SpyModuleImpl;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
-import net.flectone.pulse.module.message.MessageModule;
+import net.flectone.pulse.module.message.MessageModuleImpl;
 import net.flectone.pulse.module.message.MinecraftMessageModule;
-import net.flectone.pulse.module.message.bossbar.BossbarModule;
+import net.flectone.pulse.module.message.bossbar.BossbarModuleImpl;
 import net.flectone.pulse.module.message.bossbar.MinecraftBossbarModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.MinecraftBubbleModule;
@@ -27,25 +28,25 @@ import net.flectone.pulse.module.message.bubble.render.MinecraftBubbleRender;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.MinecraftChatModule;
 import net.flectone.pulse.module.message.format.object.MinecraftObjectModule;
-import net.flectone.pulse.module.message.format.object.ObjectModule;
+import net.flectone.pulse.module.message.format.object.ObjectModuleImpl;
 import net.flectone.pulse.module.message.format.world.MinecraftWorldModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
-import net.flectone.pulse.module.message.join.JoinModule;
+import net.flectone.pulse.module.message.join.JoinModuleImpl;
 import net.flectone.pulse.module.message.join.MinecraftJoinModule;
 import net.flectone.pulse.module.message.quit.MinecraftQuitModule;
-import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.module.message.quit.QuitModuleImpl;
 import net.flectone.pulse.module.message.rightclick.MinecraftRightClickModule;
-import net.flectone.pulse.module.message.rightclick.RightclickModule;
+import net.flectone.pulse.module.message.rightclick.RightclickModuleImpl;
 import net.flectone.pulse.module.message.scoreboard.MinecraftScoreboardModule;
 import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.scoreboard.objective.MinecraftObjectiveModule;
-import net.flectone.pulse.module.message.scoreboard.objective.ObjectiveModule;
+import net.flectone.pulse.module.message.scoreboard.objective.ObjectiveModuleImpl;
 import net.flectone.pulse.module.message.sidebar.MinecraftSidebarModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.status.MinecraftStatusModule;
-import net.flectone.pulse.module.message.status.StatusModule;
+import net.flectone.pulse.module.message.status.StatusModuleImpl;
 import net.flectone.pulse.module.message.tab.MinecraftTabModule;
-import net.flectone.pulse.module.message.tab.TabModule;
+import net.flectone.pulse.module.message.tab.TabModuleImpl;
 import net.flectone.pulse.module.message.vanilla.MinecraftVanillaModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
@@ -69,8 +70,6 @@ import net.flectone.pulse.service.MinecraftTranslationService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.service.TranslationService;
 import net.flectone.pulse.util.logging.FLogger;
-
-import java.nio.file.Path;
 
 public abstract class MinecraftPlatformInjector extends PlatformInjector {
 
@@ -103,28 +102,28 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
 
         // commands
         bind(ChatsettingModule.class).to(MinecraftChatSettingModule.class);
-        bind(MaintenanceModule.class).to(MinecraftMaintenanceModule.class);
-        bind(PollModule.class).to(MinecraftPollModule.class);
-        bind(SpyModule.class).to(MinecraftSpyModule.class);
+        bind(MaintenanceModuleImpl.class).to(MinecraftMaintenanceModule.class);
+        bind(PollModuleImpl.class).to(MinecraftPollModule.class);
+        bind(SpyModuleImpl.class).to(MinecraftSpyModule.class);
 
         // integrations
         bind(IntegrationModule.class).to(MinecraftIntegrationModule.class);
 
         // messages
-        bind(MessageModule.class).to(MinecraftMessageModule.class);
-        bind(BossbarModule.class).to(MinecraftBossbarModule.class);
+        bind(MessageModuleImpl.class).to(MinecraftMessageModule.class);
+        bind(BossbarModuleImpl.class).to(MinecraftBossbarModule.class);
         bind(BubbleModule.class).to(MinecraftBubbleModule.class);
         bind(ChatModule.class).to(MinecraftChatModule.class);
-        bind(ObjectModule.class).to(MinecraftObjectModule.class);
+        bind(ObjectModuleImpl.class).to(MinecraftObjectModule.class);
         bind(ScoreboardModule.class).to(MinecraftScoreboardModule.class);
         bind(WorldModule.class).to(MinecraftWorldModule.class);
-        bind(JoinModule.class).to(MinecraftJoinModule.class);
-        bind(ObjectiveModule.class).to(MinecraftObjectiveModule.class);
-        bind(QuitModule.class).to(MinecraftQuitModule.class);
-        bind(RightclickModule.class).to(MinecraftRightClickModule.class);
+        bind(JoinModuleImpl.class).to(MinecraftJoinModule.class);
+        bind(ObjectiveModuleImpl.class).to(MinecraftObjectiveModule.class);
+        bind(QuitModuleImpl.class).to(MinecraftQuitModule.class);
+        bind(RightclickModuleImpl.class).to(MinecraftRightClickModule.class);
         bind(SidebarModule.class).to(MinecraftSidebarModule.class);
-        bind(StatusModule.class).to(MinecraftStatusModule.class);
-        bind(TabModule.class).to(MinecraftTabModule.class);
+        bind(StatusModuleImpl.class).to(MinecraftStatusModule.class);
+        bind(TabModuleImpl.class).to(MinecraftTabModule.class);
         bind(VanillaModule.class).to(MinecraftVanillaModule.class);
 
         // registers

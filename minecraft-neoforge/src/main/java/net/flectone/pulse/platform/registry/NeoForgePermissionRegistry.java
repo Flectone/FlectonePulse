@@ -9,9 +9,6 @@ import net.flectone.pulse.config.Permission;
 
 import java.util.Map;
 
-/**
- * NeoForge-specific permission registry that stores and manages permissions.
- */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NeoForgePermissionRegistry implements PermissionRegistry {

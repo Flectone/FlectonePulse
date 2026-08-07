@@ -13,7 +13,7 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class HytaleWorldModule extends WorldModule {
+public class HytaleWorldModule extends WorldModuleImpl {
 
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;

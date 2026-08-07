@@ -18,7 +18,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import org.apache.commons.lang3.tuple.Pair;
+import net.flectone.pulse.model.util.Pair;
 import org.joml.Vector3d;
 
 import java.util.Arrays;

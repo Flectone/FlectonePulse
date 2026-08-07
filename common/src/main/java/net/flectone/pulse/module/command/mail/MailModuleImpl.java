@@ -1,0 +1,157 @@
+package net.flectone.pulse.module.command.mail;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.command.mail.listener.PulseMailListener;
+import net.flectone.pulse.module.command.mail.model.Mail;
+import net.flectone.pulse.module.command.mail.model.MailMessageContext;
+import net.flectone.pulse.module.command.tell.TellModule;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.DisableSender;
+import net.flectone.pulse.platform.sender.IgnoreSender;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
+import org.apache.commons.lang3.Strings;
+import org.incendo.cloud.context.CommandContext;
+
+import java.util.Optional;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class MailModuleImpl implements MailModule {
+
+    private final FileFacade fileFacade;
+    private final TellModule tellModule;
+    private final FPlayerService fPlayerService;
+    private final SocialService socialService;
+    private final CommandParserProvider commandParserProvider;
+    private final ListenerRegistry listenerRegistry;
+    private final IgnoreSender ignoreSender;
+    private final DisableSender disableSender;
+    private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
+    private final ModuleCommandController commandModuleController;
+
+    @Override
+    public void onEnable() {
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, manager -> manager
+                .permission(permission().name())
+                .required(promptPlayer, commandParserProvider.playerParser(true))
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
+        );
+
+        listenerRegistry.register(PulseMailListener.class);
+    }
+
+    @Override
+    public void onDisable() {
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
+
+        String playerName = commandModuleController.getArgument(this, commandContext, 0);
+        FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
+        if (fReceiver.isUnknown()) {
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
+                    .build()
+            );
+
+            return;
+        }
+
+        if (fReceiver.isOnline() && socialService.canSeeVanished(fReceiver, fPlayer)) {
+            if (!moduleController.isEnable(tellModule)) {
+                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).onlinePlayer())
+                                .build()
+                        )
+                        .build()
+                );
+
+                return;
+            }
+
+            tellModule.execute(fPlayer, commandContext);
+            return;
+        }
+
+        if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
+
+        String message = commandModuleController.getArgument(this, commandContext, 1);
+
+        Optional<Mail> mail = socialService.saveMail(fPlayer, fReceiver, message);
+        if (mail.isEmpty()) return;
+
+        int mailId = mail.get().id();
+
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MailMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(Strings.CS.replaceOnce(localization(fResolver).sender(), "<id>", String.valueOf(mailId)))
+                                .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, message), messagePipeline.targetTag(fResolver, fReceiver))
+                                .build()
+                        )
+                        .string(message)
+                        .mail(mail.get())
+                        .target(fReceiver)
+                        .build()
+                )
+                .build()
+        );
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.COMMAND_MAIL;
+    }
+
+    @Override
+    public Command.Mail config() {
+        return fileFacade.command().mail();
+    }
+
+    @Override
+    public Permission.Command.Mail permission() {
+        return fileFacade.permission().command().mail();
+    }
+
+    @Override
+    public Localization.Command.Mail localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mail();
+    }
+}

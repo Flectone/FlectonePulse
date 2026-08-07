@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.integration;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
@@ -30,6 +29,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.checker.BukkitDatapackChecker;
 import net.flectone.pulse.util.checker.PaperDatapackChecker;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -39,6 +39,8 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.permissions.Permissible;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Singleton
@@ -68,8 +70,8 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     }
 
     @Override
-    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
+    public Set<@NonNull Class<? extends ModuleSimple>> children() {
+        Set<@NonNull Class<? extends ModuleSimple>> builder = new LinkedHashSet<>(super.children());
 
         PlatformServerAdapter platformServerAdapter = platformServerAdapterProvider.get();
         if (platformServerAdapter.hasProject("AdvancedBan")) {
@@ -145,14 +147,14 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
             builder.add(BukkitTritonModule.class);
         }
 
-        return builder;
+        return Collections.unmodifiableSet(builder);
     }
 
     @Override
     public String checkMention(FEntity fSender, String message) {
         if (moduleController.isDisabledFor(this, fSender)) return message;
 
-        if (containsEnabledChild(BukkitInteractiveChatModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_INTERACTIVECHAT)) {
             return getInstance(BukkitInteractiveChatModule.class).checkMention(fSender, message);
         }
 
@@ -163,7 +165,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
         boolean value = super.hasFPlayerPermission(fPlayer, permission);
 
-        if (containsEnabledChild(BukkitVaultModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_VAULT)) {
             return getInstance(BukkitVaultModule.class).hasVaultPermission(fPlayer, permission);
         }
 
@@ -175,7 +177,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
         String prefix = super.getPrefix(fPlayer);
         if (prefix != null) return prefix;
 
-        if (containsEnabledChild(BukkitVaultModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_VAULT)) {
             return getInstance(BukkitVaultModule.class).getPrefix(fPlayer);
         }
 
@@ -187,7 +189,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
         String suffix = super.getSuffix(fPlayer);
         if (suffix != null) return suffix;
 
-        if (containsEnabledChild(BukkitVaultModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_VAULT)) {
             return getInstance(BukkitVaultModule.class).getSuffix(fPlayer);
         }
 
@@ -199,7 +201,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
         Set<String> groups = super.getGroups();
         if (!groups.isEmpty()) return groups;
 
-        if (containsEnabledChild(BukkitVaultModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_VAULT)) {
             return getInstance(BukkitVaultModule.class).getGroups();
         }
 
@@ -218,7 +220,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean hasVanishIntegration() {
-        if (containsEnabledChild(BukkitSuperVanishModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_SUPERVANISH)) {
             return getInstance(BukkitSuperVanishModule.class).isHooked();
         }
 
@@ -235,19 +237,19 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean isMuted(FPlayer fPlayer) {
-        if (containsEnabledChild(BukkitLiteBansModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_LITEBANS)) {
             return getInstance(BukkitLiteBansModule.class).isMuted(fPlayer);
         }
 
-        if (containsEnabledChild(BukkitAdvancedBanModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_ADVANCEDBAN)) {
             return getInstance(BukkitAdvancedBanModule.class).isMuted(fPlayer);
         }
 
-        if (containsEnabledChild(BukkitCMIModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_CMI)) {
             return getInstance(BukkitCMIModule.class).isMuted(fPlayer);
         }
 
-        if (containsEnabledChild(BukkitLibertyBansModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_LIBERTYBANS)) {
             return getInstance(BukkitLibertyBansModule.class).isMuted(fPlayer);
         }
 
@@ -256,19 +258,19 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public ExternalModeration getMute(FPlayer fPlayer) {
-        if (containsEnabledChild(BukkitLiteBansModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_LITEBANS)) {
             return getInstance(BukkitLiteBansModule.class).getMute(fPlayer);
         }
 
-        if (containsEnabledChild(BukkitAdvancedBanModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_ADVANCEDBAN)) {
             return getInstance(BukkitAdvancedBanModule.class).getMute(fPlayer);
         }
 
-        if (containsEnabledChild(BukkitCMIModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_CMI)) {
             return getInstance(BukkitCMIModule.class).getMute(fPlayer);
         }
 
-        if (containsEnabledChild(BukkitLibertyBansModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_LIBERTYBANS)) {
             return getInstance(BukkitLibertyBansModule.class).getMute(fPlayer);
         }
 
@@ -278,7 +280,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     @Override
     public String getTritonLocale(FPlayer fPlayer) {
         if (!moduleController.isEnable(this)) return null;
-        if (!containsEnabledChild(BukkitTritonModule.class)) return null;
+        if (!containsEnabledChild(ModuleName.INTEGRATION_TRITON)) return null;
 
         return getInstance(BukkitTritonModule.class).getLocale(fPlayer);
     }
@@ -287,7 +289,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
         if (moduleController.isDisabledFor(this, fReceiver)) return false;
 
-        if (containsEnabledChild(BukkitInteractiveChatModule.class)) {
+        if (containsEnabledChild(ModuleName.INTEGRATION_INTERACTIVECHAT)) {
             return getInstance(BukkitInteractiveChatModule.class).sendMessage(fReceiver, message);
         }
 

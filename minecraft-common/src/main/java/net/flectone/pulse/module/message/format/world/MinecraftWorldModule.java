@@ -15,7 +15,7 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class MinecraftWorldModule extends WorldModule {
+public class MinecraftWorldModule extends WorldModuleImpl {
 
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;

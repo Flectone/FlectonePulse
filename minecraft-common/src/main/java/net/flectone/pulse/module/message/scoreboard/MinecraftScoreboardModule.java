@@ -40,7 +40,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
-public class MinecraftScoreboardModule extends ScoreboardModule {
+public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
 
     private static final int ATTRIBUTE_BASE_VALUE = 64;
 

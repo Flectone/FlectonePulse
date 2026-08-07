@@ -6,25 +6,28 @@ loom {
     accessWidenerPath = file("src/main/resources/flectonepulse.accesswidener")
 }
 
+configurations {
+    shade
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
 
-    implementation project(":loader")
+    shade project(":api")
+    implementation project(":api")
 
-    compileOnlyApi "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    compileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
 
-    compileOnlyApi fabricApi.module("fabric-api-base", fabric_api_version)
-    compileOnlyApi fabricApi.module("fabric-command-api-v2", fabric_api_version)
-    compileOnlyApi fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
-    compileOnlyApi fabricApi.module("fabric-networking-api-v1", fabric_api_version)
+    compileOnly fabricApi.module("fabric-api-base", fabric_api_version)
+    compileOnly fabricApi.module("fabric-command-api-v2", fabric_api_version)
+    compileOnly fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
+    compileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
 
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
 }
 
 shadowJar {
-    dependencies {
-        include(project(":loader"))
-    }
+    configurations = [project.configurations.shade]
 
     from { project(":minecraft-fabric").tasks.shadowJar.archiveFile }
     dependsOn(":minecraft-fabric:shadowJar")

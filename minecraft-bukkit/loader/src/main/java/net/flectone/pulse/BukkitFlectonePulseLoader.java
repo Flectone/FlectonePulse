@@ -10,23 +10,23 @@ public class BukkitFlectonePulseLoader extends JavaPlugin implements Supplier<Ja
     private static final String BOOTSTRAP_CLASS = "net.flectone.pulse.BukkitFlectonePulse";
 
     private JarInJarClassLoader loader;
-    private LoaderBoostrap loaderBoostrap;
+    private LoaderBootstrap loaderBootstrap;
 
     @Override
     public void onLoad() {
         this.loader = new JarInJarClassLoader(getClass().getClassLoader(), JAR_NAME);
-        this.loaderBoostrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
-        this.loaderBoostrap.onLoad();
+        this.loaderBootstrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
+        this.loaderBootstrap.onLoad();
     }
 
     @Override
     public void onEnable() {
-        this.loaderBoostrap.onEnable();
+        this.loaderBootstrap.onEnable();
     }
 
     @Override
     public void onDisable() {
-        this.loaderBoostrap.onDisable();
+        this.loaderBootstrap.onDisable();
     }
 
     @Override

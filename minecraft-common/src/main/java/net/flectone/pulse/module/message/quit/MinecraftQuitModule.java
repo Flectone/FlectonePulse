@@ -14,7 +14,7 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class MinecraftQuitModule extends QuitModule {
+public class MinecraftQuitModule extends QuitModuleImpl {
 
     private final ListenerRegistry listenerRegistry;
 

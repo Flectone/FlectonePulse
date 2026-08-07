@@ -18,7 +18,10 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 
+import java.util.Locale;
 import java.util.UUID;
 
 @Singleton
@@ -30,10 +33,14 @@ public class MinecraftMessageSender implements MessageSender {
     private final IntegrationModule integrationModule;
     private final FLogger fLogger;
 
-
     @Override
     public void sendToConsole(String message) {
         fLogger.info(message);
+    }
+
+    @Override
+    public void sendToConsole(Component component) {
+        sendToConsole(ANSIComponentSerializer.ansi().serialize(GlobalTranslator.render(component, Locale.ROOT)));
     }
 
     @Override

@@ -1,0 +1,140 @@
+package net.flectone.pulse.module.command.ball;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.command.ball.listener.BallProxyMessageListener;
+import net.flectone.pulse.module.command.ball.model.BallMessageContext;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.incendo.cloud.context.CommandContext;
+
+import java.util.List;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class BallModuleImpl implements BallModule {
+
+    private final FileFacade fileFacade;
+    private final RandomGenerator randomUtil;
+    private final CommandParserProvider commandParserProvider;
+    private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
+    private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
+    private final SocialService socialService;
+
+    @Override
+    public void onEnable() {
+        String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
+                .permission(permission().name())
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
+        );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(BallProxyMessageListener.class);
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
+
+        int answer = randomUtil.nextInt(0, localization(FPlayer.UNKNOWN).answers().size());
+        String message = commandModuleController.getArgument(this, commandContext, 0);
+
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .range(config().range())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> BallMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(replaceAnswer(fResolver, answer))
+                                .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                                .build()
+                        )
+                        .string(message)
+                        .answer(answer)
+                        .build()
+                )
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeInt(answer);
+                    dataOutputStream.writeUTF(message);
+                })
+                .integration(() -> IntegrationMessageFormat.builder()
+                        .format(string -> {
+                            List<String> answers = localization(FPlayer.UNKNOWN).answers();
+
+                            String answerString = !answers.isEmpty()
+                                    ? answers.get(Math.min(answer, answers.size() - 1))
+                                    : StringUtils.EMPTY;
+
+                            return Strings.CS.replace(string, "<answer>", answerString);
+                        })
+                        .build()
+                )
+                .build()
+        );
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.COMMAND_BALL;
+    }
+
+    @Override
+    public Command.Ball config() {
+        return fileFacade.command().ball();
+    }
+
+    @Override
+    public Permission.Command.Ball permission() {
+        return fileFacade.permission().command().ball();
+    }
+
+    @Override
+    public Localization.Command.Ball localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().ball();
+    }
+
+    @Override
+    public String replaceAnswer(FPlayer fPlayer, int answer) {
+        Localization.Command.Ball localization = localization(fPlayer);
+        List<String> answers = localization.answers();
+
+        String answerString = !answers.isEmpty()
+                ? answers.get(Math.min(answer, answers.size() - 1))
+                : StringUtils.EMPTY;
+
+        return Strings.CS.replace(localization.format(), "<answer>", answerString);
+    }
+}

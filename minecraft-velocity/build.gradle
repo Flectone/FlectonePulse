@@ -1,7 +1,6 @@
 dependencies {
-    implementation project(":core")
-
-    compileOnlyApi project(":minecraft-velocity:loader")
+    compileOnly project(":api")
+    compileOnly project(":minecraft-velocity:loader")
 
     compileOnly "com.velocitypowered:velocity-api:$velocity_version"
     annotationProcessor "com.velocitypowered:velocity-api:$velocity_version"

@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.vanilla;
 
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.protocol.packets.interface_.ServerMessage;
@@ -35,7 +36,7 @@ import java.util.OptionalInt;
 import java.util.Set;
 
 @Singleton
-public class HytaleVanillaModule extends VanillaModule {
+public class HytaleVanillaModule extends VanillaModuleImpl {
 
     private final HytaleComponentExtractor extractor;
     private final MessagePipeline messagePipeline;
@@ -43,6 +44,7 @@ public class HytaleVanillaModule extends VanillaModule {
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     private final SocialService socialService;
+    private final Gson gson;
 
     @Inject
     public HytaleVanillaModule(FileFacade fileFacade,
@@ -56,7 +58,8 @@ public class HytaleVanillaModule extends VanillaModule {
                                HytaleListenerRegistry hytaleListenerRegistry,
                                HytaleDeathListener deathListener,
                                ModuleController moduleController,
-                               SocialService socialService) {
+                               SocialService socialService,
+                               Gson gson) {
         super(fileFacade, proxyRegistry, listenerRegistry, socialService);
 
         this.extractor = extractor;
@@ -65,6 +68,7 @@ public class HytaleVanillaModule extends VanillaModule {
         this.taskScheduler = taskScheduler;
         this.moduleController = moduleController;
         this.socialService = socialService;
+        this.gson = gson;
 
         hytaleListenerRegistry.register(javaPlugin -> javaPlugin.getEntityStoreRegistry().registerSystem(deathListener));
 
@@ -127,8 +131,8 @@ public class HytaleVanillaModule extends VanillaModule {
                         .build()
                 )
                 .proxy(dataOutputStream -> {
-                    dataOutputStream.writeString(parsedComponent.translationKey());
-                    dataOutputStream.writeAsJson(parsedComponent.arguments());
+                    dataOutputStream.writeUTF(parsedComponent.translationKey());
+                    dataOutputStream.writeUTF(gson.toJson(parsedComponent.arguments()));
                     dataOutputStream.writeBoolean(vanished);
                 })
                 .build()

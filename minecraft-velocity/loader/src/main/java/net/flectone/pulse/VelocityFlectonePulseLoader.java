@@ -27,7 +27,7 @@ public class VelocityFlectonePulseLoader implements Supplier<VelocityFlectonePul
     private final Injector injector;
 
     private JarInJarClassLoader loader;
-    private LoaderBoostrap loaderBoostrap;
+    private LoaderBootstrap loaderBootstrap;
 
     @Inject
     public VelocityFlectonePulseLoader(Injector injector) {
@@ -37,14 +37,14 @@ public class VelocityFlectonePulseLoader implements Supplier<VelocityFlectonePul
     @Subscribe
     public void onProxyInitializeEvent(ProxyInitializeEvent event) {
         this.loader = new JarInJarClassLoader(getClass().getClassLoader(), JAR_NAME);
-        this.loaderBoostrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
-        this.loaderBoostrap.onLoad();
-        this.loaderBoostrap.onEnable();
+        this.loaderBootstrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
+        this.loaderBootstrap.onLoad();
+        this.loaderBootstrap.onEnable();
     }
 
     @Subscribe
     public void onProxyShutdownEvent(ProxyShutdownEvent event) {
-        this.loaderBoostrap.onDisable();
+        this.loaderBootstrap.onDisable();
     }
 
     @Override

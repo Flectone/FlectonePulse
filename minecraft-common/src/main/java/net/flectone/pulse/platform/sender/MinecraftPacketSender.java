@@ -11,23 +11,6 @@ import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.UUID;
 
-/**
- * Sends network packets to players with silent option support.
- *
- * <p><b>Usage example:</b>
- * <pre>{@code
- * PacketSender packetSender = flectonePulse.get(PacketSender.class);
- *
- * // Send packet silently
- * packetSender.send(player, packet, true);
- *
- * // Broadcast packet to all players
- * packetSender.send(packet);
- * }</pre>
- *
- * @author TheFaser
- * @since 0.8.0
- */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftPacketSender {
@@ -35,13 +18,6 @@ public class MinecraftPacketSender {
     private final FileFacade fileFacade;
     private final MinecraftPacketProvider packetProvider;
 
-    /**
-     * Sends a packet through a network channel.
-     *
-     * @param channel the network channel to send through
-     * @param packetWrapper the packet to send
-     * @param silent whether to send silently
-     */
     public void send(Object channel, PacketWrapper<?> packetWrapper, boolean silent) {
         ProtocolManager protocolManager = packetProvider.getApi().getProtocolManager();
         if (silent || fileFacade.config().internal().alwaysSendSilentPacket()) {
@@ -51,13 +27,6 @@ public class MinecraftPacketSender {
         }
     }
 
-    /**
-     * Sends a packet to a player by UUID.
-     *
-     * @param uuid the player's UUID
-     * @param packetWrapper the packet to send
-     * @param silent whether to send silently
-     */
     public void send(UUID uuid, PacketWrapper<?> packetWrapper, boolean silent) {
         Object channel = packetProvider.getChannel(uuid);
         if (channel == null) return;
@@ -65,52 +34,22 @@ public class MinecraftPacketSender {
         send(channel, packetWrapper, silent);
     }
 
-    /**
-     * Sends a packet to a player.
-     *
-     * @param fPlayer the player to receive the packet
-     * @param packetWrapper the packet to send
-     * @param silent whether to send silently
-     */
     public void send(FPlayer fPlayer, PacketWrapper<?> packetWrapper, boolean silent) {
         send(fPlayer.uuid(), packetWrapper, silent);
     }
 
-    /**
-     * Sends a packet to a player by UUID (not silent).
-     *
-     * @param uuid the player's UUID
-     * @param packetWrapper the packet to send
-     */
     public void send(UUID uuid, PacketWrapper<?> packetWrapper) {
         send(uuid, packetWrapper, false);
     }
 
-    /**
-     * Sends a packet to a player (not silent).
-     *
-     * @param fPlayer the player to receive the packet
-     * @param packetWrapper the packet to send
-     */
     public void send(FPlayer fPlayer, PacketWrapper<?> packetWrapper) {
         send(fPlayer.uuid(), packetWrapper, false);
     }
 
-    /**
-     * Broadcasts a packet to all online players (not silent).
-     *
-     * @param packetWrapper the packet to broadcast
-     */
     public void send(PacketWrapper<?> packetWrapper) {
         send(packetWrapper, false);
     }
 
-    /**
-     * Broadcasts a packet to all online players.
-     *
-     * @param packetWrapper the packet to broadcast
-     * @param silent whether to send silently
-     */
     public void send(PacketWrapper<?> packetWrapper, boolean silent) {
         packetProvider.getApi().getProtocolManager()
                 .getUsers()

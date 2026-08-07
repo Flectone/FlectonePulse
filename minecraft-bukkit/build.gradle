@@ -1,14 +1,17 @@
 dependencies {
     implementation project(":minecraft-common")
 
-    compileOnlyApi project(":core")
-    compileOnlyApi project(":minecraft-bukkit:loader")
-    compileOnlyApi project(":minecraft-paper")
+    compileOnly project(":api")
+    compileOnly project(":common")
+    compileOnly project(":minecraft-bukkit:loader")
+    compileOnly project(":minecraft-paper")
 
-    compileOnlyApi "net.flectone:libby-core:$libby_version"
-    compileOnlyApi "org.incendo:cloud-paper:$cloud_paper_version"
-    compileOnlyApi "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
-    compileOnlyApi "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
+    compileOnly libraries.platform
+    compileOnly libraries.adventure
+
+    compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
+    compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
+    compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
 
     // integrations
     compileOnly "org.spigotmc:spigot-api:$spigot_version"

@@ -19,7 +19,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class HytaleChatsettingModule extends ChatsettingModule {
+public class HytaleChatsettingModule extends ChatsettingModuleImpl {
 
     private final Provider<HytaleMenuBuilder> hytaleMenuBuilderProvider;
 

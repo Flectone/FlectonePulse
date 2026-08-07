@@ -1,0 +1,8 @@
+dependencies {
+    compileOnly project(":api")
+
+    compileOnly libraries.platform
+    compileOnly libraries.adventure
+    compileOnly libraries.database
+    compileOnly libraries.integrations
+}

@@ -4,7 +4,6 @@ import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisplayScoreboard;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerScoreboardObjective;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -21,8 +20,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Singleton
-public class MinecraftObjectiveModule extends ObjectiveModule {
+public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
 
     private final MinecraftPacketSender packetSender;
     private final MessagePipeline messagePipeline;
@@ -37,11 +40,11 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
     }
 
     @Override
-    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        return super.childrenBuilder().add(
-                MinecraftBelownameModule.class,
-                MinecraftTabnameModule.class
-        );
+    public Set<@NonNull Class<? extends ModuleSimple>> children() {
+        Set<Class<? extends ModuleSimple>> children = new LinkedHashSet<>(super.children());
+        children.add(MinecraftBelownameModule.class);
+        children.add(MinecraftTabnameModule.class);
+        return Collections.unmodifiableSet(children);
     }
 
     public void createObjective(FPlayer fPlayer, Component displayName, Component scoreFormat, ScoreboardPosition scoreboardPosition) {

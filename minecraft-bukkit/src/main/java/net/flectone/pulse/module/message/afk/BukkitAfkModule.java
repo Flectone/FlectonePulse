@@ -17,7 +17,7 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class BukkitAfkModule extends AfkModule {
+public class BukkitAfkModule extends AfkModuleImpl {
 
     private final ListenerRegistry listenerRegistry;
 

@@ -7,7 +7,6 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -96,9 +95,12 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     }
 
     @Override
-    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
-        return ModuleLocalization.super.permissionBuilder()
-                .add(permission().hideInvisible(), permission().hideSpectator());
+    public Set<PermissionSetting> permissions() {
+        Set<PermissionSetting> permissions = new LinkedHashSet<>(ModuleLocalization.super.permissions());
+        permissions.add(permission().hideInvisible());
+        permissions.add(permission().hideSpectator());
+
+        return Collections.unmodifiableSet(permissions);
     }
 
     @Override

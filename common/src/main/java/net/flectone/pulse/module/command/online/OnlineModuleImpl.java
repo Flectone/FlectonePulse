@@ -1,0 +1,216 @@
+package net.flectone.pulse.module.command.online;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.online.listener.PulseOnlineListener;
+import net.flectone.pulse.module.command.online.model.OnlineMessageContext;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
+import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.constant.TimeType;
+import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
+import org.jspecify.annotations.NonNull;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class OnlineModuleImpl implements OnlineModule {
+
+    private final FileFacade fileFacade;
+    private final FPlayerService fPlayerService;
+    private final PlaytimeService playtimeService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final CommandParserProvider commandParserProvider;
+    private final SocialService socialService;
+    private final TimeFormatter timeFormatter;
+    private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
+    private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
+
+    @Override
+    public void onEnable() {
+        String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
+        String promptPlayer = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::player);
+        commandModuleController.registerCommand(this, manager -> manager
+                .permission(permission().name())
+                .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
+                .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
+        );
+
+        listenerRegistry.register(PulseOnlineListener.class);
+    }
+
+    @Override
+    public void onDisable() {
+        commandModuleController.clearPrompts(this);
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
+        return (_, _) -> Arrays.stream(TimeType.values())
+                .map(type -> Suggestion.suggestion(type.name().toLowerCase()))
+                .toList();
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
+
+        String type = commandModuleController.getArgument(this, commandContext, 0);
+        String target = commandModuleController.getArgument(this, commandContext, 1);
+
+        FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
+        PlayTime playTime = playtimeService.getPlayTime(targetFPlayer);
+        if (playTime == null) {
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fPlayer).nullPlayer())
+                            .build()
+                    )
+                    .build()
+            );
+
+            return;
+        }
+
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> {
+                    Localization.Command.Online localization = localization(fResolver);
+
+                    return OnlineMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(switch (type.toUpperCase()) {
+                                        case "FIRST" -> timeFormatter.format(
+                                                fPlayer,
+                                                TimeType.FIRST.getTime(fPlayer, playTime),
+                                                localization.formatFirst()
+                                        );
+                                        case "LAST" -> platformPlayerAdapter.isOnline(targetFPlayer) && socialService.canSeeVanished(targetFPlayer, fPlayer)
+                                                ? localization.formatCurrent()
+                                                : timeFormatter.format(fPlayer, TimeType.LAST.getTime(fPlayer, playTime), localization.formatLast());
+                                        default -> Strings.CS.replace(
+                                                timeFormatter.format(
+                                                        fPlayer,
+                                                        type.equalsIgnoreCase("TOTAL") ? TimeType.TOTAL.getTime(fPlayer, playTime) : TimeType.TOTAL_DYNAMIC.getTime(fPlayer, playTime),
+                                                        localization.formatTotal()
+                                                ),
+                                                "<sessions>",
+                                                String.valueOf(playTime.sessions())
+                                        );
+                                    })
+                                    .tagResolver(messagePipeline.targetTag(fResolver, targetFPlayer))
+                                    .build()
+                            )
+                            .type(type)
+                            .build();
+                })
+                .build()
+        );
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.COMMAND_ONLINE;
+    }
+
+    @Override
+    public Command.Online config() {
+        return fileFacade.command().online();
+    }
+
+    @Override
+    public Permission.Command.Online permission() {
+        return fileFacade.permission().command().online();
+    }
+
+    @Override
+    public Localization.Command.Online localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().online();
+    }
+
+    @Override
+    public MessageContext addTag(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
+        if (!(sender instanceof FPlayer fPlayer)) return messageContext;
+
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.ONLINE.getTagName(), (argumentQueue, _) -> {
+            if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
+
+            String timeValue = parseTimeValue(fPlayer, messageContext.receiver(), argumentQueue.pop().value());
+            if (StringUtils.isEmpty(timeValue)) return MessagePipeline.ReplacementTag.emptyTag();
+
+            return Tag.preProcessParsed(timeValue);
+        }));
+    }
+
+    @NonNull
+    @Override
+    public String parseTimeValue(FPlayer fPlayer, FPlayer fReceiver, String time) {
+        int lastIndex = time.lastIndexOf('_');
+        if (lastIndex != -1) {
+            time = time.substring(0, lastIndex);
+        }
+
+        Optional<TimeType> optionalType = TimeType.fromString(time);
+        if (optionalType.isEmpty()) return "";
+
+        TimeType type = optionalType.get();
+        return lastIndex != -1 ? getTimeFormatted(fPlayer, fReceiver, type) : String.valueOf(getTime(fPlayer, type));
+    }
+
+    @Override
+    public int getTime(FPlayer fPlayer, TimeType type) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return 0;
+
+        PlayTime playTime = playtimeService.getPlayTime(fPlayer);
+        if (playTime == null) return 0;
+
+        return (int) type.getTime(fPlayer, playTime) / 1000;
+    }
+
+    @NonNull
+    @Override
+    public String getTimeFormatted(FPlayer fPlayer, FPlayer fReceiver, TimeType type) {
+        int time = getTime(fPlayer, type);
+        if (time == 0) return "";
+
+        return timeFormatter.format(fReceiver, time * 1000L);
+    }
+
+}
