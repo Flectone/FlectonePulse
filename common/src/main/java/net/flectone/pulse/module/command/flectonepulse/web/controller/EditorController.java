@@ -38,10 +38,10 @@ public class EditorController {
         localizationFiles.clear();
 
         configFiles.put("config.yml", fileFacade.config());
-        configFiles.put("commands.yml", fileFacade.command());
+        configFiles.put("command.yml", fileFacade.command());
         configFiles.put("integration.yml", fileFacade.integration());
-        configFiles.put("messages.yml", fileFacade.message());
-        configFiles.put("permissions.yml", fileFacade.permission());
+        configFiles.put("message.yml", fileFacade.message());
+        configFiles.put("permission.yml", fileFacade.permission());
 
         Map<String, Localization> localizationMap = fileFacade.localizations();
         localizationFiles.put("localizations", new ArrayList<>());
