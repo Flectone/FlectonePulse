@@ -1,0 +1,3 @@
+TextField #HyUIRawTextField {
+    Value: "";
+}

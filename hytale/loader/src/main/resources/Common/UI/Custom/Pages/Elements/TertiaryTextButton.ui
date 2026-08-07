@@ -1,0 +1,4 @@
+$C = "../../Common.ui";
+$C.@TertiaryTextButton #HyUITertiaryTextButton {
+    @Text = "Button";
+}

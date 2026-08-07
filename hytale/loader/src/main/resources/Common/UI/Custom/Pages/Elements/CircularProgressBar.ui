@@ -1,0 +1,10 @@
+Group #HyUIOuterProgressBar {
+    Background: "../../Common/ProgressBar.png";
+    CircularProgressBar #HyUIProgressBar {
+        MaskTexturePath: "../../Common/ProgressBarFill.png";
+        // Direction: Start;
+        Value: 0.0;
+        // NO STYLE.
+        // Supports: Anchor, Alignment, Bar (PatchStyle field), Background (standard)
+    }
+}

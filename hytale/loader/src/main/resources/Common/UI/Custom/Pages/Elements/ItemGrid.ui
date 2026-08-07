@@ -1,0 +1,11 @@
+$C = "../../Common.ui";
+ItemGrid #HyUIItemGrid {
+  //Anchor: (Width: 300, Height: 300);
+  SlotsPerRow: 1;
+  Style: (
+          SlotSize: 64,
+          SlotIconSize: 64,
+          SlotSpacing: 0,
+          SlotBackground: "../../Common/BlockSelectorSlotBackground.png"
+        );
+}

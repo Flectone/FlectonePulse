@@ -1,0 +1,15 @@
+Group #HyUIOuterProgressBar {
+    Background: "../../Common/ProgressBar.png";
+    ProgressBar #HyUIProgressBar {
+        // Should be supported.
+        BarTexturePath: "../../Common/ProgressBarFill.png";
+        EffectTexturePath: "../../Common/ProgressBarEffect.png";
+        //EffectWidth: 102;
+        //EffectHeight: 58;
+        //EffectOffset: 74;
+        //Direction: Start;
+        Value: 0.0;
+        // NO STYLE.
+        // Supports: Anchor, Alignment, Bar (PatchStyle field), Background (standard)
+    }
+}
