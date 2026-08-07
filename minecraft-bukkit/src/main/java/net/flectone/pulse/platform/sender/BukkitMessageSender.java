@@ -3,12 +3,12 @@ package net.flectone.pulse.platform.sender;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.resolver.ReflectionResolver;
 import net.kyori.adventure.text.Component;
 
 @Singleton

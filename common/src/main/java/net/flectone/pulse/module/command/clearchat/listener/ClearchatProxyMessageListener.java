@@ -10,7 +10,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.module.command.clearchat.ClearchatModule;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.constant.ModuleName;
 
 import java.io.IOException;
 

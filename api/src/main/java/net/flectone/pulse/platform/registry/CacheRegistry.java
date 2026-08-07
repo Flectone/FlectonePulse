@@ -1,6 +1,6 @@
 package net.flectone.pulse.platform.registry;
 
-import net.flectone.pulse.util.constant.CacheName;
+import net.flectone.pulse.constant.CacheName;
 
 /**
  * Owns the plugin's caches, so each can be built from config and cleared on reload.

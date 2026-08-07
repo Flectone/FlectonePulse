@@ -1,6 +1,5 @@
 package net.flectone.pulse.platform.proxy;
 
-import net.flectone.pulse.util.constant.DatabaseType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.lettuce.core.RedisClient;
@@ -10,13 +9,14 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.constant.DatabaseType;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.listener.proxy.RedisProxyListener;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.NonNull;
 
 import java.nio.charset.StandardCharsets;

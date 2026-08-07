@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
-import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

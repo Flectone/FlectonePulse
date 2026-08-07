@@ -2,7 +2,7 @@ package net.flectone.pulse;
 
 import net.flectone.pulse.exception.InitException;
 import net.flectone.pulse.exception.ReloadException;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.logging.FLogger;
 import org.jspecify.annotations.NonNull;
 
 /**

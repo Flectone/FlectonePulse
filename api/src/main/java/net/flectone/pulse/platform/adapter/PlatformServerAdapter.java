@@ -1,8 +1,8 @@
 package net.flectone.pulse.platform.adapter;
 
+import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.constant.PlatformType;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;

@@ -7,9 +7,9 @@ import com.ibm.icu.text.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 

@@ -1,6 +1,9 @@
 package net.flectone.pulse;
 
-import com.google.inject.*;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
+import com.google.inject.Stage;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.tree.CommandNode;
 import io.netty.channel.Channel;
@@ -9,18 +12,19 @@ import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.flectone.pulse.constant.HookType;
+import net.flectone.pulse.exception.InjectorNotInitializedException;
 import net.flectone.pulse.exception.ReloadException;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.listener.player.FabricPlayerLoginListener;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceModule;
 import net.flectone.pulse.platform.adapter.FabricPacketEventsAdapter;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
-import net.flectone.pulse.processing.resolver.FabricLibraryResolver;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.util.constant.HookType;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.resolver.FabricLibraryResolver;
+import net.flectone.pulse.resolver.LibraryResolver;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
@@ -32,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
-import net.flectone.pulse.exception.InjectorNotInitializedException;
 
 @Getter
 @Singleton

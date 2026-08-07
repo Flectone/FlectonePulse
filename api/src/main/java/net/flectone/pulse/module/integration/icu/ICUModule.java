@@ -2,10 +2,10 @@ package net.flectone.pulse.module.integration.icu;
 
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.util.constant.ModuleName;
 
 /**
  * Applies ICU message formatting, so plural and gender forms come out right in every language.

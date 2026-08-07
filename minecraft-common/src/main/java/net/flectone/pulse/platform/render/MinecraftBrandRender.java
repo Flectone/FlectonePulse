@@ -6,8 +6,8 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
-import net.flectone.pulse.processing.serializer.BrandPacketSerializer;
-import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.serializer.BrandPacketSerializer;
+import net.flectone.pulse.serializer.ComponentSerializer;
 import net.kyori.adventure.text.Component;
 
 @Singleton

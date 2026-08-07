@@ -5,8 +5,7 @@ import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.event.events.player.PlayerSetupConnectEvent;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.listener.HytaleListener;
-import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
-import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
+import net.flectone.pulse.serializer.HytaleComponentSerializer;
 
 import java.util.UUID;
 

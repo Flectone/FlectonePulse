@@ -1,21 +1,21 @@
 package net.flectone.pulse;
 
 import com.google.inject.Singleton;
-import java.nio.file.Path;
+import net.flectone.pulse.checker.NeoForgePermissionChecker;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.module.integration.NeoForgeIntegrationModule;
 import net.flectone.pulse.platform.adapter.*;
 import net.flectone.pulse.platform.registry.*;
-import net.flectone.pulse.platform.regitry.ProxyRegistryImpl;
 import net.flectone.pulse.platform.sender.MinecraftMessageSender;
 import net.flectone.pulse.platform.sender.NeoForgeMessageSender;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.processing.serializer.MinecraftComponentSerializer;
-import net.flectone.pulse.processing.serializer.NeoForgeComponentSerializer;
-import net.flectone.pulse.util.checker.NeoForgePermissionChecker;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.resolver.LibraryResolver;
+import net.flectone.pulse.resolver.ReflectionResolver;
+import net.flectone.pulse.serializer.MinecraftComponentSerializer;
+import net.flectone.pulse.serializer.NeoForgeComponentSerializer;
+
+import java.nio.file.Path;
 
 @Singleton
 public class NeoForgeInjector extends MinecraftPlatformInjector {

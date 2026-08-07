@@ -10,11 +10,11 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSy
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
-import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.serializer.ComponentSerializer;
 import net.kyori.adventure.text.Component;
 
 @Singleton

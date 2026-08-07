@@ -12,13 +12,13 @@ import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.model.value.Pair;
+import net.flectone.pulse.model.value.Sound;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.model.util.Pair;
 import org.joml.Vector3d;
 
 import java.util.Arrays;

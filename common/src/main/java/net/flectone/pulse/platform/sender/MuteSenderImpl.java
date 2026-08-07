@@ -3,14 +3,14 @@ package net.flectone.pulse.platform.sender;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.checker.MuteChecker;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.util.checker.MuteChecker;
-import net.flectone.pulse.util.constant.ModuleName;
 
 import java.util.Optional;
 

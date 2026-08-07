@@ -5,13 +5,13 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.PlatformType;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.constant.PlatformType;
-import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

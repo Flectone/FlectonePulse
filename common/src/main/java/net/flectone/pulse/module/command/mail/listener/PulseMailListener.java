@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.dispatcher.MessageDispatcher;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -14,10 +14,10 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.model.MailMessageContext;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.constant.MessageFlag;
 
 import java.util.List;
 

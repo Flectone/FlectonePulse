@@ -5,9 +5,9 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.UUID;
 

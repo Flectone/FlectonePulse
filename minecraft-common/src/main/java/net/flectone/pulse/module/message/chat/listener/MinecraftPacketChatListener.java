@@ -7,10 +7,10 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCh
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton

@@ -12,7 +12,7 @@ import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Toast;
+import net.flectone.pulse.model.value.Toast;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.kyori.adventure.text.Component;
 

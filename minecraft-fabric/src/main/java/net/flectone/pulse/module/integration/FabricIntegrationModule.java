@@ -2,9 +2,13 @@ package net.flectone.pulse.module.integration;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.ExternalModeration;
+import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.floodgate.MinecraftFloodgateModule;
@@ -18,12 +22,8 @@ import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 

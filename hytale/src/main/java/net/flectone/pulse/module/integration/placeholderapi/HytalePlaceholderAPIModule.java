@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;

@@ -1,12 +1,12 @@
 package net.flectone.pulse.model.event.message;
 
 import lombok.With;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.util.constant.ModuleName;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

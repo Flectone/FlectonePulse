@@ -4,9 +4,9 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.ExternalModeration;
+import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.constant.ModuleName;
 
 /**
  * Keeps players quiet until they have been on the server long enough.

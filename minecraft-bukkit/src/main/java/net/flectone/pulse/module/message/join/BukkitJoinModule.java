@@ -2,7 +2,8 @@ package net.flectone.pulse.module.message.join;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.dispatcher.MessageDispatcher;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.message.join.listener.BukkitJoinListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -10,7 +11,6 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class BukkitJoinModule extends MinecraftJoinModule {

@@ -9,7 +9,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.icu.ICUModule;
-import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.constant.MessageFlag;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

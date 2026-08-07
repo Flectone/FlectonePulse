@@ -3,7 +3,7 @@ package net.flectone.pulse.module.command.whitelist.model;
 import lombok.Builder;
 import lombok.With;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.value.Moderation;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

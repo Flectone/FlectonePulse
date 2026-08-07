@@ -2,13 +2,13 @@ package net.flectone.pulse.platform.sender;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.NeoForgePlayerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.processing.serializer.NeoForgeComponentSerializer;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.serializer.NeoForgeComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
 

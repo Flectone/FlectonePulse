@@ -7,7 +7,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.constant.ModuleName;
 
 /**
  * Fades a message between two colors.

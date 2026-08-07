@@ -9,14 +9,14 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.TwitchMessageListener;
 import net.flectone.pulse.module.integration.twitch.model.TwitchClient;
 import net.flectone.pulse.module.integration.twitch.provider.TwitchClientProvider;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;

@@ -3,7 +3,7 @@ package net.flectone.pulse.module.integration.twitch.model;
 import lombok.Builder;
 import lombok.With;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.util.Pair;
+import net.flectone.pulse.model.value.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.HytaleListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.UUID;

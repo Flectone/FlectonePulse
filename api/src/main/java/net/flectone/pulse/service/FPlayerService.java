@@ -21,7 +21,7 @@ import java.util.UUID;
  * </p>
  *
  * @see FPlayer
- * @see net.flectone.pulse.data.repository.FPlayerRepository
+ * @see net.flectone.pulse.persistence.repository.FPlayerRepository
  *
  * @author TheFaser
  * @since 0.0.1

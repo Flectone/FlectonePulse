@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.command.flectonepulse.web.exception.EmptyHostException;
-import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;

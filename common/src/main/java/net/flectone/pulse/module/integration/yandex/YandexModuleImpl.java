@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.resolver.LibraryResolver;
+import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

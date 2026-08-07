@@ -2,6 +2,8 @@ package net.flectone.pulse.module.integration;
 
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
@@ -16,8 +18,6 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;

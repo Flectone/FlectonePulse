@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class MinecraftSimpleVoiceModule implements ModuleSimple {

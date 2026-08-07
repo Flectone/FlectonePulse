@@ -5,7 +5,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.constant.ModuleName;
 import org.incendo.cloud.context.CommandContext;
 
 /**

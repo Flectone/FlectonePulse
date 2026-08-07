@@ -5,23 +5,23 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import lombok.Getter;
+import net.flectone.pulse.constant.HookType;
+import net.flectone.pulse.exception.InjectorNotInitializedException;
 import net.flectone.pulse.exception.ReloadException;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.platform.adapter.BukkitPacketEventsAdapter;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
-import net.flectone.pulse.processing.resolver.BukkitLibraryResolver;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.util.constant.HookType;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.resolver.BukkitLibraryResolver;
+import net.flectone.pulse.resolver.LibraryResolver;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NonNull;
 
 import java.util.function.Supplier;
 import java.util.logging.Logger;
-import net.flectone.pulse.exception.InjectorNotInitializedException;
 
 @Getter
 @Singleton

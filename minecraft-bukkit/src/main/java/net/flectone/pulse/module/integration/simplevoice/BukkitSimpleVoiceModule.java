@@ -3,7 +3,7 @@ package net.flectone.pulse.module.integration.simplevoice;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.file.FileFacade;
 import org.bukkit.plugin.Plugin;
 
 @Singleton

@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.minimotd.listener.MinecraftPulseMiniMOTDListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

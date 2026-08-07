@@ -4,7 +4,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.model.value.Range;
 import org.jspecify.annotations.NonNull;
 
 import java.util.function.Predicate;

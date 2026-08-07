@@ -2,16 +2,16 @@ package net.flectone.pulse.module.message.quit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.dispatcher.MessageDispatcher;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.message.quit.listener.MinecraftPulseQuitListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class MinecraftQuitModule extends QuitModuleImpl {

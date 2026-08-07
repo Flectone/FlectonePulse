@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;

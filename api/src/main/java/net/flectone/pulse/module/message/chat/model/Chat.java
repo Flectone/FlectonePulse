@@ -3,9 +3,9 @@ package net.flectone.pulse.module.message.chat.model;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
-import net.flectone.pulse.model.util.Cooldown;
-import net.flectone.pulse.model.util.Pair;
-import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.model.value.Cooldown;
+import net.flectone.pulse.model.value.Pair;
+import net.flectone.pulse.model.value.Sound;
 import org.jspecify.annotations.Nullable;
 
 /**

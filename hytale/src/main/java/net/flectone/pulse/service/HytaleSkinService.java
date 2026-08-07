@@ -3,8 +3,8 @@ package net.flectone.pulse.service;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 
 @Singleton

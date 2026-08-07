@@ -9,10 +9,10 @@ import net.flectone.pulse.config.setting.CommandSetting;
 import net.flectone.pulse.config.setting.CooldownConfigSetting;
 import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.config.setting.SoundConfigSetting;
-import net.flectone.pulse.model.util.Cooldown;
-import net.flectone.pulse.model.util.Destination;
-import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.model.value.Cooldown;
+import net.flectone.pulse.model.value.Destination;
+import net.flectone.pulse.model.value.Range;
+import net.flectone.pulse.model.value.Sound;
 
 import java.util.LinkedHashMap;
 import java.util.List;

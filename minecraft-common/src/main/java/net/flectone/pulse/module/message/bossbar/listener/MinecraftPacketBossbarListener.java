@@ -7,8 +7,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBo
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.message.bossbar.MinecraftBossbarModule;
-import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 

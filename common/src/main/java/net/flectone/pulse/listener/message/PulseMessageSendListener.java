@@ -9,7 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
-import net.flectone.pulse.model.util.Destination;
+import net.flectone.pulse.model.value.Destination;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.render.*;
 import net.flectone.pulse.platform.sender.MessageSender;

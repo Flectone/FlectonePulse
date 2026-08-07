@@ -1,19 +1,20 @@
 package net.flectone.pulse.module;
 
-import java.util.LinkedHashSet;
-import java.util.Collections;
-import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.command.CommandModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.MessageModule;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

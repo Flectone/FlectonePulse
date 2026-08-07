@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.sign.SignModule;
-import net.flectone.pulse.processing.PaperComponentSerializer;
+import net.flectone.pulse.serializer.PaperComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;

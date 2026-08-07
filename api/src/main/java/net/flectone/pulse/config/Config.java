@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.EnableSetting;
-import net.flectone.pulse.util.constant.CacheName;
-import net.flectone.pulse.util.constant.DatabaseType;
+import net.flectone.pulse.constant.CacheName;
+import net.flectone.pulse.constant.DatabaseType;
 
 import java.util.List;
 import java.util.Map;

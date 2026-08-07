@@ -2,7 +2,7 @@ package net.flectone.pulse.platform.adapter;
 
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.model.value.PlayTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.jspecify.annotations.NonNull;

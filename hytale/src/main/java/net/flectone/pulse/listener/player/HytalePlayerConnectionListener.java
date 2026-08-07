@@ -5,14 +5,14 @@ import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.listener.HytaleListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.Set;

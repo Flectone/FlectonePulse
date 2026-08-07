@@ -4,11 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.service.MinecraftSkinService;
-import net.flectone.pulse.util.constant.ModuleName;
 
 import java.io.IOException;
 

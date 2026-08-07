@@ -3,11 +3,11 @@ package net.flectone.pulse.module.message.format.names;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.util.constant.ModuleName;
 
 /**
  * Builds the name shown for a sender, including prefixes, suffixes and the invisible-player form.

@@ -1,13 +1,12 @@
 package net.flectone.pulse.module.message;
 
-import java.util.LinkedHashSet;
-import java.util.Collections;
-import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
@@ -29,9 +28,11 @@ import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.module.message.update.UpdateModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

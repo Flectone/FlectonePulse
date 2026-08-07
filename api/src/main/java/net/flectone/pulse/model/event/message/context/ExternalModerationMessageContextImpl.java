@@ -2,7 +2,7 @@ package net.flectone.pulse.model.event.message.context;
 
 import lombok.Builder;
 import lombok.With;
-import net.flectone.pulse.model.util.ExternalModeration;
+import net.flectone.pulse.model.value.ExternalModeration;
 import org.jspecify.annotations.NonNull;
 
 /**

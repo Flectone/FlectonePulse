@@ -9,18 +9,18 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.integration.icu.listener.PulseICUListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.resolver.LibraryResolver;
+import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.concurrent.ExecutionException;
 

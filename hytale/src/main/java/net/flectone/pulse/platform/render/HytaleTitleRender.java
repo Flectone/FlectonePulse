@@ -6,9 +6,9 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Times;
+import net.flectone.pulse.model.value.Times;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
+import net.flectone.pulse.serializer.HytaleComponentSerializer;
 import net.kyori.adventure.text.Component;
 
 @Singleton

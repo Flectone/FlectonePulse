@@ -9,12 +9,12 @@ import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import net.flectone.pulse.constant.HookType;
+import net.flectone.pulse.constant.LoginStatus;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.listener.VelocityLoginStateListener;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.util.constant.HookType;
-import net.flectone.pulse.util.constant.LoginStatus;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.logging.FLogger;
 import org.slf4j.Logger;
 
 import java.util.Collections;

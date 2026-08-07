@@ -6,12 +6,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.util.ExternalModeration;
+import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

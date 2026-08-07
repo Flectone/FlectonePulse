@@ -1,13 +1,13 @@
 package net.flectone.pulse.module.command.chatsetting;
 
-import java.util.LinkedHashSet;
-import java.util.Collections;
-import java.util.Set;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.SettingText;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.listener.ChatsettingProxyMessageListener;
@@ -18,12 +18,9 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.constant.SettingText;
-import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -31,9 +28,7 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class ChatsettingModuleImpl implements ChatsettingModule {
 

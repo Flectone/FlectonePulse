@@ -20,7 +20,7 @@ package net.flectone.pulse.mixin;
 
 import io.netty.channel.ChannelPipeline;
 import net.flectone.pulse.NeoForgeFlectonePulseLoader;
-import net.flectone.pulse.util.constant.HookType;
+import net.flectone.pulse.constant.HookType;
 import net.minecraft.network.BandwidthDebugMonitor;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;

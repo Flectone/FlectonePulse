@@ -4,12 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.dto.MetricsDTO;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.sender.MetricsSender;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.scheduler.TaskScheduler;
 
 import java.time.Instant;
 

@@ -19,7 +19,7 @@
 package net.flectone.pulse.mixin;
 
 import net.flectone.pulse.NeoForgeFlectonePulseLoader;
-import net.flectone.pulse.util.constant.HookType;
+import net.flectone.pulse.constant.HookType;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;

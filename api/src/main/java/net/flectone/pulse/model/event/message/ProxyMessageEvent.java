@@ -1,10 +1,10 @@
 package net.flectone.pulse.model.event.message;
 
 import lombok.With;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.io.ProxyPayload;
+import net.flectone.pulse.util.payload.ProxyPayload;
 
 import java.util.UUID;
 

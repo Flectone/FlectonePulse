@@ -2,16 +2,16 @@ package net.flectone.pulse.module.message.rightclick;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.dispatcher.MessageDispatcher;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.message.rightclick.listener.PacketRightclickListener;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class MinecraftRightClickModule extends RightclickModuleImpl {

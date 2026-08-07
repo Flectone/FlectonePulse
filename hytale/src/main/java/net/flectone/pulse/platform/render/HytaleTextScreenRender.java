@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.TextScreen;
-import net.flectone.pulse.model.util.Times;
+import net.flectone.pulse.model.value.TextScreen;
+import net.flectone.pulse.model.value.Times;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;

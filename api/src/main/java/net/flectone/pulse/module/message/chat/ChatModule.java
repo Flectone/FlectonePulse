@@ -3,10 +3,10 @@ package net.flectone.pulse.module.message.chat;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.chat.model.Chat;
-import net.flectone.pulse.util.constant.ModuleName;
 
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;

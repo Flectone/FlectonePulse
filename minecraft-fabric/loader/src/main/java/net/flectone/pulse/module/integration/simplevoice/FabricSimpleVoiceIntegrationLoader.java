@@ -7,7 +7,7 @@ import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.FabricFlectonePulseLoader;
 import net.flectone.pulse.LoaderBootstrap;
-import net.flectone.pulse.util.constant.HookType;
+import net.flectone.pulse.constant.HookType;
 
 public class FabricSimpleVoiceIntegrationLoader implements VoicechatPlugin {
 

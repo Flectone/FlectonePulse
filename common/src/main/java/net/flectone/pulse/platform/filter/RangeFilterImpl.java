@@ -3,14 +3,14 @@ package net.flectone.pulse.platform.filter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import org.jspecify.annotations.NonNull;
 
 import java.util.function.Predicate;

@@ -3,8 +3,8 @@ package net.flectone.pulse.platform.sender;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Pair;
-import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.model.value.Pair;
+import net.flectone.pulse.model.value.Sound;
 
 /**
  * Plays sounds to players with permission checking.

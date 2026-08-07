@@ -1,11 +1,11 @@
 package net.flectone.pulse.module.message.vanilla.extractor;
-import java.util.HashMap;
 
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
-import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

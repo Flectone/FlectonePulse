@@ -1,15 +1,15 @@
 package net.flectone.pulse.util.loader;
 
-import net.flectone.pulse.util.constant.DatabaseType;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.classloader.IsolatedClassLoader;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.driver.DriverWrapper;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.constant.DatabaseType;
+import net.flectone.pulse.exception.LibraryLoadException;
+import net.flectone.pulse.persistence.database.driver.DriverWrapper;
+import net.flectone.pulse.resolver.LibraryResolver;
 import org.jspecify.annotations.NonNull;
 
 import java.sql.Driver;
@@ -17,7 +17,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import net.flectone.pulse.exception.LibraryLoadException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

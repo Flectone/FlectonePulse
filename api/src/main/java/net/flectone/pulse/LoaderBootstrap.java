@@ -1,6 +1,6 @@
 package net.flectone.pulse;
 
-import net.flectone.pulse.util.constant.HookType;
+import net.flectone.pulse.constant.HookType;
 
 public interface LoaderBootstrap {
 

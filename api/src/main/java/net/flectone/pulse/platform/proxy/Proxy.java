@@ -1,7 +1,7 @@
 package net.flectone.pulse.platform.proxy;
 
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.util.constant.ModuleName;
 import org.jspecify.annotations.NonNull;
 
 /**

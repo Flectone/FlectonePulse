@@ -8,7 +8,7 @@ import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.CooldownPermissionSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.config.setting.SoundPermissionSetting;
-import net.flectone.pulse.util.constant.AdventureTag;
+import net.flectone.pulse.constant.AdventureTag;
 
 import java.util.Map;
 
@@ -1363,7 +1363,7 @@ public record Permission(
             public record FColor(
                     String name,
                     Permission.Type type,
-                    Map<net.flectone.pulse.model.FColor.Type, PermissionEntry> colors
+                    Map<net.flectone.pulse.model.value.FColor.Type, PermissionEntry> colors
             ) implements PermissionSetting {
             }
 

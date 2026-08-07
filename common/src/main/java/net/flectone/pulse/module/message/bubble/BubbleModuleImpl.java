@@ -2,15 +2,15 @@ package net.flectone.pulse.module.message.bubble;
 
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.bubble.listener.PulseBubbleListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Set;

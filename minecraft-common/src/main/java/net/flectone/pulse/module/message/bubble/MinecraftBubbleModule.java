@@ -2,13 +2,13 @@ package net.flectone.pulse.module.message.bubble;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.message.bubble.listener.MinecraftPacketBubbleListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.scheduler.TaskScheduler;
 
 @Singleton
 public class MinecraftBubbleModule extends BubbleModuleImpl {

@@ -4,11 +4,11 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Pair;
-import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.model.value.Pair;
+import net.flectone.pulse.model.value.Sound;
 import net.flectone.pulse.module.ModuleListLocalization;
-import net.flectone.pulse.util.constant.ModuleName;
 
 /**
  * Broadcasts the configured messages on a timer.

@@ -8,14 +8,14 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSo
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.model.value.Pair;
+import net.flectone.pulse.model.value.Sound;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.model.util.Pair;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

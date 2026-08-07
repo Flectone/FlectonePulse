@@ -1,5 +1,23 @@
 package net.flectone.pulse.module.message.format.converter;
-import java.util.ArrayList;
+
+import com.google.common.cache.Cache;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 /*
     MIT License
@@ -24,28 +42,6 @@ import java.util.ArrayList;
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
  */
-
-import com.google.common.cache.Cache;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.commons.lang3.StringUtils;
-import org.jspecify.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.regex.Pattern;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

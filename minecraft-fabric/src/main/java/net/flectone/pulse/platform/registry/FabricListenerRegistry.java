@@ -8,10 +8,10 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.listener.player.FabricPlayerConnectionListener;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.FabricTpsTracker;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 public class FabricListenerRegistry extends MinecraftListenerRegistry {

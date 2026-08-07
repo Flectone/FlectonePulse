@@ -1,5 +1,9 @@
 package net.flectone.pulse.module.integration;
 
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.PlatformType;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
@@ -15,12 +19,8 @@ import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.constant.PlatformType;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.jspecify.annotations.NonNull;
 

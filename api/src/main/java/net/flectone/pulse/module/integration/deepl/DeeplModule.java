@@ -2,9 +2,9 @@ package net.flectone.pulse.module.integration.deepl;
 
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.util.constant.ModuleName;
 
 /**
  * Translates messages through DeepL.

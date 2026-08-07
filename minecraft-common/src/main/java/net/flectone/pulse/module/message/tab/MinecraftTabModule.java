@@ -2,11 +2,11 @@ package net.flectone.pulse.module.message.tab;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
-import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;

@@ -3,10 +3,10 @@ package net.flectone.pulse.module.message.vanilla;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
-import net.flectone.pulse.util.constant.ModuleName;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 /**

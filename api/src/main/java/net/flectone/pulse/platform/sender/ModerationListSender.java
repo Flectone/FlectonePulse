@@ -2,7 +2,7 @@ package net.flectone.pulse.platform.sender;
 
 import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.ModuleCommand;
 import org.incendo.cloud.context.CommandContext;
 

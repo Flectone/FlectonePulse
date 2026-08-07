@@ -2,9 +2,9 @@ package net.flectone.pulse.module;
 
 import net.flectone.pulse.config.setting.*;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Cooldown;
-import net.flectone.pulse.model.util.Pair;
-import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.model.value.Cooldown;
+import net.flectone.pulse.model.value.Pair;
+import net.flectone.pulse.model.value.Sound;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;

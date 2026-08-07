@@ -1,9 +1,9 @@
 package net.flectone.pulse.platform.formatter;
 
 import net.flectone.pulse.config.setting.MessageChannelSetting;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.util.constant.ModuleName;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;

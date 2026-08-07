@@ -2,8 +2,8 @@ package net.flectone.pulse.module;
 
 import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.util.constant.ModuleName;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Set;

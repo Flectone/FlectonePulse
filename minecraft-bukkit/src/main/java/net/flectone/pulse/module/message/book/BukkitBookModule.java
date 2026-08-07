@@ -2,14 +2,14 @@ package net.flectone.pulse.module.message.book;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.message.book.listener.BukkitBookListener;
 import net.flectone.pulse.module.message.book.listener.PaperBookListener;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.resolver.ReflectionResolver;
 import org.bukkit.inventory.meta.BookMeta;
 
 @Singleton

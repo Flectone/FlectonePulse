@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.command.whitelist.model;
 
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.value.Moderation;
 import org.jspecify.annotations.Nullable;
 
 /**

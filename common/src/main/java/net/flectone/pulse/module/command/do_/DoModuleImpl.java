@@ -6,22 +6,22 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.SettingText;
+import net.flectone.pulse.dispatcher.MessageDispatcher;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.module.command.do_.listener.DoProxyMessageListener;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.constant.SettingText;
-import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton

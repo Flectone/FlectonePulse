@@ -4,7 +4,7 @@ import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskSchedule
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.resolver.ReflectionResolver;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 

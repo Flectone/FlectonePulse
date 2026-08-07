@@ -1,6 +1,6 @@
 package net.flectone.pulse.model.event.message.context;
 
-import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.value.Moderation;
 import org.jspecify.annotations.NonNull;
 
 /**

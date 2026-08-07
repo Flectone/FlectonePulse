@@ -1,27 +1,28 @@
 package net.flectone.pulse.module.message.format.moderation.newbie;
 
-import java.util.LinkedHashSet;
-import java.util.Collections;
-import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.SettingText;
+import net.flectone.pulse.constant.TimeType;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.ExternalModeration;
-import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.model.value.ExternalModeration;
+import net.flectone.pulse.model.value.PlayTime;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.constant.SettingText;
-import net.flectone.pulse.util.constant.TimeType;
-import net.flectone.pulse.util.file.FileFacade;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

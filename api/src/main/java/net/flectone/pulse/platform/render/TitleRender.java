@@ -1,7 +1,7 @@
 package net.flectone.pulse.platform.render;
 
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Times;
+import net.flectone.pulse.model.value.Times;
 import net.kyori.adventure.text.Component;
 
 /**

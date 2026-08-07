@@ -5,13 +5,13 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;

@@ -3,7 +3,7 @@ package net.flectone.pulse.module.command.tictactoe.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Pair;
+import net.flectone.pulse.model.value.Pair;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;

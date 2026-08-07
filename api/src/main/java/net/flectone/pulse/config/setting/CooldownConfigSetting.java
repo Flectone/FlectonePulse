@@ -1,6 +1,6 @@
 package net.flectone.pulse.config.setting;
 
-import net.flectone.pulse.model.util.Cooldown;
+import net.flectone.pulse.model.value.Cooldown;
 
 /**
  * Configuration interface for settings that include a cooldown.

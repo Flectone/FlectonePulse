@@ -7,12 +7,12 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWi
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.inventory.MinecraftInventory;
 import net.flectone.pulse.model.inventory.MinecraftInventoryClickType;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.scheduler.TaskScheduler;
 
 import java.util.HashMap;
 import java.util.List;

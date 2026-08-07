@@ -7,7 +7,7 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
-import net.flectone.pulse.util.constant.LoginStatus;
+import net.flectone.pulse.constant.LoginStatus;
 
 import java.util.Map;
 import java.util.UUID;

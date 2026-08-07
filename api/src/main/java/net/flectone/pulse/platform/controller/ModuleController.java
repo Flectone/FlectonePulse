@@ -1,5 +1,6 @@
 package net.flectone.pulse.platform.controller;
 
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.command.ban.BanModule;
@@ -12,7 +13,6 @@ import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.command.warnlist.WarnlistModule;
-import net.flectone.pulse.util.constant.ModuleName;
 
 import java.util.Map;
 import java.util.Set;

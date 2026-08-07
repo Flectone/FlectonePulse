@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
-import java.nio.file.Path;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.MinecraftChatSettingModule;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModuleImpl;
@@ -59,17 +59,18 @@ import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.platform.sender.MinecraftMessageSender;
 import net.flectone.pulse.platform.sender.MinecraftSoundPlayer;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.processing.resolver.MinecraftProfileResolver;
-import net.flectone.pulse.processing.resolver.ProfileResolver;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.processing.serializer.ComponentSerializer;
-import net.flectone.pulse.processing.serializer.MinecraftComponentSerializer;
+import net.flectone.pulse.resolver.LibraryResolver;
+import net.flectone.pulse.resolver.MinecraftProfileResolver;
+import net.flectone.pulse.resolver.ProfileResolver;
+import net.flectone.pulse.resolver.ReflectionResolver;
+import net.flectone.pulse.serializer.ComponentSerializer;
+import net.flectone.pulse.serializer.MinecraftComponentSerializer;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.service.MinecraftTranslationService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.service.TranslationService;
-import net.flectone.pulse.util.logging.FLogger;
+
+import java.nio.file.Path;
 
 public abstract class MinecraftPlatformInjector extends PlatformInjector {
 

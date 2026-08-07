@@ -7,7 +7,7 @@ import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.NeoForgeFlectonePulseLoader;
-import net.flectone.pulse.util.constant.HookType;
+import net.flectone.pulse.constant.HookType;
 
 @ForgeVoicechatPlugin
 public class NeoForgeSimpleVoiceIntegrationLoader implements VoicechatPlugin {

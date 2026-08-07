@@ -1,8 +1,8 @@
 package net.flectone.pulse.service;
 
-import net.flectone.pulse.data.repository.PlaytimeRepository;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.model.value.PlayTime;
+import net.flectone.pulse.persistence.repository.PlaytimeRepository;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

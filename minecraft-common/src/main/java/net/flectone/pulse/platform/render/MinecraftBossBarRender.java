@@ -4,10 +4,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBo
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.BossBar;
+import net.flectone.pulse.model.value.BossBar;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;

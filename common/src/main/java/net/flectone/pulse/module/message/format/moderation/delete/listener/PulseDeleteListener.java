@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
@@ -13,9 +14,8 @@ import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.model.util.Destination;
+import net.flectone.pulse.model.value.Destination;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
-import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;

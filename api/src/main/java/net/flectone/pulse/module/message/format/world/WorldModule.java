@@ -2,10 +2,10 @@ package net.flectone.pulse.module.message.format.world;
 
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.util.constant.ModuleName;
 
 /**
  * Inserts the sender's world into a message, by name or by type.

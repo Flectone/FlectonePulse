@@ -7,11 +7,11 @@ import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.*;
+import net.flectone.pulse.constant.AdventureTag;
 import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.model.util.*;
+import net.flectone.pulse.model.value.*;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
-import net.flectone.pulse.util.constant.AdventureTag;
 
 import java.util.LinkedHashMap;
 import java.util.List;

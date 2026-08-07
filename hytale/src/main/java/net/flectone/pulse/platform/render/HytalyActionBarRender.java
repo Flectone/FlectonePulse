@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.serializer.ComponentSerializer;
 import net.flectone.pulse.util.HytaleMessageUtil;
 import net.kyori.adventure.text.Component;
 

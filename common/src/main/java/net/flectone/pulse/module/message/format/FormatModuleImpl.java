@@ -1,16 +1,18 @@
 package net.flectone.pulse.module.message.format;
 
-import java.util.LinkedHashSet;
-import java.util.Collections;
-import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.constant.AdventureTag;
+import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.SettingText;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -32,15 +34,10 @@ import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerMod
 import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.AdventureTag;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.constant.SettingText;
-import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -49,8 +46,7 @@ import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

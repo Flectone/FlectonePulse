@@ -12,8 +12,8 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.io.ProxyPayload;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.util.payload.ProxyPayload;
 
 import java.io.IOException;
 import java.util.UUID;

@@ -1,11 +1,11 @@
 package net.flectone.pulse.platform.sender;
 
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.exception.ProxyMessageCreateException;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.ProxyDataConsumer;
-import net.flectone.pulse.util.constant.ModuleName;
 import org.jspecify.annotations.NonNull;
 
 import java.io.*;

@@ -4,7 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -12,7 +13,6 @@ import net.flectone.pulse.model.event.lifecycle.DisableEvent;
 import net.flectone.pulse.model.event.lifecycle.EnableEvent;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.util.constant.ModuleName;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

@@ -1,6 +1,6 @@
 package net.flectone.pulse.exception;
 
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.logging.FLogger;
 
 /**
  * Thrown when the plugin cannot finish starting up. The message asks the user to report the problem.

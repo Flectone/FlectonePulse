@@ -4,8 +4,8 @@ import lombok.Getter;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
+import net.flectone.pulse.constant.HookType;
 import net.flectone.pulse.mixin.ServerLoginPacketListenerImplAccessor;
-import net.flectone.pulse.util.constant.HookType;
 
 import java.util.function.Supplier;
 

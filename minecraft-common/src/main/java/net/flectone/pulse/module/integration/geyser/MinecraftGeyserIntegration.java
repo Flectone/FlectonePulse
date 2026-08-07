@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import org.geysermc.geyser.api.GeyserApi;
 
 @Singleton

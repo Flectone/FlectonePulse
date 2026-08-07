@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.BossBar;
+import net.flectone.pulse.model.value.BossBar;
 import net.kyori.adventure.text.Component;
 
 @Singleton

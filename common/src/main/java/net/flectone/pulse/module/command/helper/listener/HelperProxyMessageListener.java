@@ -4,19 +4,19 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.dispatcher.MessageDispatcher;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.message.context.StringMessageContext;
-import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.module.command.helper.HelperModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.io.ProxyPayload;
+import net.flectone.pulse.util.payload.ProxyPayload;
 
 import java.io.IOException;
 

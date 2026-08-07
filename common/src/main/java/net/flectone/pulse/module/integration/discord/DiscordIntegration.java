@@ -8,8 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -17,8 +16,9 @@ import net.flectone.pulse.module.integration.discord.listener.DiscordMessageList
 import net.flectone.pulse.module.integration.discord.model.DiscordClient;
 import net.flectone.pulse.module.integration.discord.provider.DiscordClientProvider;
 import net.flectone.pulse.module.integration.discord.service.DiscordWebhookService;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Map;

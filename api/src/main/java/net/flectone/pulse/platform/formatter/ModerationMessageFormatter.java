@@ -1,10 +1,10 @@
 package net.flectone.pulse.platform.formatter;
 
+import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.util.ExternalModeration;
-import net.flectone.pulse.model.util.Moderation;
-import net.flectone.pulse.util.checker.MuteChecker;
+import net.flectone.pulse.model.value.ExternalModeration;
+import net.flectone.pulse.model.value.Moderation;
 
 import java.util.Optional;
 

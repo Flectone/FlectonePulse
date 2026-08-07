@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.ModuleSimple;
@@ -24,7 +25,6 @@ import net.flectone.pulse.module.message.scoreboard.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.module.message.tab.TabModule;
-import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
 

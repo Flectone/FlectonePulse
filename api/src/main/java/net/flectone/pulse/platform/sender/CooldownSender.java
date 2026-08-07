@@ -2,8 +2,8 @@ package net.flectone.pulse.platform.sender;
 
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.util.Cooldown;
-import net.flectone.pulse.model.util.Pair;
+import net.flectone.pulse.model.value.Cooldown;
+import net.flectone.pulse.model.value.Pair;
 
 import java.util.Optional;
 

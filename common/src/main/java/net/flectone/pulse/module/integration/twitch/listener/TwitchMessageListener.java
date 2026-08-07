@@ -5,10 +5,10 @@ import com.github.twitch4j.common.util.ChatReply;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.model.value.Pair;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.twitch.execution.dispatcher.TwitchCommandDispatcher;
 import net.flectone.pulse.module.integration.twitch.sender.TwitchSender;
-import net.flectone.pulse.model.util.Pair;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.integration;
 
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.logging.FLogger;
 
 /**
  * One hook into another plugin. Implementations report their name and log when they are wired up or torn down.

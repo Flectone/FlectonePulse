@@ -14,10 +14,9 @@ import net.flectone.pulse.listener.inventory.MinecraftPacketInventoryListener;
 import net.flectone.pulse.listener.module.MinecraftPulseModuleEnableListener;
 import net.flectone.pulse.listener.player.MinecraftPacketPlayerConnectionListener;
 import net.flectone.pulse.listener.proxy.cache.MinecraftSkinprofileCacheProxyMessageListener;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.platform.regitry.ListenerRegistryImpl;
-import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
 

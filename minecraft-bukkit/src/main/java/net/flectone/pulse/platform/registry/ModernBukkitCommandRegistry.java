@@ -2,12 +2,12 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.mapper.BukkitFPlayerMapper;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
-import net.flectone.pulse.processing.mapper.BukkitFPlayerMapper;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.resolver.ReflectionResolver;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.bukkit.CloudBukkitCapabilities;
 

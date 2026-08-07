@@ -1,7 +1,7 @@
 package net.flectone.pulse.platform.sender;
 
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.util.constant.ModuleName;
 
 /**
  * Sends disable messages when chat features are disabled for players.

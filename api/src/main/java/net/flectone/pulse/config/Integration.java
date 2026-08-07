@@ -7,9 +7,9 @@ import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.config.setting.MessageChannelSetting;
 import net.flectone.pulse.config.setting.SoundConfigSetting;
-import net.flectone.pulse.model.util.Destination;
-import net.flectone.pulse.model.util.Sound;
-import net.flectone.pulse.model.util.Ticker;
+import net.flectone.pulse.model.value.Destination;
+import net.flectone.pulse.model.value.Sound;
+import net.flectone.pulse.model.value.Ticker;
 
 import java.util.List;
 import java.util.Map;

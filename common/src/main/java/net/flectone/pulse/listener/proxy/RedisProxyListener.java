@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import io.lettuce.core.pubsub.RedisPubSubListener;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.platform.proxy.RedisProxy;
-import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

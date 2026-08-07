@@ -9,9 +9,9 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.util.NotificationUtil;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Toast;
+import net.flectone.pulse.model.value.Toast;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
+import net.flectone.pulse.serializer.HytaleComponentSerializer;
 import net.kyori.adventure.text.Component;
 
 @Singleton

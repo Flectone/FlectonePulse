@@ -1,7 +1,7 @@
 package net.flectone.pulse.listener;
 
 
-import net.flectone.pulse.util.constant.LoginStatus;
+import net.flectone.pulse.constant.LoginStatus;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;

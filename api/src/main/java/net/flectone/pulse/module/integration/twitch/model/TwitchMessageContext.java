@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.integration.twitch.model;
 
 import net.flectone.pulse.model.event.message.context.StringMessageContext;
-import net.flectone.pulse.model.util.Pair;
+import net.flectone.pulse.model.value.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

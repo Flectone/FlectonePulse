@@ -2,13 +2,13 @@ package net.flectone.pulse.module.message.anvil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.message.anvil.listener.BukkitAnvilListener;
 import net.flectone.pulse.module.message.anvil.listener.PaperAnvilListener;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.resolver.ReflectionResolver;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton

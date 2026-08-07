@@ -1,13 +1,13 @@
 package net.flectone.pulse.service;
 
-import net.flectone.pulse.data.repository.SocialRepository;
-import net.flectone.pulse.model.FColor;
+import net.flectone.pulse.persistence.repository.SocialRepository;
+import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
-import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.SettingText;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

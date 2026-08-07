@@ -4,10 +4,11 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.dispatcher.MessageDispatcher;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.command.poll.builder.MinecraftDialogPollBuilder;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -15,12 +16,11 @@ import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 public class MinecraftPollModule extends PollModuleImpl {

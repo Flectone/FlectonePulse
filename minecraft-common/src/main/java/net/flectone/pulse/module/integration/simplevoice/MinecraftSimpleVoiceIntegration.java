@@ -10,17 +10,17 @@ import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.checker.MuteChecker;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.render.ActionBarRender;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.checker.MuteChecker;
-import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.Optional;
 

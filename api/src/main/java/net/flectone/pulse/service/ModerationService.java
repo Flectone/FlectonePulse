@@ -1,10 +1,10 @@
 package net.flectone.pulse.service;
 
 import net.flectone.pulse.config.setting.ViolationSetting;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.util.constant.ModuleName;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;

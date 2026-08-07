@@ -4,9 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
-import net.flectone.pulse.processing.serializer.FabricComponentSerializer;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.serializer.FabricComponentSerializer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 

@@ -3,8 +3,8 @@ package net.flectone.pulse.util;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.util.file.FileWriter;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.file.FileWriter;
+import net.flectone.pulse.logging.FLogger;
 
 import java.io.IOException;
 import java.io.InputStream;

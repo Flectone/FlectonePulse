@@ -1,6 +1,6 @@
 package net.flectone.pulse.exception;
 
-import net.flectone.pulse.util.constant.CacheName;
+import net.flectone.pulse.constant.CacheName;
 
 /**
  * Thrown when a cache is created twice, or asked for before it has been created.

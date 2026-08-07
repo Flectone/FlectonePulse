@@ -1,8 +1,8 @@
 package net.flectone.pulse.model.event.message.context;
 
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
