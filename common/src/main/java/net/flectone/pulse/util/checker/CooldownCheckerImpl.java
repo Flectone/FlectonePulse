@@ -2,11 +2,11 @@ package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.repository.CooldownRepository;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
+import org.jspecify.annotations.NonNull;
 
 import java.util.UUID;
 

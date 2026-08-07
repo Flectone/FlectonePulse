@@ -1,7 +1,7 @@
 package net.flectone.pulse.util.checker;
 
-import lombok.NonNull;
 import net.flectone.pulse.model.util.Cooldown;
+import org.jspecify.annotations.NonNull;
 
 import java.util.UUID;
 
