@@ -1,13 +1,13 @@
 package net.flectone.pulse.platform.controller;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.registry.CommandRegistry;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -28,7 +28,7 @@ public class ModuleCommandControllerImpl implements ModuleCommandController {
 
     private final Map<ModuleName, List<String>> commandPromptsMap = new EnumMap<>(ModuleName.class);
 
-    private final Provider<CommandRegistry> commandRegistryProvider;
+    private final LazyInstance<CommandRegistry> commandRegistry;
     private final FileFacade fileFacade;
 
     @Override
@@ -36,7 +36,7 @@ public class ModuleCommandControllerImpl implements ModuleCommandController {
         List<String> aliases = command.config().aliases();
         String commandName = getCommandName(command);
 
-        commandRegistryProvider.get().registerCommand(manager ->
+        commandRegistry.get().registerCommand(manager ->
                 builder.apply(manager.commandBuilder(commandName, aliases, CommandMeta.empty())).handler(command)
         );
     }
@@ -46,7 +46,7 @@ public class ModuleCommandControllerImpl implements ModuleCommandController {
         List<String> aliases = command.config().aliases().stream().map(alias -> alias + subName).toList();
         String commandName = getCommandName(command) + subName;
 
-        commandRegistryProvider.get().registerCommand(manager ->
+        commandRegistry.get().registerCommand(manager ->
                 builder.apply(manager.commandBuilder(commandName, aliases, CommandMeta.empty()))
         );
     }

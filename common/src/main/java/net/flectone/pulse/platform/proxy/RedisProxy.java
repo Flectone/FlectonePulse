@@ -2,7 +2,6 @@ package net.flectone.pulse.platform.proxy;
 
 import net.flectone.pulse.util.constant.DatabaseType;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
@@ -14,6 +13,7 @@ import net.flectone.pulse.config.Config;
 import net.flectone.pulse.listener.proxy.RedisProxyListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -27,7 +27,7 @@ public class RedisProxy implements Proxy {
 
     private final FileFacade fileFacade;
     private final FLogger fLogger;
-    private final Provider<RedisProxyListener> redisListenerProvider;
+    private final LazyInstance<RedisProxyListener> redisListener;
     private final SystemVariableResolver systemVariableResolver;
 
     private RedisClient redisClient;
@@ -74,7 +74,7 @@ public class RedisProxy implements Proxy {
                 async.subscribe(tag.name().getBytes(StandardCharsets.UTF_8));
             }
 
-            pubSubConnection.addListener(redisListenerProvider.get());
+            pubSubConnection.addListener(redisListener.get());
 
             fLogger.info("Redis (Lettuce) connected");
         } catch (Exception e) {

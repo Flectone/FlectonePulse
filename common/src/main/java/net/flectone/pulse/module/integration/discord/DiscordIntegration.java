@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.integration.discord;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import discord4j.common.util.Snowflake;
 import discord4j.discordjson.json.ChannelModifyRequest;
@@ -18,6 +17,7 @@ import net.flectone.pulse.module.integration.discord.listener.DiscordMessageList
 import net.flectone.pulse.module.integration.discord.model.DiscordClient;
 import net.flectone.pulse.module.integration.discord.provider.DiscordClientProvider;
 import net.flectone.pulse.module.integration.discord.service.DiscordWebhookService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -35,7 +35,7 @@ public class DiscordIntegration implements FIntegration {
     private final DiscordModule discordModule;
     private final DiscordWebhookService discordWebhookService;
     private final DiscordClientProvider discordClientProvider;
-    private final Injector injector;
+    private final LazyInstance<DiscordMessageListener> discordMessageListener;
 
     @Getter private final FLogger fLogger;
 
@@ -64,11 +64,11 @@ public class DiscordIntegration implements FIntegration {
             updateChannelInfo();
         }
 
-        DiscordMessageListener discordMessageListener = injector.getInstance(DiscordMessageListener.class);
+        DiscordMessageListener discordMessageListenerInstance = discordMessageListener.get();
         if (!discordModule.config().messageChannel().isEmpty()) {
             discordClient.gateway().getEventDispatcher()
-                    .on(discordMessageListener.getEventType())
-                    .flatMap(discordMessageListener::execute)
+                    .on(discordMessageListenerInstance.getEventType())
+                    .flatMap(discordMessageListenerInstance::execute)
                     .subscribe();
         }
 

@@ -5,7 +5,6 @@ import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,7 @@ import net.flectone.pulse.module.integration.twitch.listener.TwitchMessageListen
 import net.flectone.pulse.module.integration.twitch.model.TwitchClient;
 import net.flectone.pulse.module.integration.twitch.provider.TwitchClientProvider;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class TwitchIntegration implements FIntegration {
     private final TwitchClientProvider twitchClientProvider;
     private final PlatformServerAdapter platformServerAdapter;
     private final TaskScheduler taskScheduler;
-    private final Injector injector;
+    private final LazyInstance<TwitchMessageListener> twitchMessageListener;
 
     @Getter private final FLogger fLogger;
 
@@ -89,10 +89,10 @@ public class TwitchIntegration implements FIntegration {
         });
 
         if (!integration.messageChannel().isEmpty()) {
-            TwitchMessageListener twitchMessageListener = injector.getInstance(TwitchMessageListener.class);
+            TwitchMessageListener twitchMessageListenerInstance = twitchMessageListener.get();
 
-            eventManager.onEvent(twitchMessageListener.getEventType(), channelMessageEvent ->
-                    taskScheduler.runAsync(() -> twitchMessageListener.execute(channelMessageEvent))
+            eventManager.onEvent(twitchMessageListenerInstance.getEventType(), channelMessageEvent ->
+                    taskScheduler.runAsync(() -> twitchMessageListenerInstance.execute(channelMessageEvent))
             );
         }
 

@@ -1,12 +1,13 @@
 package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.platform.proxy.FabricProxy;
+import net.flectone.pulse.platform.proxy.RedisProxy;
 import net.flectone.pulse.platform.regitry.ProxyRegistryImpl;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -14,17 +15,18 @@ import net.flectone.pulse.util.logging.FLogger;
 public class FabricProxyRegistry extends ProxyRegistryImpl {
 
     private final FileFacade fileFacade;
-    private final Injector injector;
+    private final LazyInstance<FabricProxy> fabricProxy;
 
     @Inject
     public FabricProxyRegistry(FileFacade fileFacade,
                                ReflectionResolver reflectionResolver,
                                FLogger fLogger,
-                               Injector injector) {
-        super(fileFacade, reflectionResolver, fLogger, injector);
+                               LazyInstance<FabricProxy> fabricProxy,
+                               LazyInstance<RedisProxy> redisProxy) {
+        super(fileFacade, reflectionResolver, fLogger, redisProxy);
 
         this.fileFacade = fileFacade;
-        this.injector = injector;
+        this.fabricProxy = fabricProxy;
     }
 
     @Override
@@ -35,10 +37,10 @@ public class FabricProxyRegistry extends ProxyRegistryImpl {
         if (config.proxy().bungeecord() || config.proxy().velocity()) {
             warnIfLocalDatabase();
 
-            FabricProxy fabricProxy = injector.getInstance(FabricProxy.class);
-            fabricProxy.onEnable();
+            FabricProxy proxy = fabricProxy.get();
+            proxy.onEnable();
 
-            registry(fabricProxy);
+            registry(proxy);
         }
     }
 

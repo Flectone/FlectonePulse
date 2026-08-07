@@ -1,5 +1,6 @@
 dependencies {
     compileOnly project(":api")
+    compileOnly project(":common")
     compileOnly project(":minecraft-common")
 
     compileOnly libraries.platform

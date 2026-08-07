@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.integration.telegram;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.TelegramMessageListener;
 import net.flectone.pulse.module.integration.telegram.model.TelegramClient;
 import net.flectone.pulse.module.integration.telegram.provider.TelegramClientProvider;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -36,7 +36,7 @@ public class TelegramIntegration implements FIntegration {
     private final TelegramClientProvider telegramClientProvider;
     private final MessagePipeline messagePipeline;
     private final TaskScheduler taskScheduler;
-    private final Injector injector;
+    private final LazyInstance<TelegramMessageListener> telegramMessageListener;
 
     @Getter private final FLogger fLogger;
 
@@ -67,8 +67,7 @@ public class TelegramIntegration implements FIntegration {
 
         try {
             // register listener
-            TelegramMessageListener telegramMessageListener = injector.getInstance(TelegramMessageListener.class);
-            telegramClient.registerListener(telegramMessageListener);
+            telegramClient.registerListener(telegramMessageListener.get());
 
             Integration.ChannelInfo channelInfo = config().channelInfo();
 

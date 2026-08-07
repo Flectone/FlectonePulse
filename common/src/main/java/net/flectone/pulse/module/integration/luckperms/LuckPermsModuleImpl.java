@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -19,24 +20,24 @@ import java.util.Set;
 public class LuckPermsModuleImpl implements LuckPermsModule {
 
     private final FileFacade fileFacade;
-    private final LuckPermsIntegration luckPermsIntegration;
     private final PlatformServerAdapter platformServerAdapter;
     private final ModuleController moduleController;
+    private final LazyInstance<LuckPermsIntegration> luckPermsIntegration;
 
     @Override
     public void onEnable() {
         if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
                 || platformServerAdapter.getPlatformType() == PlatformType.NEOFORGE) {
             // delay for init
-            luckPermsIntegration.hookLater();
+            luckPermsIntegration.get().hookLater();
         } else {
-            luckPermsIntegration.hook();
+            luckPermsIntegration.get().hook();
         }
     }
 
     @Override
     public void onDisable() {
-        luckPermsIntegration.unhook();
+        luckPermsIntegration.get().unhook();
     }
 
     @Override
@@ -58,7 +59,7 @@ public class LuckPermsModuleImpl implements LuckPermsModule {
     public boolean hasLuckPermission(FPlayer fPlayer, String permission) {
         if (!moduleController.isEnable(this)) return false;
 
-        return luckPermsIntegration.hasPermission(fPlayer, permission);
+        return luckPermsIntegration.get().hasPermission(fPlayer, permission);
     }
 
     @Override
@@ -71,28 +72,28 @@ public class LuckPermsModuleImpl implements LuckPermsModule {
         if (!moduleController.isEnable(this)) return 0;
         if (!config().tabSort()) return 0;
 
-        return luckPermsIntegration.getGroupWeight(fPlayer);
+        return luckPermsIntegration.get().getGroupWeight(fPlayer);
     }
 
     @Override
     public String getPrefix(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
-        return luckPermsIntegration.getPrefix(fPlayer);
+        return luckPermsIntegration.get().getPrefix(fPlayer);
     }
 
     @Override
     public String getSuffix(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
-        return luckPermsIntegration.getSuffix(fPlayer);
+        return luckPermsIntegration.get().getSuffix(fPlayer);
     }
 
     @Override
     public Set<String> getGroups() {
         if (!moduleController.isEnable(this)) return Set.of();
 
-        return luckPermsIntegration.getGroups();
+        return luckPermsIntegration.get().getGroups();
     }
 
 }

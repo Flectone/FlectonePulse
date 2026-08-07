@@ -114,8 +114,7 @@ public class BukkitInjector extends MinecraftPlatformInjector {
         bind(MinecraftJoinModule.class).to(BukkitJoinModule.class);
         bind(MinecraftQuitModule.class).to(BukkitQuitModule.class);
 
-        // Scheduler
-        bind(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class)
-                .toInstance(UniversalScheduler.getScheduler(plugin));
+        // scheduler
+        bind(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).toInstance(UniversalScheduler.getScheduler(plugin));
     }
 }

@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.command.chatsetting;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.chatsetting.builder.HytaleMenuBuilder;
@@ -15,13 +14,14 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class HytaleChatsettingModule extends ChatsettingModuleImpl {
 
-    private final Provider<HytaleMenuBuilder> hytaleMenuBuilderProvider;
+    private final LazyInstance<HytaleMenuBuilder> hytaleMenuBuilder;
 
     @Inject
     public HytaleChatsettingModule(FileFacade fileFacade,
@@ -35,16 +35,16 @@ public class HytaleChatsettingModule extends ChatsettingModuleImpl {
                                    TaskScheduler taskScheduler,
                                    ModuleController moduleController,
                                    ModuleCommandController commandModuleController,
-                                   Provider<HytaleMenuBuilder> hytaleMenuBuilderProvider,
+                                   LazyInstance<HytaleMenuBuilder> hytaleMenuBuilder,
                                    ListenerRegistry listenerRegistry) {
         super(fileFacade, fPlayerService, socialService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController, commandModuleController, listenerRegistry);
 
-        this.hytaleMenuBuilderProvider = hytaleMenuBuilderProvider;
+        this.hytaleMenuBuilder = hytaleMenuBuilder;
     }
 
     @Override
     protected MenuBuilder getMenuBuilder() {
-        return hytaleMenuBuilderProvider.get();
+        return hytaleMenuBuilder.get();
     }
 
 }

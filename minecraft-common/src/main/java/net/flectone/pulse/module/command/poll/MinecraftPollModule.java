@@ -3,7 +3,6 @@ package net.flectone.pulse.module.command.poll;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -19,6 +18,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -27,7 +27,7 @@ public class MinecraftPollModule extends PollModuleImpl {
 
     private final ModuleCommandController commandModuleController;
     private final MinecraftPacketProvider packetProvider;
-    private final Provider<MinecraftDialogPollBuilder> dialogPollBuilderProvider;
+    private final LazyInstance<MinecraftDialogPollBuilder> dialogPollBuilder;
 
     @Inject
     public MinecraftPollModule(FileFacade fileFacade,
@@ -42,7 +42,7 @@ public class MinecraftPollModule extends PollModuleImpl {
                                FLogger fLogger,
                                ComponentSerializer componentSerializer,
                                MinecraftPacketProvider packetProvider,
-                               Provider<MinecraftDialogPollBuilder> dialogPollBuilderProvider,
+                               LazyInstance<MinecraftDialogPollBuilder> dialogPollBuilder,
                                ListenerRegistry listenerRegistry,
                                ProxyRegistry proxyRegistry,
                                SocialService socialService,
@@ -51,7 +51,7 @@ public class MinecraftPollModule extends PollModuleImpl {
 
         this.commandModuleController = commandModuleController;
         this.packetProvider = packetProvider;
-        this.dialogPollBuilderProvider = dialogPollBuilderProvider;
+        this.dialogPollBuilder = dialogPollBuilder;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class MinecraftPollModule extends PollModuleImpl {
         if (config().enableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
             commandModuleController.registerSubCommand(this, config().subCommandGui(), commandBuilder -> commandBuilder
                     .permission(permission().create().name())
-                    .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
+                    .handler(commandContext -> dialogPollBuilder.get().openDialog(commandContext.sender()))
             );
         }
 

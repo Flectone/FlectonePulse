@@ -9,7 +9,6 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.netty.buffer.ByteBuf;
@@ -25,6 +24,7 @@ import net.flectone.pulse.processing.converter.AdventureHoverConverter;
 import net.flectone.pulse.processing.converter.IconConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.NeoForgeTpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.decorator.ComponentDecorator;
@@ -55,9 +55,9 @@ import java.util.*;
 public class NeoForgeServerAdapter implements PlatformServerAdapter {
 
     private final NeoForgeFlectonePulse neoForgeFlectonePulse;
-    private final Provider<FPlayerService> fPlayerServiceProvider;
-    private final Provider<MessagePipeline> messagePipelineProvider;
-    private final Provider<SocialService> socialServiceProvider;
+    private final LazyInstance<FPlayerService> fPlayerService;
+    private final LazyInstance<MessagePipeline> messagePipeline;
+    private final LazyInstance<SocialService> socialService;
     private final MinecraftPacketProvider packetProvider;
     private final AdventureHoverConverter adventureHoverConverter;
     private final NeoForgeTpsTracker tpsTracker;
@@ -98,10 +98,10 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
         MinecraftServer minecraftServer = neoForgeFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return 0;
 
-        return (int) fPlayerServiceProvider.get().getOnlineFPlayers().stream()
-                    .filter(fPlayer -> !fPlayer.isUnknown())
-                    .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
-                    .count();
+        return (int) fPlayerService.get().getOnlineFPlayers().stream()
+                .filter(fPlayer -> !fPlayer.isUnknown())
+                .filter(fPlayer -> !socialService.get().isVanished(fPlayer))
+                .count();
     }
 
     @Override
@@ -281,7 +281,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
         net.minecraft.network.chat.Component customName = itemStack.getCustomName();
         if (customName == null) return Component.empty();
 
-        String clearedDisplayName = messagePipelineProvider.get().buildPlain(MessageContext.builder()
+        String clearedDisplayName = messagePipeline.get().buildPlain(MessageContext.builder()
                 .message(customName.getString())
                 .build()
         );
@@ -320,13 +320,13 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
         List<Component> componentLore = lore.length == 0
                 ? List.of()
                 : Arrays.stream(lore)
-                .map(message -> messagePipelineProvider.get()
-                                .build(MessageContext.builder()
-                                       .sender(fPlayer)
-                                       .message(message)
-                                       .build()
-                                )
-                                .decoration(TextDecoration.ITALIC, false)
+                .map(message -> messagePipeline.get()
+                        .build(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(message)
+                                .build()
+                        )
+                        .decoration(TextDecoration.ITALIC, false)
                 )
                 .toList();
 
@@ -340,7 +340,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
     private @NonNull Component buildItemNameComponent(@NonNull FPlayer fPlayer, @NonNull String title) {
         if (title.isEmpty()) return Component.empty();
 
-        return messagePipelineProvider.get().build(MessageContext.builder()
+        return messagePipeline.get().build(MessageContext.builder()
                 .sender(fPlayer)
                 .message(title)
                 .build()

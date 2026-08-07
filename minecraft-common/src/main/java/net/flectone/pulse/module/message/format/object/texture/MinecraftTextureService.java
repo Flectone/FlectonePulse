@@ -4,7 +4,6 @@ import com.alessiodp.libby.Library;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -16,6 +15,7 @@ import net.flectone.pulse.module.message.format.object.texture.mineskin.Mineskin
 import net.flectone.pulse.module.message.format.object.texture.model.Frame;
 import net.flectone.pulse.module.message.format.object.texture.model.Texture;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.file.FileWriter;
 import net.flectone.pulse.util.logging.FLogger;
@@ -55,7 +55,7 @@ public class MinecraftTextureService {
     private final @Named("imagePath") Path imagePath;
     private final Gson gson;
     private final FLogger fLogger;
-    private final Injector injector;
+    private final LazyInstance<MineskinIntegration> lazyMineskinIntegration;
     private final LibraryResolver libraryResolver;
     private final TaskScheduler taskScheduler;
 
@@ -79,7 +79,7 @@ public class MinecraftTextureService {
                 );
             }
 
-            mineskinIntegration = injector.getInstance(MineskinIntegration.class);
+            mineskinIntegration = lazyMineskinIntegration.get();
             mineskinIntegration.hook();
         }
 

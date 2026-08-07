@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
@@ -32,6 +31,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
@@ -54,11 +54,11 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final FabricPlaceholderAPIModule fabricPlaceholderAPIModule;
-    private final Provider<MuteModule> muteModuleProvider;
-    private final Provider<ConditionModule> conditionModuleProvider;
-    private final Provider<AfkModule> afkModuleProvider;
-    private final Provider<OnlineModule> onlineModuleProvider;
-    private final Provider<ToponlineModule> toponlineModuleProvider;
+    private final LazyInstance<MuteModule> muteModule;
+    private final LazyInstance<ConditionModule> conditionModule;
+    private final LazyInstance<AfkModule> afkModule;
+    private final LazyInstance<OnlineModule> onlineModule;
+    private final LazyInstance<ToponlineModule> toponlineModule;
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     @Getter private final FLogger fLogger;
@@ -115,7 +115,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
-            return PlaceholderResult.value(muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer));
+            return PlaceholderResult.value(muteModule.get().getMuteSuffix(fPlayer, fPlayer));
         });
 
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration"), (context, _) -> {
@@ -123,7 +123,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
-            return PlaceholderResult.value(String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer)));
+            return PlaceholderResult.value(String.valueOf(afkModule.get().getAfkDuration(fPlayer)));
         });
 
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration_formatted"), (context, _) -> {
@@ -131,14 +131,14 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
-            return PlaceholderResult.value(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
+            return PlaceholderResult.value(afkModule.get().getAfkDurationFormatted(fPlayer, fPlayer));
         });
 
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":toponline"), (context, argument) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
-            ToponlineModule toponlineModule = toponlineModuleProvider.get();
-            Optional<FPlayer> fTarget = toponlineModule.getPlayerByPosition(argument);
+            ToponlineModule toponlineModuleInstance = toponlineModule.get();
+            Optional<FPlayer> fTarget = toponlineModuleInstance.getPlayerByPosition(argument);
 
             return PlaceholderResult.value(fTarget.isPresent() ? fTarget.get().name() : "");
         });
@@ -148,8 +148,8 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
-            OnlineModule onlineModule = onlineModuleProvider.get();
-            String timeValue = onlineModule.parseTimeValue(fPlayer, fPlayer, argument);
+            OnlineModule onlineModuleInstance = onlineModule.get();
+            String timeValue = onlineModuleInstance.parseTimeValue(fPlayer, fPlayer, argument);
             if (StringUtils.isEmpty(timeValue)) return PlaceholderResult.value("");
 
             return PlaceholderResult.value(timeValue);
@@ -158,7 +158,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":condition"), (context, argument) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
-            return PlaceholderResult.value(conditionModuleProvider.get().getConditionValue(argument, fPlayerService.getFPlayer(context.player().getUUID())));
+            return PlaceholderResult.value(conditionModule.get().getConditionValue(argument, fPlayerService.getFPlayer(context.player().getUUID())));
         });
 
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor"), (context, argument) ->

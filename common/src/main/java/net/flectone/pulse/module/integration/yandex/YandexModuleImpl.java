@@ -2,7 +2,6 @@ package net.flectone.pulse.module.integration.yandex;
 
 import com.alessiodp.libby.Library;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
@@ -12,6 +11,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -22,18 +22,18 @@ public class YandexModuleImpl implements YandexModule {
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
-    private final Injector injector;
+    private final LazyInstance<YandexIntegration> yandexIntegration;
 
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("yandex.cloud.sdk.auth.Auth", this::loadLibraries);
 
-        injector.getInstance(YandexIntegration.class).hook();
+        yandexIntegration.get().hook();
     }
 
     @Override
     public void onDisable() {
-        injector.getInstance(YandexIntegration.class).unhook();
+        yandexIntegration.get().unhook();
     }
 
     private void loadLibraries(LibraryResolver libraryResolver) {
@@ -66,6 +66,6 @@ public class YandexModuleImpl implements YandexModule {
     public String translate(FPlayer sender, String source, String target, String text) {
         if (moduleController.isDisabledFor(this, sender)) return text;
 
-        return injector.getInstance(YandexIntegration.class).translate(source, target, text);
+        return yandexIntegration.get().translate(source, target, text);
     }
 }

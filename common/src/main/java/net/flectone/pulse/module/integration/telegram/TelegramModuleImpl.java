@@ -2,7 +2,6 @@ package net.flectone.pulse.module.integration.telegram;
 
 import com.alessiodp.libby.Library;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
@@ -22,6 +21,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -41,20 +41,21 @@ public class TelegramModuleImpl implements TelegramModule {
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final SocialService socialService;
-    private final Injector injector;
+    private final LazyInstance<TelegramIntegration> telegramIntegration;
+    private final LazyInstance<TelegramSender> telegramSender;
 
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient", this::loadLibraries);
 
-        taskScheduler.runAsync(() -> injector.getInstance(TelegramIntegration.class).hook(), true);
+        taskScheduler.runAsync(() -> telegramIntegration.get().hook(), true);
 
         listenerRegistry.register(TelegramPulseListener.class);
     }
 
     @Override
     public void onDisable() {
-        injector.getInstance(TelegramIntegration.class).unhook();
+        telegramIntegration.get().unhook();
     }
 
     private void loadLibraries(LibraryResolver libraryResolver) {
@@ -122,9 +123,8 @@ public class TelegramModuleImpl implements TelegramModule {
         UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(integrationMessageFormat, messageContext);
 
         // send to discord
-        TelegramSender telegramSender = injector.getInstance(TelegramSender.class);
         for (String specificMessageName : messageNames) {
-            telegramSender.sendMessage(sender, specificMessageName.toUpperCase(), integrationFormat);
+            telegramSender.get().sendMessage(sender, specificMessageName.toUpperCase(), integrationFormat);
         }
     }
 

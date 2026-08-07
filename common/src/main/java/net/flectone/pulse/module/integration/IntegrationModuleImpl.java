@@ -1,12 +1,8 @@
 package net.flectone.pulse.module.integration;
 
-import com.google.inject.Injector;
-import com.google.inject.Provider;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
@@ -19,9 +15,9 @@ import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
@@ -31,21 +27,27 @@ import java.util.Set;
 public abstract class IntegrationModuleImpl implements IntegrationModule {
 
     private final FileFacade fileFacade;
-    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
+    private final LazyInstance<PlatformServerAdapter> platformServerAdapter;
     private final ModuleController moduleController;
     private final ListenerRegistry listenerRegistry;
-    private final Injector injector;
+    private final LazyInstance<LuckPermsModule> luckPermsModule;
+    private final LazyInstance<DeeplModule> deeplModule;
+    private final LazyInstance<YandexModule> yandexModule;
 
     protected IntegrationModuleImpl(FileFacade fileFacade,
-                                Provider<PlatformServerAdapter> platformServerAdapterProvider,
-                                ListenerRegistry listenerRegistry,
-                                ModuleController moduleController,
-                                Injector injector) {
+                                    LazyInstance<PlatformServerAdapter> platformServerAdapter,
+                                    ListenerRegistry listenerRegistry,
+                                    ModuleController moduleController,
+                                    LazyInstance<LuckPermsModule> luckPermsModule,
+                                    LazyInstance<DeeplModule> deeplModule,
+                                    LazyInstance<YandexModule> yandexModule) {
         this.fileFacade = fileFacade;
-        this.platformServerAdapterProvider = platformServerAdapterProvider;
+        this.platformServerAdapter = platformServerAdapter;
         this.listenerRegistry = listenerRegistry;
         this.moduleController = moduleController;
-        this.injector = injector;
+        this.luckPermsModule = luckPermsModule;
+        this.deeplModule = deeplModule;
+        this.yandexModule = yandexModule;
     }
 
     @Override
@@ -57,7 +59,7 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
     public Set<@NonNull Class<? extends ModuleSimple>> children() {
         Set<@NonNull Class<? extends ModuleSimple>> children = new LinkedHashSet<>(IntegrationModule.super.children());
 
-        if (platformServerAdapterProvider.get().hasProject("LuckPerms")) {
+        if (platformServerAdapter.get().hasProject("LuckPerms")) {
             children.add(LuckPermsModule.class);
         }
 
@@ -87,33 +89,6 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
     }
 
     @Override
-    public abstract String checkMention(FEntity fPlayer, String message);
-
-    @Override
-    public abstract boolean isVanished(FEntity sender);
-
-    @Override
-    public abstract boolean hasVanishIntegration();
-
-    @Override
-    public abstract boolean hasSeeVanishPermission(FEntity sender);
-
-    @Override
-    public abstract boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message);
-
-    @Override
-    public abstract boolean isMuted(FPlayer fPlayer);
-
-    @Override
-    public abstract boolean isBedrockPlayer(FEntity fPlayer);
-
-    @Override
-    public abstract ExternalModeration getMute(FPlayer fPlayer);
-
-    @Override
-    public abstract String getTritonLocale(FPlayer fPlayer);
-
-    @Override
     public boolean containsEnabledChild(ModuleName moduleName) {
         if (!moduleController.containsChild(this, moduleName)) return false;
 
@@ -121,16 +96,11 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
     }
 
     @Override
-    public <T> T getInstance(Class<T> clazz) {
-        return injector.getInstance(clazz);
-    }
-
-    @Override
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
         if (!moduleController.isEnable(this)) return false;
 
         if (containsEnabledChild(ModuleName.INTEGRATION_LUCKPERMS)) {
-            return getInstance(LuckPermsModule.class).hasLuckPermission(fPlayer, permission);
+            return luckPermsModule.get().hasLuckPermission(fPlayer, permission);
         }
 
         return false;
@@ -141,7 +111,7 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
         if (!moduleController.isEnable(this)) return false;
 
         if (containsEnabledChild(ModuleName.INTEGRATION_LUCKPERMS)) {
-            return getInstance(LuckPermsModule.class).isAlwaysHaveTrue();
+            return luckPermsModule.get().isAlwaysHaveTrue();
         }
 
         return false;
@@ -152,7 +122,7 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
         if (!moduleController.isEnable(this)) return null;
 
         if (containsEnabledChild(ModuleName.INTEGRATION_LUCKPERMS)) {
-            return injector.getInstance(LuckPermsModule.class).getPrefix(fPlayer);
+            return luckPermsModule.get().getPrefix(fPlayer);
         }
 
         return null;
@@ -163,7 +133,7 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
         if (!moduleController.isEnable(this)) return null;
 
         if (containsEnabledChild(ModuleName.INTEGRATION_LUCKPERMS)) {
-            return injector.getInstance(LuckPermsModule.class).getSuffix(fPlayer);
+            return luckPermsModule.get().getSuffix(fPlayer);
         }
 
         return null;
@@ -174,7 +144,7 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
         if (!moduleController.isEnable(this)) return Set.of();
 
         if (containsEnabledChild(ModuleName.INTEGRATION_LUCKPERMS)) {
-            return injector.getInstance(LuckPermsModule.class).getGroups();
+            return luckPermsModule.get().getGroups();
         }
 
         return Set.of();
@@ -185,14 +155,14 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
         if (!moduleController.isEnable(this)) return 0;
         if (!containsEnabledChild(ModuleName.INTEGRATION_LUCKPERMS)) return 0;
 
-        return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
+        return luckPermsModule.get().getGroupWeight(fPlayer);
     }
 
     @Override
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {
         if (moduleController.isDisabledFor(this, sender)) return text;
         if (containsEnabledChild(ModuleName.INTEGRATION_DEEPL)) {
-            return injector.getInstance(DeeplModule.class).translate(sender, source, target, text);
+            return deeplModule.get().translate(sender, source, target, text);
         }
 
         return text;
@@ -202,7 +172,7 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
     public String yandexTranslate(FPlayer sender, String source, String target, String text) {
         if (moduleController.isDisabledFor(this, sender)) return text;
         if (containsEnabledChild(ModuleName.INTEGRATION_YANDEX)) {
-            return injector.getInstance(YandexModule.class).translate(sender, source, target, text);
+            return yandexModule.get().translate(sender, source, target, text);
         }
 
         return text;

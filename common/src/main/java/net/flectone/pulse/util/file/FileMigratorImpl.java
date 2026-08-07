@@ -1,13 +1,13 @@
 package net.flectone.pulse.util.file;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.file.FilePack;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.CacheName;
 import net.flectone.pulse.util.constant.PlatformType;
 import org.apache.commons.lang3.Strings;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FileMigratorImpl implements FileMigrator {
 
-    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
+    private final LazyInstance<PlatformServerAdapter> platformServerAdapter;
 
     @Override
     public FilePack migration_1_11_1(FilePack files) {
@@ -56,7 +56,7 @@ public class FileMigratorImpl implements FileMigrator {
 
         Map<String, Localization> newLocalizations = new LinkedHashMap<>();
 
-        boolean isNotHytale = platformServerAdapterProvider.get().getPlatformType() != PlatformType.HYTALE;
+        boolean isNotHytale = platformServerAdapter.get().getPlatformType() != PlatformType.HYTALE;
         for (Localization localization : files.localizations().values()) {
             if (isNotHytale) {
                 Map<String, String> newBossbarTypes = new LinkedHashMap<>();

@@ -5,7 +5,6 @@ import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -24,6 +23,7 @@ import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -53,12 +53,8 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     private final MessagePipeline messagePipeline;
     private final ComponentSerializer componentSerializer;
     private final FLogger fLogger;
-
-    @Inject
-    private Provider<MinecraftHeaderModule> headerModuleProvider;
-
-    @Inject
-    private Provider<MinecraftFooterModule> footerModuleProvider;
+    private final LazyInstance<MinecraftHeaderModule> headerModule;
+    private final LazyInstance<MinecraftFooterModule> footerModule;
 
     private MethodHandle handleMethod;
     private MethodHandle gameProfileMethod;
@@ -275,11 +271,11 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
-        MinecraftHeaderModule headerModule = headerModuleProvider.get();
+        MinecraftHeaderModule headerModuleInstance = headerModule.get();
 
         String header;
-        if (!headerModule.isDisabledFor(fPlayer)) {
-            header = headerModule.getCurrentMessage(fPlayer);
+        if (!headerModuleInstance.isDisabledFor(fPlayer)) {
+            header = headerModuleInstance.getCurrentMessage(fPlayer);
             if (header != null) {
                 return messagePipeline.build(MessageContext.builder()
                         .sender(fPlayer)
@@ -300,11 +296,11 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
-        MinecraftFooterModule footerModule = footerModuleProvider.get();
+        MinecraftFooterModule footerModuleInstance = footerModule.get();
 
         String footer;
-        if (!footerModule.isDisabledFor(fPlayer)) {
-            footer = footerModule.getCurrentMessage(fPlayer);
+        if (!footerModuleInstance.isDisabledFor(fPlayer)) {
+            footer = footerModuleInstance.getCurrentMessage(fPlayer);
             if (footer != null) {
                 return messagePipeline.build(MessageContext.builder()
                         .sender(fPlayer)

@@ -1,9 +1,6 @@
 package net.flectone.pulse.util.file;
-import java.util.LinkedHashMap;
-import java.util.HashSet;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Getter;
@@ -13,6 +10,7 @@ import net.flectone.pulse.config.merger.*;
 import net.flectone.pulse.exception.FileLoadException;
 import net.flectone.pulse.model.file.FilePack;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.DefaultLocalization;
 import net.flectone.pulse.util.constant.FilePath;
 import net.flectone.pulse.util.constant.PlatformType;
@@ -29,10 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,7 +46,7 @@ public class FileLoaderImpl implements FileLoader {
     private final LocalizationMergerImpl localizationMerger;
     private final MessageMergerImpl messageMerger;
     private final PermissionMergerImpl permissionMerger;
-    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
+    private final LazyInstance<PlatformServerAdapter> platformServerAdapter;
 
     @Getter
     private FilePack defaultFiles;
@@ -221,7 +216,8 @@ public class FileLoaderImpl implements FileLoader {
     }
 
     private String resolveResourcePath(String path) {
-        if (platformServerAdapterProvider.get().getPlatformType() == PlatformType.HYTALE) {
+        PlatformServerAdapter platformServerAdapterInstance = platformServerAdapter.get();
+        if (platformServerAdapterInstance.getPlatformType() == PlatformType.HYTALE) {
             return "hytale/" + path;
         }
 

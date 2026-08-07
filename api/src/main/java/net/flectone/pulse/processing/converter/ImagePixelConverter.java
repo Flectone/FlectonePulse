@@ -26,8 +26,6 @@ public interface ImagePixelConverter {
      */
     @NonNull List<String> convertOrGetCache(@Nullable String link);
 
-    // Idea taken from here
-    // https://github.com/QuiltServerTools/BlockBot/blob/5d5fa854002de2c12200edbe22f12382350ca7eb/src/main/kotlin/io/github/quiltservertools/blockbotdiscord/extensions/BlockBotApiExtension.kt#L136
     /**
      * Downloads and renders the image, bypassing the cache.
      *

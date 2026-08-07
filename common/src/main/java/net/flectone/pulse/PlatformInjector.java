@@ -9,25 +9,10 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
-import java.net.http.HttpClient;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import lombok.SneakyThrows;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.DatabaseImpl;
-import net.flectone.pulse.data.repository.CooldownRepository;
-import net.flectone.pulse.data.repository.CooldownRepositoryImpl;
-import net.flectone.pulse.data.repository.FPlayerRepository;
-import net.flectone.pulse.data.repository.FPlayerRepositoryImpl;
-import net.flectone.pulse.data.repository.ModerationRepository;
-import net.flectone.pulse.data.repository.ModerationRepositoryImpl;
-import net.flectone.pulse.data.repository.PlaytimeRepository;
-import net.flectone.pulse.data.repository.PlaytimeRepositoryImpl;
-import net.flectone.pulse.data.repository.SocialRepository;
-import net.flectone.pulse.data.repository.SocialRepositoryImpl;
+import net.flectone.pulse.data.repository.*;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.EventDispatcherImpl;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
@@ -230,34 +215,14 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.controller.ModuleControllerImpl;
 import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.platform.filter.RangeFilterImpl;
-import net.flectone.pulse.platform.formatter.IntegrationFormatter;
-import net.flectone.pulse.platform.formatter.IntegrationFormatterImpl;
-import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.platform.formatter.ModerationMessageFormatterImpl;
-import net.flectone.pulse.platform.formatter.TimeFormatter;
-import net.flectone.pulse.platform.formatter.TimeFormatterImpl;
-import net.flectone.pulse.platform.formatter.UrlFormatter;
-import net.flectone.pulse.platform.formatter.UrlFormatterImpl;
+import net.flectone.pulse.platform.formatter.*;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.platform.handler.CommandExceptionHandlerImpl;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.regitry.CacheRegistryImpl;
 import net.flectone.pulse.platform.regitry.ProxyRegistryImpl;
-import net.flectone.pulse.platform.sender.CooldownSender;
-import net.flectone.pulse.platform.sender.CooldownSenderImpl;
-import net.flectone.pulse.platform.sender.DisableSender;
-import net.flectone.pulse.platform.sender.DisableSenderImpl;
-import net.flectone.pulse.platform.sender.IgnoreSender;
-import net.flectone.pulse.platform.sender.IgnoreSenderImpl;
-import net.flectone.pulse.platform.sender.MetricsSender;
-import net.flectone.pulse.platform.sender.MetricsSenderImpl;
-import net.flectone.pulse.platform.sender.ModerationListSender;
-import net.flectone.pulse.platform.sender.ModerationListSenderImpl;
-import net.flectone.pulse.platform.sender.MuteSender;
-import net.flectone.pulse.platform.sender.MuteSenderImpl;
-import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.platform.sender.ProxySenderImpl;
+import net.flectone.pulse.platform.sender.*;
 import net.flectone.pulse.processing.converter.*;
 import net.flectone.pulse.processing.parser.integer.ColorParser;
 import net.flectone.pulse.processing.parser.integer.ColorParserImpl;
@@ -302,6 +267,13 @@ import tools.jackson.dataformat.yaml.YAMLFactory;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
+import java.net.http.HttpClient;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public abstract class PlatformInjector extends AbstractModule {
 
     private final Path projectPath;
@@ -318,19 +290,17 @@ public abstract class PlatformInjector extends AbstractModule {
     @Override
     protected void configure() {
         bind(FLogger.class).toInstance(fLogger);
-        bind(FlectonePulseAPI.class).to(FlectonePulseAPIImpl.class);
-        bind(FlectonePulseAPIImpl.class).asEagerSingleton();
         bind(LibraryResolver.class).toInstance(libraryResolver);
-        bind(MiniMessage.class).toInstance(MiniMessage.builder().tags(TagResolver.builder().build()).build());
         bind(HttpClient.class).toInstance(HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build());
+        bind(MiniMessage.class).toInstance(MiniMessage.builder().tags(TagResolver.builder().build()).build());
 
         ReflectionResolver reflectionResolver = new ReflectionResolverImpl(libraryResolver);
         bind(ReflectionResolver.class).toInstance(reflectionResolver);
 
         // bind paths
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
-        bind(Path.class).annotatedWith(Names.named("imagePath")).toInstance(projectPath.resolve("images"));
         bind(Path.class).annotatedWith(Names.named("backupPath")).toInstance(projectPath.resolve("backups"));
+        bind(Path.class).annotatedWith(Names.named("imagePath")).toInstance(projectPath.resolve("images"));
         bind(Path.class).annotatedWith(Names.named("minecraftPath")).toInstance(projectPath.resolve("minecraft"));
 
         // create jackson mapper
@@ -340,9 +310,28 @@ public abstract class PlatformInjector extends AbstractModule {
         // bind date format
         bind(SimpleDateFormat.class).toInstance(new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss"));
 
-        // default module bindings — platforms that override a module bind it themselves in setupPlatform()
+        // api
+        bind(FlectonePulseAPI.class).to(FlectonePulseAPIImpl.class);
+        bind(FlectonePulseAPIImpl.class).asEagerSingleton();
+
+        // data
+        bind(CooldownRepository.class).to(CooldownRepositoryImpl.class);
+        bind(Database.class).to(DatabaseImpl.class);
+        bind(FPlayerRepository.class).to(FPlayerRepositoryImpl.class);
+        bind(ModerationRepository.class).to(ModerationRepositoryImpl.class);
+        bind(PlaytimeRepository.class).to(PlaytimeRepositoryImpl.class);
+        bind(SocialRepository.class).to(SocialRepositoryImpl.class);
+
+        // execution
+        bind(EventDispatcher.class).to(EventDispatcherImpl.class);
+        bind(MessageDispatcher.class).to(MessageDispatcherImpl.class);
+        bind(MessagePipeline.class).to(MessagePipelineImpl.class);
+        bind(TaskScheduler.class).to(TaskSchedulerImpl.class);
+
+        // module
         bind(Module.class).to(ModuleImpl.class);
-        bind(CommandModule.class).to(CommandModuleImpl.class);
+
+        // module.command
         bind(AfkModule.class).to(AfkModuleImpl.class);
         bind(AnonModule.class).to(AnonModuleImpl.class);
         bind(BallModule.class).to(BallModuleImpl.class);
@@ -353,6 +342,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(ClearchatModule.class).to(ClearchatModuleImpl.class);
         bind(ClearmailModule.class).to(ClearmailModuleImpl.class);
         bind(CoinModule.class).to(CoinModuleImpl.class);
+        bind(CommandModule.class).to(CommandModuleImpl.class);
         bind(DeletemessageModule.class).to(DeletemessageModuleImpl.class);
         bind(DiceModule.class).to(DiceModuleImpl.class);
         bind(DoModule.class).to(DoModuleImpl.class);
@@ -364,6 +354,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(IgnorelistModule.class).to(IgnorelistModuleImpl.class);
         bind(KickModule.class).to(KickModuleImpl.class);
         bind(MailModule.class).to(MailModuleImpl.class);
+        bind(MaintenanceModule.class).to(MaintenanceModuleImpl.class);
         bind(MeModule.class).to(MeModuleImpl.class);
         bind(MinesweeperModule.class).to(MinesweeperModuleImpl.class);
         bind(MuteModule.class).to(MuteModuleImpl.class);
@@ -371,9 +362,11 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(NicknameModule.class).to(NicknameModuleImpl.class);
         bind(OnlineModule.class).to(OnlineModuleImpl.class);
         bind(PingModule.class).to(PingModuleImpl.class);
+        bind(PollModule.class).to(PollModuleImpl.class);
         bind(ReplyModule.class).to(ReplyModuleImpl.class);
         bind(RockpaperscissorsModule.class).to(RockpaperscissorsModuleImpl.class);
         bind(SpriteModule.class).to(SpriteModuleImpl.class);
+        bind(SpyModule.class).to(SpyModuleImpl.class);
         bind(StreamModule.class).to(StreamModuleImpl.class);
         bind(SymbolModule.class).to(SymbolModuleImpl.class);
         bind(TellModule.class).to(TellModuleImpl.class);
@@ -388,6 +381,8 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(WarnlistModule.class).to(WarnlistModuleImpl.class);
         bind(WhitelistModule.class).to(WhitelistModuleImpl.class);
         bind(WhoisModule.class).to(WhoisModuleImpl.class);
+
+        // module.integration
         bind(DeeplModule.class).to(DeeplModuleImpl.class);
         bind(DiscordModule.class).to(DiscordModuleImpl.class);
         bind(ICUModule.class).to(ICUModuleImpl.class);
@@ -395,144 +390,109 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(TelegramModule.class).to(TelegramModuleImpl.class);
         bind(TwitchModule.class).to(TwitchModuleImpl.class);
         bind(YandexModule.class).to(YandexModuleImpl.class);
-        bind(AutoModule.class).to(AutoModuleImpl.class);
-        bind(BrandModule.class).to(BrandModuleImpl.class);
-        bind(FormatModule.class).to(FormatModuleImpl.class);
+
+        // module.message
+        bind(net.flectone.pulse.module.message.afk.AfkModule.class).to(net.flectone.pulse.module.message.afk.AfkModuleImpl.class);
         bind(AnimationModule.class).to(AnimationModuleImpl.class);
-        bind(ConditionModule.class).to(ConditionModuleImpl.class);
-        bind(FadingModule.class).to(FadingModuleImpl.class);
-        bind(FColorModule.class).to(FColorModuleImpl.class);
-        bind(FixationModule.class).to(FixationModuleImpl.class);
-        bind(MentionModule.class).to(MentionModuleImpl.class);
-        bind(ModerationModule.class).to(ModerationModuleImpl.class);
+        bind(AnvilModule.class).to(AnvilModuleImpl.class);
+        bind(AutoModule.class).to(AutoModuleImpl.class);
+        bind(BookModule.class).to(BookModuleImpl.class);
+        bind(BossbarModule.class).to(BossbarModuleImpl.class);
+        bind(BrandModule.class).to(BrandModuleImpl.class);
         bind(CapsModule.class).to(CapsModuleImpl.class);
+        bind(ConditionModule.class).to(ConditionModuleImpl.class);
         bind(DeleteModule.class).to(DeleteModuleImpl.class);
+        bind(FColorModule.class).to(FColorModuleImpl.class);
+        bind(FadingModule.class).to(FadingModuleImpl.class);
+        bind(FixationModule.class).to(FixationModuleImpl.class);
         bind(FloodModule.class).to(FloodModuleImpl.class);
-        bind(NewbieModule.class).to(NewbieModuleImpl.class);
-        bind(SwearModule.class).to(SwearModuleImpl.class);
+        bind(FormatModule.class).to(FormatModuleImpl.class);
+        bind(GreetingModule.class).to(GreetingModuleImpl.class);
+        bind(JoinModule.class).to(JoinModuleImpl.class);
+        bind(MentionModule.class).to(MentionModuleImpl.class);
+        bind(MessageModule.class).to(MessageModuleImpl.class);
+        bind(ModerationModule.class).to(ModerationModuleImpl.class);
         bind(NamesModule.class).to(NamesModuleImpl.class);
+        bind(NewbieModule.class).to(NewbieModuleImpl.class);
+        bind(ObjectModule.class).to(ObjectModuleImpl.class);
+        bind(ObjectiveModule.class).to(ObjectiveModuleImpl.class);
         bind(PaddingModule.class).to(PaddingModuleImpl.class);
         bind(QuestionAnswerModule.class).to(QuestionAnswerModuleImpl.class);
+        bind(QuitModule.class).to(QuitModuleImpl.class);
         bind(ReplacementModule.class).to(ReplacementModuleImpl.class);
+        bind(RightclickModule.class).to(RightclickModuleImpl.class);
+        bind(SignModule.class).to(SignModuleImpl.class);
+        bind(StatusModule.class).to(StatusModuleImpl.class);
+        bind(SwearModule.class).to(SwearModuleImpl.class);
+        bind(TabModule.class).to(TabModuleImpl.class);
         bind(TranslateModule.class).to(TranslateModuleImpl.class);
-        bind(GreetingModule.class).to(GreetingModuleImpl.class);
         bind(UpdateModule.class).to(UpdateModuleImpl.class);
 
-        // default processing/service/util bindings — platforms that override one bind it themselves in setupPlatform()
+        // platform
+        bind(CacheRegistry.class).to(CacheRegistryImpl.class);
+        bind(CommandExceptionHandler.class).to(CommandExceptionHandlerImpl.class);
+        bind(CooldownSender.class).to(CooldownSenderImpl.class);
+        bind(DisableSender.class).to(DisableSenderImpl.class);
+        bind(IgnoreSender.class).to(IgnoreSenderImpl.class);
+        bind(IntegrationFormatter.class).to(IntegrationFormatterImpl.class);
+        bind(MetricsSender.class).to(MetricsSenderImpl.class);
+        bind(ModerationListSender.class).to(ModerationListSenderImpl.class);
+        bind(ModerationMessageFormatter.class).to(ModerationMessageFormatterImpl.class);
+        bind(ModuleCommandController.class).to(ModuleCommandControllerImpl.class);
+        bind(ModuleController.class).to(ModuleControllerImpl.class);
+        bind(MuteSender.class).to(MuteSenderImpl.class);
+        bind(ProxyRegistry.class).to(ProxyRegistryImpl.class);
+        bind(ProxySender.class).to(ProxySenderImpl.class);
+        bind(RangeFilter.class).to(RangeFilterImpl.class);
+        bind(TimeFormatter.class).to(TimeFormatterImpl.class);
+        bind(UrlFormatter.class).to(UrlFormatterImpl.class);
+
+        // processing
+        bind(BanModerationParser.class).to(BanModerationParserImpl.class);
         bind(ColorConverter.class).to(ColorConverterImpl.class);
-        bind(IconConverter.class).to(IconConverterImpl.class);
-        bind(ImagePixelConverter.class).to(ImagePixelConverterImpl.class);
         bind(ColorParser.class).to(ColorParserImpl.class);
         bind(DurationReasonParser.class).to(DurationReasonParserImpl.class);
-        bind(BanModerationParser.class).to(BanModerationParserImpl.class);
+        bind(IconConverter.class).to(IconConverterImpl.class);
+        bind(ImagePixelConverter.class).to(ImagePixelConverterImpl.class);
+        bind(MessageParser.class).to(MessageParserImpl.class);
         bind(MuteModerationParser.class).to(MuteModerationParserImpl.class);
-        bind(WarnModerationParser.class).to(WarnModerationParserImpl.class);
-        bind(WhitelistModerationParser.class).to(WhitelistModerationParserImpl.class);
         bind(OfflinePlayerParser.class).to(OfflinePlayerParserImpl.class);
         bind(PlatformPlayerParser.class).to(PlatformPlayerParserImpl.class);
         bind(PlayerParser.class).to(PlayerParserImpl.class);
-        bind(MessageParser.class).to(MessageParserImpl.class);
-        bind(SingleMessageParser.class).to(SingleMessageParserImpl.class);
-        bind(URLParser.class).to(URLParserImpl.class);
-        bind(UUIDParser.class).to(UUIDParserImpl.class);
         bind(PlayerPreLoginProcessor.class).to(PlayerPreLoginProcessorImpl.class);
         bind(ProxyMessageProcessor.class).to(ProxyMessageProcessorImpl.class);
+        bind(SingleMessageParser.class).to(SingleMessageParserImpl.class);
         bind(SystemVariableResolver.class).to(SystemVariableResolverImpl.class);
+        bind(URLParser.class).to(URLParserImpl.class);
+        bind(UUIDParser.class).to(UUIDParserImpl.class);
+        bind(WarnModerationParser.class).to(WarnModerationParserImpl.class);
+        bind(WhitelistModerationParser.class).to(WhitelistModerationParserImpl.class);
+
+        // service
         bind(FPlayerService.class).to(FPlayerServiceImpl.class);
         bind(MetricsService.class).to(MetricsServiceImpl.class);
         bind(ModerationService.class).to(ModerationServiceImpl.class);
         bind(PlaytimeService.class).to(PlaytimeServiceImpl.class);
         bind(SocialService.class).to(SocialServiceImpl.class);
-        bind(WebUtil.class).to(WebUtilImpl.class);
-        bind(CooldownChecker.class).to(CooldownCheckerImpl.class);
-        bind(MuteChecker.class).to(MuteCheckerImpl.class);
-        bind(ValidNameChecker.class).to(ValidNameCheckerImpl.class);
-        bind(VersionComparator.class).to(VersionComparatorImpl.class);
+
+        // util
         bind(BackupCreator.class).to(BackupCreatorImpl.class);
         bind(ComponentDecorator.class).to(ComponentDecoratorImpl.class);
+        bind(CooldownChecker.class).to(CooldownCheckerImpl.class);
         bind(FileFacade.class).to(FileFacadeImpl.class);
         bind(FileLoader.class).to(FileLoaderImpl.class);
         bind(FileMigrator.class).to(FileMigratorImpl.class);
         bind(FilePathProvider.class).to(FilePathProviderImpl.class);
         bind(FileWriter.class).to(FileWriterImpl.class);
-        bind(RandomGenerator.class).to(RandomGeneratorImpl.class);
         bind(LogFilter.class).to(LogFilterImpl.class);
-
-        // repositories
-        bind(CooldownRepository.class).to(CooldownRepositoryImpl.class);
-        bind(FPlayerRepository.class).to(FPlayerRepositoryImpl.class);
-        bind(ModerationRepository.class).to(ModerationRepositoryImpl.class);
-        bind(PlaytimeRepository.class).to(PlaytimeRepositoryImpl.class);
-        bind(SocialRepository.class).to(SocialRepositoryImpl.class);
-        bind(Database.class).to(DatabaseImpl.class);
-
-        // dispatchers
-        bind(EventDispatcher.class).to(EventDispatcherImpl.class);
-        bind(MessageDispatcher.class).to(MessageDispatcherImpl.class);
-
-        // senders
-        bind(CooldownSender.class).to(CooldownSenderImpl.class);
-        bind(DisableSender.class).to(DisableSenderImpl.class);
-        bind(IgnoreSender.class).to(IgnoreSenderImpl.class);
-        bind(MetricsSender.class).to(MetricsSenderImpl.class);
-        bind(ModerationListSender.class).to(ModerationListSenderImpl.class);
-        bind(MuteSender.class).to(MuteSenderImpl.class);
-        bind(ProxySender.class).to(ProxySenderImpl.class);
-
-        // formatters
-        bind(IntegrationFormatter.class).to(IntegrationFormatterImpl.class);
-        bind(ModerationMessageFormatter.class).to(ModerationMessageFormatterImpl.class);
-        bind(TimeFormatter.class).to(TimeFormatterImpl.class);
-        bind(UrlFormatter.class).to(UrlFormatterImpl.class);
-
-        // controllers, registries and other platform-independent services
-        bind(ModuleController.class).to(ModuleControllerImpl.class);
-        bind(ModuleCommandController.class).to(ModuleCommandControllerImpl.class);
-        bind(CommandExceptionHandler.class).to(CommandExceptionHandlerImpl.class);
-        bind(CacheRegistry.class).to(CacheRegistryImpl.class);
-        bind(RangeFilter.class).to(RangeFilterImpl.class);
-
-        // Defaults that some platform replaces. Every interface is pointed at its common Impl exactly
-        // once, here; a platform that needs different behaviour re-points the Impl in setupPlatform()
-        // (bind(FooImpl.class).to(PlatformFoo.class)) instead of re-binding the interface. Guice follows
-        // the whole chain, so platforms that are happy with the default simply say nothing.
-        bind(MessagePipeline.class).to(MessagePipelineImpl.class);
-        bind(TaskScheduler.class).to(TaskSchedulerImpl.class);
-        bind(ProxyRegistry.class).to(ProxyRegistryImpl.class);
-        bind(MaintenanceModule.class).to(MaintenanceModuleImpl.class);
-        bind(PollModule.class).to(PollModuleImpl.class);
-        bind(SpyModule.class).to(SpyModuleImpl.class);
-        bind(MessageModule.class).to(MessageModuleImpl.class);
-        bind(BossbarModule.class).to(BossbarModuleImpl.class);
-        bind(JoinModule.class).to(JoinModuleImpl.class);
-        bind(ObjectModule.class).to(ObjectModuleImpl.class);
-        bind(ObjectiveModule.class).to(ObjectiveModuleImpl.class);
-        bind(QuitModule.class).to(QuitModuleImpl.class);
-        bind(RightclickModule.class).to(RightclickModuleImpl.class);
-        bind(StatusModule.class).to(StatusModuleImpl.class);
-        bind(TabModule.class).to(TabModuleImpl.class);
-        bind(AnvilModule.class).to(AnvilModuleImpl.class);
-        bind(BookModule.class).to(BookModuleImpl.class);
-        bind(SignModule.class).to(SignModuleImpl.class);
-        // command.afk.AfkModule is bound above; this is the message-side module of the same name
-        bind(net.flectone.pulse.module.message.afk.AfkModule.class)
-                .to(net.flectone.pulse.module.message.afk.AfkModuleImpl.class);
+        bind(MuteChecker.class).to(MuteCheckerImpl.class);
+        bind(RandomGenerator.class).to(RandomGeneratorImpl.class);
+        bind(ValidNameChecker.class).to(ValidNameCheckerImpl.class);
+        bind(VersionComparator.class).to(VersionComparatorImpl.class);
+        bind(WebUtil.class).to(WebUtilImpl.class);
 
         // platform binding
         setupPlatform(reflectionResolver);
-
-//        try {
-//            Package[] packs = Package.getPackages();
-//
-//            Arrays.stream(packs)
-//                    .map(Package::getName)
-//                    .filter(string -> string.contains(BuildConfig.RELOCATED_PATTERN + ""))
-//                    .sorted()
-//                    .forEach(fLogger::warning);
-//
-//        } catch (Exception _) {
-//            fLogger.warning(e);
-//        }
     }
 
     public abstract void setupPlatform(ReflectionResolver reflectionResolver);

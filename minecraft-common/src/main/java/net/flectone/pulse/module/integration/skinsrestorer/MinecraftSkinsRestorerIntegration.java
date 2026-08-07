@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.integration.skinsrestorer;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.converter.ImagePixelConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -37,8 +37,8 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
     private final FlectonePulse flectonePulse;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final Provider<MinecraftSkinService> skinServiceProvider;
-    private final Provider<ImagePixelConverter> imagePixelConverterProvider;
+    private final LazyInstance<MinecraftSkinService> skinService;
+    private final LazyInstance<ImagePixelConverter> imagePixelConverter;
     private final TaskScheduler taskScheduler;
     private final ProxySender proxySender;
     @Getter private final FLogger fLogger;
@@ -63,13 +63,13 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
 
                     // update image cache
                     if (!proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE)) {
-                        MinecraftSkinService skinService = skinServiceProvider.get();
-                        skinService.updateProfilePropertyCache(fPlayer);
+                        MinecraftSkinService skinServiceInstance = skinService.get();
+                        skinServiceInstance.updateProfilePropertyCache(fPlayer);
 
-                        ImagePixelConverter imagePixelConverter = imagePixelConverterProvider.get();
-                        imagePixelConverter.invalidate(skinService.getSkin(fPlayer));
-                        imagePixelConverter.invalidate(skinService.getBodyUrl(fPlayer));
-                        imagePixelConverter.invalidate(skinService.getAvatarUrl(fPlayer));
+                        ImagePixelConverter imagePixelConverterInstance = imagePixelConverter.get();
+                        imagePixelConverterInstance.invalidate(skinServiceInstance.getSkin(fPlayer));
+                        imagePixelConverterInstance.invalidate(skinServiceInstance.getBodyUrl(fPlayer));
+                        imagePixelConverterInstance.invalidate(skinServiceInstance.getAvatarUrl(fPlayer));
                     }
                 });
 

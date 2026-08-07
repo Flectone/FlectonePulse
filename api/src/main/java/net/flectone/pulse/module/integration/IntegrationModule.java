@@ -113,15 +113,6 @@ public interface IntegrationModule extends ModuleSimple {
     boolean containsEnabledChild(ModuleName moduleName);
 
     /**
-     * Fetches one integration through dependency injection.
-     *
-     * @param clazz the integration type
-     * @param <T> the integration type
-     * @return the instance
-     */
-    <T> T getInstance(Class<T> clazz);
-
-    /**
      * Whether a permission plugin grants this node, consulted when the platform cannot answer.
      *
      * @param fPlayer the player

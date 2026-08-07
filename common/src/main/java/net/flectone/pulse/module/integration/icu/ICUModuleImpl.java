@@ -3,7 +3,6 @@ package net.flectone.pulse.module.integration.icu;
 import com.alessiodp.libby.Library;
 import com.google.common.cache.Cache;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -31,23 +31,23 @@ public class ICUModuleImpl implements ICUModule {
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
-    private final Injector injector;
     private final ListenerRegistry listenerRegistry;
     private final FLogger fLogger;
     private final IntegrationModule integrationModule;
+    private final LazyInstance<ICUIntegration> icuIntegration;
     private final @Named("icuMessage") Cache<String, String> messageCache;
 
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("com.ibm.icu.text.ArabicShaping", this::loadLibraries);
 
-        injector.getInstance(ICUIntegration.class).hook();
+        icuIntegration.get().hook();
         listenerRegistry.register(PulseICUListener.class);
     }
 
     @Override
     public void onDisable() {
-        injector.getInstance(ICUIntegration.class).unhook();
+        icuIntegration.get().unhook();
     }
 
     @Override
@@ -72,12 +72,12 @@ public class ICUModuleImpl implements ICUModule {
         if (!receiver.isConsole() && !integrationModule.isBedrockPlayer(receiver)) return text;
 
         try {
-            return messageCache.get(text, () -> injector.getInstance(ICUIntegration.class).process(text));
+            return messageCache.get(text, () -> icuIntegration.get().process(text));
         } catch (ExecutionException e) {
             fLogger.warning(e);
         }
 
-        return injector.getInstance(ICUIntegration.class).process(text);
+        return icuIntegration.get().process(text);
     }
 
     private void loadLibraries(LibraryResolver libraryResolver) {

@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.message.chat;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
@@ -19,6 +18,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -36,8 +36,8 @@ public class MinecraftChatModule extends ChatModuleImpl {
                                PlatformServerAdapter platformServerAdapter,
                                PermissionChecker permissionChecker,
                                IntegrationModule integrationModule,
-                               Provider<BubbleModule> bubbleModuleProvider,
-                               Provider<SpyModule> spyModuleProvider,
+                               LazyInstance<BubbleModule> bubbleModule,
+                               LazyInstance<SpyModule> spyModule,
                                ListenerRegistry listenerRegistry,
                                TaskScheduler taskScheduler,
                                MuteSender muteSender,
@@ -46,7 +46,7 @@ public class MinecraftChatModule extends ChatModuleImpl {
                                MessageDispatcher messageDispatcher,
                                MessagePipeline messagePipeline,
                                ProxyRegistry proxyRegistry) {
-        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, messagePipeline, proxyRegistry, listenerRegistry);
+        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModule, spyModule, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, messagePipeline, proxyRegistry, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
         this.platformServerAdapter = platformServerAdapter;

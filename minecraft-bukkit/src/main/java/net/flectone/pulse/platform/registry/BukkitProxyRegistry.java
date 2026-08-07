@@ -1,12 +1,13 @@
 package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.platform.proxy.BukkitProxy;
+import net.flectone.pulse.platform.proxy.RedisProxy;
 import net.flectone.pulse.platform.regitry.ProxyRegistryImpl;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -14,17 +15,18 @@ import net.flectone.pulse.util.logging.FLogger;
 public class BukkitProxyRegistry extends ProxyRegistryImpl {
 
     private final FileFacade fileFacade;
-    private final Injector injector;
+    private final LazyInstance<BukkitProxy> bukkitProxy;
 
     @Inject
     public BukkitProxyRegistry(FileFacade fileFacade,
                                ReflectionResolver reflectionResolver,
                                FLogger fLogger,
-                               Injector injector) {
-        super(fileFacade, reflectionResolver, fLogger, injector);
+                               LazyInstance<RedisProxy> redisProxy,
+                               LazyInstance<BukkitProxy> bukkitProxy) {
+        super(fileFacade, reflectionResolver, fLogger, redisProxy);
 
         this.fileFacade = fileFacade;
-        this.injector = injector;
+        this.bukkitProxy = bukkitProxy;
     }
 
     @Override
@@ -36,10 +38,10 @@ public class BukkitProxyRegistry extends ProxyRegistryImpl {
         if (isBukkitProxyEnable) {
             warnIfLocalDatabase();
 
-            BukkitProxy bukkitProxy = injector.getInstance(BukkitProxy.class);
-            bukkitProxy.onEnable();
+            BukkitProxy proxy = bukkitProxy.get();
+            proxy.onEnable();
 
-            registry(bukkitProxy);
+            registry(proxy);
         }
     }
 

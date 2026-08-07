@@ -3,7 +3,6 @@ package net.flectone.pulse.module.integration.placeholderapi;
 import at.helpch.placeholderapi.PlaceholderAPI;
 import at.helpch.placeholderapi.expansion.PlaceholderExpansion;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
@@ -32,6 +31,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
@@ -57,11 +57,11 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
     private final HytalePlaceholderAPIModule placeholderAPIModule;
     private final ModuleController moduleController;
     private final TaskScheduler taskScheduler;
-    private final Provider<MuteModule> muteModuleProvider;
-    private final Provider<ConditionModule> conditionModuleProvider;
-    private final Provider<AfkModule> afkModuleProvider;
-    private final Provider<OnlineModule> onlineModuleProvider;
-    private final Provider<ToponlineModule> toponlineModuleProvider;
+    private final LazyInstance<MuteModule> muteModule;
+    private final LazyInstance<ConditionModule> conditionModule;
+    private final LazyInstance<AfkModule> afkModule;
+    private final LazyInstance<OnlineModule> onlineModule;
+    private final LazyInstance<ToponlineModule> toponlineModule;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -130,22 +130,22 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
 
         params = params.toLowerCase();
         if (params.equalsIgnoreCase("mute_suffix")) {
-            return muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer);
+            return muteModule.get().getMuteSuffix(fPlayer, fPlayer);
         }
 
         if (params.equalsIgnoreCase("afk_duration")) {
-            return String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer));
+            return String.valueOf(afkModule.get().getAfkDuration(fPlayer));
         }
 
         if (params.equalsIgnoreCase("afk_duration_formatted")) {
-            return afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer);
+            return afkModule.get().getAfkDurationFormatted(fPlayer, fPlayer);
         }
 
         if (params.startsWith("toponline_")) {
             String position = params.substring(10);
             if (StringUtils.isEmpty(position)) return null;
 
-            Optional<FPlayer> fTarget = toponlineModuleProvider.get().getPlayerByPosition(position);
+            Optional<FPlayer> fTarget = toponlineModule.get().getPlayerByPosition(position);
             return fTarget.isPresent() ? fTarget.get().name() : "";
         }
 
@@ -153,8 +153,8 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
             String time = params.substring(7);
             if (StringUtils.isEmpty(time)) return null;
 
-            OnlineModule onlineModule = onlineModuleProvider.get();
-            String timeValue = onlineModule.parseTimeValue(fPlayer, fPlayer, time);
+            OnlineModule onlineModuleInstance = onlineModule.get();
+            String timeValue = onlineModuleInstance.parseTimeValue(fPlayer, fPlayer, time);
             if (StringUtils.isEmpty(timeValue)) return null;
 
             return timeValue;
@@ -164,7 +164,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
             String conditionName = params.substring(10);
             if (StringUtils.isEmpty(conditionName)) return null;
 
-            return StringUtils.defaultString(conditionModuleProvider.get().getConditionValue(conditionName, fPlayer));
+            return StringUtils.defaultString(conditionModule.get().getConditionValue(conditionName, fPlayer));
         }
 
         if (params.startsWith("fcolor")) {

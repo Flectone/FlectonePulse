@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.command.chatsetting;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -17,14 +16,15 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class MinecraftChatSettingModule extends ChatsettingModuleImpl {
 
-    private final Provider<MinecraftDialogMenuBuilder> dialogMenuBuilderProvider;
-    private final Provider<MinecraftInventoryMenuBuilder> inventoryMenuBuilderProvider;
+    private final LazyInstance<MinecraftDialogMenuBuilder> dialogMenuBuilder;
+    private final LazyInstance<MinecraftInventoryMenuBuilder> inventoryMenuBuilder;
     private final boolean isNewerThanOrEqualsV_1_21_6;
 
     @Inject
@@ -39,23 +39,23 @@ public class MinecraftChatSettingModule extends ChatsettingModuleImpl {
                                       TaskScheduler taskScheduler,
                                       ModuleController moduleController,
                                       ModuleCommandController commandModuleController,
-                                      Provider<MinecraftDialogMenuBuilder> dialogMenuBuilderProvider,
-                                      Provider<MinecraftInventoryMenuBuilder> inventoryMenuBuilderProvider,
+                                      LazyInstance<MinecraftDialogMenuBuilder> dialogMenuBuilder,
+                                      LazyInstance<MinecraftInventoryMenuBuilder> inventoryMenuBuilder,
                                       @Named("isNewerThanOrEqualsV_1_21_6") boolean isNewerThanOrEqualsV_1_21_6,
                                       ListenerRegistry listenerRegistry) {
         super(fileFacade, fPlayerService, socialService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController, commandModuleController, listenerRegistry);
 
         this.isNewerThanOrEqualsV_1_21_6 = isNewerThanOrEqualsV_1_21_6;
-        this.dialogMenuBuilderProvider = dialogMenuBuilderProvider;
-        this.inventoryMenuBuilderProvider = inventoryMenuBuilderProvider;
+        this.dialogMenuBuilder = dialogMenuBuilder;
+        this.inventoryMenuBuilder = inventoryMenuBuilder;
     }
 
 
     @Override
     protected MenuBuilder getMenuBuilder() {
         return config().modern().enable() && isNewerThanOrEqualsV_1_21_6
-                ? dialogMenuBuilderProvider.get()
-                : inventoryMenuBuilderProvider.get();
+                ? dialogMenuBuilder.get()
+                : inventoryMenuBuilder.get();
     }
 
 

@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import net.flectone.pulse.FlectonePulseAPI;
@@ -25,6 +24,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -52,7 +52,7 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
     private final MinecraftPacketSender packetSender;
     private final MinecraftPacketProvider packetProvider;
     private final ModuleController moduleController;
-    private final Provider<IntegrationModule> integrationModuleProvider;
+    private final LazyInstance<IntegrationModule> integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerService fPlayerService;
     private final boolean isNewerThanOrEqualsV118;
@@ -67,7 +67,7 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
                                      ListenerRegistry listenerRegistry,
                                      PlatformPlayerAdapter platformPlayerAdapter,
                                      ModuleController moduleController,
-                                     Provider<IntegrationModule> integrationModuleProvider,
+                                     LazyInstance<IntegrationModule> integrationModule,
                                      SocialService socialService,
                                      FPlayerService fPlayerService,
                                      @Named("isNewerThanOrEqualsV_1_18") boolean isNewerThanOrEqualsV118,
@@ -80,7 +80,7 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
         this.moduleController = moduleController;
-        this.integrationModuleProvider = integrationModuleProvider;
+        this.integrationModule = integrationModule;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.fPlayerService = fPlayerService;
         this.isNewerThanOrEqualsV118 = isNewerThanOrEqualsV118;
@@ -276,7 +276,7 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
 
     @NonNull
     private String getSortedName(@NonNull FPlayer fPlayer) {
-        int weight = integrationModuleProvider.get().getGroupWeight(fPlayer);
+        int weight = integrationModule.get().getGroupWeight(fPlayer);
 
         // 32767 limit
         if (isNewerThanOrEqualsV118) {

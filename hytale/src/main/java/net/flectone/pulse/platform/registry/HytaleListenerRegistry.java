@@ -2,7 +2,6 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.EventRegistry;
@@ -22,6 +21,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.regitry.ListenerRegistryImpl;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
@@ -47,8 +47,8 @@ public class HytaleListenerRegistry extends ListenerRegistryImpl {
     private final JavaPlugin javaPlugin;
     private final EventRegistry eventRegistry;
     private final TaskScheduler taskScheduler;
-    private final Provider<FPlayerService> fPlayerServiceProvider;
-    private final Provider<SocialService> socialServiceProvider;
+    private final LazyInstance<FPlayerService> fPlayerService;
+    private final LazyInstance<SocialService> socialService;
 
     @Inject
     public HytaleListenerRegistry(ProxyRegistry proxyRegistry,
@@ -57,8 +57,8 @@ public class HytaleListenerRegistry extends ListenerRegistryImpl {
                                   Injector injector,
                                   JavaPlugin javaPlugin,
                                   TaskScheduler taskScheduler,
-                                  Provider<FPlayerService> fPlayerServiceProvider,
-                                  Provider<SocialService> socialServiceProvider) {
+                                  LazyInstance<FPlayerService> fPlayerService,
+                                  LazyInstance<SocialService> socialService) {
         super(proxyRegistry, fLogger, injector);
 
         this.fileFacade = fileFacade;
@@ -67,8 +67,8 @@ public class HytaleListenerRegistry extends ListenerRegistryImpl {
         this.javaPlugin = javaPlugin;
         this.eventRegistry = javaPlugin.getEventRegistry();
         this.taskScheduler = taskScheduler;
-        this.fPlayerServiceProvider = fPlayerServiceProvider;
-        this.socialServiceProvider = socialServiceProvider;
+        this.fPlayerService = fPlayerService;
+        this.socialService = socialService;
     }
 
     @Override
@@ -87,9 +87,9 @@ public class HytaleListenerRegistry extends ListenerRegistryImpl {
                             ? fileFacade.config().language().type().toLowerCase(Locale.ROOT)
                             : Strings.CS.replace(updateLanguage.language.toLowerCase(Locale.ROOT), "-", "_");
                     taskScheduler.runAsync(() -> {
-                        FPlayer fPlayer = fPlayerServiceProvider.get().getFPlayer(playerRef.getUuid());
+                        FPlayer fPlayer = fPlayerService.get().getFPlayer(playerRef.getUuid());
 
-                        socialServiceProvider.get().updateLocale(fPlayer, language);
+                        socialService.get().updateLocale(fPlayer, language);
                     });
                 }
             });

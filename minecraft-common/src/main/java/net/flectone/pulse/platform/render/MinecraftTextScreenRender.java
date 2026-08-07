@@ -11,7 +11,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -25,6 +24,7 @@ import net.flectone.pulse.module.message.bubble.render.MinecraftBubbleRender;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.converter.ColorConverter;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.MinecraftEntityUtil;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
@@ -46,8 +46,8 @@ public class MinecraftTextScreenRender implements TextScreenRender {
     private final TaskScheduler taskScheduler;
     private final RandomGenerator randomUtil;
     private final MinecraftEntityUtil entityUtil;
-    private final Provider<MinecraftBubbleRender> bubbleRenderer;
-    private final Provider<TitleRender> titleRender;
+    private final LazyInstance<MinecraftBubbleRender> bubbleRenderer;
+    private final LazyInstance<TitleRender> titleRender;
     private final @Named("isNewerThanOrEqualsV_1_19_4") boolean isNewerThanOrEqualsV_1_19_4;
 
     @Override

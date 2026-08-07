@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.integration.miniplaceholders;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import io.github.miniplaceholders.api.Expansion;
 import io.github.miniplaceholders.api.MiniPlaceholders;
@@ -30,6 +29,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -59,11 +59,11 @@ public class FabricMiniPlaceholdersIntegration implements FIntegration, PulseLis
     private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
-    private final Provider<MuteModule> muteModuleProvider;
-    private final Provider<ConditionModule> conditionModuleProvider;
-    private final Provider<AfkModule> afkModuleProvider;
-    private final Provider<OnlineModule> onlineModuleProvider;
-    private final Provider<ToponlineModule> toponlineModuleProvider;
+    private final LazyInstance<MuteModule> muteModule;
+    private final LazyInstance<ConditionModule> conditionModule;
+    private final LazyInstance<AfkModule> afkModule;
+    private final LazyInstance<OnlineModule> onlineModule;
+    private final LazyInstance<ToponlineModule> toponlineModule;
     private final MessagePipeline messagePipeline;
 
     @Getter private final FLogger fLogger;
@@ -153,23 +153,23 @@ public class FabricMiniPlaceholdersIntegration implements FIntegration, PulseLis
                 // ignore required type error
                 .audiencePlaceholder("mute_suffix", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
-                    return Tag.preProcessParsed(muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer));
+                    return Tag.preProcessParsed(muteModule.get().getMuteSuffix(fPlayer, fPlayer));
                 })
                 .audiencePlaceholder("afk_duration", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
-                    return Tag.preProcessParsed(String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer)));
+                    return Tag.preProcessParsed(String.valueOf(afkModule.get().getAfkDuration(fPlayer)));
                 })
                 .audiencePlaceholder("afk_duration_formatted", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
-                    return Tag.preProcessParsed(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
+                    return Tag.preProcessParsed(afkModule.get().getAfkDurationFormatted(fPlayer, fPlayer));
                 })
                 .audiencePlaceholder("toponline", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
-                    ToponlineModule toponlineModule = toponlineModuleProvider.get();
-                    Optional<FPlayer> fTarget = toponlineModule.getPlayerByPosition(queue.pop().value());
+                    ToponlineModule toponlineModuleInstance = toponlineModule.get();
+                    Optional<FPlayer> fTarget = toponlineModuleInstance.getPlayerByPosition(queue.pop().value());
                     if (fTarget.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
                     String json = messagePipeline.buildJson(MessageContext.builder()
@@ -185,8 +185,8 @@ public class FabricMiniPlaceholdersIntegration implements FIntegration, PulseLis
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
-                    OnlineModule onlineModule = onlineModuleProvider.get();
-                    String timeValue = onlineModule.parseTimeValue(fPlayer, fPlayer, queue.pop().value());
+                    OnlineModule onlineModuleInstance = onlineModule.get();
+                    String timeValue = onlineModuleInstance.parseTimeValue(fPlayer, fPlayer, queue.pop().value());
                     if (StringUtils.isEmpty(timeValue)) return null;
 
                     return Tag.preProcessParsed(timeValue);
@@ -195,7 +195,7 @@ public class FabricMiniPlaceholdersIntegration implements FIntegration, PulseLis
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
-                    return Tag.preProcessParsed(StringUtils.defaultString(conditionModuleProvider.get().getConditionValue(queue.pop().value(), fPlayer)));
+                    return Tag.preProcessParsed(StringUtils.defaultString(conditionModule.get().getConditionValue(queue.pop().value(), fPlayer)));
                 })
                 .audiencePlaceholder("fcolor", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());

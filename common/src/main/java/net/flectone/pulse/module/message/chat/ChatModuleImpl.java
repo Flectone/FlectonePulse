@@ -1,9 +1,6 @@
 package net.flectone.pulse.module.message.chat;
 
-import java.util.LinkedHashSet;
-import java.util.Collections;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
@@ -32,16 +29,14 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -54,8 +49,8 @@ public class ChatModuleImpl implements ChatModule {
     private final SocialService socialService;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
-    private final Provider<BubbleModule> bubbleModuleProvider;
-    private final Provider<SpyModule> spyModuleProvider;
+    private final LazyInstance<BubbleModule> bubbleModule;
+    private final LazyInstance<SpyModule> spyModule;
     private final TaskScheduler taskScheduler;
     private final MuteSender muteSender;
     private final DisableSender disableSender;
@@ -202,10 +197,10 @@ public class ChatModuleImpl implements ChatModule {
         receiversWithSender.add(fPlayer);
 
         // send to spy module
-        spyModuleProvider.get().checkChat(fPlayer, chatName, playerMessage, receiversWithSender);
+        spyModule.get().checkChat(fPlayer, chatName, playerMessage, receiversWithSender);
 
         // send to bubble module
-        bubbleModuleProvider.get().add(fPlayer, rawString, playerMessage, receiversWithSender);
+        bubbleModule.get().add(fPlayer, rawString, playerMessage, receiversWithSender);
     }
 
     @Override

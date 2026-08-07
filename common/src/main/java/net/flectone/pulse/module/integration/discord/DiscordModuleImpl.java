@@ -3,7 +3,6 @@ package net.flectone.pulse.module.integration.discord;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
@@ -23,6 +22,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -43,7 +43,8 @@ public class DiscordModuleImpl implements DiscordModule {
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final SocialService socialService;
-    private final Injector injector;
+    private final LazyInstance<DiscordIntegration> discordIntegration;
+    private final LazyInstance<DiscordSender> discordSender;
     private final FLogger fLogger;
 
     @Override
@@ -52,7 +53,7 @@ public class DiscordModuleImpl implements DiscordModule {
 
         taskScheduler.runAsync(() -> {
             try {
-                injector.getInstance(DiscordIntegration.class).hook();
+                discordIntegration.get().hook();
             } catch (Exception e) {
                 fLogger.warning(e);
             }
@@ -63,7 +64,7 @@ public class DiscordModuleImpl implements DiscordModule {
 
     @Override
     public void onDisable() {
-        injector.getInstance(DiscordIntegration.class).unhook();
+        discordIntegration.get().unhook();
     }
 
     @Override
@@ -123,9 +124,8 @@ public class DiscordModuleImpl implements DiscordModule {
         UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(integrationMessageFormat, messageContext);
 
         // send to discord
-        DiscordSender discordSender = injector.getInstance(DiscordSender.class);
         for (String specificMessageName : messageNames) {
-            discordSender.sendMessage(sender, specificMessageName, integrationFormat);
+            discordSender.get().sendMessage(sender, specificMessageName, integrationFormat);
         }
     }
 

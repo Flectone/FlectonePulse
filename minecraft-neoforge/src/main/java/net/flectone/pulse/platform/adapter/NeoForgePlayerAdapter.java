@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -21,6 +20,7 @@ import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -57,12 +57,8 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
     private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
-
-    @Inject
-    private Provider<MinecraftHeaderModule> headerModuleProvider;
-
-    @Inject
-    private Provider<MinecraftFooterModule> footerModuleProvider;
+    private final LazyInstance<MinecraftHeaderModule> headerModule;
+    private final LazyInstance<MinecraftFooterModule> footerModule;
 
     @Override
     public int getEntityId(@NonNull UUID uuid) {
@@ -217,10 +213,10 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
-        MinecraftHeaderModule headerModule = headerModuleProvider.get();
+        MinecraftHeaderModule headerModuleInstance = headerModule.get();
 
-        if (!headerModule.isDisabledFor(fPlayer)) {
-            String header = headerModule.getCurrentMessage(fPlayer);
+        if (!headerModuleInstance.isDisabledFor(fPlayer)) {
+            String header = headerModuleInstance.getCurrentMessage(fPlayer);
             if (header != null) {
                 return messagePipeline.build(MessageContext.builder()
                         .sender(fPlayer)
@@ -235,10 +231,10 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
-        MinecraftFooterModule footerModule = footerModuleProvider.get();
+        MinecraftFooterModule footerModuleInstance = footerModule.get();
 
-        if (!footerModule.isDisabledFor(fPlayer)) {
-            String footer = footerModule.getCurrentMessage(fPlayer);
+        if (!footerModuleInstance.isDisabledFor(fPlayer)) {
+            String footer = footerModuleInstance.getCurrentMessage(fPlayer);
             if (footer != null) {
                 return messagePipeline.build(MessageContext.builder()
                         .sender(fPlayer)

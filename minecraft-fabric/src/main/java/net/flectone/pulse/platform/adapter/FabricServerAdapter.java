@@ -9,7 +9,6 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.netty.buffer.ByteBuf;
@@ -27,6 +26,7 @@ import net.flectone.pulse.processing.converter.IconConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.FabricTpsTracker;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.decorator.ComponentDecorator;
 import net.flectone.pulse.util.generator.RandomGenerator;
@@ -55,9 +55,9 @@ import java.util.*;
 public class FabricServerAdapter implements PlatformServerAdapter {
 
     private final FabricFlectonePulse fabricFlectonePulse;
-    private final Provider<FPlayerService> fPlayerServiceProvider;
-    private final Provider<MessagePipeline> messagePipelineProvider;
-    private final Provider<SocialService> socialServiceProvider;
+    private final LazyInstance<FPlayerService> fPlayerService;
+    private final LazyInstance<MessagePipeline> messagePipeline;
+    private final LazyInstance<SocialService> socialService;
     private final MinecraftPacketProvider packetProvider;
     private final AdventureHoverConverter adventureHoverConverter;
     private final FabricTpsTracker tpsTracker;
@@ -98,10 +98,12 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return 0;
 
-        return (int) fPlayerServiceProvider.get().getOnlineFPlayers().stream()
-                    .filter(fPlayer -> !fPlayer.isUnknown())
-                    .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
-                    .count();
+        FPlayerService fPlayerServiceInstance = fPlayerService.get();
+        SocialService socialServiceInstance = socialService.get();
+        return (int) fPlayerServiceInstance.getOnlineFPlayers().stream()
+                .filter(fPlayer -> !fPlayer.isUnknown())
+                .filter(fPlayer -> !socialServiceInstance.isVanished(fPlayer))
+                .count();
     }
 
     @Override
@@ -281,7 +283,8 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         net.minecraft.network.chat.Component customName = itemStack.getCustomName();
         if (customName == null) return Component.empty();
 
-        String clearedDisplayName = messagePipelineProvider.get().buildPlain(MessageContext.builder()
+        MessagePipeline messagePipelineInstance = messagePipeline.get();
+        String clearedDisplayName = messagePipelineInstance.buildPlain(MessageContext.builder()
                 .message(customName.getString())
                 .build()
         );
@@ -317,16 +320,17 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
         Component componentName = buildItemNameComponent(fPlayer, title);
 
+        MessagePipeline messagePipelineInstance = messagePipeline.get();
         List<Component> componentLore = lore.length == 0
                 ? List.of()
                 : Arrays.stream(lore)
-                .map(message -> messagePipelineProvider.get()
-                                .build(MessageContext.builder()
-                                       .sender(fPlayer)
-                                       .message(message)
-                                       .build()
-                                )
-                                .decoration(TextDecoration.ITALIC, false)
+                .map(message -> messagePipelineInstance
+                        .build(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(message)
+                                .build()
+                        )
+                        .decoration(TextDecoration.ITALIC, false)
                 )
                 .toList();
 
@@ -340,7 +344,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private @NonNull Component buildItemNameComponent(@NonNull FPlayer fPlayer, @NonNull String title) {
         if (title.isEmpty()) return Component.empty();
 
-        return messagePipelineProvider.get().build(MessageContext.builder()
+        return messagePipeline.get().build(MessageContext.builder()
                 .sender(fPlayer)
                 .message(title)
                 .build()

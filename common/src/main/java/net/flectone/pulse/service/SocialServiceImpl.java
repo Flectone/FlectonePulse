@@ -1,7 +1,6 @@
 package net.flectone.pulse.service;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.repository.SocialRepository;
@@ -13,6 +12,7 @@ import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -29,12 +29,8 @@ public class SocialServiceImpl implements SocialService {
     private final SocialRepository socialRepository;
     private final ProxyRegistry proxyRegistry;
     private final ProxySender proxySender;
-
-    @Inject
-    private Provider<FileFacade> fileFacadeProvider;
-
-    @Inject
-    private Provider<IntegrationModule> integrationModuleProvider;
+    private final LazyInstance<FileFacade> fileFacade;
+    private final LazyInstance<IntegrationModule> integrationModule;
 
     @Override
     public void invalidate() {
@@ -240,7 +236,7 @@ public class SocialServiceImpl implements SocialService {
 
     @Override
     public boolean updateLocale(@NonNull FPlayer fPlayer, @NonNull String newLocale) {
-        String locale = integrationModuleProvider.get().getTritonLocale(fPlayer);
+        String locale = integrationModule.get().getTritonLocale(fPlayer);
         if (locale == null) {
             locale = newLocale;
         }
@@ -260,19 +256,19 @@ public class SocialServiceImpl implements SocialService {
 
     @Override
     public boolean isVanished(@NonNull FEntity fEntity, boolean checkVanishIntegration) {
-        IntegrationModule integrationModule = integrationModuleProvider.get();
-        if (checkVanishIntegration && !integrationModule.hasVanishIntegration()) return false;
+        IntegrationModule integrationModuleInstance = integrationModule.get();
+        if (checkVanishIntegration && !integrationModuleInstance.hasVanishIntegration()) return false;
 
         if (fEntity instanceof FPlayer fPlayer) {
-            FileFacade fileFacade = fileFacadeProvider.get();
-            if (fileFacade.integration().supervanish().enable()
-                    && fileFacade.integration().supervanish().proxySync()
+            FileFacade fileFacadeInstance = fileFacade.get();
+            if (fileFacadeInstance.integration().supervanish().enable()
+                    && fileFacadeInstance.integration().supervanish().proxySync()
                     && getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
                 return true;
             }
         }
 
-        return integrationModule.isVanished(fEntity);
+        return integrationModuleInstance.isVanished(fEntity);
     }
 
     @Override
@@ -285,7 +281,7 @@ public class SocialServiceImpl implements SocialService {
         if (fTarget.equals(fViewer)) return true;
         if (fViewer instanceof FPlayer fPlayer && fPlayer.isConsole()) return true;
 
-        return !targetVanished || integrationModuleProvider.get().hasSeeVanishPermission(fViewer);
+        return !targetVanished || integrationModule.get().hasSeeVanishPermission(fViewer);
     }
 
 }

@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +32,7 @@ import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -70,7 +70,8 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     private static final String PASTES_DEV_URL = "https://pastes.dev/";
     private static final URI API_PASTES_DEV = URI.create("https://api.pastes.dev/post");
 
-    private final Injector injector;
+    private final LazyInstance<SparkServer> sparkServer;
+    private final LazyInstance<UrlService> urlService;
     private final FileFacade fileFacade;
     private final FlectonePulse flectonePulse;
     private final CommandParserProvider commandParserProvider;
@@ -108,7 +109,7 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     @Override
     public void onDisable() {
         if (reflectionResolver.hasClass(SPARK_CLASS)) {
-            injector.getInstance(SparkServer.class).onDisable();
+            sparkServer.get().onDisable();
         }
 
         commandModuleController.clearPrompts(this);
@@ -283,8 +284,7 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
 
         sendMessageStarting(fPlayer, operation);
 
-        UrlService urlService = injector.getInstance(UrlService.class);
-        String url = urlService.generateUrl();
+        String url = urlService.get().generateUrl();
 
         reflectionResolver.hasClassOrElse(SPARK_CLASS, this::loadSparkLibrary);
 
@@ -321,7 +321,7 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     }
 
     private boolean isPortAvailable(int port) {
-        if (injector.getInstance(SparkServer.class).isEnable()) return true;
+        if (sparkServer.get().isEnable()) return true;
 
         try (var _ = new ServerSocket(port)) {
             return true;
@@ -499,9 +499,9 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     }
 
     private void enableSpark() {
-        SparkServer sparkServer = injector.getInstance(SparkServer.class);
-        if (!sparkServer.isEnable()) {
-            sparkServer.onEnable();
+        SparkServer server = sparkServer.get();
+        if (!server.isEnable()) {
+            server.onEnable();
         }
     }
 

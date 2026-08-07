@@ -1,7 +1,6 @@
 package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.NeoForgeFlectonePulse;
@@ -11,6 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.NeoForgePlayerAdapter;
 import net.flectone.pulse.platform.registry.NeoForgePermissionRegistry;
+import net.flectone.pulse.util.LazyInstance;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -23,9 +23,7 @@ public class NeoForgePermissionChecker implements PermissionChecker {
     private final NeoForgeFlectonePulse neoForgeFlectonePulse;
     private final NeoForgePlayerAdapter neoForgePlayerAdapter;
     private final NeoForgePermissionRegistry neoForgePermissionRegistry;
-
-    @Inject
-    private Provider<IntegrationModule> integrationModuleProvider;
+    private final LazyInstance<IntegrationModule> integrationModule;
 
     @Override
     public boolean check(FEntity entity, String permission) {
@@ -35,14 +33,14 @@ public class NeoForgePermissionChecker implements PermissionChecker {
         MinecraftServer minecraftServer = neoForgeFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return true;
 
-        IntegrationModule integrationModule = integrationModuleProvider.get();
-        if (integrationModule.hasFPlayerPermission(fPlayer, permission)) return true;
+        IntegrationModule integrationModuleInstance = integrationModule.get();
+        if (integrationModuleInstance.hasFPlayerPermission(fPlayer, permission)) return true;
 
         Permission.Type neoForgePermission = neoForgePermissionRegistry.getPermissions().get(permission);
 
         boolean value;
         if (neoForgePermission != null) {
-            if (neoForgePermission == Permission.Type.TRUE && integrationModule.isAlwaysHaveTruePermission()) return true;
+            if (neoForgePermission == Permission.Type.TRUE && integrationModuleInstance.isAlwaysHaveTruePermission()) return true;
 
             value = neoForgePermission != Permission.Type.FALSE &&
                     (neoForgePermission == Permission.Type.TRUE || neoForgePlayerAdapter.isOperator(fPlayer) && neoForgePermission != Permission.Type.NOT_OP);

@@ -1,7 +1,6 @@
 package net.flectone.pulse.data.database;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
@@ -12,12 +11,15 @@ import net.flectone.pulse.data.database.dao.FColorDao;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.VersionDAO;
 import net.flectone.pulse.data.database.driver.DriverBackedDataSource;
+import net.flectone.pulse.exception.DatabaseNotInitializedException;
+import net.flectone.pulse.exception.UnsupportedDatabaseOperationException;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.comparator.VersionComparator;
 import net.flectone.pulse.util.constant.DatabaseType;
 import net.flectone.pulse.util.creator.BackupCreator;
@@ -43,8 +45,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
-import net.flectone.pulse.exception.DatabaseNotInitializedException;
-import net.flectone.pulse.exception.UnsupportedDatabaseOperationException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -56,7 +56,7 @@ public class DatabaseImpl implements Database {
     private final SystemVariableResolver systemVariableResolver;
     private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
-    private final Provider<VersionDAO> versionDAOProvider;
+    private final LazyInstance<VersionDAO> versionDAO;
     private final BackupCreator backupCreator;
     private final DriverLoader driverLoader;
 
@@ -283,12 +283,12 @@ public class DatabaseImpl implements Database {
     }
 
     private void checkMigration() throws IOException {
-        VersionDAO versionDAO = versionDAOProvider.get();
+        VersionDAO versionDAOInstance = versionDAO.get();
 
         if (versionComparator.isOlderThan(fileFacade.getPreInitVersion(), fileFacade.config().version())) {
             backupCreator.backup(fileFacade.getPreInitVersion(), config());
 
-            Optional<String> versionName = versionDAO.find();
+            Optional<String> versionName = versionDAOInstance.find();
 
             String oldDatabaseVersion = versionName.orElse(null);
 
@@ -301,7 +301,7 @@ public class DatabaseImpl implements Database {
         }
 
         // always update to latest version
-        versionDAO.insertOrUpdate(fileFacade.config().version());
+        versionDAOInstance.insertOrUpdate(fileFacade.config().version());
     }
 
     private void migration(String version) {

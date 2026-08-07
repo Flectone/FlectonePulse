@@ -2,7 +2,6 @@ package net.flectone.pulse.service;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.ViolationSetting;
@@ -14,6 +13,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.Nullable;
@@ -36,9 +36,7 @@ public class ModerationServiceImpl implements ModerationService {
     private final ProxySender proxySender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final Gson gson;
-
-    @Inject
-    private Provider<IntegrationModule> integrationModuleProvider;
+    private final LazyInstance<IntegrationModule> integrationModule;
 
     @Override
     public void invalidate() {
@@ -263,7 +261,7 @@ public class ModerationServiceImpl implements ModerationService {
         if (time != -1 && time < 1) return false;
         if (timeLimits.isEmpty()) return true;
 
-        int groupWeight = integrationModuleProvider.get().getGroupWeight(fPlayer);
+        int groupWeight = integrationModule.get().getGroupWeight(fPlayer);
 
         long timeLimit = -1;
         for (Map.Entry<Integer, Long> timeEntry : timeLimits.entrySet()) {
@@ -287,8 +285,8 @@ public class ModerationServiceImpl implements ModerationService {
         if (!sourceIsOperator && targetIsOperator) return false;
         if (sourceIsOperator && !targetIsOperator) return true;
 
-        IntegrationModule integrationModule = integrationModuleProvider.get();
-        return integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target);
+        IntegrationModule integrationModuleInstance = integrationModule.get();
+        return integrationModuleInstance.getGroupWeight(source) > integrationModuleInstance.getGroupWeight(target);
     }
 
     @Override

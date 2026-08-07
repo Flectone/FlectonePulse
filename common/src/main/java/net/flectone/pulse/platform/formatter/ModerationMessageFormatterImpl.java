@@ -1,7 +1,6 @@
 package net.flectone.pulse.platform.formatter;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
@@ -20,6 +19,7 @@ import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -36,11 +36,11 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
     private final FileFacade fileFacade;
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
-    private final Provider<IntegrationModule> integrationModuleProvider;
-    private final Provider<CapsModule> capsModuleProvider;
-    private final Provider<FloodModule> floodModuleProvider;
-    private final Provider<NewbieModule> newbieModuleProvider;
-    private final Provider<SwearModule> swearModuleProvider;
+    private final LazyInstance<IntegrationModule> integrationModule;
+    private final LazyInstance<CapsModule> capsModule;
+    private final LazyInstance<FloodModule> floodModule;
+    private final LazyInstance<NewbieModule> newbieModule;
+    private final LazyInstance<SwearModule> swearModule;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
     private final SocialService socialService;
@@ -68,7 +68,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
                 yield Optional.of(muteContext);
             }
             case EXTERNAL -> {
-                ExternalModeration mute = integrationModuleProvider.get().getMute(fPlayer);
+                ExternalModeration mute = integrationModule.get().getMute(fPlayer);
                 if (mute == null) yield Optional.empty();
 
                 String format = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute().person();
@@ -86,16 +86,16 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
                 yield Optional.of(muteContext);
             }
             case CAPS -> {
-                CapsModule capsModule = capsModuleProvider.get();
-                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), capsModule);
+                CapsModule capsModuleInstance = capsModule.get();
+                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), capsModuleInstance);
                 if (timestamp == null) yield Optional.empty();
 
-                String format = capsModule.localization(fPlayer).formatRestrict();
+                String format = capsModuleInstance.localization(fPlayer).formatRestrict();
 
                 ExternalModeration mute = new ExternalModeration(
                         fPlayer.name(),
                         fileFacade.config().logger().console(),
-                        capsModule.localization(FPlayer.UNKNOWN).formatRestrict(),
+                        capsModuleInstance.localization(FPlayer.UNKNOWN).formatRestrict(),
                         -1,
                         System.currentTimeMillis(),
                         timestamp,
@@ -115,16 +115,16 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
                 yield Optional.of(muteContext);
             }
             case FLOOD -> {
-                FloodModule floodModule = floodModuleProvider.get();
-                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), floodModule);
+                FloodModule floodModuleInstance = floodModule.get();
+                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), floodModuleInstance);
                 if (timestamp == null) yield Optional.empty();
 
-                String format = floodModule.localization(fPlayer).formatRestrict();
+                String format = floodModuleInstance.localization(fPlayer).formatRestrict();
 
                 ExternalModeration mute = new ExternalModeration(
                         fPlayer.name(),
                         fileFacade.config().logger().console(),
-                        floodModule.localization(FPlayer.UNKNOWN).formatRestrict(),
+                        floodModuleInstance.localization(FPlayer.UNKNOWN).formatRestrict(),
                         -1,
                         System.currentTimeMillis(),
                         timestamp,
@@ -144,12 +144,12 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
                 yield Optional.of(muteContext);
             }
             case NEWBIE -> {
-                NewbieModule newbieModule = newbieModuleProvider.get();
+                NewbieModule newbieModuleInstance = newbieModule.get();
 
-                ExternalModeration mute = newbieModule.getModeration(fPlayer);
+                ExternalModeration mute = newbieModuleInstance.getModeration(fPlayer);
                 if (mute == null) yield Optional.empty();
 
-                String format = newbieModule.localization(fPlayer).formatRestrict();
+                String format = newbieModuleInstance.localization(fPlayer).formatRestrict();
 
                 MessageContext muteContext = ExternalModerationMessageContext.builder()
                         .base(MessageContext.builder()
@@ -164,16 +164,16 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
                 yield Optional.of(muteContext);
             }
             case SWEAR -> {
-                SwearModule swearModule = swearModuleProvider.get();
-                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), swearModule);
+                SwearModule swearModuleInstance = swearModule.get();
+                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), swearModuleInstance);
                 if (timestamp == null) yield Optional.empty();
 
-                String format = swearModule.localization(fPlayer).formatRestrict();
+                String format = swearModuleInstance.localization(fPlayer).formatRestrict();
 
                 ExternalModeration mute = new ExternalModeration(
                         fPlayer.name(),
                         fileFacade.config().logger().console(),
-                        swearModule.localization(FPlayer.UNKNOWN).formatRestrict(),
+                        swearModuleInstance.localization(FPlayer.UNKNOWN).formatRestrict(),
                         -1,
                         System.currentTimeMillis(),
                         timestamp,

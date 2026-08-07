@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.message.chat;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
@@ -21,6 +20,7 @@ import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -37,8 +37,8 @@ public class BukkitChatModule extends MinecraftChatModule {
                                PlatformServerAdapter platformServerAdapter,
                                PermissionChecker permissionChecker,
                                IntegrationModule integrationModule,
-                               Provider<BubbleModule> bubbleModuleProvider,
-                               Provider<SpyModule> spyModuleProvider,
+                               LazyInstance<BubbleModule> bubbleModule,
+                               LazyInstance<SpyModule> spyModule,
                                BukkitListenerRegistry listenerRegistry,
                                TaskScheduler taskScheduler,
                                ReflectionResolver reflectionResolver,
@@ -49,7 +49,7 @@ public class BukkitChatModule extends MinecraftChatModule {
                                MessagePipeline messagePipeline,
                                ProxyRegistry proxyRegistry) {
         super(fileFacade, fPlayerService, socialService, platformServerAdapter, permissionChecker,
-                integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry,
+                integrationModule, bubbleModule, spyModule, listenerRegistry,
                 taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, messagePipeline, proxyRegistry);
 
         this.listenerRegistry = listenerRegistry;

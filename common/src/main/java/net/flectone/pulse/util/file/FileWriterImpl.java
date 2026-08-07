@@ -3,12 +3,12 @@ package net.flectone.pulse.util.file;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.exception.FileWriteException;
 import net.flectone.pulse.model.file.FilePack;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.PlatformType;
 import org.apache.commons.lang3.Strings;
 import tools.jackson.databind.ObjectMapper;
@@ -40,7 +40,7 @@ public class FileWriterImpl implements FileWriter {
 
     private final ObjectMapper yamlMapper;
     private final FilePathProvider filePathProvider;
-    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
+    private final LazyInstance<PlatformServerAdapter> platformServerAdapter;
 
     @Override
     public void save(FilePack files, boolean checkExist, boolean checkLastModifiedTime) {
@@ -114,7 +114,7 @@ public class FileWriterImpl implements FileWriter {
             JsonPropertyDescription propertyDescription = field.getAnnotation(JsonPropertyDescription.class);
             if (propertyDescription != null && propertyDescription.value() != null && !propertyDescription.value().isEmpty()) {
                 String comment = propertyDescription.value().trim();
-                if (platformServerAdapterProvider.get().getPlatformType() == PlatformType.HYTALE) {
+                if (platformServerAdapter.get().getPlatformType() == PlatformType.HYTALE) {
                     comment = Strings.CS.replace(comment, "/docs/", "/docs/hytale/");
                 }
 

@@ -1,7 +1,6 @@
 package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -12,17 +11,18 @@ import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.LazyInstance;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MuteCheckerImpl implements MuteChecker {
 
     private final ModerationService moderationService;
-    private final Provider<IntegrationModule> integrationModuleProvider;
-    private final Provider<CapsModule> capsModuleProvider;
-    private final Provider<FloodModule> floodModuleProvider;
-    private final Provider<NewbieModule> newbieModuleProvider;
-    private final Provider<SwearModule> swearModuleProvider;
+    private final LazyInstance<IntegrationModule> integrationModule;
+    private final LazyInstance<CapsModule> capsModule;
+    private final LazyInstance<FloodModule> floodModule;
+    private final LazyInstance<NewbieModule> newbieModule;
+    private final LazyInstance<SwearModule> swearModule;
 
     @Override
     public Status check(FPlayer fPlayer) {
@@ -30,23 +30,23 @@ public class MuteCheckerImpl implements MuteChecker {
             return Status.LOCAL;
         }
 
-        if (newbieModuleProvider.get().isNewBie(fPlayer)) {
+        if (newbieModule.get().isNewBie(fPlayer)) {
             return Status.NEWBIE;
         }
 
-        if (capsModuleProvider.get().isRestricted(fPlayer.uuid())) {
+        if (capsModule.get().isRestricted(fPlayer.uuid())) {
             return Status.CAPS;
         }
 
-        if (floodModuleProvider.get().isRestricted(fPlayer.uuid())) {
+        if (floodModule.get().isRestricted(fPlayer.uuid())) {
             return Status.FLOOD;
         }
 
-        if (swearModuleProvider.get().isRestricted(fPlayer.uuid())) {
+        if (swearModule.get().isRestricted(fPlayer.uuid())) {
             return Status.SWEAR;
         }
 
-        if (integrationModuleProvider.get().isMuted(fPlayer)) {
+        if (integrationModule.get().isMuted(fPlayer)) {
             return Status.EXTERNAL;
         }
 

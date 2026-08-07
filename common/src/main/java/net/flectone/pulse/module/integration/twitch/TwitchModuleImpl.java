@@ -3,7 +3,6 @@ package net.flectone.pulse.module.integration.twitch;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
@@ -23,6 +22,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -42,20 +42,21 @@ public class TwitchModuleImpl implements TwitchModule {
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final SocialService socialService;
-    private final Injector injector;
+    private final LazyInstance<TwitchIntegration> twitchIntegration;
+    private final LazyInstance<TwitchSender> twitchSender;
 
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("com.github.twitch4j.TwitchClient", this::loadLibraries);
 
-        taskScheduler.runAsync(() -> injector.getInstance(TwitchIntegration.class).hook(), true);
+        taskScheduler.runAsync(() -> twitchIntegration.get().hook(), true);
 
         listenerRegistry.register(TwitchPulseListener.class);
     }
 
     @Override
     public void onDisable() {
-        injector.getInstance(TwitchIntegration.class).unhook();
+        twitchIntegration.get().unhook();
     }
 
     @Override
@@ -94,9 +95,8 @@ public class TwitchModuleImpl implements TwitchModule {
         UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(integrationMessageFormat, messageContext);
 
         // send to twitch
-        TwitchSender twitchSender = injector.getInstance(TwitchSender.class);
         for (String specificMessageName : messageNames) {
-            twitchSender.sendMessage(sender, specificMessageName, integrationFormat);
+            twitchSender.get().sendMessage(sender, specificMessageName, integrationFormat);
         }
     }
 

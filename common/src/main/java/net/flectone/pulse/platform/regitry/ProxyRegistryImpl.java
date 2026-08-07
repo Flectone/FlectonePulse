@@ -3,7 +3,6 @@ package net.flectone.pulse.platform.regitry;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import net.flectone.pulse.platform.proxy.RedisProxy;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.DatabaseType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -32,7 +32,7 @@ public class ProxyRegistryImpl implements ProxyRegistry {
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final FLogger fLogger;
-    private final Injector injector;
+    private final LazyInstance<RedisProxy> redisProxy;
 
     public boolean hasEnabledProxy() {
         return proxies.stream().anyMatch(Proxy::isEnable);
@@ -53,10 +53,10 @@ public class ProxyRegistryImpl implements ProxyRegistry {
 
             reflectionResolver.hasClassOrElse(BuildConfig.RELOCATED_PATTERN + ".lettuce.core.RedisClient", this::loadLibraries);
 
-            RedisProxy redisProxy = injector.getInstance(RedisProxy.class);
-            redisProxy.onEnable();
+            RedisProxy proxy = redisProxy.get();
+            proxy.onEnable();
 
-            registry(redisProxy);
+            registry(proxy);
         }
     }
 

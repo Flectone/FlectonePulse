@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
@@ -9,6 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -21,12 +21,12 @@ import java.util.Set;
 public class HytalePlaceholderAPIModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
-    private final Provider<HytalePlaceholderAPIIntegration> placeholderAPIIntegrationProvider;
+    private final LazyInstance<HytalePlaceholderAPIIntegration> placeholderAPIIntegration;
     private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
-        placeholderAPIIntegrationProvider.get().hook();
+        placeholderAPIIntegration.get().hook();
         listenerRegistry.register(HytalePlaceholderAPIIntegration.class);
     }
 
@@ -39,7 +39,7 @@ public class HytalePlaceholderAPIModule implements ModuleSimple {
 
     @Override
     public void onDisable() {
-        placeholderAPIIntegrationProvider.get().unhook();
+        placeholderAPIIntegration.get().unhook();
     }
 
     @Override

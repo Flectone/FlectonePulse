@@ -1,7 +1,6 @@
 package net.flectone.pulse.execution.scheduler;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.With;
@@ -9,6 +8,7 @@ import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -28,10 +28,8 @@ public class TaskSchedulerImpl implements TaskScheduler {
     private final AtomicLong threadCounter = new AtomicLong(0L);
     private final Map<Long, List<ScheduledTask>> scheduledTasks = new ConcurrentSkipListMap<>();
     private final FLogger fLogger;
-    private final Provider<FPlayerService> fPlayerServiceProvider;
-
-    @Inject
-    private Provider<FileFacade> fileFacadeProvider;
+    private final LazyInstance<FPlayerService> fPlayerService;
+    private final LazyInstance<FileFacade> fileFacade;
 
     @Getter
     private ExecutorService executorService;
@@ -41,9 +39,11 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     @Inject
     public TaskSchedulerImpl(FLogger fLogger,
-                         Provider<FPlayerService> fPlayerServiceProvider) {
+                             LazyInstance<FPlayerService> fPlayerService,
+                             LazyInstance<FileFacade> fileFacade) {
         this.fLogger = fLogger;
-        this.fPlayerServiceProvider = fPlayerServiceProvider;
+        this.fPlayerService = fPlayerService;
+        this.fileFacade = fileFacade;
     }
 
     @Override
@@ -166,7 +166,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     @Override
     public CompletableFuture<Void> runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long delay, long period) {
-        return runAsyncTimer(() -> fPlayerServiceProvider.get().getPlatformFPlayers().forEach(fPlayerConsumer), delay, period);
+        return runAsyncTimer(() -> fPlayerService.get().getPlatformFPlayers().forEach(fPlayerConsumer), delay, period);
     }
 
     @Override
@@ -270,7 +270,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     private ExecutorService createExecutorService() {
-        config = fileFacadeProvider.get().config().executor();
+        config = fileFacade.get().config().executor();
 
         ThreadFactory factory = Thread.ofPlatform()
                 .name(THREAD_PREFIX, threadCounter.getAndIncrement())

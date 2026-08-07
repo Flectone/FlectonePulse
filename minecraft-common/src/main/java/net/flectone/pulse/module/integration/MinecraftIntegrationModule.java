@@ -1,20 +1,22 @@
 package net.flectone.pulse.module.integration;
 
-import com.google.inject.Injector;
-import com.google.inject.Provider;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.floodgate.MinecraftFloodgateModule;
 import net.flectone.pulse.module.integration.geyser.MinecraftGeyserModule;
+import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.minimotd.MinecraftMiniMOTDModule;
 import net.flectone.pulse.module.integration.plasmovoice.MinecraftPlasmoVoiceModule;
 import net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceModule;
 import net.flectone.pulse.module.integration.skinsrestorer.MinecraftSkinsRestorerModule;
+import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -28,48 +30,58 @@ import java.util.Set;
 
 public abstract class MinecraftIntegrationModule extends IntegrationModuleImpl {
 
-    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
+    private final LazyInstance<PlatformServerAdapter> platformServerAdapter;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
     private final FLogger fLogger;
-    private final Injector injector;
+    private final LazyInstance<MinecraftFloodgateModule> floodgateModule;
+    private final LazyInstance<MinecraftGeyserModule> geyserModule;
+    private final LazyInstance<MinecraftSkinsRestorerModule> skinsRestorerModule;
 
     protected MinecraftIntegrationModule(FileFacade fileFacade,
                                          FLogger fLogger,
-                                         Provider<PlatformServerAdapter> platformServerAdapterProvider,
+                                         LazyInstance<PlatformServerAdapter> platformServerAdapter,
                                          ReflectionResolver reflectionResolver,
                                          ListenerRegistry listenerRegistry,
                                          ModuleController moduleController,
-                                         Injector injector) {
-        super(fileFacade, platformServerAdapterProvider, listenerRegistry, moduleController, injector);
+                                         LazyInstance<LuckPermsModule> luckPermsModule,
+                                         LazyInstance<DeeplModule> deeplModule,
+                                         LazyInstance<YandexModule> yandexModule,
+                                         LazyInstance<MinecraftFloodgateModule> floodgateModule,
+                                         LazyInstance<MinecraftGeyserModule> geyserModule,
+                                         LazyInstance<MinecraftSkinsRestorerModule> skinsRestorerModule) {
+        super(fileFacade, platformServerAdapter, listenerRegistry, moduleController,
+                luckPermsModule, deeplModule, yandexModule);
 
-        this.platformServerAdapterProvider = platformServerAdapterProvider;
+        this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;
         this.moduleController = moduleController;
         this.fLogger = fLogger;
-        this.injector = injector;
+        this.floodgateModule = floodgateModule;
+        this.geyserModule = geyserModule;
+        this.skinsRestorerModule = skinsRestorerModule;
     }
 
     @Override
     public Set<@NonNull Class<? extends ModuleSimple>> children() {
         Set<@NonNull Class<? extends ModuleSimple>> builder = new LinkedHashSet<>(super.children());
 
-        PlatformServerAdapter platformServerAdapter = platformServerAdapterProvider.get();
-        if (platformServerAdapter.hasProject("SkinsRestorer")) {
+        PlatformServerAdapter platformServerAdapterInstance = platformServerAdapter.get();
+        if (platformServerAdapterInstance.hasProject("SkinsRestorer")) {
             builder.add(MinecraftSkinsRestorerModule.class);
         }
 
-        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
-                ? platformServerAdapter.hasProject("minimotd-fabric")
-                : platformServerAdapter.hasProject("MiniMOTD")) {
+        if (platformServerAdapterInstance.getPlatformType() == PlatformType.FABRIC
+                ? platformServerAdapterInstance.hasProject("minimotd-fabric")
+                : platformServerAdapterInstance.hasProject("MiniMOTD")) {
             builder.add(MinecraftMiniMOTDModule.class);
         }
 
-        if (platformServerAdapter.hasProject("voicechat")) {
+        if (platformServerAdapterInstance.hasProject("voicechat")) {
             builder.add(MinecraftSimpleVoiceModule.class);
         }
 
-        if (platformServerAdapter.hasProject("PlasmoVoice")) {
+        if (platformServerAdapterInstance.hasProject("PlasmoVoice")) {
             if (reflectionResolver.hasClass("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent")) {
                 builder.add(MinecraftPlasmoVoiceModule.class);
             } else {
@@ -77,11 +89,11 @@ public abstract class MinecraftIntegrationModule extends IntegrationModuleImpl {
             }
         }
 
-        if (platformServerAdapter.hasProject("floodgate")) {
+        if (platformServerAdapterInstance.hasProject("floodgate")) {
             builder.add(MinecraftFloodgateModule.class);
         }
 
-        if (hasGeyser(platformServerAdapter)) {
+        if (hasGeyser(platformServerAdapterInstance)) {
             if (reflectionResolver.hasClass("org.geysermc.geyser.api.GeyserApi")) {
                 builder.add(MinecraftGeyserModule.class);
             } else {
@@ -104,11 +116,11 @@ public abstract class MinecraftIntegrationModule extends IntegrationModuleImpl {
         if (!moduleController.isEnable(this)) return false;
 
         if (containsEnabledChild(ModuleName.INTEGRATION_FLOODGATE)) {
-            return injector.getInstance(MinecraftFloodgateModule.class).isBedrockPlayer(fPlayer);
+            return floodgateModule.get().isBedrockPlayer(fPlayer);
         }
 
         if (containsEnabledChild(ModuleName.INTEGRATION_GEYSER)) {
-            return injector.getInstance(MinecraftGeyserModule.class).isBedrockPlayer(fPlayer);
+            return geyserModule.get().isBedrockPlayer(fPlayer);
         }
 
         // if Floodgate and Geyser are not installed on the server, let's try to check player by UUID
@@ -122,7 +134,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModuleImpl {
         if (!containsEnabledChild(ModuleName.INTEGRATION_SKINSRESTORER)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
-        return injector.getInstance(MinecraftSkinsRestorerModule.class).getTextureUrl(fPlayer);
+        return skinsRestorerModule.get().getTextureUrl(fPlayer);
     }
 
     public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FEntity sender) {
@@ -130,7 +142,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModuleImpl {
         if (!containsEnabledChild(ModuleName.INTEGRATION_SKINSRESTORER)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
-        return injector.getInstance(MinecraftSkinsRestorerModule.class).getProfileProperty(fPlayer);
+        return skinsRestorerModule.get().getProfileProperty(fPlayer);
     }
 
 }

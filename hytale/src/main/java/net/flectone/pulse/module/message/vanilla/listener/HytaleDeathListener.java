@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.message.vanilla.listener;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -19,6 +18,7 @@ import net.flectone.pulse.module.message.vanilla.extractor.HytaleComponentExtrac
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.LazyInstance;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -32,7 +32,7 @@ public class HytaleDeathListener extends DeathSystems.OnDeathSystem {
     public static final String DEATH_TRANSLATION_KEY = "server.death.player";
     public static final String DEATH_KILLED_BY_TRANSLATION_KEY = "server.death.player.killedBy";
 
-    private final Provider<HytaleVanillaModule> hytaleVanillaModuleProvider;
+    private final LazyInstance<HytaleVanillaModule> hytaleVanillaModule;
     private final HytaleComponentExtractor hytaleComponentExtractor;
     private final FPlayerService fPlayerService;
     private final ModuleController moduleController;
@@ -44,8 +44,8 @@ public class HytaleDeathListener extends DeathSystems.OnDeathSystem {
 
     @Override
     public void onComponentAdded(@NonNull Ref<EntityStore> ref, @NonNull DeathComponent deathComponent, @NonNull Store<EntityStore> store, @NonNull CommandBuffer<EntityStore> commandBuffer) {
-        HytaleVanillaModule hytaleVanillaModule = hytaleVanillaModuleProvider.get();
-        if (!moduleController.isEnable(hytaleVanillaModule)) return;
+        HytaleVanillaModule hytaleVanillaModuleInstance = hytaleVanillaModule.get();
+        if (!moduleController.isEnable(hytaleVanillaModuleInstance)) return;
 
         PlayerRef player = store.getComponent(ref, PlayerRef.getComponentType());
         if (player == null) return;
@@ -58,13 +58,13 @@ public class HytaleDeathListener extends DeathSystems.OnDeathSystem {
         if (deathComponent.getDeathMessage() != null) {
             arguments.put(1, hytaleComponentExtractor.extractArguments(deathComponent.getDeathMessage().getFormattedMessage()).get(0));
 
-            hytaleVanillaModule.send(fTarget, new ParsedComponent(
+            hytaleVanillaModuleInstance.send(fTarget, new ParsedComponent(
                     DEATH_KILLED_BY_TRANSLATION_KEY,
                     hytaleComponentExtractor.getVanillaMessage(DEATH_KILLED_BY_TRANSLATION_KEY),
                     arguments
             ));
         } else {
-            hytaleVanillaModule.send(fTarget, new ParsedComponent(
+            hytaleVanillaModuleInstance.send(fTarget, new ParsedComponent(
                     DEATH_TRANSLATION_KEY,
                     hytaleComponentExtractor.getVanillaMessage(DEATH_TRANSLATION_KEY),
                     arguments

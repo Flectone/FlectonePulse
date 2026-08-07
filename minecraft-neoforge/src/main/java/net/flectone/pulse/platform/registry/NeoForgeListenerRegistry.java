@@ -2,12 +2,12 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.NeoForgeFlectonePulse;
 import net.flectone.pulse.listener.player.NeoForgePlayerConnectionListener;
 import net.flectone.pulse.listener.player.NeoForgePlayerLoginListener;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.NeoForgeTpsTracker;
 import net.flectone.pulse.util.logging.FLogger;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,15 +21,15 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 public class NeoForgeListenerRegistry extends MinecraftListenerRegistry {
 
     private final NeoForgeFlectonePulse neoForgeFlectonePulse;
-    private final Provider<NeoForgePlayerConnectionListener> neoForgePlayerConnectionListenerProvider;
-    private final Provider<NeoForgePlayerLoginListener> neoForgePlayerLoginListenerProvider;
+    private final LazyInstance<NeoForgePlayerConnectionListener> neoForgePlayerConnectionListener;
+    private final LazyInstance<NeoForgePlayerLoginListener> neoForgePlayerLoginListener;
     private final NeoForgeTpsTracker tpsTracker;
 
     @Inject
     public NeoForgeListenerRegistry(ProxyRegistry proxyRegistry,
                                     NeoForgeFlectonePulse neoForgeFlectonePulse,
-                                    Provider<NeoForgePlayerConnectionListener> neoForgePlayerConnectionListenerProvider,
-                                    Provider<NeoForgePlayerLoginListener> neoForgePlayerLoginListenerProvider,
+                                    LazyInstance<NeoForgePlayerConnectionListener> neoForgePlayerConnectionListener,
+                                    LazyInstance<NeoForgePlayerLoginListener> neoForgePlayerLoginListener,
                                     NeoForgeTpsTracker tpsTracker,
                                     FLogger fLogger,
                                     Injector injector,
@@ -37,8 +37,8 @@ public class NeoForgeListenerRegistry extends MinecraftListenerRegistry {
         super(proxyRegistry, fLogger, injector, packetProvider);
 
         this.neoForgeFlectonePulse = neoForgeFlectonePulse;
-        this.neoForgePlayerConnectionListenerProvider = neoForgePlayerConnectionListenerProvider;
-        this.neoForgePlayerLoginListenerProvider = neoForgePlayerLoginListenerProvider;
+        this.neoForgePlayerConnectionListener = neoForgePlayerConnectionListener;
+        this.neoForgePlayerLoginListener = neoForgePlayerLoginListener;
         this.tpsTracker = tpsTracker;
     }
 
@@ -54,11 +54,11 @@ public class NeoForgeListenerRegistry extends MinecraftListenerRegistry {
         NeoForge.EVENT_BUS.addListener((ServerStoppingEvent _) -> neoForgeFlectonePulse.onDisable());
 
         // register pre login listener
-        NeoForgePlayerLoginListener loginListener = neoForgePlayerLoginListenerProvider.get();
+        NeoForgePlayerLoginListener loginListener = neoForgePlayerLoginListener.get();
         neoForgeFlectonePulse.getLoader().getEventBus().addListener(loginListener::onPreLogin);
 
         // register connection listener
-        NeoForgePlayerConnectionListener connectionListener = neoForgePlayerConnectionListenerProvider.get();
+        NeoForgePlayerConnectionListener connectionListener = neoForgePlayerConnectionListener.get();
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) ->
                 connectionListener.asyncProcessJoinEvent(((ServerPlayer) event.getEntity()).connection)
         );

@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.command.translateto;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
@@ -13,7 +12,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.translateto.listener.TranslatetoProxyMessageListener;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -24,6 +22,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -49,7 +48,7 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
-    private final Provider<TranslateModule> translateModuleProvider;
+    private final LazyInstance<TranslateModule> translateModule;
     private final MessageDispatcher messageDispatcher;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
@@ -96,7 +95,7 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
 
         String message = commandModuleController.getArgument(this, commandContext, 1);
 
-        String messageToTranslate = translateModuleProvider.get().getMessage(message);
+        String messageToTranslate = translateModule.get().getMessage(message);
         if (StringUtils.isEmpty(messageToTranslate)) {
             messageToTranslate = message;
         }

@@ -2,7 +2,6 @@ package net.flectone.pulse.execution.pipeline;
 
 import com.google.common.cache.Cache;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
@@ -10,6 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -26,18 +26,18 @@ public class HytaleMessagePipeline extends MessagePipelineImpl {
 
     private static final Map<String, Locale> LOCALE_CACHE = new ConcurrentHashMap<>();
 
-    private final Provider<SocialService> socialServiceProvider;
+    private final LazyInstance<SocialService> socialService;
 
     @Inject
     public HytaleMessagePipeline(FLogger fLogger,
                                  MiniMessage miniMessage,
                                  EventDispatcher eventDispatcher,
                                  ComponentSerializer componentSerializer,
-                                 Provider<SocialService> socialServiceProvider,
+                                 LazyInstance<SocialService> socialService,
                                  @Named("messageContext") Cache<MessageContext.CacheKey, Component> messageContextCache) {
         super(fLogger, miniMessage, eventDispatcher, componentSerializer, messageContextCache);
 
-        this.socialServiceProvider = socialServiceProvider;
+        this.socialService = socialService;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class HytaleMessagePipeline extends MessagePipelineImpl {
     }
 
     public Locale getLocale(FPlayer fPlayer) {
-        String locale = socialServiceProvider.get().getSetting(fPlayer, SettingText.LOCALE);
+        String locale = socialService.get().getSetting(fPlayer, SettingText.LOCALE);
         if (locale == null) return Locale.ENGLISH;
 
         return LOCALE_CACHE.computeIfAbsent(locale, string -> Locale.forLanguageTag(string.replace('_', '-')));

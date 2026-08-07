@@ -2,7 +2,6 @@ package net.flectone.pulse.module.integration.deepl;
 
 import com.alessiodp.libby.Library;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
@@ -12,6 +11,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -22,18 +22,18 @@ public class DeeplModuleImpl implements DeeplModule {
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
-    private final Injector injector;
+    private final LazyInstance<DeeplIntegration> deeplIntegration;
 
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("com.deepl.api.DeepLClient", this::loadLibraries);
 
-        injector.getInstance(DeeplIntegration.class).hook();
+        deeplIntegration.get().hook();
     }
 
     @Override
     public void onDisable() {
-        injector.getInstance(DeeplIntegration.class).unhook();
+        deeplIntegration.get().unhook();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class DeeplModuleImpl implements DeeplModule {
     public String translate(FPlayer sender, String source, String target, String text) {
         if (moduleController.isDisabledFor(this, sender)) return text;
 
-        return injector.getInstance(DeeplIntegration.class).translate(source, target, text);
+        return deeplIntegration.get().translate(source, target, text);
     }
 
     private void loadLibraries(LibraryResolver libraryResolver) {
