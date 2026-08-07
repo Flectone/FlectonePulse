@@ -50,7 +50,7 @@ public class ModuleControllerImpl implements ModuleController {
         ModuleSimple root = injector.getInstance(clazz);
 
         Map<String, String> modules = new LinkedHashMap<>();
-        modules.put(root.getClass().getSimpleName(), Boolean.toString(isEnable(root)));
+        modules.put(root.name().name(), Boolean.toString(isEnable(root)));
 
         root.children().forEach(subModule -> modules.putAll(collectModuleStatuses(subModule)));
 
