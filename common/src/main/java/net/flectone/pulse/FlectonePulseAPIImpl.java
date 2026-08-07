@@ -10,8 +10,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.lifecycle.DisableEvent;
 import net.flectone.pulse.model.event.lifecycle.EnableEvent;
-import net.flectone.pulse.model.event.lifecycle.EndReloadEvent;
-import net.flectone.pulse.model.event.lifecycle.StartReloadEvent;
+import net.flectone.pulse.model.event.lifecycle.ReloadEvent;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.render.TextScreenRender;
@@ -163,7 +162,7 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
         EventDispatcher eventDispatcher = instance.get(EventDispatcher.class);
 
         // start reload event
-        StartReloadEvent startReloadEvent = eventDispatcher.dispatch(new StartReloadEvent(instance));
+        ReloadEvent startReloadEvent = eventDispatcher.dispatch(new ReloadEvent(instance, ReloadEvent.Type.START));
         if (startReloadEvent.cancelled()) return;
 
         // get flogger
@@ -182,7 +181,7 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
         ListenerRegistry listenerRegistry = instance.get(ListenerRegistry.class);
 
         // save reloadListeners to call them later
-        Map<Event.Priority, List<UnaryOperator<Event>>> reloadListeners = listenerRegistry.getPulseListeners(EndReloadEvent.class);
+        Map<Event.Priority, List<UnaryOperator<Event>>> reloadListeners = listenerRegistry.getPulseListeners(ReloadEvent.class);
 
         // clear listeners and register default listeners
         listenerRegistry.onDisable();
@@ -302,7 +301,7 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
         }
 
         // end reload event
-        EndReloadEvent endReloadEvent = eventDispatcher.dispatch(reloadListeners, new EndReloadEvent(instance, reloadException));
+        ReloadEvent endReloadEvent = eventDispatcher.dispatch(reloadListeners, new ReloadEvent(instance, ReloadEvent.Type.END, reloadException));
         if (endReloadEvent.cancelled()) return;
 
         // log plugin reloaded

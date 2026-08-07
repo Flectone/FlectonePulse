@@ -10,13 +10,15 @@ import org.jspecify.annotations.Nullable;
  * Fired after a reload finishes, whether or not it succeeded.
  *
  * @param cancelled whether a listener vetoed the remaining reload work
+ * @param type the phase of the reload cycle that this event represents
  * @param flectonePulse the plugin instance
  * @param reloadException the failure that occurred, or null if the reload succeeded
  * @author TheFaser
  */
 @With
-public record EndReloadEvent(
+public record ReloadEvent(
         boolean cancelled,
+        Type type,
         FlectonePulse flectonePulse,
         @Nullable ReloadException reloadException
 ) implements Event {
@@ -25,10 +27,21 @@ public record EndReloadEvent(
      * Creates an event that has not been cancelled.
      *
      * @param flectonePulse the plugin instance
+     * @param type the phase of the reload cycle that this event represents
      * @param reloadException the failure that occurred, or null on success
      */
-    public EndReloadEvent(FlectonePulse flectonePulse, ReloadException reloadException) {
-        this(false, flectonePulse, reloadException);
+    public ReloadEvent(FlectonePulse flectonePulse, Type type, ReloadException reloadException) {
+        this(false, type, flectonePulse, reloadException);
+    }
+
+    /**
+     * Creates an event that has not been cancelled and represents a successful reload.
+     *
+     * @param flectonePulse the plugin instance
+     * @param type the phase of the reload cycle that this event represents
+     */
+    public ReloadEvent(FlectonePulse flectonePulse, Type type) {
+        this(false, type, flectonePulse, null);
     }
 
     /**
@@ -38,6 +51,17 @@ public record EndReloadEvent(
      */
     public boolean isSuccessful() {
         return reloadException == null;
+    }
+
+    /**
+     * Represents the phase of a reload cycle.
+     */
+    public enum Type {
+        /** Fired when the reload is about to begin. */
+        START,
+
+        /** Fired after the reload has completed. */
+        END
     }
 
 }
