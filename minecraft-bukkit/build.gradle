@@ -55,7 +55,7 @@ tasks.named("buildFinalJar", Jar) {
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    from { zipTree(project(":minecraft-bukkit:loader").tasks.shadowJar.archiveFile) }
+    from { zipTree(project(":minecraft-bukkit:loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
     from { zipTree(project(":minecraft-velocity:loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
     from { zipTree(project(":minecraft-bungeecord:loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
 
