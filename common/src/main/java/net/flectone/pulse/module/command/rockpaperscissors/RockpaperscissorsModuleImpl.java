@@ -395,4 +395,12 @@ public class RockpaperscissorsModuleImpl implements RockpaperscissorsModule {
         gameMap.put(id, rockPaperScissors);
     }
 
+    @Override
+    public void removeGame(UUID uuid) {
+        gameMap.entrySet().removeIf(entry -> {
+            RockPaperScissors rockPaperScissors = entry.getValue();
+            return rockPaperScissors.getSender().equals(uuid) || rockPaperScissors.getReceiver().equals(uuid);
+        });
+    }
+
 }

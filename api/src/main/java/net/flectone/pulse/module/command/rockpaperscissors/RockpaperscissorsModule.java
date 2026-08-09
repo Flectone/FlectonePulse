@@ -78,6 +78,13 @@ public interface RockpaperscissorsModule extends ModuleCommand {
     void create(UUID id, FEntity fPlayer, UUID receiver);
 
     /**
+     * Removes an active game session by the UUID of either the sender or the receiver
+     *
+     * @param uuid the UUID of the sender or the receiver whose game should be removed
+     */
+    void removeGame(UUID uuid);
+
+    /**
      * How far a round has got.
      */
     enum GamePhase {

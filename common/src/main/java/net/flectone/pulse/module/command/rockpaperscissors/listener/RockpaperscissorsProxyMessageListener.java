@@ -9,6 +9,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.command.rockpaperscissors.RockpaperscissorsModule;
 import net.flectone.pulse.util.payload.ProxyPayload;
 
@@ -22,8 +23,21 @@ public class RockpaperscissorsProxyMessageListener implements PulseListener {
     private final RockpaperscissorsModule rockpaperscissorsModule;
 
     @Pulse
+    public void onPlayerQuitEvent(PlayerQuitEvent event) {
+        FPlayer fPlayer = event.player();
+
+        rockpaperscissorsModule.removeGame(fPlayer.uuid());
+    }
+
+    @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
         if (event.processed()) return event;
+
+        if (event.name() == ModuleName.PLAYER_DISCONNECTED) {
+            rockpaperscissorsModule.removeGame(event.uuid());
+            return event;
+        }
+
         if (event.name() != ModuleName.COMMAND_ROCKPAPERSCISSORS) return event;
 
         try (ProxyPayload proxyPayload = new ProxyPayload(event.payload())) {
