@@ -378,6 +378,8 @@ public class PollModuleImpl implements PollModule {
 
         StringBuilder answersBuilder = new StringBuilder();
 
+        int[] countAnswers = poll.getCountAnswers();
+
         int k = 0;
         for (String answer : poll.getAnswers()) {
 
@@ -391,7 +393,7 @@ public class PollModuleImpl implements PollModule {
             answersBuilder.append(StringUtils.replaceEach(
                     localization.answerTemplate(),
                     new String[]{"<command>", "<id>", "<number>", "<answer>", "<count>"},
-                    new String[]{commandModuleController.getCommandName(this) + config().subCommandVote(), String.valueOf(poll.getId()), String.valueOf(k), componentSerializer.toPlain(answerComponent), String.valueOf(poll.getCountAnswers()[k])}
+                    new String[]{commandModuleController.getCommandName(this) + config().subCommandVote(), String.valueOf(poll.getId()), String.valueOf(k), componentSerializer.toPlain(answerComponent), String.valueOf(countAnswers[k])}
             ));
 
             k++;
