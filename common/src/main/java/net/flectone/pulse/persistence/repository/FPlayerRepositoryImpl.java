@@ -4,20 +4,21 @@ import com.google.common.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.constant.CacheName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.persistence.database.dao.FPlayerDAO;
+import net.flectone.pulse.platform.registry.CacheRegistryImpl;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FPlayerRepositoryImpl implements FPlayerRepository {
 
     private final Map<UUID, FPlayer> onlinePlayers = new ConcurrentHashMap<>();
@@ -28,6 +29,21 @@ public class FPlayerRepositoryImpl implements FPlayerRepository {
 
     private final @Named("offlinePlayers") Cache<UUID, FPlayer> offlinePlayersCache;
     private final FPlayerDAO fPlayerDAO;
+
+    @Inject
+    public FPlayerRepositoryImpl(@Named("offlinePlayers") Cache<UUID, FPlayer> offlinePlayersCache,
+                                 FPlayerDAO fPlayerDAO,
+                                 CacheRegistryImpl cacheRegistry) {
+        this.offlinePlayersCache = offlinePlayersCache;
+        this.fPlayerDAO = fPlayerDAO;
+
+        cacheRegistry.<UUID, FPlayer>addRemovalListener(CacheName.OFFLINE_PLAYERS, notification -> {
+            FPlayer evicted = notification.getValue();
+            if (evicted != null) {
+                removeFromIndexes(evicted);
+            }
+        });
+    }
 
     @Override
     public void invalid(@NonNull UUID uuid) {
@@ -87,7 +103,7 @@ public class FPlayerRepositoryImpl implements FPlayerRepository {
 
     @Override
     public FPlayer get(@NonNull String playerName) {
-        UUID uuid = nameToUuidIndex.get(playerName.toLowerCase());
+        UUID uuid = nameToUuidIndex.get(playerName.toLowerCase(Locale.ROOT));
 
         FPlayer cache = getFromCache(uuid);
         if (cache != null) return cache;
@@ -261,7 +277,7 @@ public class FPlayerRepositoryImpl implements FPlayerRepository {
 
     private void addToIndexes(FPlayer fPlayer) {
         UUID uuid = fPlayer.uuid();
-        nameToUuidIndex.put(fPlayer.name().toLowerCase(), uuid);
+        nameToUuidIndex.put(fPlayer.name().toLowerCase(Locale.ROOT), uuid);
         idToUuidIndex.put(fPlayer.id(), uuid);
         if (fPlayer.ip() != null) {
             ipToUuidIndex.put(fPlayer.ip(), uuid);
@@ -269,10 +285,11 @@ public class FPlayerRepositoryImpl implements FPlayerRepository {
     }
 
     private void removeFromIndexes(FPlayer fPlayer) {
-        nameToUuidIndex.remove(fPlayer.name().toLowerCase());
-        idToUuidIndex.remove(fPlayer.id());
+        UUID uuid = fPlayer.uuid();
+        nameToUuidIndex.remove(fPlayer.name().toLowerCase(Locale.ROOT), uuid);
+        idToUuidIndex.remove(fPlayer.id(), uuid);
         if (fPlayer.ip() != null) {
-            ipToUuidIndex.remove(fPlayer.ip());
+            ipToUuidIndex.remove(fPlayer.ip(), uuid);
         }
     }
 }
