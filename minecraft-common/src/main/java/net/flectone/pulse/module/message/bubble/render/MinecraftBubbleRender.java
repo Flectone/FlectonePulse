@@ -115,7 +115,7 @@ public class MinecraftBubbleRender implements BubbleRender {
 
         FPlayer sender = bubble.getSender();
         String key = sender.uuid().toString() + fViewer.uuid();
-        Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ConcurrentLinkedDeque<>());
+        Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.computeIfAbsent(key, _ -> new ConcurrentLinkedDeque<>());
 
         // create bubble entity
         MinecraftBubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);

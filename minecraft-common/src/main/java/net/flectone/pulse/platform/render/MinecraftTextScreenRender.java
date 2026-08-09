@@ -82,7 +82,7 @@ public class MinecraftTextScreenRender implements TextScreenRender {
 
     @Override
     public List<Integer> getPassengers(UUID uuid) {
-        return livingEntities.getOrDefault(uuid, new CopyOnWriteArrayList<>());
+        return livingEntities.computeIfAbsent(uuid, _ -> new CopyOnWriteArrayList<>());
     }
 
     @Override

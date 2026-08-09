@@ -188,20 +188,12 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Override
     public void addViolation(ViolationKey violationKey, Long violationValue) {
-        // get timestamps
-        List<Long> timestamps = playerViolations.getOrDefault(violationKey, new CopyOnWriteArrayList<>());
-
-        // get current time
-        long currentTimestamp = System.currentTimeMillis();
-
-        // remove old timestamps
-        timestamps.removeIf(timestamp -> currentTimestamp > timestamp);
-
-        // add new timestamp
-        timestamps.add(violationValue);
-
-        // save to cache
-        playerViolations.put(violationKey, timestamps);
+        playerViolations.compute(violationKey, (_, list) -> {
+            List<Long> target = list == null ? new CopyOnWriteArrayList<>() : list;
+            target.removeIf(timeStamp -> System.currentTimeMillis() > timeStamp);
+            target.add(violationValue);
+            return target;
+        });
     }
 
     @Override
