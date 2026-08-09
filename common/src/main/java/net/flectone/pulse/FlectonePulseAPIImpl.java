@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.lifecycle.DisableEvent;
 import net.flectone.pulse.model.event.lifecycle.EnableEvent;
 import net.flectone.pulse.model.event.lifecycle.ReloadEvent;
 import net.flectone.pulse.persistence.database.Database;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.render.TextScreenRender;
@@ -205,7 +206,11 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
         TaskScheduler taskScheduler = instance.get(TaskScheduler.class);
 
         // sync task scheduler reload
-        taskScheduler.runSync(taskScheduler::reload).join();
+        if (instance.get(PlatformServerAdapter.class).isPrimaryThread()) {
+            taskScheduler.reload();
+        } else {
+            taskScheduler.runSync(taskScheduler::reload).join();
+        }
 
         // get fplayer service
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
