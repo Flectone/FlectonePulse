@@ -136,14 +136,15 @@ public class MinecraftBubbleRender implements BubbleRender {
 
     @Override
     public void removeBubbleIf(Predicate<Bubble> bubbleEntityPredicate) {
-        activeBubbleEntities.forEach((_, bubbleEntities) -> {
-            if (bubbleEntities.isEmpty()) return;
+        activeBubbleEntities.entrySet().removeIf(entry -> {
+            Deque<MinecraftBubbleEntity> bubbleEntities = entry.getValue();
+            if (bubbleEntities.isEmpty()) return true;
 
             List<MinecraftBubbleEntity> bubbleEntitiesToRemove = bubbleEntities.stream()
                     .filter(bubbleEntity -> bubbleEntityPredicate.test(bubbleEntity.getBubble()))
                     .toList();
 
-            if (bubbleEntitiesToRemove.isEmpty()) return;
+            if (bubbleEntitiesToRemove.isEmpty()) return false;
 
             // despawn entities
             bubbleEntitiesToRemove.forEach(this::despawnBubbleEntity);
@@ -155,6 +156,7 @@ public class MinecraftBubbleRender implements BubbleRender {
             MinecraftBubbleEntity bubbleEntity = bubbleEntitiesToRemove.getFirst();
 
             rideEntities(bubbleEntity.getBubble().getSender(), bubbleEntity.getViewer());
+            return false;
         });
     }
 
