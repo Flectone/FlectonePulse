@@ -9,6 +9,7 @@ import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.Ticker;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
@@ -38,12 +39,15 @@ public class BubbleService {
     private final MessagePipeline messagePipeline;
 
     public void startTicker() {
+        Ticker ticker = fileFacade.message().bubble().ticker();
+        if (!ticker.enable()) return;
+
         taskScheduler.runPlayerAsyncTimer(fPlayer -> {
             PlayerBubbleState state = playerBubbleStates.get(fPlayer.uuid());
             if (state == null) return;
 
             processBubbleQueue(fPlayer.uuid(), state);
-        }, 1L);
+        },   ticker.period());
     }
 
     public void addMessage(@NonNull FPlayer sender, @NonNull String message, Set<FPlayer> receivers) {
