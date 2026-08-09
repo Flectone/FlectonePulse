@@ -29,12 +29,12 @@ public class MetricsSenderImpl implements MetricsSender {
             URL url = new URI(FLECTONEPULSE_API_URL).toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
             connection.setRequestProperty("Content-Length", String.valueOf(jsonData.getBytes(StandardCharsets.UTF_8).length));
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Content-Encoding", "gzip");
             connection.setDoOutput(true);
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
 
             try (OutputStream os = connection.getOutputStream();
                  GZIPOutputStream gzipOS = new GZIPOutputStream(os)) {

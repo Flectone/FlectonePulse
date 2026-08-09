@@ -13,6 +13,7 @@ import org.jspecify.annotations.Nullable;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -114,9 +115,14 @@ public class ImagePixelConverterImpl implements ImagePixelConverter {
     private Optional<BufferedImage> readImage(URL url) {
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setInstanceFollowRedirects(false);
             connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
 
-            return Optional.of(ImageIO.read(connection.getInputStream()));
+            try (InputStream inputStream = connection.getInputStream()) {
+                return Optional.of(ImageIO.read(inputStream));
+            }
         } catch (IOException _) {
             return Optional.empty();
         }

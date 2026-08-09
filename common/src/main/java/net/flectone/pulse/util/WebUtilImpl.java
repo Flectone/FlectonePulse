@@ -51,8 +51,8 @@ public class WebUtilImpl implements WebUtil {
         HttpURLConnection connection = (HttpURLConnection) URI.create(url).toURL().openConnection();
         connection.setRequestProperty("User-Agent", USER_AGENT);
         connection.setRequestMethod("GET");
-        connection.setConnectTimeout(15000);
-        connection.setReadTimeout(15000);
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
         return connection;
     }
 

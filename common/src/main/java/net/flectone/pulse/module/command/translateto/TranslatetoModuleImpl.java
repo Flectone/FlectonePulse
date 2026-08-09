@@ -188,17 +188,18 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
             URL url = new URI("http://translate.googleapis.com/translate_a/single?client=gtx&sl=" + source + "&tl="
                     + lang + "&dt=t&q=" + text + "&ie=UTF-8&oe=UTF-8").toURL();
 
-            URLConnection uc = url.openConnection();
-            uc.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
+            URLConnection connection = url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream(), StandardCharsets.UTF_8));
-            String inputLine;
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                String inputLine;
 
-            while ((inputLine = in.readLine()) != null) {
-                text = inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    text = inputLine;
+                }
             }
-
-            in.close();
 
             String jsonResponse = text;
             int startIndex = jsonResponse.indexOf("\"") + 1;
