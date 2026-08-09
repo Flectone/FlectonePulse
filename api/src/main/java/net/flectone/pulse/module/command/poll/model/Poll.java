@@ -54,6 +54,8 @@ public class Poll {
      * @return whether the vote was cast, changed or withdrawn
      */
     public int vote(FEntity fPlayer, int numberVote) {
+        if (numberVote < 0 || numberVote >= answers.size()) return -1;
+
         boolean[] votes = votesMap.getOrDefault(fPlayer.uuid(), new boolean[answers.size()]);
 
         for (int x = 0; x < answers.size(); x++) {
@@ -100,6 +102,7 @@ public class Poll {
      */
     public boolean repeat() {
         if (System.currentTimeMillis() < nextRepeat) return false;
+        if (repeatTime <= 0) return false;
 
         nextRepeat = System.currentTimeMillis() + repeatTime;
         return true;
