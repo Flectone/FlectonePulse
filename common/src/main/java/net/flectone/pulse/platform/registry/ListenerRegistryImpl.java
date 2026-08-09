@@ -21,8 +21,7 @@ import org.jspecify.annotations.NonNull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.UnaryOperator;
 
 @Getter
@@ -30,22 +29,16 @@ import java.util.function.UnaryOperator;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ListenerRegistryImpl implements ListenerRegistry {
 
-    private final Map<Class<? extends Event>, EnumMap<Event.Priority, List<UnaryOperator<Event>>>> pulseListeners = new HashMap<>();
-    private final Set<PulseListener> permanentListeners = new HashSet<>();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Map<Class<? extends Event>, EnumMap<Event.Priority, List<UnaryOperator<Event>>>> pulseListeners = new ConcurrentHashMap<>();
+    private final Set<PulseListener> permanentListeners = new LinkedHashSet<>();
 
     private final ProxyRegistry proxyRegistry;
     private final FLogger fLogger;
     private final Injector injector;
 
     public @NonNull Map<Event.Priority, List<UnaryOperator<Event>>> getPulseListeners(Class<? extends Event> event) {
-        lock.readLock().lock();
-        try {
-            Map<Event.Priority, List<UnaryOperator<Event>>> enumMap = pulseListeners.get(event);
-            return enumMap == null ? Map.of() : Map.copyOf(enumMap);
-        } finally {
-            lock.readLock().unlock();
-        }
+        Map<Event.Priority, List<UnaryOperator<Event>>> enumMap = pulseListeners.get(event);
+        return enumMap == null ? Map.of() : Map.copyOf(enumMap);
     }
 
     public void registerPermanent(PulseListener pulseListener) {
@@ -100,24 +93,14 @@ public class ListenerRegistryImpl implements ListenerRegistry {
     }
 
     public void register(Class<? extends Event> eventClass, Event.Priority priority, UnaryOperator<Event> handler) {
-        lock.writeLock().lock();
-        try {
-            pulseListeners
-                    .computeIfAbsent(eventClass, _ -> new EnumMap<>(Event.Priority.class))
-                    .computeIfAbsent(priority, _ -> new ArrayList<>())
-                    .add(handler);
-        } finally {
-            lock.writeLock().unlock();
-        }
+        pulseListeners
+                .computeIfAbsent(eventClass, _ -> new EnumMap<>(Event.Priority.class))
+                .computeIfAbsent(priority, _ -> new ArrayList<>())
+                .add(handler);
     }
 
     public void unregisterAll() {
-        lock.writeLock().lock();
-        try {
-            pulseListeners.clear();
-        } finally {
-            lock.writeLock().unlock();
-        }
+        pulseListeners.clear();
     }
 
     @Override
@@ -128,12 +111,7 @@ public class ListenerRegistryImpl implements ListenerRegistry {
     @Override
     public void onEnable() {
         registerDefaultListeners();
-        lock.writeLock().lock();
-        try {
-            permanentListeners.forEach(this::register);
-        } finally {
-            lock.writeLock().unlock();
-        }
+        permanentListeners.forEach(this::register);
     }
 
     public void registerDefaultListeners() {

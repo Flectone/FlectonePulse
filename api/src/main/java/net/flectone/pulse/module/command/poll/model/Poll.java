@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.flectone.pulse.model.entity.FEntity;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A running poll and the votes cast so far.
@@ -19,7 +20,7 @@ public class Poll {
     private final boolean multipleVote;
     private final String title;
     private final List<String> answers = new ArrayList<>();
-    private final Map<UUID, boolean[]> votesMap = new LinkedHashMap<>();
+    private final Map<UUID, boolean[]> votesMap = new ConcurrentHashMap<>();
 
     private long nextRepeat;
 

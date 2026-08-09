@@ -33,16 +33,16 @@ import net.flectone.pulse.service.SocialService;
 import org.incendo.cloud.context.CommandContext;
 import org.jspecify.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TellModuleImpl implements TellModule {
 
-    private final Map<UUID, String> senderReceiverMap = new HashMap<>();
+    private final Map<UUID, String> senderReceiverMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

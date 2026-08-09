@@ -7,13 +7,14 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.util.random.RandomGenerator;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TictactoeService {
 
-    private final LinkedHashMap<Integer, TicTacToe> ticTacToeMap = new LinkedHashMap<>();
+    private final Map<Integer, TicTacToe> ticTacToeMap = new ConcurrentHashMap<>();
 
     private final RandomGenerator randomUtil;
 

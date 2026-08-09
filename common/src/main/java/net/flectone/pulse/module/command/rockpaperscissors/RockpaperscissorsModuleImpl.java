@@ -35,13 +35,14 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.standard.UUIDParser;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RockpaperscissorsModuleImpl implements RockpaperscissorsModule {
 
-    private final Map<UUID, RockPaperScissors> gameMap = new LinkedHashMap<>();
+    private final Map<UUID, RockPaperScissors> gameMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final ProxySender proxySender;

@@ -43,12 +43,13 @@ import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PollModuleImpl implements PollModule {
 
-    private final LinkedHashMap<Integer, Poll> pollMap = new LinkedHashMap<>();
+    private final Map<Integer, Poll> pollMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

@@ -31,6 +31,7 @@ import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -40,7 +41,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuestionAnswerModuleImpl implements QuestionAnswerModule {
 
-    private final Map<String, Pattern> patternMap = new HashMap<>();
+    private final Map<String, Pattern> patternMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final FLogger fLogger;
