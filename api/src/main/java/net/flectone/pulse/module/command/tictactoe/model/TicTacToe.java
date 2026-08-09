@@ -236,11 +236,18 @@ public class TicTacToe {
         field[rowColumn.getLeft()][rowColumn.getRight()] = REMOVE_MULTIPLIER * currentPlayerValue;
     }
 
-    private @Nullable Pair<Integer, Integer> parseMove(String move) {
-        try {
-            String[] stringMove = move.split("-");
+    private @Nullable Pair<Integer, Integer> parseMove(@Nullable String move) {
+        if (move == null) return null;
 
-            return Pair.of(Integer.parseInt(stringMove[0]), Integer.parseInt(stringMove[1]));
+        String[] parts = move.split("-", 2);
+        if (parts.length != 2) return null;
+
+        try {
+            int row = Integer.parseInt(parts[0]);
+            int column = Integer.parseInt(parts[1]);
+            if (row < 0 || row > 2 || column < 0 || column > 2) return null;
+
+            return Pair.of(row, column);
         } catch (NumberFormatException _) {
             return null;
         }
