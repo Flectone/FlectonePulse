@@ -1,17 +1,19 @@
 package net.flectone.pulse.module.command.nickname;
 
-import java.util.LinkedHashSet;
-import java.util.Collections;
-import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
-import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -19,6 +21,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.nickname.listener.NicknameProxyMessageListener;
 import net.flectone.pulse.module.command.nickname.listener.PulseNicknameListener;
 import net.flectone.pulse.module.command.nickname.model.NicknameMessageContext;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -28,16 +31,13 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.resolver.ProfileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.constant.MessageFlag;
-import net.flectone.pulse.constant.ModuleName;
-import net.flectone.pulse.constant.SettingText;
-import net.flectone.pulse.file.FileFacade;
-import net.flectone.pulse.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -66,12 +66,13 @@ public class NicknameModuleImpl implements NicknameModule {
 
     @Override
     public void onEnable() {
-        if (!config().allowedInput().isEmpty()) {
+        if (config().allowedInput().isEmpty()) {
+            allowedPredicate = null;
+        } else {
             try {
                 allowedPredicate = Pattern.compile(config().allowedInput()).asMatchPredicate();
             } catch (PatternSyntaxException e) {
                 fLogger.warning(e);
-                return;
             }
         }
 

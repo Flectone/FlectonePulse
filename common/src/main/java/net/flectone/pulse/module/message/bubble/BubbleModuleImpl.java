@@ -60,12 +60,13 @@ public abstract class BubbleModuleImpl implements BubbleModule {
 
     @Override
     public void onEnable() {
-        if (!config().disallowedInput().isEmpty()) {
+        if (config().disallowedInput().isEmpty()) {
+            disallowedPredicate = null;
+        } else {
             try {
                 disallowedPredicate = Pattern.compile(config().disallowedInput()).asMatchPredicate();
             } catch (PatternSyntaxException e) {
                 fLogger.warning(e);
-                return;
             }
         }
 
