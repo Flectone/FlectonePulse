@@ -11,12 +11,15 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,9 +67,7 @@ public class ImagePixelConverterImpl implements ImagePixelConverter {
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
 
-        if (height * width >= MAX_DIMENSION) return List.of();
-
-        int stepSize = Math.max((int) Math.ceil(bufferedImage.getWidth() / 48.0), 1);
+        int stepSize = Math.max((int) Math.ceil(width / 48.0), 1);
         int stepSquared = stepSize * stepSize;
 
         int x = 0;
@@ -120,8 +121,24 @@ public class ImagePixelConverterImpl implements ImagePixelConverter {
             connection.setInstanceFollowRedirects(false);
             connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
 
-            try (InputStream inputStream = connection.getInputStream()) {
-                return Optional.of(ImageIO.read(inputStream));
+            try (InputStream inputStream = connection.getInputStream();
+                 ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream)) {
+                Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);
+                if (!readers.hasNext()) return Optional.empty();
+
+                ImageReader reader = readers.next();
+                reader.setInput(imageInputStream);
+
+                long pixels = (long) reader.getWidth(0) * reader.getHeight(0);
+                if (pixels >= MAX_DIMENSION) {
+                    reader.dispose();
+                    return Optional.empty();
+                }
+
+                BufferedImage image = reader.read(0);
+                reader.dispose();
+
+                return Optional.of(image);
             }
         } catch (IOException _) {
             return Optional.empty();
