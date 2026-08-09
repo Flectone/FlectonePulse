@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
 
@@ -19,6 +20,7 @@ public class PulsePlayerPersistAndDisposeListener implements PulseListener {
     private final FPlayerService fPlayerService;
     private final PlaytimeService playtimeService;
     private final SocialService socialService;
+    private final ModerationService moderationService;
 
     @Pulse(priority = Event.Priority.LOW)
     public PlayerPersistAndDisposeEvent onPlayerPersistAndDispose(PlayerPersistAndDisposeEvent event) {
@@ -29,6 +31,9 @@ public class PulsePlayerPersistAndDisposeListener implements PulseListener {
 
         // clear social cache
         socialService.invalidate(fPlayer.uuid());
+
+        // clear moderation cache
+        moderationService.invalidate(fPlayer.uuid());
 
         return event.withPlayer(fPlayer);
     }

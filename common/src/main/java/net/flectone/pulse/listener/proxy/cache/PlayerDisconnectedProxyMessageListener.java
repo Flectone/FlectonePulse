@@ -12,6 +12,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
 
@@ -25,6 +26,7 @@ public class PlayerDisconnectedProxyMessageListener implements PulseListener {
     private final FPlayerService fPlayerService;
     private final PlaytimeService playtimeService;
     private final SocialService socialService;
+    private final ModerationService moderationService;
     private final QuitModule quitModule;
 
     @Pulse
@@ -47,6 +49,9 @@ public class PlayerDisconnectedProxyMessageListener implements PulseListener {
 
             // clear social cache
             socialService.invalidate(playerUUID);
+
+            // clear moderation cache
+            moderationService.invalidate(playerUUID);
         }
 
         return event.withProcessed(true);
