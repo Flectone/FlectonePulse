@@ -15,6 +15,7 @@ import net.flectone.pulse.util.LazyInstance;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -26,7 +27,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     private final AtomicLong currentTick = new AtomicLong(0L);
     private final AtomicLong threadCounter = new AtomicLong(0L);
-    private final Map<Long, List<ScheduledTask>> scheduledTasks = new ConcurrentSkipListMap<>();
+    private final ConcurrentNavigableMap<Long, List<ScheduledTask>> scheduledTasks = new ConcurrentSkipListMap<>();
     private final FLogger fLogger;
     private final LazyInstance<FPlayerService> fPlayerService;
     private final LazyInstance<FileFacade> fileFacade;
@@ -50,7 +51,6 @@ public class TaskSchedulerImpl implements TaskScheduler {
     public void reload() {
         processTasks(currentTick.get());
         scheduledTasks.clear();
-        currentTick.set(0L);
     }
 
     @Override
@@ -193,20 +193,24 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     private void processTasks(long tick) {
-        List<ScheduledTask> tasks = scheduledTasks.remove(tick);
-        if (tasks == null) return;
+        NavigableMap<Long, List<ScheduledTask>> due = scheduledTasks.headMap(tick, true);
 
-        List<ScheduledTask> syncTasks = new ArrayList<>();
+        while (!due.isEmpty()) {
+            Map.Entry<Long, List<ScheduledTask>> entry = due.pollFirstEntry();
+            if (entry == null) break;
 
-        for (ScheduledTask scheduledTask : tasks) {
-            if (scheduledTask.async()) {
-                execute(scheduledTask);
-            } else {
-                syncTasks.add(scheduledTask);
+            List<ScheduledTask> syncTasks = new ArrayList<>();
+
+            for (ScheduledTask scheduledTask : entry.getValue()) {
+                if (scheduledTask.async()) {
+                    execute(scheduledTask);
+                } else {
+                    syncTasks.add(scheduledTask);
+                }
             }
-        }
 
-        syncTasks.forEach(this::execute);
+            syncTasks.forEach(this::execute);
+        }
     }
 
     private void execute(ScheduledTask scheduledTask) {
