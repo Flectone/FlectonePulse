@@ -238,6 +238,8 @@ public class PollModuleImpl implements PollModule {
 
     @Override
     public void createPoll(FPlayer fPlayer, String title, boolean multipleValue, long endTimeValue, long repeatTimeValue, List<String> answers) {
+        if (answers.isEmpty()) return;
+
         Poll poll = new Poll(config().lastId(),
                 fPlayer.id(),
                 endTimeValue + System.currentTimeMillis(),
