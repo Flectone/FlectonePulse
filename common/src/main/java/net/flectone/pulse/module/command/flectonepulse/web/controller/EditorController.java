@@ -14,6 +14,7 @@ import spark.Response;
 import spark.Service;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -200,7 +201,7 @@ public class EditorController {
 
     private String loadTemplate(String name) {
         try (InputStream is = getClass().getResourceAsStream("/web/" + name);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             return reader.lines().collect(Collectors.joining("\n"));
         } catch (IOException | NullPointerException e) {
             throw new FileLoadException("editor template " + name, e);
