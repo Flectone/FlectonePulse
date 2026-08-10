@@ -73,52 +73,63 @@ public class DatabaseImpl implements Database {
         Driver driver = driverLoader.getOrLoad(config().type());
         HikariConfig hikariConfig = createHikariConfig(driver);
 
-        HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
-        this.dataSource = hikariDataSource;
+        HikariDataSource newDataSource = new HikariDataSource(hikariConfig);
 
-        jdbi = Jdbi.create(hikariDataSource);
-        jdbi.installPlugin(new SqlObjectPlugin());
+        try {
+            Jdbi newJdbi = Jdbi.create(newDataSource);
+            newJdbi.installPlugin(new SqlObjectPlugin());
 
-        setupTemplateEngine(jdbi);
+            setupTemplateEngine(newJdbi);
 
-        jdbi.registerRowMapper(ConstructorMapper.factory(FColorDao.FColorInfo.class));
-        jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
-        // these models are public api and carry no JDBI annotations, so the column mapping lives here
-        jdbi.registerRowMapper(Ignore.class, (rs, _) -> new Ignore(
-                rs.getInt("id"),
-                rs.getLong("date"),
-                rs.getInt("target")
-        ));
-        jdbi.registerRowMapper(Mail.class, (rs, _) -> new Mail(
-                rs.getInt("id"),
-                rs.getLong("date"),
-                rs.getInt("sender"),
-                rs.getInt("receiver"),
-                rs.getString("message")
-        ));
-        jdbi.registerRowMapper(Moderation.class, (rs, _) -> new Moderation(
-                rs.getInt("id"),
-                rs.getInt("player"),
-                rs.getLong("date"),
-                rs.getLong("time"),
-                rs.getString("reason"),
-                rs.getInt("moderator"),
-                Moderation.Type.valueOf(rs.getString("type").toUpperCase()),
-                rs.getBoolean("valid"),
-                rs.getString("server")
-        ));
-        jdbi.registerRowMapper(PlayTime.class, (rs, _) -> new PlayTime(
-                rs.getInt("id"),
-                rs.getInt("player"),
-                rs.getLong("first"),
-                rs.getLong("last"),
-                rs.getLong("total"),
-                rs.getInt("sessions")
-        ));
+            newJdbi.registerRowMapper(ConstructorMapper.factory(FColorDao.FColorInfo.class));
+            newJdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
+            // these models are public api and carry no JDBI annotations, so the column mapping lives here
+            newJdbi.registerRowMapper(Ignore.class, (rs, _) -> new Ignore(
+                    rs.getInt("id"),
+                    rs.getLong("date"),
+                    rs.getInt("target")
+            ));
+            newJdbi.registerRowMapper(Mail.class, (rs, _) -> new Mail(
+                    rs.getInt("id"),
+                    rs.getLong("date"),
+                    rs.getInt("sender"),
+                    rs.getInt("receiver"),
+                    rs.getString("message")
+            ));
+            newJdbi.registerRowMapper(Moderation.class, (rs, _) -> new Moderation(
+                    rs.getInt("id"),
+                    rs.getInt("player"),
+                    rs.getLong("date"),
+                    rs.getLong("time"),
+                    rs.getString("reason"),
+                    rs.getInt("moderator"),
+                    Moderation.Type.valueOf(rs.getString("type").toUpperCase()),
+                    rs.getBoolean("valid"),
+                    rs.getString("server")
+            ));
+            newJdbi.registerRowMapper(PlayTime.class, (rs, _) -> new PlayTime(
+                    rs.getInt("id"),
+                    rs.getInt("player"),
+                    rs.getLong("first"),
+                    rs.getLong("last"),
+                    rs.getLong("total"),
+                    rs.getInt("sessions")
+            ));
 
-        executeInitSQLDatabaseFile();
+            this.dataSource = newDataSource;
+            this.jdbi = newJdbi;
 
-        checkMigration();
+            executeInitSQLDatabaseFile();
+
+            checkMigration();
+        } catch (Exception e) {
+            this.dataSource = null;
+            this.jdbi = null;
+
+            newDataSource.close();
+
+            throw e;
+        }
 
         init();
     }
