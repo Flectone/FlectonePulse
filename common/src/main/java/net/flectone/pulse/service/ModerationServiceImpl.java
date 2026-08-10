@@ -125,6 +125,11 @@ public class ModerationServiceImpl implements ModerationService {
     }
 
     @Override
+    public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type, @Nullable String server, int limit, int offset) {
+        return moderationRepository.getValid(fPlayer, type, server, limit, offset);
+    }
+
+    @Override
     public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type, int limit, int offset) {
         return moderationRepository.getValid(fPlayer, type, getServer(type), limit, offset);
     }

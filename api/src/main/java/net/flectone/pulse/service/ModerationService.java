@@ -158,6 +158,18 @@ public interface ModerationService {
     Optional<Moderation> getValid(FPlayer fPlayer, Moderation.Type type);
 
     /**
+     * A page of a player's active punishments on one server, for the list commands.
+     *
+     * @param fPlayer the player to check
+     * @param type the punishment type
+     * @param server the server to list from, or null for every server
+     * @param limit how many to return
+     * @param offset how many to skip
+     * @return the page
+     */
+    List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type, String server, int limit, int offset);
+
+    /**
      * A page of a player's active punishments, for the list commands.
      *
      * @param fPlayer the player to check
