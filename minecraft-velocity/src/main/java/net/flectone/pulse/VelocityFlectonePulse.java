@@ -94,6 +94,8 @@ public class VelocityFlectonePulse implements LoaderBootstrap {
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getIdentifier().equals(IDENTIFIER)) return;
 
+        event.setResult(PluginMessageEvent.ForwardResult.handled());
+
         // only backend servers may talk on this channel, never clients
         if (event.getSource() instanceof ServerConnection) {
             ProxySender.send(event.getData(), bytes -> proxyServer.getAllServers().stream()
@@ -106,8 +108,6 @@ public class VelocityFlectonePulse implements LoaderBootstrap {
                     }
             );
         }
-
-        event.setResult(PluginMessageEvent.ForwardResult.handled());
     }
 
     @Subscribe

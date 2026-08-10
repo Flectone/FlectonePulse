@@ -87,6 +87,8 @@ public final class BungeecordFlectonePulse implements LoaderBootstrap, Listener 
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getTag().equals(CHANNEL)) return;
 
+        event.setCancelled(true);
+
         // only backend servers may talk on this channel, never clients
         if (event.getSender() instanceof Server) {
             ProxySender.send(event.getData(), bytes -> ProxyServer.getInstance().getServers().values().stream()
