@@ -193,6 +193,17 @@ public record FLogger(
     }
 
     /**
+     * Logs a failure with its stack trace under a formatted message.
+     *
+     * @param throwable the failure
+     * @param format the format string
+     * @param args the arguments
+     */
+    public void warning(Throwable throwable, String format, Object... args) {
+        warning(throwable, String.format(format, args));
+    }
+
+    /**
      * Logs a failure with its stack trace and a request to report it.
      *
      * @param throwable the failure
@@ -213,17 +224,6 @@ public record FLogger(
         throwable.printStackTrace(printWriter);
 
         log(new LogRecord(Level.WARNING, string + " " + stringWriter));
-    }
-
-    /**
-     * Logs a failure with its stack trace under a formatted message.
-     *
-     * @param throwable the failure
-     * @param format the format string
-     * @param args the argument
-     */
-    public void warning(Throwable throwable, String format, Object args) {
-        warning(throwable, String.format(format, args));
     }
 
 }
