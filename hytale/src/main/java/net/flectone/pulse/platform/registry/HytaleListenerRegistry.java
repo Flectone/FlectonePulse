@@ -11,7 +11,6 @@ import com.hypixel.hytale.server.core.io.adapter.PacketAdapters;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketFilter;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.listener.HytaleListener;
 import net.flectone.pulse.listener.module.HytalePulseModuleEnableListener;
@@ -30,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 public class HytaleListenerRegistry extends ListenerRegistryImpl {
 
     // don't clear these listeners
-    private final List<HytaleListener> listeners = new ObjectArrayList<>();
+    private final List<HytaleListener> listeners = new CopyOnWriteArrayList<>();
     private final AtomicBoolean languageListenerRegistered = new AtomicBoolean(false);
 
     private final FileFacade fileFacade;

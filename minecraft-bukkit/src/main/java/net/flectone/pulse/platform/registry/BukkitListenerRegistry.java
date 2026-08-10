@@ -3,7 +3,6 @@ package net.flectone.pulse.platform.registry;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.listener.player.BukkitPlayerConnectionListener;
 import net.flectone.pulse.listener.player.BukkitPlayerConnectionValidListener;
 import net.flectone.pulse.listener.player.BukkitPlayerLoginListener;
@@ -20,11 +19,12 @@ import org.bukkit.plugin.PluginManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 public class BukkitListenerRegistry extends MinecraftListenerRegistry {
 
-    private final List<Listener> listeners = new ObjectArrayList<>();
+    private final List<Listener> listeners = new CopyOnWriteArrayList<>();
 
     private final Plugin plugin;
     private final Injector injector;

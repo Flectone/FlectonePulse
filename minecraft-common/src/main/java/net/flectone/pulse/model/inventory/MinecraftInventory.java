@@ -3,13 +3,14 @@ package net.flectone.pulse.model.inventory;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -17,14 +18,14 @@ import java.util.function.Consumer;
 public class MinecraftInventory {
 
     private final int size;
-    private final Int2ObjectOpenHashMap<BiConsumer<ItemStack, MinecraftInventory>> clickConsumerMap = new Int2ObjectOpenHashMap<>();
-    private final List<Consumer<MinecraftInventory>> closeConsumerList = new ObjectArrayList<>();
+    private final Map<Integer, BiConsumer<ItemStack, MinecraftInventory>> clickConsumerMap = new HashMap<>();
+    private final List<Consumer<MinecraftInventory>> closeConsumerList = new ArrayList<>();
     private final WrapperPlayServerOpenWindow wrapperWindow;
 
     @Setter private WrapperPlayServerWindowItems wrapperItems;
 
     public MinecraftInventory(int size,
-                              Int2ObjectOpenHashMap<BiConsumer<ItemStack, MinecraftInventory>> clickConsumerMap,
+                              Map<Integer, BiConsumer<ItemStack, MinecraftInventory>> clickConsumerMap,
                               List<Consumer<MinecraftInventory>> closeConsumerList,
                               WrapperPlayServerOpenWindow wrapperWindow,
                               WrapperPlayServerWindowItems wrapperItems) {
@@ -37,9 +38,9 @@ public class MinecraftInventory {
 
     public static class Builder {
 
-        private final Int2ObjectOpenHashMap<ItemStack> itemMap = new Int2ObjectOpenHashMap<>();
-        private final Int2ObjectOpenHashMap<BiConsumer<ItemStack, MinecraftInventory>> clickConsumerMap = new Int2ObjectOpenHashMap<>();
-        private final List<Consumer<MinecraftInventory>> closeConsumerList = new ObjectArrayList<>();
+        private final Map<Integer, ItemStack> itemMap = new HashMap<>();
+        private final Map<Integer, BiConsumer<ItemStack, MinecraftInventory>> clickConsumerMap = new HashMap<>();
+        private final List<Consumer<MinecraftInventory>> closeConsumerList = new ArrayList<>();
         private Component name = Component.empty();
         private int size;
 
@@ -73,7 +74,7 @@ public class MinecraftInventory {
                     ? new WrapperPlayServerOpenWindow(126, size >= 24 ? 5 : size, name)
                     : new WrapperPlayServerOpenWindow(126, "chest", name, size, 0);
 
-            List<ItemStack> items = new ObjectArrayList<>(size);
+            List<ItemStack> items = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 items.add(itemMap.getOrDefault(i, ItemStack.EMPTY));
             }

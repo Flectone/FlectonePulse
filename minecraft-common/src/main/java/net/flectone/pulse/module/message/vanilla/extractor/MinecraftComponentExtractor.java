@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.vanilla.extractor;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.vanilla.model.Mapping;
@@ -77,7 +76,7 @@ public class MinecraftComponentExtractor extends ComponentExtractor<Translatable
 
     @Override
     public Map<Integer, Object> extractArguments(TranslatableComponent translatableComponent) {
-        Map<Integer, Object> parsedArguments = new Object2ObjectOpenHashMap<>();
+        Map<Integer, Object> parsedArguments = new HashMap<>();
 
         for (int i = 0; i < translatableComponent.arguments().size(); i++) {
             Object argument = extractArgument(translatableComponent, i);

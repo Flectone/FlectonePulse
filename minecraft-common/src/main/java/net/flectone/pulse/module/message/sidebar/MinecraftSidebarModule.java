@@ -8,8 +8,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSc
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -25,15 +23,15 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.random.RandomGenerator;
 import net.kyori.adventure.text.Component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 public class MinecraftSidebarModule extends SidebarModuleImpl {
 
-    private final List<UUID> playerSidebars = new ObjectArrayList<>();
-    private final Map<UUID, List<String>> playerSidebarContent = new Object2ObjectOpenHashMap<>();
+    private final List<UUID> playerSidebars = new CopyOnWriteArrayList<>();
+    private final Map<UUID, List<String>> playerSidebarContent = new ConcurrentHashMap<>();
 
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
@@ -161,7 +159,7 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
     }
 
     private List<String> modernSidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
-        List<String> content = new ObjectArrayList<>(15);
+        List<String> content = new ArrayList<>(15);
 
         for (int i = 1; i < lines.length && i < 16; i++) {
             int lineIndex = i - 1;
@@ -190,7 +188,7 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
     }
 
     private List<String> legacySidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
-        List<String> content = new ObjectArrayList<>(15);
+        List<String> content = new ArrayList<>(15);
 
         for (int i = 1; i < lines.length && i < 16; i++) {
             int lineIndex = i - 1;

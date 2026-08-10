@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Message;
@@ -33,6 +32,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -215,7 +215,7 @@ public class MinecraftTextureService {
         int framesY = original.getHeight() / HEAD_SIZE;
         int totalFrames = framesX * framesY;
 
-        List<CompletableFuture<Frame>> futures = new ObjectArrayList<>(framesX * framesY);
+        List<CompletableFuture<Frame>> futures = new ArrayList<>(framesX * framesY);
 
         for (int y = 0; y < framesY; y++) {
             for (int x = 0; x < framesX; x++) {

@@ -5,8 +5,6 @@ import com.google.inject.Singleton;
 import io.github.miniplaceholders.api.Expansion;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
@@ -43,9 +41,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,7 +94,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
 
     @Pulse(priority = Event.Priority.HIGH)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
-        Set<TagResolver> resolvers = new ObjectArraySet<>();
+        Set<TagResolver> resolvers = new HashSet<>();
         resolvers.add(MiniPlaceholders.globalPlaceholders());
 
         MessageContext messageContext = event.context();
@@ -277,7 +273,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
         if (argument == null) return MessagePipeline.ReplacementTag.emptyTag();
         if (!StringUtils.isNumeric(argument)) return MessagePipeline.ReplacementTag.emptyTag();
 
-        Int2ObjectArrayMap<String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
+        Map<Integer, String> colorsMap = new HashMap<>(fileFacade.message().format().fcolor().defaultColors());
         for (FColor.Type type : types) {
             colorsMap.putAll(socialService.loadColors(fPlayer, type));
         }

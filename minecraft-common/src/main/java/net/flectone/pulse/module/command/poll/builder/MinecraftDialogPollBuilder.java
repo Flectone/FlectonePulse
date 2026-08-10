@@ -16,7 +16,6 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -29,6 +28,7 @@ import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
@@ -114,7 +114,7 @@ public class MinecraftDialogPollBuilder {
                 new NumberRangeInputControl.RangeInfo(1.0f, 600.0f, repeatTimeValue, 1.0f)
         ));
 
-        List<Input> inputs = new ObjectArrayList<>(List.of(input, multiple, endTime, repeatTime));
+        List<Input> inputs = new ArrayList<>(List.of(input, multiple, endTime, repeatTime));
 
         for (int i = 0; i < answers.size(); i++) {
             Component answerNameComponent = messagePipeline.build(MessageContext.builder()
@@ -178,7 +178,7 @@ public class MinecraftDialogPollBuilder {
                     if (nbt instanceof NBTCompound nbtCompound) {
                         NBTPoll nbtPoll = readPoll(fPlayer, nbtCompound);
 
-                        List<String> answers = new ObjectArrayList<>(nbtPoll.answers());
+                        List<String> answers = new ArrayList<>(nbtPoll.answers());
                         if (answers.size() < 10) {
                             answers.add(poll.inputAnswersInitial());
                         }
@@ -213,7 +213,7 @@ public class MinecraftDialogPollBuilder {
                     if (nbt instanceof NBTCompound nbtCompound) {
                         NBTPoll nbtPoll = readPoll(fPlayer, nbtCompound);
 
-                        List<String> answers = new ObjectArrayList<>(nbtPoll.answers());
+                        List<String> answers = new ArrayList<>(nbtPoll.answers());
                         if (!answers.isEmpty()) {
                             answers.removeLast();
                         }
@@ -257,7 +257,7 @@ public class MinecraftDialogPollBuilder {
         float endTime = (float) nbtCompound.getNumberTagValueOrDefault(END_TIME_KEY, 5.0f);
         float repeatTime = (float) nbtCompound.getNumberTagValueOrDefault(REPEAT_TIME_KEY, 1.0f);
 
-        List<String> answers = new ObjectArrayList<>();
+        List<String> answers = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             String answerValue = nbtCompound.getStringTagValueOrNull(ANSWER_KEY + i);
             if (answerValue == null) break;

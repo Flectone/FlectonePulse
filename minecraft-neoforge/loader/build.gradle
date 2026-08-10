@@ -9,7 +9,6 @@ neoForge {
 configurations.configureEach {
     resolutionStrategy {
         force "org.jspecify:jspecify:1.0.1"
-        force "it.unimi.dsi:fastutil:8.5.19"
         force "commons-io:commons-io:2.22.0"
     }
 }

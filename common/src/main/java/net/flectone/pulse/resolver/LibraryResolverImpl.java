@@ -201,19 +201,6 @@ public class LibraryResolverImpl extends LibraryManager implements LibraryResolv
         );
 
         loadLibrary(Library.builder()
-                .groupId("it{}unimi{}dsi")
-                .artifactId("fastutil")
-                .version(BuildConfig.FASTUTIL_VERSION)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .relocate(Relocation.builder()
-                        .pattern("it{}unimi{}dsi")
-                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".fastutil")
-                        .build()
-                )
-                .build()
-        );
-
-        loadLibrary(Library.builder()
                 .groupId("com{}zaxxer")
                 .artifactId("HikariCP")
                 .version(BuildConfig.HIKARICP_VERSION)

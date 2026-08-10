@@ -20,7 +20,6 @@ import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.constant.SettingText;
@@ -41,6 +40,7 @@ import org.joml.Vector3d;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -224,8 +224,8 @@ public class HytaleBubbleRender implements BubbleRender {
 
     @Override
     public void removeBubbleIf(Predicate<Bubble> bubblePredicate) {
-        List<String> keysToRemove = new ObjectArrayList<>();
-        List<HytaleBubbleEntity> bubblesToRemove = new ObjectArrayList<>();
+        List<String> keysToRemove = new ArrayList<>();
+        List<HytaleBubbleEntity> bubblesToRemove = new ArrayList<>();
 
         activeBubbles.forEach((key, bubbleDataList) -> bubbleDataList.stream()
                 .filter(bubbleEntity -> bubblePredicate.test(bubbleEntity.bubble()))
