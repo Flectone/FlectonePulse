@@ -181,7 +181,7 @@ public class SwearModuleImpl implements SwearModule {
             String fullWord = getFullWord(string, start);
             if (!StringUtils.isEmpty(fullWord) && isIgnored(fullWord)) continue;
 
-            matcher.appendReplacement(result, "<swear:'" + word + "'>");
+            matcher.appendReplacement(result, Matcher.quoteReplacement("<swear:'" + word.replace("'", "") + "'>"));
         }
 
         matcher.appendTail(result);
