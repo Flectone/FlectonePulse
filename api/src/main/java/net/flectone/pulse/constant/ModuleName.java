@@ -165,7 +165,9 @@ public enum ModuleName {
     UPDATE_CACHE_VIOLATION,
     UPDATE_CACHE_SETTING,
     UPDATE_CACHE_COLOR,
-    UPDATE_CACHE_IGNORE;
+    UPDATE_CACHE_IGNORE,
+
+    ADDON;
 
     private static final Map<String, ModuleName> ENUM_BY_PROXY_KEY = Arrays.stream(ModuleName.values())
             .collect(Collectors.toUnmodifiableMap(
