@@ -68,9 +68,13 @@ public class ReplacementModuleImpl implements ReplacementModule {
     public void onEnable() {
         listenerRegistry.register(PulseReplacementListener.class);
 
-        config().triggers().forEach((name, regex) ->
-                triggerPatterns.put(name, Pattern.compile(regex))
-        );
+        config().triggers().forEach((name, regex) -> {
+            try {
+                triggerPatterns.put(name, Pattern.compile(regex));
+            } catch (Exception e) {
+                fLogger.warning(e);
+            }
+        });
     }
 
     @Override
