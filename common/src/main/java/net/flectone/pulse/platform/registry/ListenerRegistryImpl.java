@@ -30,7 +30,7 @@ import java.util.function.UnaryOperator;
 public class ListenerRegistryImpl implements ListenerRegistry {
 
     private final Map<Class<? extends Event>, EnumMap<Event.Priority, List<UnaryOperator<Event>>>> pulseListeners = new ConcurrentHashMap<>();
-    private final Set<PulseListener> permanentListeners = new LinkedHashSet<>();
+    private final Set<PulseListener> permanentListeners = ConcurrentHashMap.newKeySet();
 
     private final ProxyRegistry proxyRegistry;
     private final FLogger fLogger;
@@ -38,7 +38,7 @@ public class ListenerRegistryImpl implements ListenerRegistry {
 
     public @NonNull Map<Event.Priority, List<UnaryOperator<Event>>> getPulseListeners(Class<? extends Event> event) {
         Map<Event.Priority, List<UnaryOperator<Event>>> enumMap = pulseListeners.get(event);
-        return enumMap == null ? Map.of() : Map.copyOf(enumMap);
+        return enumMap == null ? Map.of() : Collections.unmodifiableMap(enumMap);
     }
 
     public void registerPermanent(PulseListener pulseListener) {
@@ -93,10 +93,19 @@ public class ListenerRegistryImpl implements ListenerRegistry {
     }
 
     public void register(Class<? extends Event> eventClass, Event.Priority priority, UnaryOperator<Event> handler) {
-        pulseListeners
-                .computeIfAbsent(eventClass, _ -> new EnumMap<>(Event.Priority.class))
-                .computeIfAbsent(priority, _ -> new ArrayList<>())
-                .add(handler);
+        pulseListeners.compute(eventClass, (_, byPriority) -> {
+            EnumMap<Event.Priority, List<UnaryOperator<Event>>> copy = byPriority == null
+                    ? new EnumMap<>(Event.Priority.class)
+                    : new EnumMap<>(byPriority);
+
+            copy.merge(priority, List.of(handler), (old, add) -> {
+                List<UnaryOperator<Event>> merged = new ArrayList<>(old);
+                merged.addAll(add);
+                return List.copyOf(merged);
+            });
+
+            return copy;
+        });
     }
 
     public void unregisterAll() {
