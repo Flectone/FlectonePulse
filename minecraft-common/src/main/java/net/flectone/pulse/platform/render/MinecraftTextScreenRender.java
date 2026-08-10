@@ -22,11 +22,11 @@ import net.flectone.pulse.model.value.TextScreen;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.render.MinecraftBubbleRender;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.MinecraftEntityUtil;
-import net.flectone.pulse.util.random.RandomGenerator;
 import net.kyori.adventure.text.Component;
 
 import java.util.*;
@@ -40,11 +40,11 @@ public class MinecraftTextScreenRender implements TextScreenRender {
 
     private final Map<UUID, List<Integer>> livingEntities = new ConcurrentHashMap<>();
 
+    private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MinecraftPacketSender packetSender;
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
-    private final RandomGenerator randomUtil;
     private final MinecraftEntityUtil entityUtil;
     private final LazyInstance<MinecraftBubbleRender> bubbleRenderer;
     private final LazyInstance<TitleRender> titleRender;
@@ -118,7 +118,7 @@ public class MinecraftTextScreenRender implements TextScreenRender {
 
         Location location = new Location(coordinates.x(), coordinates.y() + 1.8, coordinates.z(), coordinates.yaw(), coordinates.pitch());
 
-        int entityId = randomUtil.nextInt(Integer.MAX_VALUE);
+        int entityId = platformServerAdapter.generateEntityId();
         EntityType entityType = EntityTypes.TEXT_DISPLAY;
 
         packetSender.send(fPlayer, new WrapperPlayServerSpawnEntity(
