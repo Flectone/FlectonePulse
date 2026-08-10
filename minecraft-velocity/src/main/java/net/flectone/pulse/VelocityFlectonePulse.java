@@ -8,6 +8,7 @@ import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.flectone.pulse.constant.HookType;
 import net.flectone.pulse.constant.LoginStatus;
@@ -91,6 +92,12 @@ public class VelocityFlectonePulse implements LoaderBootstrap {
     @Subscribe
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getIdentifier().equals(IDENTIFIER)) return;
+
+        // only backend servers may talk on this channel, never clients
+        if (!(event.getSource() instanceof ServerConnection)) {
+            event.setResult(PluginMessageEvent.ForwardResult.handled());
+            return;
+        }
 
         ProxySender.send(event.getData(), bytes -> proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
