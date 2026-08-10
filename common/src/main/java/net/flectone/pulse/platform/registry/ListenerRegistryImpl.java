@@ -80,7 +80,7 @@ public class ListenerRegistryImpl implements ListenerRegistry {
         Class<? extends Event> eventClass = (Class<? extends Event>) paramTypes[0];
 
         register(eventClass, annotation.priority(), event -> {
-            if (event.cancelled() && !annotation.ignorecancelled()) return event;
+            if (event.cancelled() && !annotation.ignoreCancelled()) return event;
 
             try {
                 Object result = method.invoke(listener, event);

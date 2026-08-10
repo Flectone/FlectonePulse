@@ -31,6 +31,6 @@ public @interface Pulse {
      *
      * @return true to ignore cancelled events
      */
-    boolean ignorecancelled() default false;
+    boolean ignoreCancelled() default false;
 
 }

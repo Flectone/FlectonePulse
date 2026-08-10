@@ -32,7 +32,7 @@ public class PulseAfkListener implements PulseListener {
     private final TaskScheduler taskScheduler;
     private final PlatformServerAdapter platformServerAdapter;
 
-    @Pulse(ignorecancelled = true)
+    @Pulse(ignoreCancelled = true)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
         String messageType = event.moduleName().name();
 
