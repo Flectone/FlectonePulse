@@ -204,7 +204,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
 
                     return Tag.preProcessParsed(timeValue);
                 })
-                .globalPlaceholder("online", (queue, _) -> {
+                .globalPlaceholder("maintenance", (queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     String server = queue.pop().value();
