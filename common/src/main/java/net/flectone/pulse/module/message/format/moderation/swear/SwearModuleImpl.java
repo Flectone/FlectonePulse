@@ -54,10 +54,14 @@ public class SwearModuleImpl implements SwearModule {
 
     @Override
     public void onEnable() {
-        try {
-            combinedPattern = Pattern.compile(String.join("|", config().trigger()));
-        } catch (PatternSyntaxException e) {
-            fLogger.warning(e);
+        if (config().trigger().isEmpty()) {
+            combinedPattern = null;
+        } else {
+            try {
+                combinedPattern = Pattern.compile(String.join("|", config().trigger()));
+            } catch (PatternSyntaxException e) {
+                fLogger.warning(e);
+            }
         }
 
         listenerRegistry.register(PulseSwearListener.class);
