@@ -32,6 +32,7 @@ import net.flectone.pulse.module.integration.discord.provider.DiscordClientProvi
 import net.flectone.pulse.module.integration.discord.service.DiscordWebhookService;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.service.SkinService;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -209,7 +210,7 @@ public class DiscordSender {
                                         return Tag.inserting(messagePipeline.build(MessageContext.builder()
                                                 .message(discordModule.localization(fResolver).formatReply())
                                                 .tagResolvers(
-                                                        messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.getLeft()))),
+                                                        messagePipeline.resolver("reply_user", Tag.inserting(Component.text(StringUtils.defaultString(reply.getLeft())))),
                                                         messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                                                                 .sender(discordClient.sender())
                                                                 .receiver(fResolver)

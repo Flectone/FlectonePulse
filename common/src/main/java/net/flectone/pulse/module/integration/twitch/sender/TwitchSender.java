@@ -17,6 +17,7 @@ import net.flectone.pulse.module.integration.twitch.model.TwitchClient;
 import net.flectone.pulse.module.integration.twitch.model.TwitchMessageContext;
 import net.flectone.pulse.module.integration.twitch.provider.TwitchClientProvider;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
@@ -60,7 +61,7 @@ public class TwitchSender {
                                     return Tag.inserting(messagePipeline.build(MessageContext.builder()
                                             .message(twitchModule.localization(fResolver).formatReply())
                                             .tagResolvers(
-                                                    messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.getLeft()))),
+                                                    messagePipeline.resolver("reply_user", Tag.inserting(Component.text(StringUtils.defaultString(reply.getLeft())))),
                                                     messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                                                             .sender(twitchClient.sender())
                                                             .receiver(fResolver)

@@ -19,6 +19,7 @@ import net.flectone.pulse.module.integration.telegram.model.TelegramClient;
 import net.flectone.pulse.module.integration.telegram.model.TelegramMessageContext;
 import net.flectone.pulse.module.integration.telegram.provider.TelegramClientProvider;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -140,7 +141,7 @@ public class TelegramSender {
                                     return Tag.inserting(messagePipeline.build(MessageContext.builder()
                                             .message(telegramModule.localization(fResolver).formatReply())
                                             .tagResolvers(
-                                                    messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.getLeft()))),
+                                                    messagePipeline.resolver("reply_user", Tag.inserting(Component.text(StringUtils.defaultString(reply.getLeft())))),
                                                     messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                                                             .sender(telegramClient.sender())
                                                             .receiver(fResolver)
