@@ -257,7 +257,10 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public boolean isOperator(@NonNull UUID uuid) {
-        return Bukkit.getOperators().stream().anyMatch(offlinePlayer -> offlinePlayer.getUniqueId().equals(uuid));
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null) return player.isOp();
+
+        return Bukkit.getOfflinePlayer(uuid).isOp();
     }
 
     @Override
