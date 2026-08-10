@@ -277,6 +277,24 @@ public interface PlatformPlayerAdapter {
     }
 
     /**
+     * Checks if the player is dead.
+     *
+     * @param uuid the player UUID
+     * @return true if dead
+     */
+    boolean isDead(@NonNull UUID uuid);
+
+    /**
+     * Convenience form taking an entity rather than its id.
+     *
+     * @param entity the entity
+     * @return whether the entity is dead
+     */
+    default boolean isDead(@NonNull FEntity entity) {
+        return isDead(entity.uuid());
+    }
+
+    /**
      * Checks if the player has played before.
      *
      * @param uuid the player UUID

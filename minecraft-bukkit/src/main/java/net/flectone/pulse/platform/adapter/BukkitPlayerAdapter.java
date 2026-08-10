@@ -63,7 +63,6 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     private void initGameProfileMethods(Player player) {
         gameProfileMethodsInitialized = true;
-
         try {
             handleMethod = reflectionResolver.unreflectMethod(player.getClass().getMethod("getHandle"));
             if (handleMethod == null) return;
@@ -267,6 +266,14 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         if (player == null) return false;
 
         return player.isSneaking();
+    }
+
+    @Override
+    public boolean isDead(@NonNull UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return false;
+
+        return player.isDead();
     }
 
     @Override

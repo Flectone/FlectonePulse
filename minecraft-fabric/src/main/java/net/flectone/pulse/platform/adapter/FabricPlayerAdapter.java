@@ -305,6 +305,14 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public boolean isDead(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return false;
+
+        return !player.isAlive();
+    }
+
+    @Override
     public boolean hasPlayedBefore(@NonNull UUID uuid) {
         return true;
     }

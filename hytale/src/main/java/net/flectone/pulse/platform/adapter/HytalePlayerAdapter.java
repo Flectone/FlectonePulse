@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.adapter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.metrics.metric.HistoricMetric;
 import com.hypixel.hytale.protocol.GameMode;
@@ -297,6 +298,36 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public boolean isSneaking(@NonNull UUID uuid) {
         return false;
+    }
+
+    @Override
+    public boolean isDead(@NonNull UUID uuid) {
+        PlayerRef playerRef = getPlayer(uuid);
+        if (playerRef == null) return false;
+
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref == null) return false;
+
+        Store<EntityStore> store = ref.getStore();
+        World world = store.getExternalData().getWorld();
+
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        world.execute(() -> {
+            EntityStatMap statMap = store.getComponent(ref, EntityStatMap.getComponentType());
+            boolean isDead = false;
+
+            if (statMap != null) {
+                EntityStatValue healthValue = statMap.get(DefaultEntityStatTypes.getHealth());
+                if (healthValue != null) {
+                    isDead = healthValue.get() <= 0;
+                }
+            }
+
+            future.complete(isDead);
+        });
+
+        return future.join();
     }
 
     @Override
