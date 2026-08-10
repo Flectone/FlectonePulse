@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.dispatcher.EventDispatcher;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.module.ModuleDisableEvent;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
@@ -39,6 +40,7 @@ public class ModuleControllerImpl implements ModuleController {
     private final CooldownSender cooldownSender;
     private final MuteSender muteSender;
     private final PermissionRegistry permissionRegistry;
+    private final FLogger fLogger;
 
     @Override
     public Map<String, String> collectModuleStatuses() {
@@ -141,8 +143,13 @@ public class ModuleControllerImpl implements ModuleController {
             if (preEnableEvent.cancelled()) {
                 moduleStateMap.put(module.name(), false);
             } else {
-                module.permissions().forEach(permissionRegistry::register);
-                module.onEnable();
+                try {
+                    module.permissions().forEach(permissionRegistry::register);
+                    module.onEnable();
+                } catch (Exception e) {
+                    fLogger.warning(e, "Failed to enable module " + module.name());
+                    moduleStateMap.put(module.name(), false);
+                }
             }
         }
 
