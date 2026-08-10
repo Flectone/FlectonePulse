@@ -2,10 +2,7 @@ package net.flectone.pulse.persistence.database.driver;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
+import java.sql.*;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -41,13 +38,12 @@ public record DriverBackedDataSource(
 
     @Override
     public void setLoginTimeout(int seconds) {
-        // Hikari does not use this method directly
+        DriverManager.setLoginTimeout(seconds);
     }
 
     @Override
     public int getLoginTimeout() {
-        // Hikari does not use this method directly
-        return 0;
+        return DriverManager.getLoginTimeout();
     }
 
     @Override
