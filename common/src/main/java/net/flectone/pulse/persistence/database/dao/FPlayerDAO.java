@@ -49,7 +49,12 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
         } catch (Exception e) {
             // player has changed after select and an error appears due to cache, trying to insert a second time
             if (e.getMessage().contains("Record has changed since last read")) {
-                return insertOrUpdateInTransaction(uuid, name, ip, online);
+                try {
+                    return insertOrUpdateInTransaction(uuid, name, ip, online); }
+                catch (Exception retry) {
+                    logger.warning(retry);
+                    return FPlayer.UNKNOWN;
+                }
             }
 
             logger.warning(e);
