@@ -28,20 +28,17 @@ public class FabricProxy implements Proxy {
     private final FabricFlectonePulse fabricFlectonePulse;
     private final ProxyMessageProcessor proxyMessageProcessor;
 
-    private CustomPacketPayload.Type<@NonNull ProxyPayload> channel;
+    private CustomPacketPayload.Type<@NonNull ProxyPayload> payloadType;
     private StreamCodec<@NonNull FriendlyByteBuf, @NonNull ProxyPayload> streamCodec;
 
     @Override
     public boolean isEnable() {
-        return channel != null;
+        return fileFacade.config().proxy().bungeecord() || fileFacade.config().proxy().velocity();
     }
 
     @Override
     public void onEnable() {
-        String channelName = getChannel();
-        if (channelName == null) return;
-
-        channel = new CustomPacketPayload.Type<>(Identifier.parse(channelName));
+        payloadType = new CustomPacketPayload.Type<>(Identifier.parse(Proxy.CHANNEL));
 
         if (streamCodec == null) {
             streamCodec = StreamCodec.of(
@@ -49,15 +46,15 @@ public class FabricProxy implements Proxy {
                     buf -> {
                         byte[] data = new byte[buf.readableBytes()];
                         buf.readBytes(data);
-                        return new ProxyPayload(channel, data);
+                        return new ProxyPayload(payloadType, data);
                     }
             );
 
-            PayloadTypeRegistry.clientboundPlay().register(channel, streamCodec);
-            PayloadTypeRegistry.serverboundPlay().register(channel, streamCodec);
+            PayloadTypeRegistry.clientboundPlay().register(payloadType, streamCodec);
+            PayloadTypeRegistry.serverboundPlay().register(payloadType, streamCodec);
         }
 
-        ServerPlayNetworking.registerGlobalReceiver(channel, (payload, _) ->
+        ServerPlayNetworking.registerGlobalReceiver(payloadType, (payload, _) ->
                 proxyMessageProcessor.process(payload.data())
         );
     }
@@ -66,8 +63,8 @@ public class FabricProxy implements Proxy {
     public void onDisable() {
         if (!isEnable()) return;
 
-        ServerPlayNetworking.unregisterGlobalReceiver(channel.id());
-        channel = null;
+        ServerPlayNetworking.unregisterGlobalReceiver(payloadType.id());
+        payloadType = null;
     }
 
     @Override
@@ -80,20 +77,8 @@ public class FabricProxy implements Proxy {
         ServerPlayer player = getOnlinePlayer(sender);
         if (player == null) return false;
 
-        ServerPlayNetworking.send(player, new ProxyPayload(channel, message));
+        ServerPlayNetworking.send(player, new ProxyPayload(payloadType, message));
         return true;
-    }
-
-    public @Nullable String getChannel() {
-        if (fileFacade.config().proxy().bungeecord()) {
-            return "bungeecord:main";
-        }
-
-        if (fileFacade.config().proxy().velocity()) {
-            return "flectonepulse:main";
-        }
-
-        return null;
     }
 
     public record ProxyPayload(

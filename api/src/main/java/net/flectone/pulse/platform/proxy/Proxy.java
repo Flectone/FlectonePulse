@@ -11,6 +11,12 @@ import org.jspecify.annotations.NonNull;
 public interface Proxy {
 
     /**
+     * The plugin-message channel identifier used for BungeeCord / Velocity
+     * communication between the proxy and all backend servers.
+     */
+    String CHANNEL = "flectonepulse:main";
+
+    /**
      * Whether this transport is turned on in the config and ready to use.
      *
      * @return true if it can carry messages

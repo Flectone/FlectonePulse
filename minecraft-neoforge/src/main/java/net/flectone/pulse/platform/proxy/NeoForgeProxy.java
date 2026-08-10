@@ -29,20 +29,17 @@ public class NeoForgeProxy implements Proxy {
     private final NeoForgeFlectonePulse neoForgeFlectonePulse;
     private final ProxyMessageProcessor proxyMessageProcessor;
 
-    private CustomPacketPayload.Type<@NonNull ProxyPayload> channel;
+    private CustomPacketPayload.Type<@NonNull ProxyPayload> payloadType;
     private StreamCodec<@NonNull FriendlyByteBuf, @NonNull ProxyPayload> streamCodec;
 
     @Override
     public boolean isEnable() {
-        return channel != null;
+        return fileFacade.config().proxy().bungeecord() || fileFacade.config().proxy().velocity();
     }
 
     @Override
     public void onEnable() {
-        String channelName = getChannel();
-        if (channelName == null) return;
-
-        channel = new CustomPacketPayload.Type<>(Identifier.parse(channelName));
+        payloadType = new CustomPacketPayload.Type<>(Identifier.parse(Proxy.CHANNEL));
 
         if (streamCodec == null) {
             streamCodec = StreamCodec.of(
@@ -50,17 +47,17 @@ public class NeoForgeProxy implements Proxy {
                     buf -> {
                         byte[] data = new byte[buf.readableBytes()];
                         buf.readBytes(data);
-                        return new ProxyPayload(channel, data);
+                        return new ProxyPayload(payloadType, data);
                     }
             );
         }
 
         neoForgeFlectonePulse.getLoader().getEventBus().addListener((RegisterPayloadHandlersEvent event) -> {
-            if (channel == null || streamCodec == null) return;
+            if (payloadType == null || streamCodec == null) return;
 
             PayloadRegistrar registrar = event.registrar("flectonepulse");
             registrar.playBidirectional(
-                    channel,
+                    payloadType,
                     streamCodec,
                     (payload, _) -> proxyMessageProcessor.process(payload.data())
             );
@@ -71,7 +68,7 @@ public class NeoForgeProxy implements Proxy {
     public void onDisable() {
         if (!isEnable()) return;
 
-        channel = null;
+        payloadType = null;
     }
 
     @Override
@@ -84,20 +81,8 @@ public class NeoForgeProxy implements Proxy {
         ServerPlayer player = getOnlinePlayer(sender);
         if (player == null) return false;
 
-        PacketDistributor.sendToPlayer(player, new ProxyPayload(channel, message));
+        PacketDistributor.sendToPlayer(player, new ProxyPayload(payloadType, message));
         return true;
-    }
-
-    public @Nullable String getChannel() {
-        if (fileFacade.config().proxy().bungeecord()) {
-            return "bungeecord:main";
-        }
-
-        if (fileFacade.config().proxy().velocity()) {
-            return "flectonepulse:main";
-        }
-
-        return null;
     }
 
     public record ProxyPayload(

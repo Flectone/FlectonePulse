@@ -5,6 +5,7 @@ import net.flectone.pulse.constant.LoginStatus;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.listener.BungeecordLoginStateListener;
 import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -26,7 +27,7 @@ import java.util.function.Supplier;
 public final class BungeecordFlectonePulse implements LoaderBootstrap, Listener {
 
     private static final String UNKNOWN_SERVER_NAME = "Unknown";
-    private static final String CHANNEL = "BungeeCord";
+    private static final String CHANNEL = Proxy.CHANNEL;
 
     private final Set<UUID> pendingConnections = Collections.synchronizedSet(new HashSet<>());
 
@@ -86,15 +87,18 @@ public final class BungeecordFlectonePulse implements LoaderBootstrap, Listener 
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getTag().equals(CHANNEL)) return;
 
-        ProxySender.send(event.getData(), bytes -> ProxyServer.getInstance().getServers().values().stream()
-                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, bytes)),
-                playerUUID -> {
-                    if (pendingConnections.remove(playerUUID)) {
-                        sendPlayerConnectedEvent(playerUUID, true);
+        // only backend servers may talk on this channel, never clients
+        if (event.getSender() instanceof Server) {
+            ProxySender.send(event.getData(), bytes -> ProxyServer.getInstance().getServers().values().stream()
+                    .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                    .forEach(serverInfo -> serverInfo.sendData(CHANNEL, bytes)),
+                    playerUUID -> {
+                        if (pendingConnections.remove(playerUUID)) {
+                            sendPlayerConnectedEvent(playerUUID, true);
+                        }
                     }
-                }
-        );
+            );
+        }
     }
 
     @EventHandler

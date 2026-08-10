@@ -21,23 +21,18 @@ public class BukkitProxy implements Proxy {
     private final Plugin plugin;
     private final ProxyMessageProcessor proxyMessageProcessor;
 
-    private String channel;
-
     @Override
     public boolean isEnable() {
-        return channel != null;
+        return fileFacade.config().proxy().bungeecord() || fileFacade.config().proxy().velocity();
     }
 
     @Override
     public void onEnable() {
-        channel = getChannel();
-        if (channel == null) return;
-
         plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(plugin);
         plugin.getServer().getMessenger().unregisterIncomingPluginChannel(plugin);
-        plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, channel);
-        plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin, channel, (proxyChannel, _, message) -> {
-            if (!proxyChannel.equals(channel) || !isEnable()) {
+        plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, Proxy.CHANNEL);
+        plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin, Proxy.CHANNEL, (proxyChannel, _, message) -> {
+            if (!proxyChannel.equals(Proxy.CHANNEL) || !isEnable()) {
                 return;
             }
 
@@ -51,8 +46,6 @@ public class BukkitProxy implements Proxy {
 
         plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(plugin);
         plugin.getServer().getMessenger().unregisterIncomingPluginChannel(plugin);
-
-        channel = null;
     }
 
     @Override
@@ -62,20 +55,8 @@ public class BukkitProxy implements Proxy {
         Player player = getOnlinePlayer(sender);
         if (player == null || !player.isOnline()) return false;
 
-        player.sendPluginMessage(plugin, channel, message);
+        player.sendPluginMessage(plugin, Proxy.CHANNEL, message);
         return true;
-    }
-
-    public @Nullable String getChannel() {
-        if (fileFacade.config().proxy().bungeecord()) {
-            return "BungeeCord";
-        }
-
-        if (fileFacade.config().proxy().velocity()) {
-            return "flectonepulse:main";
-        }
-
-        return null;
     }
 
     @Nullable

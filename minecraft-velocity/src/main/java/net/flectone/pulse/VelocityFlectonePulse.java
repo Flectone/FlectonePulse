@@ -15,6 +15,7 @@ import net.flectone.pulse.constant.LoginStatus;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.listener.VelocityLoginStateListener;
 import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.sender.ProxySender;
 import org.slf4j.Logger;
 
@@ -27,7 +28,7 @@ import java.util.function.Supplier;
 public class VelocityFlectonePulse implements LoaderBootstrap {
 
     private static final String UNKNOWN_SERVER_NAME = "Unknown";
-    private static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("flectonepulse:main");
+    private static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from(Proxy.CHANNEL);
 
     private final Set<UUID> pendingConnections = Collections.synchronizedSet(new HashSet<>());
 
@@ -94,20 +95,17 @@ public class VelocityFlectonePulse implements LoaderBootstrap {
         if (!event.getIdentifier().equals(IDENTIFIER)) return;
 
         // only backend servers may talk on this channel, never clients
-        if (!(event.getSource() instanceof ServerConnection)) {
-            event.setResult(PluginMessageEvent.ForwardResult.handled());
-            return;
-        }
-
-        ProxySender.send(event.getData(), bytes -> proxyServer.getAllServers().stream()
-                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
-                .forEach(registeredServer -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)),
-                playerUUID -> {
-                    if (pendingConnections.remove(playerUUID)) {
-                        sendPlayerConnectedEvent(playerUUID, true);
+        if (event.getSource() instanceof ServerConnection) {
+            ProxySender.send(event.getData(), bytes -> proxyServer.getAllServers().stream()
+                            .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                            .forEach(registeredServer -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)),
+                    playerUUID -> {
+                        if (pendingConnections.remove(playerUUID)) {
+                            sendPlayerConnectedEvent(playerUUID, true);
+                        }
                     }
-                }
-        );
+            );
+        }
 
         event.setResult(PluginMessageEvent.ForwardResult.handled());
     }
