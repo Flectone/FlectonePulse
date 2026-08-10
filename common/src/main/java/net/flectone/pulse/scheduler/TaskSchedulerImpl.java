@@ -62,17 +62,23 @@ public class TaskSchedulerImpl implements TaskScheduler {
     public void shutdown() {
         disabled = true;
 
+        ExecutorService currentExecutorService = executorService;
+        if (currentExecutorService == null) {
+            scheduledTasks.clear();
+            return;
+        }
+
         processTasks(currentTick.get());
 
-        executorService.shutdown();
+        currentExecutorService.shutdown();
 
         try {
-            if (!executorService.awaitTermination(config.shutdownTimeout().duration(), config.shutdownTimeout().timeUnit())) {
-                executorService.shutdownNow();
+            if (!currentExecutorService.awaitTermination(config.shutdownTimeout().duration(), config.shutdownTimeout().timeUnit())) {
+                currentExecutorService.shutdownNow();
             }
         } catch (InterruptedException e) {
             fLogger.warning(e);
-            executorService.shutdownNow();
+            currentExecutorService.shutdownNow();
             Thread.currentThread().interrupt();
         } finally {
             scheduledTasks.clear();
@@ -203,17 +209,17 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
             for (ScheduledTask scheduledTask : entry.getValue()) {
                 if (scheduledTask.async()) {
-                    execute(scheduledTask);
+                    execute(scheduledTask, tick);
                 } else {
                     syncTasks.add(scheduledTask);
                 }
             }
 
-            syncTasks.forEach(this::execute);
+            syncTasks.forEach(scheduledTask -> execute(scheduledTask, tick));
         }
     }
 
-    private void execute(ScheduledTask scheduledTask) {
+    private void execute(ScheduledTask scheduledTask, long currentProcessedTick) {
         if (scheduledTask.future().isCancelled()) return;
 
         Runnable runnable = wrapExceptionRunnable(scheduledTask);
@@ -224,7 +230,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
         }
 
         if (scheduledTask.isRepeating() && !scheduledTask.future().isCancelled()) {
-            rescheduleTask(scheduledTask);
+            rescheduleTask(scheduledTask, currentProcessedTick);
         }
     }
 
@@ -238,16 +244,35 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     private Runnable wrapExceptionRunnable(ScheduledTask scheduledTask) {
-        return wrapExceptionRunnable(scheduledTask.runnable(), scheduledTask.future());
+        CompletableFuture<Void> future = scheduledTask.future();
+
+        return () -> {
+            if (future.isCancelled()) return;
+
+            try {
+                scheduledTask.runnable().run();
+
+                // repeating task future is never completed, otherwise cancel() stops working
+                if (!scheduledTask.isRepeating()) {
+                    future.complete(null);
+                }
+            } catch (Exception e) {
+                fLogger.warning(e, "Task execution failed:");
+
+                if (!scheduledTask.isRepeating()) {
+                    future.completeExceptionally(e);
+                }
+            }
+        };
     }
 
     protected Runnable wrapExceptionRunnable(SchedulerRunnable runnable, CompletableFuture<Void> future) {
         return () -> {
+            if (future.isCancelled()) return;
+
             try {
                 runnable.run();
-                if (!future.isCancelled()) {
-                    future.complete(null);
-                }
+                future.complete(null);
             } catch (Exception e) {
                 fLogger.warning(e, "Task execution failed:");
                 future.completeExceptionally(e);
@@ -255,8 +280,13 @@ public class TaskSchedulerImpl implements TaskScheduler {
         };
     }
 
-    private void rescheduleTask(ScheduledTask task) {
-        registerTask(task.withNextTick(task.nextTick() + task.period()));
+    private void rescheduleTask(ScheduledTask task, long currentProcessedTick) {
+        long nextTick = task.nextTick() + task.period();
+        if (nextTick <= currentProcessedTick) {
+            nextTick = currentProcessedTick + task.period();
+        }
+
+        registerTask(task.withNextTick(nextTick));
     }
 
     private ScheduledTask registerTask(SchedulerRunnable runnable, long nextTick, long period, boolean async) {

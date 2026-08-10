@@ -27,7 +27,7 @@ public interface TaskScheduler {
     ExecutorService getExecutorService();
 
     /**
-     * Runs the pending tasks, clears the queue and resets the tick counter.
+     * Runs the pending tasks and clears the queue.
      */
     void reload();
 
@@ -85,7 +85,7 @@ public interface TaskScheduler {
      *
      * @param runnable the task to execute repeatedly
      * @param period the number of ticks between consecutive executions
-     * @return a CompletableFuture that completes when the task is first executed
+     * @return a CompletableFuture used to stop the task, it never completes on its own
      */
     CompletableFuture<Void> runAsyncTimer(SchedulerRunnable runnable, long period);
 
@@ -95,7 +95,7 @@ public interface TaskScheduler {
      * @param runnable the task to execute repeatedly
      * @param delay the number of ticks to wait before the first execution
      * @param period the number of ticks between consecutive executions
-     * @return a CompletableFuture that completes when the task is first executed
+     * @return a CompletableFuture used to stop the task, it never completes on its own
      */
     CompletableFuture<Void> runAsyncTimer(SchedulerRunnable runnable, long delay, long period);
 
@@ -121,7 +121,7 @@ public interface TaskScheduler {
      *
      * @param runnable the task to execute repeatedly
      * @param period the number of ticks between consecutive executions
-     * @return a CompletableFuture that completes when the task is first executed
+     * @return a CompletableFuture used to stop the task, it never completes on its own
      */
     CompletableFuture<Void> runSyncTimer(SchedulerRunnable runnable, long period);
 
@@ -131,7 +131,7 @@ public interface TaskScheduler {
      * @param runnable the task to execute repeatedly
      * @param delay the number of ticks to wait before the first execution
      * @param period the number of ticks between consecutive executions
-     * @return a CompletableFuture that completes when the task is first executed
+     * @return a CompletableFuture used to stop the task, it never completes on its own
      */
     CompletableFuture<Void> runSyncTimer(SchedulerRunnable runnable, long delay, long period);
 
@@ -150,7 +150,7 @@ public interface TaskScheduler {
      *
      * @param fPlayerConsumer the consumer to apply to each platform player
      * @param period the number of ticks between consecutive executions
-     * @return a CompletableFuture that completes when the task is first executed
+     * @return a CompletableFuture used to stop the task, it never completes on its own
      */
     CompletableFuture<Void> runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long period);
 
@@ -161,7 +161,7 @@ public interface TaskScheduler {
      * @param fPlayerConsumer the consumer to apply to each platform player
      * @param delay the number of ticks to wait before the first execution
      * @param period the number of ticks between consecutive executions
-     * @return a CompletableFuture that completes when the task is first executed
+     * @return a CompletableFuture used to stop the task, it never completes on its own
      */
     CompletableFuture<Void> runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long delay, long period);
 
