@@ -8,6 +8,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -98,6 +99,16 @@ public interface PollModule extends ModuleCommand {
      * @return the rendered poll
      */
     String resolvePollFormat(FPlayer fPlayer, Poll poll, Status status);
+
+    /**
+     * The answers of a poll, each as its own tag
+     *
+     * @param sender who created the poll
+     * @param fReceiver the reader
+     * @param poll the poll
+     * @return one resolver per answer
+     */
+    TagResolver[] resolveAnswerTags(FEntity sender, FPlayer fReceiver, Poll poll);
 
     /**
      * How far a poll has got, either just announced, running, or closed.

@@ -30,10 +30,9 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -49,6 +48,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PollModuleImpl implements PollModule {
 
+    private static final String ANSWER_TAG = "answer_";
+
     private final Map<Integer, Poll> pollMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
@@ -60,7 +61,6 @@ public class PollModuleImpl implements PollModule {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
-    private final ComponentSerializer componentSerializer;
     private final FLogger fLogger;
     private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
@@ -91,7 +91,7 @@ public class PollModuleImpl implements PollModule {
         );
 
         taskScheduler.runAsyncTimer(() -> {
-            HashSet toRemove = new HashSet();
+            Set<Integer> toRemove = new HashSet<>();
 
             pollMap.forEach((id, poll) -> {
                 Status status;
@@ -116,6 +116,7 @@ public class PollModuleImpl implements PollModule {
                                         .receiver(fResolver)
                                         .message(resolvePollFormat(fResolver, poll, status))
                                         .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, poll.getTitle()))
+                                        .tagResolvers(resolveAnswerTags(fPlayer, fResolver, poll))
                                         .build()
                                 )
                                 .string(poll.getTitle())
@@ -260,6 +261,7 @@ public class PollModuleImpl implements PollModule {
                                 .receiver(fResolver)
                                 .message(resolvePollFormat(fResolver, poll, Status.START))
                                 .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, poll.getTitle()))
+                                .tagResolvers(resolveAnswerTags(fPlayer, fResolver, poll))
                                 .build()
                         )
                         .string(poll.getTitle())
@@ -373,30 +375,36 @@ public class PollModuleImpl implements PollModule {
     }
 
     @Override
+    public TagResolver[] resolveAnswerTags(FEntity sender, FPlayer fReceiver, Poll poll) {
+        List<String> answers = poll.getAnswers();
+
+        TagResolver[] tagResolvers = new TagResolver[answers.size()];
+        for (int index = 0; index < answers.size(); index++) {
+            tagResolvers[index] = messagePipeline.resolver(
+                    Set.of(ANSWER_TAG + index),
+                    messagePipeline.messageComponent(sender, fReceiver, answers.get(index))
+            );
+        }
+
+        return tagResolvers;
+    }
+
+    @Override
     public String resolvePollFormat(FPlayer fPlayer, Poll poll, Status status) {
         Localization.Command.Poll localization = localization(fPlayer);
 
         StringBuilder answersBuilder = new StringBuilder();
 
         int[] countAnswers = poll.getCountAnswers();
+        String voteCommand = commandModuleController.getCommandName(this) + config().subCommandVote();
+        String pollId = String.valueOf(poll.getId());
 
-        int k = 0;
-        for (String answer : poll.getAnswers()) {
-
-            Component answerComponent = messagePipeline.build(MessageContext.builder()
-                    .sender(fPlayer)
-                    .receiver(FPlayer.UNKNOWN)
-                    .message(answer)
-                    .build()
-            );
-
+        for (int index = 0; index < poll.getAnswers().size(); index++) {
             answersBuilder.append(StringUtils.replaceEach(
                     localization.answerTemplate(),
                     new String[]{"<command>", "<id>", "<number>", "<answer>", "<count>"},
-                    new String[]{commandModuleController.getCommandName(this) + config().subCommandVote(), String.valueOf(poll.getId()), String.valueOf(k), componentSerializer.toPlain(answerComponent), String.valueOf(countAnswers[k])}
+                    new String[]{voteCommand, pollId, String.valueOf(index), "<" + ANSWER_TAG + index + ">", String.valueOf(countAnswers[index])}
             ));
-
-            k++;
         }
 
         String messageStatus = Strings.CS.replace(
@@ -406,7 +414,7 @@ public class PollModuleImpl implements PollModule {
                     case END -> localization.status().end();
                 },
                 "<id>",
-                String.valueOf(poll.getId())
+                pollId
         );
 
         return StringUtils.replaceEach(

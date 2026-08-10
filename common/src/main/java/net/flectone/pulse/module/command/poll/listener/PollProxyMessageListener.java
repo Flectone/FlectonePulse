@@ -57,6 +57,7 @@ public class PollProxyMessageListener implements PulseListener {
                                             .receiver(fResolver)
                                             .message(pollModule.resolvePollFormat(fResolver, poll, PollModule.Status.START))
                                             .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, poll.getTitle()))
+                                            .tagResolvers(pollModule.resolveAnswerTags(event.sender(), fResolver, poll))
                                             .build()
                                     )
                                     .string(poll.getTitle())
