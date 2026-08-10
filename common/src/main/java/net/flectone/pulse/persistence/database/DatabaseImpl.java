@@ -61,7 +61,7 @@ public class DatabaseImpl implements Database {
     private final DriverLoader driverLoader;
 
     @Nullable private volatile HikariDataSource dataSource;
-    @Nullable private Jdbi jdbi;
+    @Nullable private volatile Jdbi jdbi;
 
     @Override
     public Config.Database config() {
@@ -149,8 +149,10 @@ public class DatabaseImpl implements Database {
     public void disconnect() {
         HikariDataSource hikariDataSource = dataSource;
         if (hikariDataSource != null) {
-            hikariDataSource.close();
             this.dataSource = null;
+            this.jdbi = null;
+
+            hikariDataSource.close();
 
             fLogger.info("[-] Database disconnected");
         }
