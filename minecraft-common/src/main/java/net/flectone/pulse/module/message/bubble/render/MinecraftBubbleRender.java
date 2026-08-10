@@ -115,49 +115,55 @@ public class MinecraftBubbleRender implements BubbleRender {
 
         FPlayer sender = bubble.getSender();
         String key = sender.uuid().toString() + fViewer.uuid();
-        Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.computeIfAbsent(key, _ -> new ConcurrentLinkedDeque<>());
 
-        // create bubble entity
-        MinecraftBubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
-        bubbleEntities.push(bubbleEntity);
+        activeBubbleEntities.compute(key, (_, existing) -> {
+            Deque<MinecraftBubbleEntity> bubbleEntities = existing == null
+                    ? new ConcurrentLinkedDeque<>()
+                    : existing;
 
-        if (bubble.isInteractionRiding()) {
-            bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
-        } else {
-            for (int i = 0; i < bubble.getElevation(); i++) {
+            // create bubble entity
+            bubbleEntities.push(createBubbleEntity(bubble, formattedMessage, fViewer));
+
+            if (bubble.isInteractionRiding()) {
                 bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+            } else {
+                for (int i = 0; i < bubble.getElevation(); i++) {
+                    bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+                }
             }
-        }
 
-        activeBubbleEntities.put(key, bubbleEntities);
+            return bubbleEntities;
+        });
 
         rideEntities(sender, fViewer);
     }
 
     @Override
     public void removeBubbleIf(Predicate<Bubble> bubbleEntityPredicate) {
-        activeBubbleEntities.entrySet().removeIf(entry -> {
-            Deque<MinecraftBubbleEntity> bubbleEntities = entry.getValue();
-            if (bubbleEntities.isEmpty()) return true;
+        for (String key : activeBubbleEntities.keySet()) {
+            List<MinecraftBubbleEntity> bubbleEntitiesToRemove = new ArrayList<>();
 
-            List<MinecraftBubbleEntity> bubbleEntitiesToRemove = bubbleEntities.stream()
-                    .filter(bubbleEntity -> bubbleEntityPredicate.test(bubbleEntity.getBubble()))
-                    .toList();
+            activeBubbleEntities.computeIfPresent(key, (_, bubbleEntities) -> {
+                bubbleEntities.stream()
+                        .filter(bubbleEntity -> bubbleEntityPredicate.test(bubbleEntity.getBubble()))
+                        .forEach(bubbleEntitiesToRemove::add);
 
-            if (bubbleEntitiesToRemove.isEmpty()) return false;
+                // remove from active bubbles
+                bubbleEntities.removeAll(bubbleEntitiesToRemove);
+
+                return bubbleEntities.isEmpty() ? null : bubbleEntities;
+            });
+
+            if (bubbleEntitiesToRemove.isEmpty()) continue;
 
             // despawn entities
             bubbleEntitiesToRemove.forEach(this::despawnBubbleEntity);
-
-            // remove from active bubbles
-            bubbleEntities.removeAll(bubbleEntitiesToRemove);
 
             // remove space
             MinecraftBubbleEntity bubbleEntity = bubbleEntitiesToRemove.getFirst();
 
             rideEntities(bubbleEntity.getBubble().getSender(), bubbleEntity.getViewer());
-            return false;
-        });
+        }
     }
 
     public void rideEntities(FPlayer sender, FPlayer viewer) {

@@ -82,7 +82,7 @@ public class MinecraftTextScreenRender implements TextScreenRender {
 
     @Override
     public List<Integer> getPassengers(UUID uuid) {
-        return livingEntities.computeIfAbsent(uuid, _ -> new CopyOnWriteArrayList<>());
+        return livingEntities.getOrDefault(uuid, List.of());
     }
 
     @Override
@@ -167,10 +167,11 @@ public class MinecraftTextScreenRender implements TextScreenRender {
     }
 
     private void addAndRide(UUID uuid, int playerId, int entityId) {
-        List<Integer> textScreenPassengers = getPassengers(uuid);
-        textScreenPassengers.add(entityId);
-
-        livingEntities.put(uuid, textScreenPassengers);
+        List<Integer> textScreenPassengers = livingEntities.compute(uuid, (_, list) -> {
+            List<Integer> target = list == null ? new CopyOnWriteArrayList<>() : list;
+            target.add(entityId);
+            return target;
+        });
 
         ride(uuid, playerId, textScreenPassengers, false);
     }
