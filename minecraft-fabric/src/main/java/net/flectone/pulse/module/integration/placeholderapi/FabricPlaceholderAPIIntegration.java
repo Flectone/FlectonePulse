@@ -23,6 +23,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.command.toponline.ToponlineModule;
@@ -34,6 +35,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.LazyInstance;
 import net.minecraft.resources.Identifier;
@@ -60,6 +62,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
     private final LazyInstance<AfkModule> afkModule;
     private final LazyInstance<OnlineModule> onlineModule;
     private final LazyInstance<ToponlineModule> toponlineModule;
+    private final LazyInstance<ModerationService> moderationService;
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     @Getter private final FLogger fLogger;
@@ -159,6 +162,10 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
             return PlaceholderResult.value(timeValue);
         });
+
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":maintenance"), (_, argument) ->
+                PlaceholderResult.value(moderationService.get().getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE, argument, 1, 0).isEmpty() ? "no" : "yes")
+        );
 
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":condition"), (context, argument) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();

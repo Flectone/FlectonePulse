@@ -23,6 +23,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.command.toponline.ToponlineModule;
@@ -34,6 +35,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.LazyInstance;
 import org.apache.commons.lang3.StringUtils;
@@ -60,6 +62,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
     private final LazyInstance<AfkModule> afkModule;
     private final LazyInstance<OnlineModule> onlineModule;
     private final LazyInstance<ToponlineModule> toponlineModule;
+    private final LazyInstance<ModerationService> moderationService;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -90,6 +93,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
                 "%flectonepulse_afk_duration_formatted%",
                 "%flectonepulse_toponline_<position>%",
                 "%flectonepulse_online_<time>%",
+                "%flectonepulse_maintenance_<server>%",
                 "%flectonepulse_condition_<name>%",
                 "%flectonepulse_fcolor_<number>%",
                 "%flectonepulse_fcolor_out_<number>%",
@@ -164,6 +168,13 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
             if (StringUtils.isEmpty(timeValue)) return null;
 
             return timeValue;
+        }
+
+        if (params.startsWith("maintenance_")) {
+            String server = params.substring(12);
+            if (StringUtils.isEmpty(server)) return null;
+
+            return PlaceholderAPI.booleanValue(!moderationService.get().getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE, server, 1, 0).isEmpty());
         }
 
         if (params.startsWith("condition_")) {

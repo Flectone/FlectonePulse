@@ -20,6 +20,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.command.toponline.ToponlineModule;
@@ -30,6 +31,7 @@ import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.audience.Audience;
@@ -61,6 +63,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
     private final LazyInstance<AfkModule> afkModule;
     private final LazyInstance<OnlineModule> onlineModule;
     private final LazyInstance<ToponlineModule> toponlineModule;
+    private final LazyInstance<ModerationService> moderationService;
     private final MessagePipeline messagePipeline;
 
     @Getter private final FLogger fLogger;
@@ -200,6 +203,15 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                     if (StringUtils.isEmpty(timeValue)) return null;
 
                     return Tag.preProcessParsed(timeValue);
+                })
+                .globalPlaceholder("online", (queue, _) -> {
+                    if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
+
+                    String server = queue.pop().value();
+
+                    return Tag.preProcessParsed(
+                            moderationService.get().getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE, server, 1, 0).isEmpty() ? "no" : "yes"
+                    );
                 })
                 .audiencePlaceholder("condition", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
