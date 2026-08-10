@@ -107,6 +107,7 @@ subprojects {
         relocate("com.github.retrooper.packetevents", "${relocated_pattern}.packetevents")
         relocate("io.github.retrooper.packetevents", "${relocated_pattern}.packetevents.impl")
         relocate("org.incendo", "${relocated_pattern}.cloud")
+        relocate("org.mineskin", "${relocated_pattern}.mineskin")
 
         if (project.name != "minecraft-paper") {
             relocate("net.kyori", "${relocated_pattern}")

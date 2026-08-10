@@ -40,6 +40,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
@@ -51,19 +52,19 @@ public class MinecraftTextureService {
 
     private final Map<String, Component> textureMap = new ConcurrentHashMap<>();
 
+    private final AtomicBoolean loaded = new AtomicBoolean(false);
+
     private final FileFacade fileFacade;
     private final @Named("imagePath") Path imagePath;
     private final Gson gson;
     private final FLogger fLogger;
-    private final LazyInstance<MineskinIntegration> lazyMineskinIntegration;
-    private final LibraryResolver libraryResolver;
+    private final LazyInstance<MineskinIntegration> mineskinIntegration;
     private final TaskScheduler taskScheduler;
-
-    private MineskinIntegration mineskinIntegration;
+    private final LibraryResolver libraryResolver;
 
     public void reload() {
         if (StringUtils.isNotEmpty(config().mineskinApiKey())) {
-            if (mineskinIntegration == null) {
+            if (!loaded.get()) {
                 libraryResolver.loadLibrary(Library.builder()
                         .groupId("org{}mineskin")
                         .artifactId("java-client-jsoup")
@@ -71,16 +72,22 @@ public class MinecraftTextureService {
                         .repository("https://repo.inventivetalent.org/repository/public/")
                         .resolveTransitiveDependencies(true)
                         .relocate(Relocation.builder()
+                                .pattern("org{}mineskin")
+                                .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".mineskin")
+                                .build()
+                        )
+                        .relocate(Relocation.builder()
                                 .pattern("com{}google{}gson")
                                 .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".gson")
                                 .build()
                         )
                         .build()
                 );
+
+                loaded.set(true);
             }
 
-            mineskinIntegration = lazyMineskinIntegration.get();
-            mineskinIntegration.hook();
+            mineskinIntegration.get().hook();
         }
 
         // lazy clear
@@ -154,9 +161,7 @@ public class MinecraftTextureService {
     }
 
     public void terminateMineskin() {
-        if (mineskinIntegration != null && mineskinIntegration.isHooked()) {
-            mineskinIntegration.unhook();
-        }
+        mineskinIntegration.get().unhook();
     }
 
     @Nullable
@@ -165,7 +170,7 @@ public class MinecraftTextureService {
     }
 
     public boolean isMineSkinHooked() {
-        return mineskinIntegration != null && mineskinIntegration.isHooked();
+        return mineskinIntegration.get().isHooked();
     }
 
     private List<Frame> loadTexture(String textureFile) throws IOException {
@@ -222,7 +227,7 @@ public class MinecraftTextureService {
                 BufferedImage headPart = createHead(original, x, y);
                 BufferedImage skinImage = createSkin(headPart);
 
-                futures.add(mineskinIntegration.loadTexture(x, y, skinImage, textureName));
+                futures.add(mineskinIntegration.get().loadTexture(x, y, skinImage, textureName));
             }
         }
 
