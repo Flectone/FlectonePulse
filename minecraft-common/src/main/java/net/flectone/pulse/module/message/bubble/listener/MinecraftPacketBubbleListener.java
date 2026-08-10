@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerPositionAndLook;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -37,23 +38,36 @@ public class MinecraftPacketBubbleListener implements PacketListener {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         PacketTypeCommon packetType = event.getPacketType();
-        if (packetType == PacketType.Play.Server.PLAYER_POSITION_AND_LOOK) {
-            UUID playerUUID = event.getUser().getUUID();
-            taskScheduler.runAsync(() ->
-                    bubbleRenderer.removeBubbleIf(bubble -> bubble.getSender().uuid().equals(playerUUID))
-            );
-            return;
+        switch (packetType) {
+            case PacketType.Play.Server.PLAYER_POSITION_AND_LOOK -> {
+                WrapperPlayServerPlayerPositionAndLook wrapper = new WrapperPlayServerPlayerPositionAndLook(event);
+                if (wrapper.getRelativeFlags().getFullMask() != 0) {
+                    UUID playerUUID = event.getUser().getUUID();
+                    taskScheduler.runAsync(() ->
+                            bubbleRenderer.removeBubbleIf(bubble -> bubble.getSender().uuid().equals(playerUUID))
+                    );
+                }
+            }
+            case PacketType.Play.Server.DEATH_COMBAT_EVENT -> {
+                UUID playerUUID = event.getUser().getUUID();
+                taskScheduler.runAsync(() ->
+                        bubbleRenderer.removeBubbleIf(bubble -> bubble.getSender().uuid().equals(playerUUID))
+                );
+            }
+            case PacketType.Play.Server.SET_PASSENGERS -> {
+                WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
+                UUID playerUUID = platformPlayerAdapter.getPlayerByEntityId(wrapper.getEntityId());
+                if (playerUUID == null) return;
+
+                taskScheduler.runAsync(() ->
+                        bubbleRenderer.removeBubbleIf(bubble -> bubble.getSender().uuid().equals(playerUUID))
+                );
+            }
+            default -> {
+                // nothing
+            }
         }
 
-        if (packetType == PacketType.Play.Server.SET_PASSENGERS) {
-            WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
-            UUID playerUUID = platformPlayerAdapter.getPlayerByEntityId(wrapper.getEntityId());
-            if (playerUUID == null) return;
-
-            taskScheduler.runAsync(() ->
-                    bubbleRenderer.removeBubbleIf(bubble -> bubble.getSender().uuid().equals(playerUUID))
-            );
-        }
     }
 
     @Override
