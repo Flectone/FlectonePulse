@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
-import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
@@ -16,6 +18,7 @@ import net.flectone.pulse.module.command.translateto.listener.TranslatetoProxyMe
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -24,9 +27,6 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.WebUtil;
-import net.flectone.pulse.constant.ModuleName;
-import net.flectone.pulse.constant.SettingText;
-import net.flectone.pulse.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -35,9 +35,11 @@ import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.*;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -206,7 +208,7 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
             int endIndex = jsonResponse.indexOf("\"", startIndex);
 
             return jsonResponse.substring(startIndex, endIndex);
-        } catch (IOException | URISyntaxException _) {
+        } catch (Exception _) {
             return "";
         }
     }
