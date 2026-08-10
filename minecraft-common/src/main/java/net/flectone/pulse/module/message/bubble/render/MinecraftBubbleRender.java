@@ -392,12 +392,12 @@ public class MinecraftBubbleRender implements BubbleRender {
 
     @Override
     public boolean isCorrectPlayer(FPlayer sender) {
-        List<Integer> passengers = platformPlayerAdapter.getPassengers(sender.uuid());
+        if (platformPlayerAdapter.isDead(sender)) return false;
+        if (platformPlayerAdapter.getGamemode(sender).equals(GameMode.SPECTATOR.name())) return false;
+        if (platformPlayerAdapter.hasPotionEffect(sender, PotionUtil.INVISIBILITY_POTION_NAME)) return false;
+        if (!textScreenRender.getPassengers(sender.uuid()).isEmpty()) return false;
 
-        return !platformPlayerAdapter.getGamemode(sender).equals(GameMode.SPECTATOR.name())
-                && !platformPlayerAdapter.hasPotionEffect(sender, PotionUtil.INVISIBILITY_POTION_NAME)
-                && textScreenRender.getPassengers(sender.uuid()).isEmpty()
-                && passengers.isEmpty();
+        return platformPlayerAdapter.getPassengers(sender.uuid()).isEmpty();
     }
 
     @Override
