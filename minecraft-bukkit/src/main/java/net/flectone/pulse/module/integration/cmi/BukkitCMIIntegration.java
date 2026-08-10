@@ -29,8 +29,12 @@ public class BukkitCMIIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        cmi = CMI.getInstance();
-        logHook();
+        try {
+            cmi = CMI.getInstance();
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
+        }
     }
 
     public boolean isMuted(FEntity fEntity) {

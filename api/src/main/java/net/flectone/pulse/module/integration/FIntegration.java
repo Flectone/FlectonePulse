@@ -44,6 +44,15 @@ public interface FIntegration {
     }
 
     /**
+     * Logs that the integration failed to load.
+     *
+     * @param exception the exception that caused the failure
+     */
+    default void lohHookFailed(Exception exception) {
+        getFLogger().warning("[-] Failed to load integration: %s", getIntegrationName(), exception);
+    }
+
+    /**
      * Logs that the integration is no longer active.
      */
     default void logUnhook() {

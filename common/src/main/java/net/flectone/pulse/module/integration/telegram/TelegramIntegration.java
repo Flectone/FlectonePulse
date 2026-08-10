@@ -53,19 +53,19 @@ public class TelegramIntegration implements FIntegration {
     public void hook() {
         long taskId = taskGeneration.incrementAndGet();
 
-        TelegramClient telegramClient = telegramClientProvider.create();
-        if (telegramClient == null) return;
-
-        if (taskGeneration.get() != taskId) {
-            try {
-                telegramClient.application().close();
-            } catch (Exception _) {
-                // just ignore
-            }
-            return;
-        }
-
         try {
+            TelegramClient telegramClient = telegramClientProvider.create();
+            if (telegramClient == null) return;
+
+            if (taskGeneration.get() != taskId) {
+                try {
+                    telegramClient.application().close();
+                } catch (Exception _) {
+                    // just ignore
+                }
+                return;
+            }
+
             // register listener
             telegramClient.registerListener(telegramMessageListener.get());
 
@@ -78,8 +78,8 @@ public class TelegramIntegration implements FIntegration {
             }
 
             logHook();
-        } catch (TelegramApiException e) {
-            fLogger.warning(e);
+        } catch (Exception e) {
+            lohHookFailed(e);
         }
     }
 

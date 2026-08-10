@@ -26,9 +26,13 @@ public class BukkitMaintenanceIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        hooked = true;
-        maintenance = MaintenanceProvider.get();
-        logHook();
+        try {
+            hooked = true;
+            maintenance = MaintenanceProvider.get();
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
+        }
     }
 
     @Override

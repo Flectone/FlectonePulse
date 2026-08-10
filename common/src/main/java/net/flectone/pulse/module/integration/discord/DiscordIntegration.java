@@ -48,33 +48,37 @@ public class DiscordIntegration implements FIntegration {
     public void hook() {
         long taskId = taskGeneration.incrementAndGet();
 
-        DiscordClient discordClient = discordClientProvider.create();
-        if (discordClient == null) return;
+        try {
+            DiscordClient discordClient = discordClientProvider.create();
+            if (discordClient == null) return;
 
-        if (taskGeneration.get() != taskId) {
-            discordClient.gateway().logout().block();
-            return;
+            if (taskGeneration.get() != taskId) {
+                discordClient.gateway().logout().block();
+                return;
+            }
+
+            Integration.ChannelInfo channelInfo = discordModule.config().channelInfo();
+
+            if (channelInfo.enable() && channelInfo.ticker().enable()) {
+                long period = channelInfo.ticker().period();
+                taskScheduler.runAsyncTimer(this::updateChannelInfo, period, period);
+                updateChannelInfo();
+            }
+
+            DiscordMessageListener discordMessageListenerInstance = discordMessageListener.get();
+            if (!discordModule.config().messageChannel().isEmpty()) {
+                discordClient.gateway().getEventDispatcher()
+                        .on(discordMessageListenerInstance.getEventType())
+                        .flatMap(discordMessageListenerInstance::execute)
+                        .subscribe();
+            }
+
+            discordWebhookService.initialize();
+
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
         }
-
-        Integration.ChannelInfo channelInfo = discordModule.config().channelInfo();
-
-        if (channelInfo.enable() && channelInfo.ticker().enable()) {
-            long period = channelInfo.ticker().period();
-            taskScheduler.runAsyncTimer(this::updateChannelInfo, period, period);
-            updateChannelInfo();
-        }
-
-        DiscordMessageListener discordMessageListenerInstance = discordMessageListener.get();
-        if (!discordModule.config().messageChannel().isEmpty()) {
-            discordClient.gateway().getEventDispatcher()
-                    .on(discordMessageListenerInstance.getEventType())
-                    .flatMap(discordMessageListenerInstance::execute)
-                    .subscribe();
-        }
-
-        discordWebhookService.initialize();
-
-        logHook();
     }
 
     @Override

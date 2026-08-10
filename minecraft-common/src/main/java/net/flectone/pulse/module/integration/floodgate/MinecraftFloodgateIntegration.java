@@ -26,8 +26,12 @@ public class MinecraftFloodgateIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        this.floodgateApi = FloodgateApi.getInstance();
-        logHook();
+        try {
+            this.floodgateApi = FloodgateApi.getInstance();
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
+        }
     }
 
     public void hookLater() {

@@ -44,59 +44,63 @@ public class TwitchIntegration implements FIntegration {
     public void hook() {
         long taskId = taskGeneration.incrementAndGet();
 
-        TwitchClient twitchClient = twitchClientProvider.create();
-        if (twitchClient == null) return;
+        try {
+            TwitchClient twitchClient = twitchClientProvider.create();
+            if (twitchClient == null) return;
 
-        if (taskGeneration.get() != taskId) {
-            twitchClient.client().close();
-            return;
-        }
+            if (taskGeneration.get() != taskId) {
+                twitchClient.client().close();
+                return;
+            }
 
-        Integration.Twitch integration = twitchModule.config();
-        for (List<String> channels : integration.messageChannel().values()) {
-            for (String channel : channels) {
-                TwitchChat twitchChat = twitchClient.client().getChat();
-                if (!twitchChat.isChannelJoined(channel)) {
-                    twitchChat.joinChannel(channel);
+            Integration.Twitch integration = twitchModule.config();
+            for (List<String> channels : integration.messageChannel().values()) {
+                for (String channel : channels) {
+                    TwitchChat twitchChat = twitchClient.client().getChat();
+                    if (!twitchChat.isChannelJoined(channel)) {
+                        twitchChat.joinChannel(channel);
+                    }
                 }
             }
+
+            for (String channel : integration.channelAction().keySet()) {
+                twitchClient.client().getClientHelper().enableStreamEventListener(channel);
+            }
+
+            EventManager eventManager = twitchClient.client().getEventManager();
+
+            // online action
+            eventManager.onEvent(ChannelGoLiveEvent.class, event -> {
+                String channelName = event.getChannel().getName();
+
+                Integration.Twitch.Channel channel = integration.channelAction().get(channelName);
+                if (channel == null || channel.online().isEmpty()) return;
+
+                channel.online().forEach(platformServerAdapter::dispatchCommand);
+            });
+
+            // offline action
+            eventManager.onEvent(ChannelGoOfflineEvent.class, event -> {
+                String channelName = event.getChannel().getName();
+
+                Integration.Twitch.Channel channel = integration.channelAction().get(channelName);
+                if (channel == null || channel.offline().isEmpty()) return;
+
+                channel.offline().forEach(platformServerAdapter::dispatchCommand);
+            });
+
+            if (!integration.messageChannel().isEmpty()) {
+                TwitchMessageListener twitchMessageListenerInstance = twitchMessageListener.get();
+
+                eventManager.onEvent(twitchMessageListenerInstance.getEventType(), channelMessageEvent ->
+                        taskScheduler.runAsync(() -> twitchMessageListenerInstance.execute(channelMessageEvent))
+                );
+            }
+
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
         }
-
-        for (String channel : integration.channelAction().keySet()) {
-            twitchClient.client().getClientHelper().enableStreamEventListener(channel);
-        }
-
-        EventManager eventManager = twitchClient.client().getEventManager();
-
-        // online action
-        eventManager.onEvent(ChannelGoLiveEvent.class, event -> {
-            String channelName = event.getChannel().getName();
-
-            Integration.Twitch.Channel channel = integration.channelAction().get(channelName);
-            if (channel == null || channel.online().isEmpty()) return;
-
-            channel.online().forEach(platformServerAdapter::dispatchCommand);
-        });
-
-        // offline action
-        eventManager.onEvent(ChannelGoOfflineEvent.class, event -> {
-            String channelName = event.getChannel().getName();
-
-            Integration.Twitch.Channel channel = integration.channelAction().get(channelName);
-            if (channel == null || channel.offline().isEmpty()) return;
-
-            channel.offline().forEach(platformServerAdapter::dispatchCommand);
-        });
-
-        if (!integration.messageChannel().isEmpty()) {
-            TwitchMessageListener twitchMessageListenerInstance = twitchMessageListener.get();
-
-            eventManager.onEvent(twitchMessageListenerInstance.getEventType(), channelMessageEvent ->
-                    taskScheduler.runAsync(() -> twitchMessageListenerInstance.execute(channelMessageEvent))
-            );
-        }
-
-        logHook();
     }
 
     @Override

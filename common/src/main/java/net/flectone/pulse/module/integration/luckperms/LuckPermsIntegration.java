@@ -32,8 +32,12 @@ public class LuckPermsIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        this.luckPerms = LuckPermsProvider.get();
-        logHook();
+        try {
+            this.luckPerms = LuckPermsProvider.get();
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
+        }
     }
 
     public void hookLater() {

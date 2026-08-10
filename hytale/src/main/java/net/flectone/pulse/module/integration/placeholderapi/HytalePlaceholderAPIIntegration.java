@@ -110,14 +110,22 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
 
     @Override
     public void hook() {
-        taskScheduler.runSync(this::register);
-        logHook();
+        try {
+            taskScheduler.runSync(this::register);
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
+        }
     }
 
     @Override
     public void unhook() {
-        taskScheduler.runSync(this::unregister);
-        logUnhook();
+        try {
+            taskScheduler.runSync(this::unregister);
+            logUnhook();
+        } catch (Exception _) {
+            // ignore
+        }
     }
 
     @Override

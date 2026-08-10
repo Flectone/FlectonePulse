@@ -48,9 +48,10 @@ public class TelegramModuleImpl implements TelegramModule {
     public void onEnable() {
         reflectionResolver.hasClassOrElse("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient", this::loadLibraries);
 
-        taskScheduler.runAsync(() -> telegramIntegration.get().hook(), true);
-
-        listenerRegistry.register(TelegramPulseListener.class);
+        taskScheduler.runAsync(() -> {
+            telegramIntegration.get().hook();
+            listenerRegistry.register(TelegramPulseListener.class);
+        }, true);
     }
 
     @Override

@@ -38,13 +38,17 @@ public class BukkitLibertyBansIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        Omnibus omnibus = OmnibusProvider.getOmnibus();
-        Optional<LibertyBans> optionalLibertyBans = omnibus.getRegistry().getProvider(LibertyBans.class);
-        if (optionalLibertyBans.isEmpty()) return;
+        try {
+            Omnibus omnibus = OmnibusProvider.getOmnibus();
+            Optional<LibertyBans> optionalLibertyBans = omnibus.getRegistry().getProvider(LibertyBans.class);
+            if (optionalLibertyBans.isEmpty()) return;
 
-        libertyBans = optionalLibertyBans.get();
+            libertyBans = optionalLibertyBans.get();
 
-        logHook();
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
+        }
     }
 
     public boolean isHooked() {

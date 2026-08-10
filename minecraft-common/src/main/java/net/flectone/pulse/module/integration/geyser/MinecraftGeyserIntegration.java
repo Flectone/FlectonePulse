@@ -26,8 +26,12 @@ public class MinecraftGeyserIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        this.geyserApi = GeyserApi.api();
-        logHook();
+        try {
+            this.geyserApi = GeyserApi.api();
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
+        }
     }
 
     public void hookLater() {

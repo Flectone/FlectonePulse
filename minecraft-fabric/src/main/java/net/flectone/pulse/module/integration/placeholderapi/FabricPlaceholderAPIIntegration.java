@@ -73,11 +73,15 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
     @Override
     public void hook() {
-        if (!hooked) {
-            taskScheduler.runAsyncLater(() -> {
-                register();
-                hooked = true;
-            });
+        try {
+            if (!hooked) {
+                taskScheduler.runAsyncLater(() -> {
+                    register();
+                    hooked = true;
+                });
+            }
+        } catch (Exception e) {
+            lohHookFailed(e);
         }
     }
 

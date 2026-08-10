@@ -35,17 +35,21 @@ public class BukkitVaultIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        RegisteredServiceProvider<Permission> permissionProvider = plugin.getServer().getServicesManager().getRegistration(Permission.class);
-        if (permissionProvider != null) {
-            this.permission = permissionProvider.getProvider();
-        }
+        try {
+            RegisteredServiceProvider<Permission> permissionProvider = plugin.getServer().getServicesManager().getRegistration(Permission.class);
+            if (permissionProvider != null) {
+                this.permission = permissionProvider.getProvider();
+            }
 
-        RegisteredServiceProvider<Chat> chatProvider = plugin.getServer().getServicesManager().getRegistration(Chat.class);
-        if (chatProvider != null) {
-            this.chat = chatProvider.getProvider();
-        }
+            RegisteredServiceProvider<Chat> chatProvider = plugin.getServer().getServicesManager().getRegistration(Chat.class);
+            if (chatProvider != null) {
+                this.chat = chatProvider.getProvider();
+            }
 
-        logHook();
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
+        }
     }
 
     public boolean hasPermission(FPlayer fPlayer, String permissionName) {

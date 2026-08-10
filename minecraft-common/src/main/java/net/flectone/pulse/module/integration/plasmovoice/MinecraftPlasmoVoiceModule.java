@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.ModuleSimple;
 import su.plo.voice.api.server.PlasmoVoiceServer;
 
@@ -16,11 +17,16 @@ public class MinecraftPlasmoVoiceModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final MinecraftPlasmoVoiceIntegration plasmoVoiceIntegration;
+    private final FLogger fLogger;
 
     @Override
     public void onEnable() {
-        PlasmoVoiceServer.getAddonsLoader().load(plasmoVoiceIntegration);
-        plasmoVoiceIntegration.hook();
+        try {
+            PlasmoVoiceServer.getAddonsLoader().load(plasmoVoiceIntegration);
+            plasmoVoiceIntegration.hook();
+        } catch (Exception e) {
+            plasmoVoiceIntegration.lohHookFailed(e);
+        }
     }
 
     @Override

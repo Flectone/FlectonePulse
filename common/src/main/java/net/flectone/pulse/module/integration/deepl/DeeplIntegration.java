@@ -41,7 +41,7 @@ public class DeeplIntegration implements FIntegration {
 
             logHook();
         } catch (Exception e) {
-            fLogger.warning(e);
+            lohHookFailed(e);
         }
     }
 

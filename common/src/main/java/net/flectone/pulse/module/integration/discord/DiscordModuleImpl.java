@@ -9,7 +9,9 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.SettingText;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
@@ -21,12 +23,9 @@ import net.flectone.pulse.platform.formatter.IntegrationFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.resolver.ReflectionResolver;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.LazyInstance;
-import net.flectone.pulse.constant.ModuleName;
-import net.flectone.pulse.constant.SettingText;
-import net.flectone.pulse.file.FileFacade;
-import net.flectone.pulse.logging.FLogger;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -45,21 +44,15 @@ public class DiscordModuleImpl implements DiscordModule {
     private final SocialService socialService;
     private final LazyInstance<DiscordIntegration> discordIntegration;
     private final LazyInstance<DiscordSender> discordSender;
-    private final FLogger fLogger;
 
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("discord4j.core.DiscordClient", this::loadLibraries);
 
         taskScheduler.runAsync(() -> {
-            try {
-                discordIntegration.get().hook();
-            } catch (Exception e) {
-                fLogger.warning(e);
-            }
+            discordIntegration.get().hook();
+            listenerRegistry.register(DiscordPulseListener.class);
         }, true);
-
-        listenerRegistry.register(DiscordPulseListener.class);
     }
 
     @Override

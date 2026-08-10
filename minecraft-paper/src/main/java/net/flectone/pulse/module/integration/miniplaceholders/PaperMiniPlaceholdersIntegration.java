@@ -74,22 +74,30 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
 
     @Override
     public void hook() {
-        if (expansion == null) {
-            expansion = createExpansion();
+        try {
+            if (expansion == null) {
+                expansion = createExpansion();
+            }
+
+            expansion.register();
+
+            logHook();
+        } catch (Exception e) {
+            lohHookFailed(e);
         }
-
-        expansion.register();
-
-        logHook();
     }
 
     @Override
     public void unhook() {
-        if (expansion != null) {
-            expansion.unregister();
-        }
+        try {
+            if (expansion != null) {
+                expansion.unregister();
+            }
 
-        logUnhook();
+            logUnhook();
+        } catch (Exception _) {
+            // ignore
+        }
     }
 
     @Pulse(priority = Event.Priority.HIGH)
