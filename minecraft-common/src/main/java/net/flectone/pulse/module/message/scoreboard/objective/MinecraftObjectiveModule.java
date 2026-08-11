@@ -118,7 +118,7 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
     }
 
     private String getObjectiveName(FPlayer fPlayer, ScoreboardPosition scoreboardPosition) {
-        return scoreboardPosition.name() + "_" + fPlayer.id();
+        return "fp_" + scoreboardPosition.name() + "_" + fPlayer.id();
     }
 
 }
