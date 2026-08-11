@@ -23,9 +23,12 @@ import org.jspecify.annotations.NonNull;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
+
+    private final Set<String> objectives = ConcurrentHashMap.newKeySet();
 
     private final MinecraftPacketSender packetSender;
     private final MessagePipeline messagePipeline;
@@ -49,6 +52,9 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
 
     public void createObjective(FPlayer fPlayer, Component displayName, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
         String objectiveName = getObjectiveName(fPlayer, scoreboardPosition);
+        if (objectives.contains(objectiveName)) return;
+
+        objectives.add(objectiveName);
 
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 objectiveName,
@@ -79,6 +85,7 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
 
     public void removeObjective(FPlayer fPlayer, ScoreboardPosition scoreboardPosition) {
         String objectiveName = getObjectiveName(fPlayer, scoreboardPosition);
+        if (!objectives.remove(objectiveName)) return;
 
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 objectiveName,
