@@ -31,10 +31,7 @@ import org.incendo.cloud.context.CommandContext;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -135,7 +132,9 @@ public class SpyModuleImpl implements SpyModule {
 
             FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
-            String message = String.join(" ", lines);
+            String message = prepareMessage(lines);
+            if (StringUtils.isEmpty(message)) return;
+
             spy(fPlayer, "sign", message);
         });
     }
@@ -150,7 +149,10 @@ public class SpyModuleImpl implements SpyModule {
             FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
             if (pages != null) {
-                spy(fPlayer, "book", String.join(" ", pages));
+                String message = prepareMessage(pages);
+                if (StringUtils.isNotEmpty(message)) {
+                    spy(fPlayer, "book", message);
+                }
             }
 
             if (StringUtils.isNotEmpty(title)) {
@@ -252,6 +254,18 @@ public class SpyModuleImpl implements SpyModule {
         List<String> values = categories.get(category);
 
         return values != null && values.contains(value);
+    }
+
+    private String prepareMessage(String[] strings) {
+        return Arrays.stream(strings)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(" "));
+    }
+
+    private String prepareMessage(Collection<String> strings) {
+        return strings.stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(" "));
     }
 
 }
