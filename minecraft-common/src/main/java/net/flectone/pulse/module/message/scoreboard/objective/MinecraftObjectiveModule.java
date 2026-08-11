@@ -52,9 +52,7 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
 
     public void createObjective(FPlayer fPlayer, Component displayName, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
         String objectiveName = getObjectiveName(fPlayer, scoreboardPosition);
-        if (objectives.contains(objectiveName)) return;
-
-        objectives.add(objectiveName);
+        if (!objectives.add(objectiveName)) return;
 
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 objectiveName,
