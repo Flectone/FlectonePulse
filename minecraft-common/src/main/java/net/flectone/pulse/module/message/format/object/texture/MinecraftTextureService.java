@@ -161,7 +161,9 @@ public class MinecraftTextureService {
     }
 
     public void terminateMineskin() {
-        mineskinIntegration.get().unhook();
+        if (loaded.get()) {
+            mineskinIntegration.get().unhook();
+        }
     }
 
     @Nullable
@@ -170,7 +172,7 @@ public class MinecraftTextureService {
     }
 
     public boolean isMineSkinHooked() {
-        return mineskinIntegration.get().isHooked();
+        return loaded.get() && mineskinIntegration.get().isHooked();
     }
 
     private List<Frame> loadTexture(String textureFile) throws IOException {
