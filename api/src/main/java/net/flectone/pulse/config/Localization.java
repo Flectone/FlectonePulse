@@ -1,5 +1,6 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
@@ -7,7 +8,6 @@ import lombok.With;
 import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
-import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.Map;
 @Jacksonized
 public record Localization(
 
-        @Nullable
+        @JsonIgnore
         String language,
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message")
