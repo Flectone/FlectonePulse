@@ -262,6 +262,7 @@ import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
 import tools.jackson.databind.*;
 import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.deser.DeserializationProblemHandler;
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.dataformat.yaml.YAMLFactory;
 import tools.jackson.dataformat.yaml.YAMLMapper;
@@ -644,6 +645,7 @@ public abstract class PlatformInjector extends AbstractModule {
                 .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY) // disable auto sorting
                 .disable(MapperFeature.DETECT_PARAMETER_NAMES) // [databind#5314]
                 .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS) // fix enum names
+                .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES) // fix keys typed in a wrong case
                 .enable(MapperFeature.ALLOW_FINAL_FIELDS_AS_MUTATORS) // fix custom classes deserialization
                 // deserialization
                 .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES) // jackson 2.x value
@@ -667,27 +669,92 @@ public abstract class PlatformInjector extends AbstractModule {
                 .withConfigOverride(List.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null list
                 .withConfigOverride(Set.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null set
                 .withConfigOverride(Map.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null map
-                .addModule(new SimpleModule().addDeserializer(String.class, new ValueDeserializer<>() {
-                    // fix null values like "key: null"
-                    // idk, why withConfigOverride(String.class, ...) doesn't fix it
+                .addHandler(new DeserializationProblemHandler() {
 
                     @Override
-                    public String deserialize(JsonParser p, DeserializationContext ctxt) {
-                        return p.currentToken() == JsonToken.VALUE_NULL ? "" : p.getString();
+                    public Object handleWeirdStringValue(DeserializationContext context, Class<?> type, String value, String failureMessage) {
+                        fLogger.warning("Value '%s' is not valid for '%s', using the default one", value, type.getSimpleName());
+                        return fallback(type);
                     }
 
                     @Override
-                    public String getNullValue(DeserializationContext ctxt) {
-                        return "";
+                    public Object handleWeirdNumberValue(DeserializationContext context, Class<?> type, Number value, String failureMessage) {
+                        fLogger.warning("Value '%s' is not valid for '%s', using the default one", value, type.getSimpleName());
+                        return fallback(type);
                     }
 
                     @Override
-                    public String getAbsentValue(DeserializationContext ctxt) {
-                        return null;
+                    public Object handleUnexpectedToken(DeserializationContext context, JavaType type, JsonToken token, JsonParser parser, String failureMessage) {
+                        fLogger.warning("Expected %s but found '%s', using the default one", type, token);
+                        parser.skipChildren();
+                        return fallback(type.getRawClass());
                     }
 
-                }))
+                    @Override
+                    public boolean handleUnknownProperty(DeserializationContext context, JsonParser parser, ValueDeserializer<?> deserializer, Object target, String property) {
+                        fLogger.warning("Unknown key '%s', maybe a typo, ignoring it", property);
+                        parser.skipChildren();
+                        return true;
+                    }
+
+                })
+                .addModule(new SimpleModule()
+                        .addDeserializer(String.class, new ValueDeserializer<>() {
+
+                            @Override
+                            public String deserialize(JsonParser p, DeserializationContext ctxt) {
+                                return p.currentToken() == JsonToken.VALUE_NULL ? "" : p.getString();
+                            }
+
+                            @Override
+                            public String getNullValue(DeserializationContext ctxt) {
+                                return "";
+                            }
+
+                            @Override
+                            public String getAbsentValue(DeserializationContext ctxt) {
+                                // a missing key is not an empty value, keep it null so the merger restores the default
+                                return null;
+                            }
+
+                        })
+                        .addDeserializer(Boolean.class, new ValueDeserializer<>() {
+
+                            @Override
+                            public Boolean deserialize(JsonParser p, DeserializationContext ctxt) {
+                                if (p.currentToken() == JsonToken.VALUE_TRUE) return Boolean.TRUE;
+                                if (p.currentToken() == JsonToken.VALUE_FALSE) return Boolean.FALSE;
+                                if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) return p.getIntValue() != 0;
+
+                                String value = String.valueOf(p.getString()).trim().toLowerCase(Locale.ROOT);
+                                return switch (value) {
+                                    case "true", "yes", "y", "on", "enable", "enabled" -> Boolean.TRUE;
+                                    case "false", "no", "n", "off", "disable", "disabled" -> Boolean.FALSE;
+                                    default -> {
+                                        fLogger.warning("Value '%s' is not a true/false one, using the default one", value);
+                                        yield null;
+                                    }
+                                };
+                            }
+
+                        })
+                )
                 .build();
+    }
+
+    // config records use boxed types, so null means "not set" and the merger puts the default back
+    // primitives cannot express that
+    private Object fallback(Class<?> type) {
+        if (!type.isPrimitive()) return null;
+        if (type == boolean.class) return Boolean.FALSE;
+        if (type == long.class) return 0L;
+        if (type == double.class) return 0.0d;
+        if (type == float.class) return 0.0f;
+        if (type == short.class) return (short) 0;
+        if (type == byte.class) return (byte) 0;
+        if (type == char.class) return (char) 0;
+
+        return 0;
     }
 
 }
