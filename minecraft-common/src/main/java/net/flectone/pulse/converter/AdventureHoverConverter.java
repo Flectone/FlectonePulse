@@ -103,7 +103,7 @@ public class AdventureHoverConverter {
                         modCompound.setTag("name", new NBTString(entry.getModifier().getName()));
                     }
                     modCompound.setTag("amount", new NBTDouble(entry.getModifier().getValue()));
-                    modCompound.setTag("operation", new NBTString(entry.getModifier().getOperation().name().toLowerCase(Locale.ROOT)));
+                    modCompound.setTag("operation", new NBTString(entry.getModifier().getOperation().getCodecName()));
                     compound.setTag("modifier", modCompound);
                     modifierList.addTag(compound);
                 }
