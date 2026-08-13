@@ -56,7 +56,7 @@ public class ModuleCommandControllerImpl implements ModuleCommandController {
     @Override
     public void clearPrompts(ModuleCommand abstractModuleCommand) {
         if (fileFacade.config().internal().unregisterCommandOnReload()) {
-            commandPromptsMap.remove(abstractModuleCommand.getClass());
+            commandPromptsMap.remove(abstractModuleCommand.name());
         }
     }
 
