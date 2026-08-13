@@ -681,6 +681,11 @@ public abstract class PlatformInjector extends AbstractModule {
                         return "";
                     }
 
+                    @Override
+                    public String getAbsentValue(DeserializationContext ctxt) {
+                        return null;
+                    }
+
                 }))
                 .build();
     }
