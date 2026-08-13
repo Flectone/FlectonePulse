@@ -166,12 +166,12 @@ public record FLogger(
     /**
      * Logs a failure with its stack trace under a formatted message.
      *
-     * @param throwable the failure
      * @param format the format string
+     * @param throwable the failure
      * @param args the arguments
      */
-    public void warning(@Nullable Throwable throwable, @NonNull String format, Object... args) {
-        warning(throwable, String.format(format, args));
+    public void warning(@NonNull String format, @Nullable Throwable throwable, Object... args) {
+        warning(String.format(format, args), throwable);
     }
 
     /**
@@ -180,16 +180,16 @@ public record FLogger(
      * @param throwable the failure
      */
     public void warning(@Nullable Throwable throwable) {
-        warning(throwable, ERROR_MESSAGE_REPORT);
+        warning(ERROR_MESSAGE_REPORT, throwable);
     }
 
     /**
      * Logs a failure with its stack trace under a message of your own.
      *
-     * @param throwable the failure
      * @param string the message
+     * @param throwable the failure
      */
-    public void warning(@Nullable Throwable throwable, @Nullable String string) {
+    public void warning(@Nullable String string, @Nullable Throwable throwable) {
         log(LogLevel.WARN, string, throwable);
     }
 

@@ -257,7 +257,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
                     future.complete(null);
                 }
             } catch (Exception e) {
-                fLogger.warning(e, "Task execution failed:");
+                fLogger.warning("Task execution failed:", e);
 
                 if (!scheduledTask.isRepeating()) {
                     future.completeExceptionally(e);
@@ -274,7 +274,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
                 runnable.run();
                 future.complete(null);
             } catch (Exception e) {
-                fLogger.warning(e, "Task execution failed:");
+                fLogger.warning("Task execution failed:", e);
                 future.completeExceptionally(e);
             }
         };

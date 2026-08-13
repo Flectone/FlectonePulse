@@ -138,7 +138,7 @@ public class BackupCreatorImpl implements BackupCreator {
             Files.createDirectories(backupFilePath.getParent());
             Files.copy(pathToFile, backupFilePath);
         } catch (IOException e) {
-            fLogger.warning(e, "Failed to backup %s", fileName);
+            fLogger.warning("Failed to backup %s", e, fileName);
         }
     }
 }

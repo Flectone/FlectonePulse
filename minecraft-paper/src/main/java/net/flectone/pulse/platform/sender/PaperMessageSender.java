@@ -24,7 +24,7 @@ public class PaperMessageSender {
             Component component = GsonComponentSerializer.gson().deserialize(serialized);
             player.sendMessage(component);
         } catch (Exception e) {
-            fLogger.warning(e, "Failed to deserialize message %s", serialized);
+            fLogger.warning("Failed to deserialize message %s", e, serialized);
             return false;
         }
 

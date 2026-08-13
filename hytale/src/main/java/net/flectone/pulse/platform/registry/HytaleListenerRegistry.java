@@ -160,7 +160,7 @@ public class HytaleListenerRegistry extends ListenerRegistryImpl {
                 try {
                     method.invoke(hytaleListener, event);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    fLogger.warning(e, "Error invoking event handler %s", method.getName());
+                    fLogger.warning("Error invoking event handler %s", e, method.getName());
                 }
             };
 

@@ -49,7 +49,7 @@ public interface FIntegration {
      * @param exception the exception that caused the failure
      */
     default void lohHookFailed(Exception exception) {
-        getFLogger().warning(exception, "[-] Failed to load integration: %s", getIntegrationName());
+        getFLogger().warning("[-] Failed to load integration: %s", exception, getIntegrationName());
     }
 
     /**

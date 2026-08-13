@@ -52,7 +52,7 @@ public class NeoForgeMessageSender extends MinecraftMessageSender {
         try {
             serverPlayer.sendSystemMessage(componentSerializer.toNeoForge(component));
         } catch (Throwable e) {
-            fLogger.warning(e, "Failed to deserialize message %s", component);
+            fLogger.warning("Failed to deserialize message %s", e, component);
             return false;
         }
 

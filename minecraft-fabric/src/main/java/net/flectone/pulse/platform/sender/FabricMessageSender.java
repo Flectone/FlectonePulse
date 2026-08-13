@@ -52,7 +52,7 @@ public class FabricMessageSender extends MinecraftMessageSender {
         try {
             serverPlayer.sendSystemMessage(componentSerializer.toFabric(component));
         } catch (Throwable e) {
-            fLogger.warning(e, "Failed to deserialize message %s", component);
+            fLogger.warning("Failed to deserialize message %s", e, component);
             return false;
         }
 

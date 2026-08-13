@@ -147,7 +147,7 @@ public class ModuleControllerImpl implements ModuleController {
                     module.permissions().forEach(permissionRegistry::register);
                     module.onEnable();
                 } catch (Exception e) {
-                    fLogger.warning(e, "Failed to enable module " + module.name());
+                    fLogger.warning("Failed to enable module " + module.name(), e);
                     moduleStateMap.put(module.name(), false);
                 }
             }

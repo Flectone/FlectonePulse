@@ -108,7 +108,7 @@ public class CacheRegistryImpl implements CacheRegistry  {
                 try {
                     listener.onRemoval(notification);
                 } catch (Exception e) {
-                    fLogger.warning(e, "Removal listener failed for cache " + cacheName);
+                    fLogger.warning("Removal listener failed for cache " + cacheName, e);
                 }
             }
         };

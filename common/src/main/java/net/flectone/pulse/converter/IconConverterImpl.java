@@ -38,7 +38,7 @@ public class IconConverterImpl implements IconConverter {
             return new String(Base64.getEncoder().encode(bytes));
 
         } catch (Exception e) {
-            fLogger.warning(e, "Failed to load %s", icon.getName());
+            fLogger.warning("Failed to load %s", e, icon.getName());
         }
 
         return null;
