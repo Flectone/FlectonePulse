@@ -32,7 +32,7 @@ public class AdventureHoverConverter {
     private final MinecraftPacketProvider packetProvider;
 
     public HoverEvent<HoverEvent.ShowItem> convert(ItemStack itemStack) {
-        Key itemKey = Key.key(itemStack.getType().getName().toString().toLowerCase());
+        Key itemKey = Key.key(itemStack.getType().getName().toString().toLowerCase(Locale.ROOT));
         int amount = itemStack.getAmount();
 
         if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_5)) {
@@ -95,16 +95,24 @@ public class AdventureHoverConverter {
                     NBTCompound compound = new NBTCompound();
                     compound.setTag("type", new NBTString(entry.getAttribute().getName().toString()));
                     compound.setTag("slot", new NBTString(entry.getSlotGroup().getId()));
-                    NBTCompound modCompound = new NBTCompound();
-                    if (version.isNewerThanOrEquals(ClientVersion.V_1_21)) {
-                        modCompound.setTag("id", new NBTString(entry.getModifier().getName()));
+
+                    if (version.isNewerThanOrEquals(ClientVersion.V_1_21_5)) {
+                        compound.setTag("id", new NBTString(entry.getModifier().getName()));
+                        compound.setTag("amount", new NBTDouble(entry.getModifier().getValue()));
+                        compound.setTag("operation", new NBTString(entry.getModifier().getOperation().getCodecName()));
                     } else {
-                        modCompound.setTag("uuid", new NBTIntArray(UniqueIdUtil.toIntArray(entry.getModifier().getId())));
-                        modCompound.setTag("name", new NBTString(entry.getModifier().getName()));
+                        NBTCompound modCompound = new NBTCompound();
+                        if (version.isNewerThanOrEquals(ClientVersion.V_1_21)) {
+                            modCompound.setTag("id", new NBTString(entry.getModifier().getName()));
+                        } else {
+                            modCompound.setTag("uuid", new NBTIntArray(UniqueIdUtil.toIntArray(entry.getModifier().getId())));
+                            modCompound.setTag("name", new NBTString(entry.getModifier().getName()));
+                        }
+                        modCompound.setTag("amount", new NBTDouble(entry.getModifier().getValue()));
+                        modCompound.setTag("operation", new NBTString(entry.getModifier().getOperation().getCodecName()));
+                        compound.setTag("modifier", modCompound);
                     }
-                    modCompound.setTag("amount", new NBTDouble(entry.getModifier().getValue()));
-                    modCompound.setTag("operation", new NBTString(entry.getModifier().getOperation().getCodecName()));
-                    compound.setTag("modifier", modCompound);
+
                     modifierList.addTag(compound);
                 }
                 if (version.isOlderThan(ClientVersion.V_1_21_5)) {
