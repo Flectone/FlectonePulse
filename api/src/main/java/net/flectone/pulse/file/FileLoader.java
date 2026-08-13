@@ -29,6 +29,13 @@ public interface FileLoader {
     void init();
 
     /**
+     * Reads the version from the config file on disk.
+     *
+     * @return the version string
+     */
+    String loadVersion();
+
+    /**
      * Reads every file from disk, merging each over the matching current one.
      *
      * @param currentFiles the files to merge over, or null to merge over the defaults

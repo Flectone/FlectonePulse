@@ -86,6 +86,20 @@ public class FileLoaderImpl implements FileLoader {
     }
 
     @Override
+    public String loadVersion() {
+        String defaultVersion = defaultFiles.config().version();
+
+        Path pathToFile = Paths.get(projectPath.toString(), FilePath.CONFIG.getPath());
+        if (!Files.exists(pathToFile)) return defaultVersion;
+
+        try {
+            return yamlMapper.readTree(pathToFile.toFile()).path("version").asString(defaultVersion);
+        } catch (Exception e) {
+            return defaultVersion;
+        }
+    }
+
+    @Override
     public FilePack loadFiles(FilePack currentFiles) {
         currentFiles = currentFiles == null ? defaultFiles : currentFiles;
 

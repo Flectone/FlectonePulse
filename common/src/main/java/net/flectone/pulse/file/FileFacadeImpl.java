@@ -51,9 +51,10 @@ public class FileFacadeImpl implements FileFacade {
     public void reload() throws IOException {
         fileLoader.init();
 
-        // this is to check FlectonePulse version
-        // maybe in the future we should put version in a separate file, but I think it's not so important
-        preInitVersion = fileLoader.loadAndMergeConfig(files).version();
+        // load FlectonePulse version
+        preInitVersion = fileLoader.loadVersion();
+
+        // check version
         boolean versionChanged = !preInitVersion.equals(BuildConfig.PROJECT_VERSION);
 
         // backup if version changed
