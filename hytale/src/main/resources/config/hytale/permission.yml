@@ -826,9 +826,6 @@ message:
     fixation:
       name: "flectonepulse.module.message.format.fixation"
       type: "TRUE"
-    image:
-      name: "flectonepulse.module.message.format.image"
-      type: "TRUE"
     mention:
       name: "flectonepulse.module.message.format.mention"
       type: "TRUE"
@@ -1024,9 +1021,6 @@ message:
         strikethrough:
           name: "flectonepulse.module.message.format.replacement.strikethrough"
           type: "TRUE"
-    spoiler:
-      name: "flectonepulse.module.message.format.spoiler"
-      type: "TRUE"
     translate:
       name: "flectonepulse.module.message.format.translate"
       type: "TRUE"
