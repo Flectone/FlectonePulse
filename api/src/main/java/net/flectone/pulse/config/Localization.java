@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
 import lombok.With;
-import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
 
@@ -22,7 +21,6 @@ import java.util.Map;
  */
 @With
 @Builder(toBuilder = true)
-@Jacksonized
 public record Localization(
 
         @JsonIgnore
@@ -47,7 +45,6 @@ public record Localization(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Time(
             String format,
             String permanent,
@@ -57,7 +54,6 @@ public record Localization(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Command(
             Exception exception,
             Prompt prompt,
@@ -212,7 +208,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Exception(
                 String execution,
                 String parseUnknown,
@@ -226,7 +221,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Prompt(
                 String message,
                 String hard,
@@ -251,13 +245,11 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Anon(String format) implements LocalizationSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ball(
                 String format,
                 List<String> answers
@@ -266,7 +258,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ban(
                 String nullPlayer,
                 String nullTime,
@@ -281,7 +272,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Banlist(
                 String empty,
                 String nullPage,
@@ -293,13 +283,11 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Broadcast(String format) implements LocalizationSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Chatcolor(
                 String nullPlayer,
                 String nullType,
@@ -310,7 +298,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Chatsetting(
                 String noPermission,
                 String disabledSelf,
@@ -322,7 +309,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Checkbox(
                     String enabledColor,
                     String enabledHover,
@@ -334,7 +320,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Menu(
                     SubMenu chat,
                     SubMenu see,
@@ -343,7 +328,6 @@ public record Localization(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record SubMenu(
                         String item,
                         String inventory,
@@ -355,7 +339,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Clearchat(
                 String nullPlayer,
                 String format
@@ -364,7 +347,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Clearmail(
                 String nullMail,
                 String format
@@ -373,7 +355,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Coin(
                 String head,
                 String tail,
@@ -384,7 +365,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Deletemessage(
                 String nullMessage,
                 String format
@@ -393,7 +373,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Dice(
                 Map<Integer, String> symbols,
                 String format
@@ -402,13 +381,11 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record CommandDo(String format) implements LocalizationSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Emit(
                 String nullPlayer,
                 String format
@@ -417,7 +394,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Flectonepulse(
                 String dumpError,
                 String nullHostEditor,
@@ -436,7 +412,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Geolocate(
                 String nullPlayer,
                 String nullOrError,
@@ -446,7 +421,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Helper(
                 String nullHelper,
                 String global,
@@ -456,7 +430,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ignore(
                 String nullPlayer,
                 String myself,
@@ -469,7 +442,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ignorelist(
                 String empty,
                 String nullPage,
@@ -481,7 +453,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Kick(
                 String nullPlayer,
                 String lowerWeightGroup,
@@ -493,7 +464,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Mail(
                 String nullPlayer,
                 String onlinePlayer,
@@ -504,7 +474,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Maintenance(
                 String alreadyTrue,
                 String alreadyFalse,
@@ -519,13 +488,11 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Me(String format) implements LocalizationSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Minesweeper(
                 String alreadyInGame,
                 String wrongParameters,
@@ -544,7 +511,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Cell(
                     String unknown,
                     String flag,
@@ -573,7 +539,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Mute(
                 String nullPlayer,
                 String nullTime,
@@ -588,7 +553,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Mutelist(
                 String empty,
                 String nullPage,
@@ -600,7 +564,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Nickname(
                 String nullPlayer,
                 String nullNickname,
@@ -613,7 +576,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Online(
                 String nullPlayer,
                 String formatCurrent,
@@ -625,7 +587,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ping(
                 String nullPlayer,
                 String format
@@ -634,7 +595,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Poll(
                 String nullPoll,
                 String expired,
@@ -649,7 +609,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Status(
                     String start,
                     String run,
@@ -659,7 +618,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Modern(
                     String header,
                     String inputName,
@@ -678,13 +636,11 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Reply(String nullReceiver) implements LocalizationSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Rockpaperscissors(
                 String nullPlayer,
                 String nullGame,
@@ -702,7 +658,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Sprite(
                 String nullAtlas,
                 String nullPage,
@@ -716,7 +671,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Spy(
                 String formatTrue,
                 String formatFalse,
@@ -727,7 +681,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Stream(
                 String already,
                 String not,
@@ -741,7 +694,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Symbol(
                 String nullCategory,
                 String nullPage,
@@ -753,7 +705,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Tell(
                 String nullPlayer,
                 String sender,
@@ -764,7 +715,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Tictactoe(
                 String nullPlayer,
                 String myself,
@@ -784,7 +734,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Symbol(
                     String blank,
                     String first,
@@ -799,7 +748,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Toponline(
                 String nullPage,
                 String header,
@@ -810,7 +758,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Translateto(
                 String nullOrError,
                 String format
@@ -819,7 +766,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record CommandTry(
                 String formatTrue,
                 String formatFalse
@@ -828,7 +774,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Unban(
                 String nullPlayer,
                 String nullId,
@@ -841,7 +786,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Unmute(
                 String nullPlayer,
                 String nullId,
@@ -854,7 +798,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Unwarn(
                 String nullPlayer,
                 String nullId,
@@ -867,7 +810,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Warn(
                 String nullPlayer,
                 String nullTime,
@@ -880,7 +822,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Warnlist(
                 String empty,
                 String nullPage,
@@ -892,7 +833,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Whitelist(
                 String empty,
                 String nullPage,
@@ -916,7 +856,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Whois(
                 String empty,
                 String nullPage,
@@ -932,7 +871,6 @@ public record Localization(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Integration(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord")
             Discord discord,
@@ -946,7 +884,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Discord(
                 String nullPlayer,
                 String senderName,
@@ -958,7 +895,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record ChannelEmbed(
                     String content,
                     String webhookName,
@@ -969,7 +905,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Embed(
                     String color,
                     String title,
@@ -985,7 +920,6 @@ public record Localization(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Author(
                         String name,
                         String url,
@@ -995,7 +929,6 @@ public record Localization(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Footer(
                         String text,
                         String iconUrl
@@ -1004,7 +937,6 @@ public record Localization(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Field(
                         String name,
                         String value,
@@ -1016,7 +948,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Telegram(
                 String nullPlayer,
                 String senderName,
@@ -1029,7 +960,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Twitch(
                 String nullPlayer,
                 String senderName,
@@ -1042,7 +972,6 @@ public record Localization(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Message(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/afk")
             Afk afk,
@@ -1101,7 +1030,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Afk(
                 String suffix,
                 Format formatTrue,
@@ -1110,7 +1038,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Format(
                     String global,
                     String local
@@ -1120,7 +1047,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Auto(
                 Map<String, List<String>> types
         ) implements LocalizationSetting {
@@ -1128,7 +1054,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Bossbar(
                 Map<String, String> announce,
                 Map<String, String> types
@@ -1137,7 +1062,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Brand(
                 List<String> values
         ) implements LocalizationSetting {
@@ -1145,13 +1069,11 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Bubble(String format) implements LocalizationSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Chat(
                 String nullChat,
                 String nullReceiver,
@@ -1161,7 +1083,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Format(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/animation")
                 Animation animation,
@@ -1200,7 +1121,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Animation(
                     Map<String, List<String>> values
             ) implements LocalizationSetting {
@@ -1208,7 +1128,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Condition(
                     Map<String, Map<String, String>> values
             ) implements LocalizationSetting {
@@ -1216,7 +1135,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Fading(
                     String symbol
             ) implements LocalizationSetting {
@@ -1224,7 +1142,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Object(
                     String defaultSymbol
             ) implements LocalizationSetting {
@@ -1232,14 +1149,12 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Padding(
                     Map<String, Value> values
             ) implements LocalizationSetting {
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Value(
                         String symbol,
                         String start,
@@ -1251,7 +1166,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Replacement(
                     String spoilerSymbol,
                     Map<String, String> values
@@ -1260,7 +1174,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Mention(
                     String person,
                     String format
@@ -1269,7 +1182,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Moderation(
                     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/caps")
                     Caps caps,
@@ -1289,13 +1201,11 @@ public record Localization(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Caps(String formatRestrict) implements LocalizationSetting {
                 }
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Delete(
                         String placeholder,
                         String format
@@ -1304,26 +1214,22 @@ public record Localization(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Flood(String formatRestrict) implements LocalizationSetting {
                 }
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Newbie(String formatRestrict) implements LocalizationSetting {
                 }
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Swear(String symbol, String formatSee, String formatRestrict) implements LocalizationSetting {
                 }
             }
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Names(
                     List<String> constant,
                     List<String> display,
@@ -1336,7 +1242,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record QuestionAnswer(
                     Map<String, String> questions
             ) implements LocalizationSetting {
@@ -1344,20 +1249,17 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Translate(String action) implements LocalizationSetting {
             }
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Greeting(String format) implements LocalizationSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Join(
                 String format,
                 String formatFirstTime
@@ -1366,7 +1268,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Scoreboard(
                 String prefix,
                 String suffix,
@@ -1378,7 +1279,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Objective(
 
                     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard/objective/belowname")
@@ -1391,7 +1291,6 @@ public record Localization(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Belowname(
                         String score,
                         String displayFormat,
@@ -1401,7 +1300,6 @@ public record Localization(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Tabname(
                         String score,
                         String displayFormat,
@@ -1415,7 +1313,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Serverlink(
                 Map<String, String> values
         ) implements LocalizationSetting {
@@ -1423,19 +1320,16 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Quit(String format) implements LocalizationSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Rightclick(String format) implements LocalizationSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Sidebar(
                 List<List<String>> values
         ) implements LocalizationSetting {
@@ -1443,7 +1337,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Status(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/motd")
                 MOTD motd,
@@ -1457,7 +1350,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record MOTD(
                     List<List<String>> values
             ) implements LocalizationSetting {
@@ -1465,7 +1357,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Players(
                     List<Sample> samples,
                     String full
@@ -1473,7 +1364,6 @@ public record Localization(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Sample(
                         String name,
                         String id
@@ -1483,14 +1373,12 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Version(String name) implements LocalizationSetting {
             }
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Tab(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/header")
                 Header header,
@@ -1504,7 +1392,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Footer(
                     List<List<String>> lists
             ) implements LocalizationSetting {
@@ -1512,7 +1399,6 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Header(
                     List<List<String>> lists
             ) implements LocalizationSetting {
@@ -1520,14 +1406,12 @@ public record Localization(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Playerlistname(String format) implements LocalizationSetting {
             }
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Update(
                 String formatPlayer,
                 String formatConsole
@@ -1536,7 +1420,6 @@ public record Localization(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Vanilla(
                 String formatPlayer,
                 String formatEntity,
@@ -1547,7 +1430,6 @@ public record Localization(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record ListTypeMessage(
             String header,
             String line,

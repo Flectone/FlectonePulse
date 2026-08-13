@@ -21,7 +21,6 @@ import java.util.Map;
  */
 @With
 @Builder(toBuilder = true)
-@Jacksonized
 public record Permission(
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/module")
@@ -47,7 +46,6 @@ public record Permission(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Command(
             String name,
             Permission.Type type,
@@ -206,7 +204,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Afk(
                 String name,
                 Permission.Type type,
@@ -217,7 +214,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Anon(
                 String name,
                 Permission.Type type,
@@ -228,7 +224,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ball(
                 String name,
                 Permission.Type type,
@@ -239,7 +234,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ban(
                 String name,
                 Permission.Type type,
@@ -250,7 +244,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Banlist(
                 String name,
                 Permission.Type type,
@@ -261,7 +254,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Broadcast(
                 String name,
                 Permission.Type type,
@@ -272,7 +264,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Chatcolor(
                 String name,
                 Permission.Type type,
@@ -285,7 +276,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Chatsetting(
                 String name,
                 Permission.Type type,
@@ -297,7 +287,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record SettingItem(
                     String name,
                     Permission.Type type
@@ -307,7 +296,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Clearchat(
                 String name,
                 Permission.Type type,
@@ -319,7 +307,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Clearmail(
                 String name,
                 Permission.Type type,
@@ -330,7 +317,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Coin(
                 String name,
                 Permission.Type type,
@@ -341,7 +327,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Deletemessage(
                 String name,
                 Permission.Type type,
@@ -352,7 +337,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Dice(
                 String name,
                 Permission.Type type,
@@ -363,7 +347,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record CommandDo(
                 String name,
                 Permission.Type type,
@@ -374,7 +357,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Emit(
                 String name,
                 Permission.Type type,
@@ -385,7 +367,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Flectonepulse(
                 String name,
                 Permission.Type type,
@@ -396,7 +377,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Geolocate(
                 String name,
                 Permission.Type type,
@@ -407,7 +387,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Helper(
                 String name,
                 Permission.Type type,
@@ -419,7 +398,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ignore(
                 String name,
                 Permission.Type type,
@@ -430,7 +408,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ignorelist(
                 String name,
                 Permission.Type type,
@@ -441,7 +418,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Kick(
                 String name,
                 Permission.Type type,
@@ -452,7 +428,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Mail(
                 String name,
                 Permission.Type type,
@@ -463,7 +438,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Maintenance(
                 String name,
                 Permission.Type type,
@@ -475,7 +449,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Me(
                 String name,
                 Permission.Type type,
@@ -486,7 +459,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Minesweeper(
                 String name,
                 Permission.Type type,
@@ -497,7 +469,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Mute(
                 String name,
                 Permission.Type type,
@@ -508,7 +479,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Mutelist(
                 String name,
                 Permission.Type type,
@@ -519,7 +489,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Nickname(
                 String name,
                 Permission.Type type,
@@ -532,7 +501,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Online(
                 String name,
                 Permission.Type type,
@@ -543,7 +511,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Ping(
                 String name,
                 Permission.Type type,
@@ -554,7 +521,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Poll(
                 String name,
                 Permission.Type type,
@@ -566,7 +532,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Reply(
                 String name,
                 Permission.Type type,
@@ -577,7 +542,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Rockpaperscissors(
                 String name,
                 Permission.Type type,
@@ -588,7 +552,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Sprite(
                 String name,
                 Permission.Type type,
@@ -599,7 +562,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Spy(
                 String name,
                 Permission.Type type,
@@ -610,7 +572,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Stream(
                 String name,
                 Permission.Type type,
@@ -621,7 +582,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Symbol(
                 String name,
                 Permission.Type type,
@@ -632,7 +592,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Tell(
                 String name,
                 Permission.Type type,
@@ -643,7 +602,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Tictactoe(
                 String name,
                 Permission.Type type,
@@ -654,7 +612,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Toponline(
                 String name,
                 Permission.Type type,
@@ -665,7 +622,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Translateto(
                 String name,
                 Permission.Type type,
@@ -676,7 +632,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record CommandTry(
                 String name,
                 Permission.Type type,
@@ -687,7 +642,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Unban(
                 String name,
                 Permission.Type type,
@@ -698,7 +652,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Unmute(
                 String name,
                 Permission.Type type,
@@ -709,7 +662,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Unwarn(
                 String name,
                 Permission.Type type,
@@ -720,7 +672,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Warn(
                 String name,
                 Permission.Type type,
@@ -731,7 +682,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Warnlist(
                 String name,
                 Permission.Type type,
@@ -742,7 +692,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Whitelist(
                 String name,
                 Permission.Type type,
@@ -754,7 +703,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Whois(
                 String name,
                 Permission.Type type,
@@ -767,7 +715,6 @@ public record Permission(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Integration(
             String name,
             Permission.Type type,
@@ -859,7 +806,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Advancedban(
                 String name,
                 Permission.Type type
@@ -868,7 +814,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Blazeandcave(
                 String name,
                 Permission.Type type
@@ -877,7 +822,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record CMI(
                 String name,
                 Permission.Type type
@@ -886,7 +830,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Libertybans(
                 String name,
                 Permission.Type type
@@ -895,7 +838,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Deepl(
                 String name,
                 Permission.Type type
@@ -904,7 +846,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Discord(
                 String name,
                 Permission.Type type,
@@ -914,7 +855,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Floodgate(
                 String name,
                 Permission.Type type
@@ -923,7 +863,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Geyser(
                 String name,
                 Permission.Type type
@@ -932,7 +871,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Icu(
                 String name,
                 Permission.Type type
@@ -941,7 +879,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Interactivechat(
                 String name,
                 Permission.Type type
@@ -950,7 +887,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Itemsadder(
                 String name,
                 Permission.Type type
@@ -959,7 +895,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Litebans(
                 String name,
                 Permission.Type type
@@ -968,7 +903,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Luckperms(
                 String name,
                 Permission.Type type
@@ -977,7 +911,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Maintenance(
                 String name,
                 Permission.Type type
@@ -986,7 +919,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record MiniMOTD(
                 String name,
                 Permission.Type type
@@ -995,7 +927,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record MiniPlaceholders(
                 String name,
                 Permission.Type type,
@@ -1005,7 +936,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record MOTD(
                 String name,
                 Permission.Type type
@@ -1014,7 +944,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Placeholderapi(
                 String name,
                 Permission.Type type,
@@ -1024,7 +953,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Plasmovoice(
                 String name,
                 Permission.Type type
@@ -1033,7 +961,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Simplevoice(
                 String name,
                 Permission.Type type
@@ -1042,7 +969,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Skinsrestorer(
                 String name,
                 Permission.Type type
@@ -1051,7 +977,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Supervanish(
                 String name,
                 Permission.Type type
@@ -1060,7 +985,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Tab(
                 String name,
                 Permission.Type type
@@ -1069,7 +993,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Telegram(
                 String name,
                 Permission.Type type,
@@ -1079,7 +1002,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Triton(
                 String name,
                 Permission.Type type
@@ -1088,7 +1010,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Twitch(
                 String name,
                 Permission.Type type,
@@ -1098,7 +1019,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Vault(
                 String name,
                 Permission.Type type
@@ -1107,7 +1027,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Yandex(
                 String name,
                 Permission.Type type
@@ -1117,7 +1036,6 @@ public record Permission(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Message(
             String name,
             Permission.Type type,
@@ -1188,7 +1106,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Afk(
                 String name,
                 Permission.Type type,
@@ -1198,7 +1115,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Anvil(
                 String name,
                 Permission.Type type
@@ -1207,7 +1123,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Auto(
                 String name,
                 Permission.Type type,
@@ -1217,7 +1132,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Book(
                 String name,
                 Permission.Type type
@@ -1226,7 +1140,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Bossbar(
                 String name,
                 Permission.Type type,
@@ -1236,7 +1149,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Brand(
                 String name,
                 Permission.Type type
@@ -1245,7 +1157,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Bubble(
                 String name,
                 Permission.Type type
@@ -1254,7 +1165,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Chat(
                 String name,
                 Permission.Type type,
@@ -1263,7 +1173,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Type(
                     String name,
                     Permission.Type type,
@@ -1275,7 +1184,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Format(
                 String name,
                 Permission.Type type,
@@ -1328,7 +1236,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Animation(
                     String name,
                     Permission.Type type,
@@ -1338,7 +1245,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Condition(
                     String name,
                     Permission.Type type,
@@ -1348,7 +1254,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Fading(
                     String name,
                     Permission.Type type,
@@ -1359,7 +1264,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record FColor(
                     String name,
                     Permission.Type type,
@@ -1369,7 +1273,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Fixation(
                     String name,
                     Permission.Type type
@@ -1378,7 +1281,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Mention(
                     String name,
                     Permission.Type type,
@@ -1390,7 +1292,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Moderation(
                     String name,
                     Permission.Type type,
@@ -1413,7 +1314,6 @@ public record Permission(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Caps(
                         String name,
                         Permission.Type type,
@@ -1423,7 +1323,6 @@ public record Permission(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Delete(
                         String name,
                         Permission.Type type
@@ -1432,7 +1331,6 @@ public record Permission(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Newbie(
                         String name,
                         Permission.Type type,
@@ -1442,7 +1340,6 @@ public record Permission(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Flood(
                         String name,
                         Permission.Type type,
@@ -1452,7 +1349,6 @@ public record Permission(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Swear(
                         String name,
                         Permission.Type type,
@@ -1464,7 +1360,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Names(
                     String name,
                     Permission.Type type,
@@ -1474,7 +1369,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Object(
                     String name,
                     Permission.Type type,
@@ -1486,7 +1380,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Padding(
                     String name,
                     Permission.Type type,
@@ -1496,7 +1389,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record QuestionAnswer(
                     String name,
                     Permission.Type type,
@@ -1505,7 +1397,6 @@ public record Permission(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Question(
                         String name,
                         Permission.Type type,
@@ -1517,7 +1408,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Replacement(
                     String name,
                     Permission.Type type,
@@ -1527,7 +1417,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Translate(
                     String name,
                     Permission.Type type
@@ -1536,7 +1425,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record World(
                     String name,
                     Permission.Type type
@@ -1546,7 +1434,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Greeting(
                 String name,
                 Permission.Type type,
@@ -1556,7 +1443,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Join(
                 String name,
                 Permission.Type type,
@@ -1566,7 +1452,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Scoreboard(
                 String name,
                 Permission.Type type,
@@ -1578,7 +1463,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Objective(
                     String name,
                     Permission.Type type,
@@ -1592,7 +1476,6 @@ public record Permission(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Belowname(
                         String name,
                         Permission.Type type
@@ -1601,7 +1484,6 @@ public record Permission(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Tabname(
                         String name,
                         Permission.Type type
@@ -1613,7 +1495,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Serverlink(
                 String name,
                 Permission.Type type
@@ -1623,7 +1504,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Quit(
                 String name,
                 Permission.Type type,
@@ -1633,7 +1513,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Rightclick(
                 String name,
                 Permission.Type type,
@@ -1644,7 +1523,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Sidebar(
                 String name,
                 Permission.Type type
@@ -1653,7 +1531,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Sign(
                 String name,
                 Permission.Type type
@@ -1662,7 +1539,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Status(
                 String name,
                 Permission.Type type,
@@ -1682,7 +1558,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record MOTD(
                     String name,
                     Permission.Type type
@@ -1691,7 +1566,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Icon(
                     String name,
                     Permission.Type type
@@ -1700,7 +1574,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Players(
                     String name,
                     Permission.Type type,
@@ -1710,7 +1583,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Version(
                     String name,
                     Permission.Type type
@@ -1720,7 +1592,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Tab(
                 String name,
                 Permission.Type type,
@@ -1737,7 +1608,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Footer(
                     String name,
                     Permission.Type type
@@ -1746,7 +1616,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Header(
                     String name,
                     Permission.Type type
@@ -1755,7 +1624,6 @@ public record Permission(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Playerlistname(
                     String name,
                     Permission.Type type,
@@ -1767,7 +1635,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Update(
                 String name,
                 Permission.Type type,
@@ -1777,7 +1644,6 @@ public record Permission(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Vanilla(
                 String name,
                 Permission.Type type
@@ -1787,7 +1653,6 @@ public record Permission(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record PermissionEntry(
             String name,
             Permission.Type type

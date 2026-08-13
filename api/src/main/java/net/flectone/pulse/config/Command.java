@@ -27,7 +27,6 @@ import java.util.Map;
  */
 @With
 @Builder(toBuilder = true)
-@Jacksonized
 public record Command(
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command")
@@ -188,7 +187,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Anon(
             Boolean enable,
             Range range,
@@ -201,7 +199,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Afk(
             Boolean enable,
             List<String> aliases,
@@ -212,7 +209,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Ball(
             Boolean enable,
             Range range,
@@ -225,7 +221,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Ban(
             Boolean enable,
             Boolean filterByServer,
@@ -244,7 +239,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Banlist(
             Boolean enable,
             Integer perPage,
@@ -256,7 +250,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Broadcast(
             Boolean enable,
             Range range,
@@ -269,7 +262,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Chatcolor(
             Boolean enable,
             List<String> aliases,
@@ -281,7 +273,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Deletemessage(
             Boolean enable,
             List<String> aliases,
@@ -293,7 +284,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Chatsetting(
             Boolean enable,
             List<String> aliases,
@@ -306,7 +296,6 @@ public record Command(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Modern(
                 Boolean enable,
                 Integer panelWidth,
@@ -320,7 +309,6 @@ public record Command(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Checkbox(
                 String disabledMaterial,
                 String enabledMaterial,
@@ -330,7 +318,6 @@ public record Command(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Menu(
                 String material,
                 Chat chat,
@@ -340,7 +327,6 @@ public record Command(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Chat(
                     Integer slot,
                     List<Type> types
@@ -348,7 +334,6 @@ public record Command(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Type(
                         String name,
                         String material
@@ -358,7 +343,6 @@ public record Command(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Color(
                     Integer slot,
                     List<Type> types
@@ -366,7 +350,6 @@ public record Command(
 
                 @With
                 @Builder(toBuilder = true)
-                @Jacksonized
                 public record Type(
                         String name,
                         String material,
@@ -379,7 +362,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Clearchat(
             Boolean enable,
             Integer length,
@@ -392,7 +374,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Clearmail(
             Boolean enable,
             List<String> aliases,
@@ -404,7 +385,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Coin(
             Boolean enable,
             Boolean draw,
@@ -418,7 +398,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Dice(
             Boolean enable,
             Range range,
@@ -433,7 +412,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record CommandDo(
             Boolean enable,
             Range range,
@@ -446,7 +424,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Emit(
             Boolean enable,
             List<String> aliases,
@@ -457,7 +434,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Flectonepulse(
             Boolean enable,
             Boolean executeInMainThread,
@@ -470,7 +446,6 @@ public record Command(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Editor(
                 String host,
                 Boolean https,
@@ -482,7 +457,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Geolocate(
             Boolean enable,
             Boolean suggestOfflinePlayers,
@@ -495,7 +469,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Helper(
             Boolean enable,
             Boolean nullHelper,
@@ -509,7 +482,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Ignore(
             Boolean enable,
             Boolean suggestOfflinePlayers,
@@ -522,7 +494,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Ignorelist(
             Boolean enable,
             Integer perPage,
@@ -534,7 +505,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Kick(
             Boolean enable,
             Boolean filterByServer,
@@ -549,7 +519,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Mail(
             Boolean enable,
             List<String> aliases,
@@ -561,7 +530,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Maintenance(
             Boolean enable,
             Boolean filterByServer,
@@ -575,7 +543,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Me(
             Boolean enable,
             Range range,
@@ -588,7 +555,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Minesweeper(
             Boolean enable,
             Boolean checkDuplicate,
@@ -603,7 +569,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Mute(
             Boolean enable,
             Boolean filterByServer,
@@ -621,7 +586,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Mutelist(
             Boolean enable,
             Integer perPage,
@@ -633,7 +597,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Nickname(
             Boolean enable,
             String allowedInput,
@@ -647,7 +610,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Online(
             Boolean enable,
             Boolean suggestOfflinePlayers,
@@ -661,7 +623,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Ping(
             Boolean enable,
             List<String> aliases,
@@ -673,7 +634,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Poll(
             Boolean enable,
             Boolean enableGui,
@@ -689,7 +649,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Reply(
             Boolean enable,
             List<String> aliases,
@@ -700,7 +659,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Rockpaperscissors(
             Boolean enable,
             List<String> aliases,
@@ -712,7 +670,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Sprite(
             Boolean enable,
             Integer perPage,
@@ -725,7 +682,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Spy(
             Boolean enable,
             Range range,
@@ -739,7 +695,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Stream(
             Boolean enable,
             Range range,
@@ -752,7 +707,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Symbol(
             Boolean enable,
             Integer perPage,
@@ -766,7 +720,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Tell(
             Boolean enable,
             Boolean suggestOfflinePlayers,
@@ -780,7 +733,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Tictactoe(
             Boolean enable,
             String subCommandMove,
@@ -792,7 +744,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Toponline(
             Boolean enable,
             Integer perPage,
@@ -804,7 +755,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Translateto(
             Boolean enable,
             Range range,
@@ -825,7 +775,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record CommandTry(
             Boolean enable,
             Range range,
@@ -841,7 +790,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Unban(
             Boolean enable,
             Boolean checkGroupWeight,
@@ -855,7 +803,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Unmute(
             Boolean enable,
             Boolean checkGroupWeight,
@@ -869,7 +816,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Unwarn(
             Boolean enable,
             Boolean checkGroupWeight,
@@ -883,7 +829,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Warn(
             Boolean enable,
             Boolean filterByServer,
@@ -901,7 +846,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Warnlist(
             Boolean enable,
             Integer perPage,
@@ -913,7 +857,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Whitelist(
             Boolean enable,
             Boolean autoAdd,
@@ -933,7 +876,6 @@ public record Command(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Whois(
             Boolean enable,
             Integer perPage,

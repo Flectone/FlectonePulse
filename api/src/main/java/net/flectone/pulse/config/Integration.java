@@ -23,7 +23,6 @@ import java.util.Map;
  */
 @With
 @Builder(toBuilder = true)
-@Jacksonized
 public record Integration(
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration")
@@ -120,7 +119,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Advancedban(
             Boolean enable,
             Boolean disableFlectonepulseBan,
@@ -132,7 +130,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Blazeandcave(
             Boolean enable
     ) implements EnableSetting {
@@ -140,7 +137,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record CMI(
             Boolean enable,
             Boolean disableFlectonepulseBan,
@@ -152,7 +148,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Libertybans(
             Boolean enable,
             Boolean disableFlectonepulseBan,
@@ -164,7 +159,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Deepl(
             Boolean enable,
             String authKey
@@ -173,7 +167,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Discord(
             Boolean enable,
             Boolean ignoreAllBots,
@@ -190,7 +183,6 @@ public record Integration(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Presence(
                 Boolean enable,
                 String status,
@@ -198,7 +190,6 @@ public record Integration(
         ) {
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Activity(
                     Boolean enable,
                     String type,
@@ -211,25 +202,21 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record ChannelInfo(Boolean enable, Ticker ticker) {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Floodgate(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Geyser(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Icu(
             Boolean enable,
             Bidi bidi,
@@ -240,14 +227,12 @@ public record Integration(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Bidi(
                 Boolean enable
         ) {}
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record ArabicShaping(
                 Boolean enable,
                 Boolean numerals
@@ -255,7 +240,6 @@ public record Integration(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record WordBreaking(
                 Boolean enable,
                 Boolean thai,
@@ -267,7 +251,6 @@ public record Integration(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Normalization(
                 Boolean enable,
                 Form form
@@ -285,19 +268,16 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Interactivechat(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Itemsadder(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Litebans(
             Boolean enable,
             Boolean disableFlectonepulseBan,
@@ -309,7 +289,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Luckperms(
             Boolean enable,
             Boolean alwaysHaveTrue,
@@ -319,13 +298,11 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Maintenance(Boolean enable, Boolean disableFlectonepulseMaintenance) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record MiniMOTD(
             Boolean enable,
             Boolean disableFlectonepulseStatus
@@ -334,43 +311,36 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record MiniPlaceholders(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record MOTD(Boolean enable, Boolean disableFlectonepulseStatus) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Placeholderapi(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Plasmovoice(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Simplevoice(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Skinsrestorer(Boolean enable, Boolean loadMojangSkin) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Supervanish(
             Boolean enable,
             Boolean showFakeQuit,
@@ -381,7 +351,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Tab(
             Boolean enable,
             Boolean disableFlectonepulseScoreboard,
@@ -393,7 +362,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Telegram(
             Boolean enable,
             Boolean ignoreAllBots,
@@ -416,13 +384,11 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Triton(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Twitch(
             Boolean enable,
             String clientID,
@@ -437,7 +403,6 @@ public record Integration(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Channel(List<String> online, List<String> offline) {
         }
 
@@ -445,19 +410,16 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Vault(Boolean enable) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Yandex(Boolean enable, String token, String folderId) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Proxy(
             java.net.Proxy.Type type,
             String host,
@@ -469,7 +431,6 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Command(Boolean needPlayer, List<String> aliases) {
     }
 }

@@ -26,7 +26,6 @@ import java.util.Map;
  */
 @With
 @Builder(toBuilder = true)
-@Jacksonized
 public record Message(
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message")
@@ -99,7 +98,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Afk(
             Boolean enable,
             Boolean trackPlaytime,
@@ -115,7 +113,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Anvil(
             Boolean enable,
             Boolean allowObject
@@ -124,7 +121,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Auto(
             Boolean enable,
             Map<String, Type> types
@@ -132,7 +128,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Type(
                 Boolean random,
                 Destination destination,
@@ -144,7 +139,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Book(
             Boolean enable,
             Boolean allowObject
@@ -153,7 +147,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Bossbar(
             Boolean enable,
             Map<String, Announce> announce
@@ -161,7 +154,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Announce(
                 Destination destination,
                 Sound sound
@@ -171,7 +163,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Brand(
             Boolean enable,
             Boolean random,
@@ -182,7 +173,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Bubble(
             Boolean enable,
             Boolean visibleToSelf,
@@ -202,7 +192,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Interaction(
                 Boolean enable,
                 Float height
@@ -211,7 +200,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Modern(
                 Boolean enable,
                 Boolean hasShadow,
@@ -226,7 +214,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Chat(
             Boolean enable,
             Mode mode,
@@ -242,7 +229,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Type(
                 Boolean enable,
                 Boolean cancel,
@@ -257,7 +243,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record NullReceiver(
                     Boolean enable,
                     Destination destination
@@ -268,7 +253,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Format(
             Boolean enable,
             Boolean convertLegacyColor,
@@ -321,7 +305,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Animation(
                 Boolean enable,
                 Map<String, AnimationConfig> values
@@ -329,7 +312,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record AnimationConfig(
                     Boolean raw,
                     Integer interval
@@ -340,14 +322,12 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Condition(
                 Boolean enable,
                 Map<String, Criteria> values
         ) implements EnableSetting {
 
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Criteria(
                     String value,
                     Type type
@@ -365,7 +345,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Fading(
                 Boolean enable,
                 Boolean hideDifferentWorld,
@@ -376,7 +355,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record FColor(
                 Boolean enable,
                 Map<Integer, String> defaultColors
@@ -385,7 +363,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Fixation(
                 Boolean enable,
                 Boolean endDot,
@@ -396,7 +373,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Mention(
                 Boolean enable,
                 String trigger,
@@ -408,7 +384,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Moderation(
                 Boolean enable,
 
@@ -431,7 +406,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Caps(
                     Boolean enable,
                     Integer violationLimit,
@@ -442,7 +416,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Delete(
                     Boolean enable,
                     Integer historyLength
@@ -451,7 +424,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Flood(
                     Boolean enable,
                     Boolean trimToSingle,
@@ -464,7 +436,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Newbie(
                     Boolean enable,
                     Mode mode,
@@ -478,7 +449,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Swear(
                     Boolean enable,
                     Integer violationLimit,
@@ -491,7 +461,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Names(
                 Boolean enable,
                 Boolean shouldCheckInvisibility
@@ -500,7 +469,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Object(
                 Boolean enable,
                 PlayerheadTag playerHeadTag,
@@ -529,7 +497,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record TextureTag(
                     Boolean enable,
                     Boolean needExtraSpace,
@@ -542,7 +509,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Padding(
                 Boolean enable,
                 Map<String, Value> values
@@ -550,7 +516,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Value(
                     Type type,
                     Integer length
@@ -568,7 +533,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record QuestionAnswer(
                 Boolean enable,
                 Map<String, Question> questions
@@ -576,7 +540,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Question(
                     Range range,
                     Destination destination,
@@ -590,7 +553,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Replacement(
                 Boolean enable,
                 Map<String, String> triggers
@@ -599,13 +561,11 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Translate(Boolean enable) implements EnableSetting {
         }
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record World(
                 Boolean enable,
                 WorldModule.Mode mode,
@@ -617,7 +577,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Greeting(
             Boolean enable,
             Destination destination,
@@ -627,7 +586,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Join(
             Boolean enable,
             Boolean first,
@@ -639,7 +597,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Serverlink(
             Boolean enable,
             Map<String, String> values,
@@ -649,7 +606,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Quit(
             Boolean enable,
             Range range,
@@ -660,7 +616,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Rightclick(
             Boolean enable,
             Boolean shouldCheckSneaking,
@@ -674,7 +629,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Scoreboard(
             Boolean enable,
             Boolean nameVisible,
@@ -690,7 +644,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Objective(
                 Boolean enable,
 
@@ -704,7 +657,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Belowname(
                     Boolean enable,
                     Double distance,
@@ -714,7 +666,6 @@ public record Message(
 
             @With
             @Builder(toBuilder = true)
-            @Jacksonized
             public record Tabname(
                     Boolean enable,
                     Ticker ticker
@@ -726,7 +677,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Sidebar(
             Boolean enable,
             Boolean random,
@@ -743,7 +693,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Sign(
             Boolean enable,
             Boolean allowObject
@@ -752,7 +701,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Status(
             Boolean enable,
 
@@ -772,7 +720,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record MOTD(
                 Boolean enable,
                 Boolean random
@@ -781,7 +728,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Icon(
                 Boolean enable,
                 Boolean random,
@@ -791,7 +737,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Players(
                 Boolean enable,
                 Boolean control,
@@ -802,7 +747,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Version(
                 Boolean enable,
                 Integer protocol
@@ -812,7 +756,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Tab(
             Boolean enable,
 
@@ -829,7 +772,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Footer(
                 Boolean enable,
                 Boolean random,
@@ -840,7 +782,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Header(
                 Boolean enable,
                 Boolean random,
@@ -851,7 +792,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Playerlistname(
                 Boolean enable,
                 Boolean hideInvisible,
@@ -865,7 +805,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Update(
             Boolean enable,
             Destination destination,
@@ -875,7 +814,6 @@ public record Message(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Vanilla(
             Boolean enable,
             Boolean cancelDefaultDeathScreen,
@@ -884,7 +822,6 @@ public record Message(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record VanillaMessage(
                 String name,
                 Boolean multiMessage,

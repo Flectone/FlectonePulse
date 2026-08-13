@@ -3,7 +3,6 @@ package net.flectone.pulse.config;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
 import lombok.With;
-import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.constant.CacheName;
 import net.flectone.pulse.constant.DatabaseType;
@@ -22,7 +21,6 @@ import java.util.concurrent.TimeUnit;
  */
 @With
 @Builder(toBuilder = true)
-@Jacksonized
 public record Config(
 
         @JsonPropertyDescription(" Don't change it if you don't know what it is")
@@ -57,14 +55,12 @@ public record Config(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Language(String type,
                            Boolean byPlayer) {
     }
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Database(
             Boolean usePlaytimeTracking,
             DatabaseType type,
@@ -80,7 +76,6 @@ public record Config(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record PoolSettings(
                 Integer maxSize,
                 Integer minIdle,
@@ -94,7 +89,6 @@ public record Config(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Executor(
             Integer minPoolSize,
             Integer maxPoolSize,
@@ -106,7 +100,6 @@ public record Config(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record DurationUnit(
                 Long duration,
                 TimeUnit timeUnit
@@ -122,7 +115,6 @@ public record Config(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Internal(
             Boolean enable,
             Boolean alwaysSendSilentPacket,
@@ -139,7 +131,6 @@ public record Config(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Proxy(
             Set<String> clusters,
             Boolean bungeecord,
@@ -149,7 +140,6 @@ public record Config(
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record Redis(
                 Boolean enable,
                 String host,
@@ -164,7 +154,6 @@ public record Config(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Logger(
             String console,
             String prefix,
@@ -178,12 +167,10 @@ public record Config(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Cache(Map<CacheName, CacheSetting> types) {
 
         @With
         @Builder(toBuilder = true)
-        @Jacksonized
         public record CacheSetting(
                 boolean invalidateOnReload,
                 boolean expireAfterWrite,
@@ -196,7 +183,6 @@ public record Config(
 
     @With
     @Builder(toBuilder = true)
-    @Jacksonized
     public record Metrics(Boolean enable) {
     }
 }

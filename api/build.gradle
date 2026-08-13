@@ -9,9 +9,6 @@ dependencies {
 
     // required by the MapStruct-generated mappers (componentModel = JAKARTA)
     compileOnly "jakarta.inject:jakarta.inject-api:$jakarta_inject_version"
-
-    // required by the Lombok @Jacksonized
-    compileOnly "tools.jackson.dataformat:jackson-dataformat-yaml:$jackson_dataformat_version"
 }
 
 shadowJar {
