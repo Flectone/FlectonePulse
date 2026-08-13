@@ -67,10 +67,10 @@ public class FileLoaderImpl implements FileLoader {
         Map<String, Localization> localizations = new LinkedHashMap<>();
         localizations.put(DefaultLocalization.ENGLISH.getName(), defaultEnglishLocalization);
         localizations.put(DefaultLocalization.RUSSIAN.getName(), defaultRussianLocalization);
-        for (Localization localization : loadLocalizationFiles(config, localizations, false).values()) {
-            if (localizations.containsKey(localization.language())) continue;
+        for (String language : findLanguages(config)) {
+            if (localizations.containsKey(language)) continue;
 
-            localizations.put(localization.language(), getDefaultLocalizationByLanguage(localization.language(), localizations));
+            localizations.put(language, getDefaultLocalizationByLanguage(language, localizations));
         }
 
         defaultFiles = new FilePack(
@@ -143,24 +143,7 @@ public class FileLoaderImpl implements FileLoader {
 
     @Override
     public Map<String, Localization> loadLocalizationFiles(Config config, Map<String, Localization> localizations, boolean merge) {
-        Set<String> languages = new HashSet<>(Arrays.stream(DefaultLocalization.values()).map(DefaultLocalization::getName).toList());
-        languages.add(config.language().type());
-
-        try (Stream<Path> paths = Files.walk(projectPath.resolve(Localization.FOLDER_NAME))) {
-            paths.filter(Files::isRegularFile).forEach(path -> {
-                File localization = path.toFile();
-                String localizationName = localization.getName();
-                if (localizationName.endsWith(".yml")) {
-                    languages.add(Strings.CS.replace(localizationName, ".yml", ""));
-                }
-            });
-        } catch (NoSuchFileException _) {
-            // ignore first startup
-        } catch (IOException e) {
-            fLogger.warning(e);
-        }
-
-        return languages.stream().collect(
+        return findLanguages(config).stream().collect(
                 Collectors.toUnmodifiableMap(
                         language -> language,
                         language -> loadOrDefault(
@@ -223,6 +206,26 @@ public class FileLoaderImpl implements FileLoader {
         }
 
         return Optional.empty();
+    }
+
+    private Set<String> findLanguages(Config config) {
+        Set<String> languages = new HashSet<>(Arrays.stream(DefaultLocalization.values()).map(DefaultLocalization::getName).toList());
+        languages.add(config.language().type());
+
+        try (Stream<Path> paths = Files.walk(projectPath.resolve(Localization.FOLDER_NAME))) {
+            paths.filter(Files::isRegularFile).forEach(path -> {
+                String localizationName = path.toFile().getName();
+                if (localizationName.endsWith(".yml")) {
+                    languages.add(Strings.CS.replace(localizationName, ".yml", ""));
+                }
+            });
+        } catch (NoSuchFileException _) {
+            // ignore first startup
+        } catch (IOException e) {
+            fLogger.warning(e);
+        }
+
+        return languages;
     }
 
     private String resolveResourcePath(FilePath filePath) {
