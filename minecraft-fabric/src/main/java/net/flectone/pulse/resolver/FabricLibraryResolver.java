@@ -1,43 +1,19 @@
 package net.flectone.pulse.resolver;
 
 import com.alessiodp.libby.Library;
-import com.alessiodp.libby.logging.LogLevel;
-import com.alessiodp.libby.logging.adapters.LogAdapter;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Singleton;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.BuildConfig;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
+import net.flectone.pulse.logging.FLogger;
 
 import java.util.List;
 
 @Singleton
 public class FabricLibraryResolver extends LibraryResolverImpl {
 
-    public FabricLibraryResolver(Logger logger) {
-        super(new LogAdapter() {
-            @Override
-            public void log(@NonNull LogLevel logLevel, @Nullable String s) {
-                switch (logLevel) {
-                    case INFO -> logger.info(s);
-                    case DEBUG -> logger.debug(s);
-                    case WARN -> logger.warn(s);
-                    case ERROR -> logger.error(s);
-                }
-            }
-
-            @Override
-            public void log(@NonNull LogLevel logLevel, @Nullable String s, @Nullable Throwable throwable) {
-                switch (logLevel) {
-                    case INFO -> logger.info(s, throwable);
-                    case DEBUG -> logger.debug(s, throwable);
-                    case WARN -> logger.warn(s, throwable);
-                    case ERROR -> logger.error(s, throwable);
-                }
-            }
-        }, FabricLoader.getInstance().getConfigDir().resolve(BuildConfig.PROJECT_MOD_ID));
+    public FabricLibraryResolver(FLogger fLogger) {
+        super(fLogger, FabricLoader.getInstance().getConfigDir().resolve(BuildConfig.PROJECT_MOD_ID));
     }
 
     @Override

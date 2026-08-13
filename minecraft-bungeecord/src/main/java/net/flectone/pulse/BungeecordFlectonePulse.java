@@ -5,6 +5,7 @@ import net.flectone.pulse.constant.LoginStatus;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.listener.BungeecordLoginStateListener;
 import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.platform.adapter.JavaLogAdapter;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.md_5.bungee.api.ProxyServer;
@@ -23,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 public final class BungeecordFlectonePulse implements LoaderBootstrap, Listener {
 
@@ -40,7 +42,9 @@ public final class BungeecordFlectonePulse implements LoaderBootstrap, Listener 
         this.loader = loader;
 
         Plugin plugin = loader.get();
-        this.fLogger = new FLogger(logRecord -> plugin.getLogger().log(logRecord), () -> null);
+        Logger logger = plugin.getLogger();
+
+        this.fLogger = new FLogger(new JavaLogAdapter(logger), () -> null);
     }
 
     @Override

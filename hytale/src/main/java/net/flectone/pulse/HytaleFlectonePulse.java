@@ -1,5 +1,6 @@
 package net.flectone.pulse;
 
+import com.alessiodp.libby.logging.LogLevel;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -12,6 +13,7 @@ import net.flectone.pulse.exception.InjectorNotInitializedException;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.platform.adapter.HytaleLogAdapter;
 import net.flectone.pulse.resolver.HytaleLibraryResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -30,6 +32,7 @@ public class HytaleFlectonePulse implements FlectonePulse {
 
     private FLogger fLogger;
     private Injector injector;
+    private FileFacade fileFacade;
 
     public HytaleFlectonePulse(Supplier<HytaleFlectonePulseLoader> loader) {
         this.loader = loader;
@@ -40,21 +43,18 @@ public class HytaleFlectonePulse implements FlectonePulse {
     public void onLoad() {
         // initialize custom logger
         HytaleLogger hytaleLogger = getLoader().getLogger();
-        fLogger = new FLogger(
-                logRecord -> hytaleLogger.at(logRecord.getLevel()).log(logRecord.getMessage()),
-                () -> injector == null ? null : injector.getInstance(FileFacade.class)
-        );
+        fLogger = new FLogger(new HytaleLogAdapter(hytaleLogger), () -> fileFacade);
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading
-        LibraryResolver libraryResolver = new HytaleLibraryResolver(hytaleLogger, projectPath);
+        LibraryResolver libraryResolver = new HytaleLibraryResolver(fLogger, projectPath);
         libraryResolver.resolveRepositories();
 
         try {
             libraryResolver.loadLibraries();
         } catch (RuntimeException e) {
             if (e.getMessage().contains("Failed to download library")) {
-                hytaleLogger.atSevere().log("\n\n====================\n A problem occurred while downloading the libraries, perhaps you do not have access to repository. \n Try downloading the libraries manually from https://flectone.net/files/r/FlectonePulse-libraries.zip and extract them into FlectonePulse folder \n====================\n");
+                fLogger.log(LogLevel.ERROR, "\n\n====================\n A problem occurred while downloading the libraries, perhaps you do not have access to repository. \n Try downloading the libraries manually from https://flectone.net/files/r/FlectonePulse-libraries.zip and extract them into FlectonePulse folder \n====================\n");
             }
 
             throw e;
@@ -64,6 +64,7 @@ public class HytaleFlectonePulse implements FlectonePulse {
         try {
             // create guice injector for dependency injection
             injector = Guice.createInjector(Stage.PRODUCTION, new HytaleInjector(this, projectPath, libraryResolver, fLogger));
+            fileFacade = injector.getInstance(FileFacade.class);
         } catch (Exception e) {
             throwInitException(e);
         }

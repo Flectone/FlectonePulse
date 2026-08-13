@@ -15,6 +15,7 @@ import net.flectone.pulse.constant.LoginStatus;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.listener.VelocityLoginStateListener;
 import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.platform.adapter.VelocityLogAdapter;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.sender.ProxySender;
 import org.slf4j.Logger;
@@ -45,8 +46,8 @@ public class VelocityFlectonePulse implements LoaderBootstrap {
         this.proxyServer = injector.getInstance(ProxyServer.class);
 
         Logger logger = injector.getInstance(Logger.class);
-        this.fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()), () -> null);
 
+        this.fLogger = new FLogger(new VelocityLogAdapter(logger), () -> null);
         this.velocityLoginStateListener = injector.getInstance(VelocityLoginStateListener.class);
     }
 

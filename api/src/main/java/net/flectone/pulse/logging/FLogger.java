@@ -1,27 +1,26 @@
 package net.flectone.pulse.logging;
 
+import com.alessiodp.libby.logging.LogLevel;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.platform.adapter.LogAdapter;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Locale;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 /**
  * The plugin's logger. It writes through the platform's own logger and, where the console
  * supports it, renders the colors a message carries.
  *
- * @param logConsumer hands a finished record to the platform logger
+ * @param logAdapter hands a finished record to the platform logger
  * @param fileFacadeSupplier supplies the config, which is not loaded yet when the logger is created
  * @author TheFaser
  */
 public record FLogger(
-        Consumer<LogRecord> logConsumer,
+        LogAdapter logAdapter,
         Supplier<FileFacade> fileFacadeSupplier
 ) {
 
@@ -58,36 +57,8 @@ public record FLogger(
      *
      * @return the settings, or null
      */
-    public Config.Logger config() {
+    public Config.@Nullable Logger config() {
         return fileFacadeSupplier.get() == null ? null : fileFacadeSupplier.get().config().logger();
-    }
-
-    /**
-     * Writes a record, rendering its colors when the console supports them.
-     *
-     * @param logRecord the record
-     */
-    public void log(LogRecord logRecord) {
-        Config.Logger config = config();
-        if (config == null) {
-            logRecord.setLoggerName("FlectonePulse");
-            logConsumer.accept(logRecord);
-            return;
-        }
-
-        if (ANSI_SUPPORTED) {
-            String color = switch (logRecord.getLevel().intValue()) {
-                case 900 -> config.warn();
-                case 800 -> config.info();
-                default -> config.primary();
-            };
-            logRecord.setMessage(config.primary() + config.prefix() + RESET_COLOR + color + logRecord.getMessage() + RESET_COLOR);
-        } else {
-            logRecord.setMessage(config.prefix() + logRecord.getMessage());
-        }
-
-        logRecord.setLoggerName("");
-        logConsumer.accept(logRecord);
     }
 
     /**
@@ -150,8 +121,8 @@ public record FLogger(
      *
      * @param string the message
      */
-    public void info(String string) {
-        log(new LogRecord(Level.INFO, string));
+    public void info(@Nullable String string) {
+        log(LogLevel.INFO, string);
     }
 
     /**
@@ -160,7 +131,7 @@ public record FLogger(
      * @param format the format string
      * @param args the arguments
      */
-    public void info(String format, Object... args) {
+    public void info(@NonNull String format, Object... args) {
         info(String.format(format, args));
     }
 
@@ -169,7 +140,7 @@ public record FLogger(
      *
      * @param object the value
      */
-    public void warning(Object object) {
+    public void warning(@Nullable Object object) {
         warning(String.valueOf(object));
     }
 
@@ -178,8 +149,8 @@ public record FLogger(
      *
      * @param string the message
      */
-    public void warning(String string) {
-        log(new LogRecord(Level.WARNING, string));
+    public void warning(@Nullable String string) {
+        log(LogLevel.WARN, string);
     }
 
     /**
@@ -188,7 +159,7 @@ public record FLogger(
      * @param format the format string
      * @param args the arguments
      */
-    public void warning(String format, Object... args) {
+    public void warning(@NonNull String format, Object... args) {
         warning(String.format(format, args));
     }
 
@@ -199,7 +170,7 @@ public record FLogger(
      * @param format the format string
      * @param args the arguments
      */
-    public void warning(Throwable throwable, String format, Object... args) {
+    public void warning(@Nullable Throwable throwable, @NonNull String format, Object... args) {
         warning(throwable, String.format(format, args));
     }
 
@@ -208,7 +179,7 @@ public record FLogger(
      *
      * @param throwable the failure
      */
-    public void warning(Throwable throwable) {
+    public void warning(@Nullable Throwable throwable) {
         warning(throwable, ERROR_MESSAGE_REPORT);
     }
 
@@ -218,12 +189,52 @@ public record FLogger(
      * @param throwable the failure
      * @param string the message
      */
-    public void warning(Throwable throwable, String string) {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-        throwable.printStackTrace(printWriter);
+    public void warning(@Nullable Throwable throwable, @Nullable String string) {
+        log(LogLevel.WARN, string, throwable);
+    }
 
-        log(new LogRecord(Level.WARNING, string + " " + stringWriter));
+    /**
+     * Logs a message at the given level with formatting applied.
+     *
+     * @param logLevel the level
+     * @param string the message
+     */
+    public void log(@NonNull LogLevel logLevel, @Nullable String string) {
+        Config.Logger config = config();
+        if (config == null) {
+            logAdapter.log(logLevel, string, false);
+        } else {
+            logAdapter.log(logLevel, formatMessage(logLevel, config, string), true);
+        }
+    }
+
+    /**
+     * Logs a failure at the given level with formatting applied.
+     *
+     * @param logLevel the level
+     * @param string the message
+     * @param throwable the failure
+     */
+    public void log(@NonNull LogLevel logLevel, @Nullable String string, @Nullable Throwable throwable) {
+        Config.Logger config = config();
+        if (config == null) {
+            logAdapter.log(logLevel, string, throwable, false);
+        } else {
+            logAdapter.log(logLevel, formatMessage(logLevel, config, string), throwable, true);
+        }
+    }
+
+    private @NonNull String formatMessage(@NonNull LogLevel logLevel, Config.@NonNull Logger config, @Nullable String message) {
+        if (ANSI_SUPPORTED) {
+            String color = switch (logLevel) {
+                case WARN -> config.warn();
+                case INFO -> config.info();
+                default -> "";
+            };
+            return config.primary() + config.prefix() + RESET_COLOR + color + message + RESET_COLOR;
+        } else {
+            return config.prefix() + message;
+        }
     }
 
 }

@@ -5,11 +5,11 @@ import com.alessiodp.libby.LibraryManager;
 import com.alessiodp.libby.classloader.ClassLoaderHelper;
 import com.alessiodp.libby.classloader.SystemClassLoaderHelper;
 import com.alessiodp.libby.classloader.URLClassLoaderHelper;
-import com.alessiodp.libby.logging.adapters.LogAdapter;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.exception.LibraryLoadException;
+import net.flectone.pulse.logging.FLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
@@ -32,8 +32,8 @@ public class LibraryResolverImpl extends LibraryManager implements LibraryResolv
 
     private final ClassLoaderHelper classLoaderHelper;
 
-    public LibraryResolverImpl(@NonNull LogAdapter logAdapter, @NonNull Path dataDirectory) {
-        super(logAdapter, dataDirectory, "libraries");
+    public LibraryResolverImpl(@NonNull FLogger fLogger, @NonNull Path dataDirectory) {
+        super(fLogger.logAdapter(), dataDirectory, "libraries");
 
         ClassLoader classLoader = getClass().getClassLoader();
         if (classLoader instanceof URLClassLoader urlClassLoader) {

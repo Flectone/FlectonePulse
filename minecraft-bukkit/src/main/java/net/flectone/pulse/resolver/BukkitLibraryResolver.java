@@ -1,10 +1,10 @@
 package net.flectone.pulse.resolver;
 
 import com.alessiodp.libby.Library;
-import com.alessiodp.libby.logging.adapters.JDKLogAdapter;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
+import net.flectone.pulse.logging.FLogger;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
@@ -12,8 +12,8 @@ import java.util.List;
 @Singleton
 public class BukkitLibraryResolver extends LibraryResolverImpl {
 
-    public BukkitLibraryResolver(Plugin plugin) {
-        super(new JDKLogAdapter(plugin.getLogger()), plugin.getDataFolder().toPath());
+    public BukkitLibraryResolver(FLogger fLogger, Plugin plugin) {
+        super(fLogger, plugin.getDataFolder().toPath());
     }
 
     @Override
