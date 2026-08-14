@@ -314,7 +314,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
             return getModernItemName(bukkitItem.getType());
         }
 
-        return getLegacyItemName(bukkitItem);
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            return getLegacyItemName(bukkitItem);
+        }
+
+        return getLegacyItemName(bukkitItem) + ".name";
     }
 
     @Override
