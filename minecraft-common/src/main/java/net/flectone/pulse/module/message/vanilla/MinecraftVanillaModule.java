@@ -183,6 +183,7 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
             if (number > parsedComponent.arguments().size()) return MessagePipeline.ReplacementTag.emptyTag();
 
             Object replacement = parsedComponent.arguments().get(number);
+            if (replacement == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             // <argument:...>
             if (!argumentQueue.hasNext()) return argumentResolver(fResolver, replacement);
