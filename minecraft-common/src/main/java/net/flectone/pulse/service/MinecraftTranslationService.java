@@ -1,14 +1,15 @@
 package net.flectone.pulse.service;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.util.WebUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -167,7 +168,7 @@ public class MinecraftTranslationService implements TranslationService {
     private String formatLegacyLanguage(String language) {
         String[] parts = language.split("_");
         if (parts.length != 2) return null;
-        return parts[0] + "_" + parts[1].toUpperCase(Locale.ROOT);
+        return parts[0] + "_" + (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_11) ? parts[1].toLowerCase(Locale.ROOT) : parts[1].toUpperCase(Locale.ROOT));
     }
 
     private record FlectoneTranslator(Map<String, String> translations) implements Translator {
