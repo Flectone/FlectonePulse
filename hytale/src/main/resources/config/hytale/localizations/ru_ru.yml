@@ -760,7 +760,7 @@ message:
       server.commands.teleport.notFurther: "<fcolor:1>Нельзя телепортироваться дальше в этом направлении!<fcolor:1>"
       server.commands.teleport.setHome: "<fcolor:1>Точка возрождения установлена на вашу текущую позицию.<fcolor:1>"
       server.commands.teleport.worldNotLoaded: "<fcolor:1>Этот мир больше не загружен!<fcolor:1>"
-      server.commands.teleport.failedBecausecancelled: "<fcolor:1>Не удалось телепортироваться, потому что телепорт был отменён!<fcolor:1>"
+      server.commands.teleport.failedBecauseCancelled: "<fcolor:1>Не удалось телепортироваться, потому что телепорт был отменён!<fcolor:1>"
       server.commands.teleport.teleportedToWaypoint: "<fcolor:1>Вы телепортировались в <fcolor:2><argument:0><fcolor:1>.<fcolor:1>"
       server.commands.teleport.teleportedToCoordinates: "<fcolor:1>Вы телепортировались в (<fcolor:2><argument:0><fcolor:1>, <fcolor:2><argument:1><fcolor:1>, <fcolor:2><argument:2><fcolor:1>).<fcolor:1>"
       server.commands.teleport.teleportedToCoordinatesWithLook: "<fcolor:1>Вы телепортировались в (<fcolor:2><argument:0><fcolor:1>, <fcolor:2><argument:1><fcolor:1>, <fcolor:2><argument:2><fcolor:1>, <fcolor:2><argument:3><fcolor:1>, <fcolor:2><argument:4><fcolor:1>, <fcolor:2><argument:5><fcolor:1>).<fcolor:1>"
