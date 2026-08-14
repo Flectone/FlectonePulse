@@ -573,14 +573,14 @@ message:
     announce:
       key: "message"
     types:
-      entity.minecraft.ender_dragon: "<sprite:block/chorus_flower><gradient:#ff6bff:#dda0dd>Эндер-дракон"
-      entity.minecraft.wither: "<sprite:gui:mob_effect/wither><gradient:#7b68ee:#9370db>Визер"
-      event.minecraft.raid: "<sprite:gui:mob_effect/raid_omen><gradient:#ff6b6b:#ff4444>Рейд"
-      event.minecraft.raid.defeat: "<sprite:gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Поражение"
-      event.minecraft.raid.defeat.full: "<sprite:gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Рейд — Поражение"
+      entity.minecraft.ender_dragon: "<sprite_or:'':block/chorus_flower><gradient:#ff6bff:#dda0dd>Эндер-дракон"
+      entity.minecraft.wither: "<sprite_or:'':gui:mob_effect/wither><gradient:#7b68ee:#9370db>Визер"
+      event.minecraft.raid: "<sprite_or:'':gui:mob_effect/raid_omen><gradient:#ff6b6b:#ff4444>Рейд"
+      event.minecraft.raid.defeat: "<sprite_or:'':gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Поражение"
+      event.minecraft.raid.defeat.full: "<sprite_or:'':gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Рейд — Поражение"
       event.minecraft.raid.raiders_remaining: " — Осталось рейдеров: <raiders>"
-      event.minecraft.raid.victory: "<sprite:gui:hud/heart/full><gradient:#32cd32:#228b22>Победа"
-      event.minecraft.raid.victory.full: "<sprite:gui:hud/heart/full><gradient:#32cd32:#228b22>Рейд — Победа"
+      event.minecraft.raid.victory: "<sprite_or:'':gui:hud/heart/full><gradient:#32cd32:#228b22>Победа"
+      event.minecraft.raid.victory.full: "<sprite_or:'':gui:hud/heart/full><gradient:#32cd32:#228b22>Рейд — Победа"
   brand:
     values:
     - "<white>Майнкрафт"
@@ -591,8 +591,8 @@ message:
     null_chat: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>На сервер выключен чат"
     null_receiver: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Тебя никто не услышал"
     types:
-      global: "<delete><display_name> <world>»<fcolor:4> <message><reset>"
-      local: "<delete><display_name><fcolor:3>: <message><reset>"
+      global: "<delete><display_name> <world>»<fcolor:4> <message>"
+      local: "<delete><display_name><fcolor:3>: <message>"
   format:
     animation:
       values:
@@ -695,9 +695,9 @@ message:
       constant: []
       display:
         - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <white><player_head_or:''></white><nickname>\"><white><player_head_or:''></white><prefix><stream><fcolor:2><nickname><afk><suffix><reset>"
-      entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>"
+      entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><sprite_or:'':gui:icon/accessibility><name></hover>"
       unknown: "<fcolor:2><name>"
-      console: "<white><player_head:Console></white><click:suggest_command:\"/msg <name> \"><hover:show_text:\"<fcolor:2>Написать в <white><player_head:Console></white>Консоль\"><fcolor:2>Консоль"
+      console: "<white><player_head_or:'':Console></white><click:suggest_command:\"/msg <name> \"><hover:show_text:\"<fcolor:2>Написать в <white><player_head_or:'':Console></white>Консоль\"><fcolor:2>Консоль"
       invisible: "<fcolor:2>👻 Невидимка"
     question_answer:
       questions:
