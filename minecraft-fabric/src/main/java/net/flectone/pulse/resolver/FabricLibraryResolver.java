@@ -53,7 +53,7 @@ public class FabricLibraryResolver extends LibraryResolverImpl {
         getPacketEventsArtifactIds().forEach(artifactId -> loadLibrary(Library.builder()
                 .groupId("net{}flectone")
                 .artifactId(artifactId)
-                .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
+                .version(BuildConfig.PACKETEVENTSMODERN_VERSION)
                 .repository(BuildConfig.CODEMC_REPOSITORY)
                 .fallbackRepository(BuildConfig.CODEMC_REPOSITORY)
                 .relocate(Relocation.builder()
