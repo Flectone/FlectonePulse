@@ -231,7 +231,7 @@ public record FLogger(
                 case INFO -> config.info();
                 default -> "";
             };
-            return config.primary() + config.prefix() + RESET_COLOR + color + message + RESET_COLOR;
+            return RESET_COLOR + config.primary() + config.prefix() + RESET_COLOR + color + message + RESET_COLOR;
         } else {
             return config.prefix() + message;
         }
