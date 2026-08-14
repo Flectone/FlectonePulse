@@ -41,7 +41,7 @@ public class MinecraftPulseModuleEnableListener implements PulseListener {
         if (eventModule instanceof TabModule
                 && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)
                 && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_9_4)) {
-            fLogger.warning("Server link module is only supported in Minecraft versions 1.8.8, 1.8.9 and 1.10+");
+            fLogger.warning("TAB module is only supported in Minecraft versions 1.8.8, 1.8.9 and 1.10+");
             return event.withCancelled(true);
         }
 
