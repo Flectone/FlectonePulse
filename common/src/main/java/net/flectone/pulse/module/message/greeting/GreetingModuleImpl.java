@@ -67,7 +67,7 @@ public class GreetingModuleImpl implements GreetingModule {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         taskScheduler.runAsyncLater(() -> {
-            List<String> pixels = imagePixelConverter.convert(skinService.getAvatarUrl(fPlayer));
+            List<String> pixels = imagePixelConverter.convertOrGetCache(skinService.getAvatarUrl(fPlayer));
 
             messageDispatcher.dispatch(this, EventMetadata.builder()
                     .destination(config().destination())
