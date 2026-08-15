@@ -17,7 +17,7 @@ public class ColorConverterImpl implements ColorConverter {
 
     @Override
     public @Nullable String isCorrect(String color) {
-        if (color == null) return null;
+        if (color == null || color.equals("null")) return null;
 
         if (isHex(color)) {
             return color;

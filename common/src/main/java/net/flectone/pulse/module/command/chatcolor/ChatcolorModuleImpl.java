@@ -1,20 +1,23 @@
 package net.flectone.pulse.module.command.chatcolor;
 
-import java.util.LinkedHashSet;
-import java.util.Collections;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.constant.SettingText;
+import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.value.FColor;
+import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.module.command.chatcolor.listener.ChatcolorProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -22,14 +25,10 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.constant.ModuleName;
-import net.flectone.pulse.constant.SettingText;
-import net.flectone.pulse.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
+import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -65,7 +64,7 @@ public class ChatcolorModuleImpl implements ChatcolorModule {
                     .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion());
 
             for (int i = 0; i < fColorConfig().defaultColors().size(); i++) {
-                commandBuilder = commandBuilder.optional(promptColor + " " + (i + 1), commandParserProvider.colorParser());
+                commandBuilder = commandBuilder.optional(promptColor + " " + (i + 1), commandParserProvider.colorParser(), DefaultValue.constant("null"));
             }
 
             return commandBuilder.optional(promptPlayer, commandParserProvider.offlinePlayerParser(), commandParserProvider.playerSuggestionPermission(true, permission().other()));
