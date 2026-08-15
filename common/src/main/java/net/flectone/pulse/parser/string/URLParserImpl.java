@@ -3,6 +3,7 @@ package net.flectone.pulse.parser.string;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -19,11 +20,11 @@ public class URLParserImpl implements URLParser {
     @NonNull
     @Override
     public Optional<URL> parse(@Nullable String string) {
-        if (string == null) return Optional.empty();
+        if (StringUtils.isEmpty(string)) return Optional.empty();
 
         try {
             return Optional.of(new URI(string).toURL());
-        } catch (URISyntaxException | MalformedURLException _) {
+        } catch (URISyntaxException | MalformedURLException | IllegalArgumentException _) {
             return Optional.empty();
         }
     }
