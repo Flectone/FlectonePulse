@@ -1,6 +1,6 @@
 package net.flectone.pulse.persistence.repository;
 
-import com.google.common.cache.Cache;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -37,8 +37,7 @@ public class FPlayerRepositoryImpl implements FPlayerRepository {
         this.offlinePlayersCache = offlinePlayersCache;
         this.fPlayerDAO = fPlayerDAO;
 
-        cacheRegistry.<UUID, FPlayer>addRemovalListener(CacheName.OFFLINE_PLAYERS, notification -> {
-            FPlayer evicted = notification.getValue();
+        cacheRegistry.<UUID, FPlayer>addRemovalListener(CacheName.OFFLINE_PLAYERS, (_, evicted, _) -> {
             if (evicted != null) {
                 removeFromIndexes(evicted);
             }

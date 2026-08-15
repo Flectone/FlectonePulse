@@ -104,6 +104,7 @@ subprojects {
         relocate("tools.jackson", "${relocated_pattern}.jackson")
         relocate("org.snakeyaml.engine", "${relocated_pattern}.snakeyaml")
         relocate("io.lettuce", "${relocated_pattern}.lettuce")
+        relocate("com.github.benmanes.caffeine", "${relocated_pattern}.caffeine")
         relocate("com.github.retrooper.packetevents", "${relocated_pattern}.packetevents")
         relocate("io.github.retrooper.packetevents", "${relocated_pattern}.packetevents.impl")
         relocate("org.incendo", "${relocated_pattern}.cloud")

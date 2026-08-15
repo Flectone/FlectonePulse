@@ -97,6 +97,11 @@ public class DiscordModuleImpl implements DiscordModule {
                         .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".discord.fasterxml")
                         .build()
                 )
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}benmanes{}caffeine")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".discord.caffeine")
+                        .build()
+                )
                 .build()
         );
     }

@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.format.replacement;
 
-import com.google.common.cache.Cache;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -38,7 +38,6 @@ import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -119,11 +118,8 @@ public class ReplacementModuleImpl implements ReplacementModule {
         String contextMessage = messageContext.message();
         if (StringUtils.isEmpty(contextMessage)) return messageContext;
 
-        String formattedMessage;
-        try {
-            formattedMessage = messageCache.get(contextMessage, () -> processMessage(sender, contextMessage));
-        } catch (ExecutionException e) {
-            fLogger.warning(e);
+        String formattedMessage = messageCache.get(contextMessage, _ -> processMessage(sender, contextMessage));
+        if (formattedMessage == null) {
             formattedMessage = processMessage(sender, contextMessage);
         }
 
@@ -395,12 +391,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
     private Tag skinTag(MessageContext messageContext) {
         String url = skinService.getBodyUrl(messageContext.sender());
 
-        Component componentPixels;
-        try {
-            componentPixels = createImageComponent(url);
-        } catch (ExecutionException _) {
-            return MessagePipeline.ReplacementTag.emptyTag();
-        }
+        Component componentPixels = createImageComponent(url);
 
         return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
                 .base(MessageContext.builder()
@@ -473,12 +464,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
         if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
         if (messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
 
-        Component componentPixels;
-        try {
-            componentPixels = createImageComponent(url);
-        } catch (ExecutionException _) {
-            return MessagePipeline.ReplacementTag.emptyTag();
-        }
+        Component componentPixels = createImageComponent(url);
 
         return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
                 .base(MessageContext.builder()
@@ -503,8 +489,8 @@ public class ReplacementModuleImpl implements ReplacementModule {
     }
 
     @Override
-    public Component createImageComponent(String link) throws ExecutionException {
-        return imageCache.get(link, () -> {
+    public Component createImageComponent(String link) {
+        return imageCache.get(link, _ -> {
             List<String> pixels = imagePixelConverter.convert(link);
 
             Component component = Component.empty();
@@ -519,8 +505,6 @@ public class ReplacementModuleImpl implements ReplacementModule {
                             .append(Component.newline());
                 }
             }
-
-            imageCache.put(link, component);
 
             return component;
         });

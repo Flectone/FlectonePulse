@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.command.clearmail;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ClearmailModuleImpl implements ClearmailModule {
 
-    private final Cache<UUID, List<String>> suggestionCache = CacheBuilder.newBuilder()
+    private final Cache<UUID, List<String>> suggestionCache = Caffeine.newBuilder()
             .expireAfterWrite(5, TimeUnit.SECONDS)
             .maximumSize(10)
             .build();

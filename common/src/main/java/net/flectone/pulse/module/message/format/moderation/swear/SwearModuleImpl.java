@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.format.moderation.swear;
 
-import com.google.common.cache.Cache;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -31,7 +31,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -109,11 +108,8 @@ public class SwearModuleImpl implements SwearModule {
         if (StringUtils.isEmpty(message)) return messageContext;
         if (permissionChecker.check(sender, permission().bypass())) return messageContext;
 
-        String formattedMessage;
-        try {
-            formattedMessage = messageCache.get(message, () -> replace(message));
-        } catch (ExecutionException e) {
-            fLogger.warning(e);
+        String formattedMessage = messageCache.get(message, _ -> replace(message));
+        if (formattedMessage == null) {
             formattedMessage = replace(message);
         }
 

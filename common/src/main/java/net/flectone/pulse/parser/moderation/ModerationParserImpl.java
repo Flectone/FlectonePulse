@@ -1,7 +1,7 @@
 package net.flectone.pulse.parser.moderation;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.service.ModerationService;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class ModerationParserImpl implements ModerationParser {
 
-    private final Cache<String, List<String>> suggestionCache = CacheBuilder.newBuilder()
+    private final Cache<String, List<String>> suggestionCache = Caffeine.newBuilder()
             .expireAfterWrite(5, TimeUnit.SECONDS)
             .maximumSize(10)
             .build();

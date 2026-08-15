@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.format.converter;
 
-import com.google.common.cache.Cache;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.file.FileFacade;
-import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 /*
@@ -63,7 +61,6 @@ public class LegacyColorConverter {
     private final @Named("legacyColorMessage") Cache<String, String> messageCache;
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
-    private final FLogger fLogger;
 
     public MessageContext convert(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
@@ -77,15 +74,12 @@ public class LegacyColorConverter {
     }
 
     public String convert(String text) {
-        String convertedMessage;
-        try {
-            convertedMessage = messageCache.get(text, () -> convert(text, DEFAULT_OPTIONS));
-        } catch (ExecutionException e) {
-            fLogger.warning(e);
-            convertedMessage = convert(text, DEFAULT_OPTIONS);
+        String convertedText = messageCache.get(text, _ -> convert(text, DEFAULT_OPTIONS));
+        if (convertedText == null) {
+            convertedText = convert(text, DEFAULT_OPTIONS);
         }
 
-        return convertedMessage;
+        return convertedText;
     }
 
     private String convert(String text, Collection<Option> options) {

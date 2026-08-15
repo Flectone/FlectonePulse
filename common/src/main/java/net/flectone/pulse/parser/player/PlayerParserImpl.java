@@ -1,7 +1,7 @@
 package net.flectone.pulse.parser.player;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class PlayerParserImpl implements PlayerParser {
 
     private final StringParser<FPlayer> stringParser = new StringParser<>(StringParser.StringMode.SINGLE);
 
-    private final Cache<UUID, List<String>> suggestionCache = CacheBuilder.newBuilder()
+    private final Cache<UUID, List<String>> suggestionCache = Caffeine.newBuilder()
             .expireAfterWrite(5, TimeUnit.SECONDS)
             .maximumSize(100)
             .build();

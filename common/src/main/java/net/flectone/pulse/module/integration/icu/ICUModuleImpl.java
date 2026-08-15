@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.integration.icu;
 
 import com.alessiodp.libby.Library;
-import com.google.common.cache.Cache;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -11,7 +11,6 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
-import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -22,8 +21,6 @@ import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.util.LazyInstance;
 
-import java.util.concurrent.ExecutionException;
-
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ICUModuleImpl implements ICUModule {
@@ -32,7 +29,6 @@ public class ICUModuleImpl implements ICUModule {
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
     private final ListenerRegistry listenerRegistry;
-    private final FLogger fLogger;
     private final IntegrationModule integrationModule;
     private final LazyInstance<ICUIntegration> icuIntegration;
     private final @Named("icuMessage") Cache<String, String> messageCache;
@@ -71,13 +67,12 @@ public class ICUModuleImpl implements ICUModule {
         if (moduleController.isDisabledFor(this, receiver)) return text;
         if (!receiver.isConsole() && !integrationModule.isBedrockPlayer(receiver)) return text;
 
-        try {
-            return messageCache.get(text, () -> icuIntegration.get().process(text));
-        } catch (ExecutionException e) {
-            fLogger.warning(e);
+        String processedText = messageCache.get(text, _ -> icuIntegration.get().process(text));
+        if (processedText == null) {
+            processedText = icuIntegration.get().process(text);
         }
 
-        return icuIntegration.get().process(text);
+        return processedText;
     }
 
     private void loadLibraries(LibraryResolver libraryResolver) {

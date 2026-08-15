@@ -1,8 +1,8 @@
 package net.flectone.pulse.platform.registry;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
@@ -54,9 +54,9 @@ public class CacheRegistryImpl implements CacheRegistry  {
 
         Config.Cache.CacheSetting setting = config(cacheName);
 
-        CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder()
+        Caffeine<Object, Object> builder = Caffeine.newBuilder()
                 .maximumSize(setting.size())
-                .removalListener(dispatcher(cacheName));
+                .evictionListener(dispatcher(cacheName));
 
         cacheMap.put(cacheName, (setting.expireAfterWrite()
                 ? builder.expireAfterWrite(setting.duration(), setting.timeUnit())
@@ -101,12 +101,10 @@ public class CacheRegistryImpl implements CacheRegistry  {
     }
 
     private RemovalListener<Object, Object> dispatcher(CacheName cacheName) {
-        return notification -> {
-            if (!notification.wasEvicted()) return;
-
+        return (key, value, cause) -> {
             for (RemovalListener<Object, Object> listener : removalListeners.get(cacheName)) {
                 try {
-                    listener.onRemoval(notification);
+                    listener.onRemoval(key, value, cause);
                 } catch (Exception e) {
                     fLogger.warning("Removal listener failed for cache " + cacheName, e);
                 }

@@ -167,6 +167,19 @@ public class LibraryResolverImpl extends LibraryManager implements LibraryResolv
         );
 
         loadLibrary(Library.builder()
+                .groupId("com{}github{}ben-manes{}caffeine")
+                .artifactId("caffeine")
+                .version(BuildConfig.CAFFEINE_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}benmanes{}caffeine")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".caffeine")
+                        .build()
+                )
+                .build()
+        );
+
+        loadLibrary(Library.builder()
                 .groupId("tools{}jackson{}dataformat")
                 .artifactId("jackson-dataformat-yaml")
                 .version(BuildConfig.JACKSON_DATAFORMAT_VERSION)

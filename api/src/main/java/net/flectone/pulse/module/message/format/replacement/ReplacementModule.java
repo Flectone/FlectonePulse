@@ -9,8 +9,6 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.kyori.adventure.text.Component;
 
-import java.util.concurrent.ExecutionException;
-
 /**
  * Rewrites configured fragments of a message, turning links and emotes into rich content.
  * @author TheFaser
@@ -53,11 +51,11 @@ public interface ReplacementModule extends ModuleLocalization {
 
     /**
      * Renders a remote image as a component, downloading it on the first request.
+     * An image that cannot be downloaded or rendered comes back empty.
      *
      * @param link the image url
      * @return the rendered image
-     * @throws ExecutionException if the download or rendering fails
      */
-    Component createImageComponent(String link) throws ExecutionException;
+    Component createImageComponent(String link);
 
 }

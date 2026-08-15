@@ -480,6 +480,11 @@ public class TwitchModuleImpl implements TwitchModule {
                 .version("0.7.1")
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}benmanes{}caffeine")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".twitch.caffeine")
+                        .build()
+                )
                 .build()
         );
 

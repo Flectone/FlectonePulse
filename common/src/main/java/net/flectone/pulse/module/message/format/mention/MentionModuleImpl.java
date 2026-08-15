@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.format.mention;
 
-import com.google.common.cache.Cache;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -15,7 +15,6 @@ import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
 import net.flectone.pulse.file.FileFacade;
-import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -35,7 +34,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -51,7 +49,6 @@ public class MentionModuleImpl implements MentionModule {
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final FLogger fLogger;
 
     @Override
     public void onEnable() {
@@ -101,11 +98,8 @@ public class MentionModuleImpl implements MentionModule {
         String contextMessage = messageContext.message();
         if (StringUtils.isEmpty(contextMessage)) return messageContext;
 
-        String formattedMessage;
-        try {
-            formattedMessage = messageCache.get(contextMessage, () -> replace(contextMessage));
-        } catch (ExecutionException e) {
-            fLogger.warning(e);
+        String formattedMessage = messageCache.get(contextMessage, _ -> replace(contextMessage));
+        if (formattedMessage == null) {
             formattedMessage = replace(contextMessage);
         }
 
