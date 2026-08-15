@@ -34,9 +34,9 @@ dependencies {
 
     compileOnly "org.incendo:cloud-neoforge:${cloud_neoforge_version}"
 
-    compileOnly "net.flectone:packeteventsmodern-api:$packetevents_spigot_version"
-    compileOnly "net.flectone:packeteventsmodern-netty-common:$packetevents_spigot_version"
-    compileOnly "net.flectone:packeteventsmodern-neoforge:$packetevents_spigot_version"
+    compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
+    compileOnly "net.flectone:packeteventsmodern-netty-common:$packeteventsmodern_version"
+    compileOnly "net.flectone:packeteventsmodern-neoforge:$packeteventsmodern_version"
 }
 
 shadowJar {
