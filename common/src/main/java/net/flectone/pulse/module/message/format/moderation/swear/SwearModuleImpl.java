@@ -109,9 +109,6 @@ public class SwearModuleImpl implements SwearModule {
         if (permissionChecker.check(sender, permission().bypass())) return messageContext;
 
         String formattedMessage = messageCache.get(message, _ -> replace(message));
-        if (formattedMessage == null) {
-            formattedMessage = replace(message);
-        }
 
         if (messageContext.isFlag(MessageFlag.VIOLATION_PROCESSING) && config().violationLimit() > 0
                 && messageContext.receiver().equals(messageContext.sender()) && !formattedMessage.trim().equals(message)) {

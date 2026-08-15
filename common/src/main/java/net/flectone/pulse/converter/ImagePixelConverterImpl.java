@@ -43,13 +43,7 @@ public class ImagePixelConverterImpl implements ImagePixelConverter {
     public @NonNull List<String> convertOrGetCache(@Nullable String link) {
         if (link == null) return List.of();
 
-        List<String> pixels = imagePixelsCache.getIfPresent(link);
-        if (pixels != null) return pixels;
-
-        pixels = convert(link);
-        imagePixelsCache.put(link, pixels);
-
-        return pixels;
+        return imagePixelsCache.get(link, this::convert);
     }
 
     // Idea taken from here

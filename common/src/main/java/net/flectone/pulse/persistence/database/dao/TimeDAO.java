@@ -57,6 +57,7 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
     public void saveAfk(@NonNull FPlayer fPlayer, boolean afk, PlayTime playTime) {
         if (database.isClosed()) return;
         if (fPlayer.isUnknown()) return;
+        if (playTime == null) return;
 
         long currentTime = System.currentTimeMillis();
 
@@ -71,7 +72,7 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
     public void saveQuit(@NonNull FPlayer fPlayer, PlayTime playTime) {
         if (database.isClosed()) return;
         if (fPlayer.isUnknown()) return;
-        if (playTime.last() < 0) return;
+        if (playTime == null || playTime.last() < 0) return;
 
         long currentTime = System.currentTimeMillis();
         long newTotal = playTime.total() + (currentTime - playTime.last());

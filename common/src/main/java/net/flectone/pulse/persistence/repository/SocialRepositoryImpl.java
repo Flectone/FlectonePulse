@@ -41,13 +41,7 @@ public class SocialRepositoryImpl implements SocialRepository {
 
     @Override
     public List<Ignore> loadIgnores(FPlayer fPlayer) {
-        List<Ignore> cache = playerIgnoreCache.getIfPresent(fPlayer.uuid());
-        if (cache != null) return cache;
-
-        List<Ignore> ignores = ignoreDAO.load(fPlayer);
-        playerIgnoreCache.put(fPlayer.uuid(), ignores);
-
-        return ignores;
+        return playerIgnoreCache.get(fPlayer.uuid(), _ -> ignoreDAO.load(fPlayer));
     }
 
     @Override
@@ -104,13 +98,7 @@ public class SocialRepositoryImpl implements SocialRepository {
     @NonNull
     @Override
     public Map<FColor.Type, Set<FColor>> loadColors(@NonNull FPlayer fPlayer) {
-        Map<FColor.Type, Set<FColor>> cache = playerColorCache.getIfPresent(fPlayer.uuid());
-        if (cache != null) return cache;
-
-        Map<FColor.Type, Set<FColor>> colors = fColorDao.load(fPlayer);
-        playerColorCache.put(fPlayer.uuid(), colors);
-
-        return colors;
+        return playerColorCache.get(fPlayer.uuid(), _ -> fColorDao.load(fPlayer));
     }
 
     @Override
@@ -129,13 +117,7 @@ public class SocialRepositoryImpl implements SocialRepository {
 
     @Override
     public Settings loadSettings(@NonNull FPlayer fPlayer) {
-        Settings cache = playerSettingCache.getIfPresent(fPlayer.uuid());
-        if (cache != null) return cache;
-
-        Settings settings = settingDAO.load(fPlayer).orElse(Settings.EMPTY);
-        playerSettingCache.put(fPlayer.uuid(), settings);
-
-        return settings;
+        return playerSettingCache.get(fPlayer.uuid(), _ -> settingDAO.load(fPlayer).orElse(Settings.EMPTY));
     }
 
     @Override

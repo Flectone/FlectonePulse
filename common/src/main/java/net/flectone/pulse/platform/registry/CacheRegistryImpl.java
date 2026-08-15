@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.registry;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
@@ -56,6 +57,7 @@ public class CacheRegistryImpl implements CacheRegistry  {
 
         Caffeine<Object, Object> builder = Caffeine.newBuilder()
                 .maximumSize(setting.size())
+                .scheduler(Scheduler.systemScheduler())
                 .evictionListener(dispatcher(cacheName));
 
         cacheMap.put(cacheName, (setting.expireAfterWrite()

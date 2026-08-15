@@ -41,13 +41,7 @@ public abstract class ModerationParserImpl implements ModerationParser {
     public @NonNull Iterable<@NonNull String> stringSuggestions(@NonNull CommandContext<FPlayer> context, @NonNull CommandInput input) {
         String cacheKey = type.name() + moderationService.getServer(type);
 
-        List<String> cached = suggestionCache.getIfPresent(cacheKey);
-        if (cached != null) return cached;
-
-        List<String> suggestions = moderationService.getValidNames(type);
-        suggestionCache.put(cacheKey, suggestions);
-
-        return suggestions;
+        return suggestionCache.get(cacheKey, _ -> moderationService.getValidNames(type));
     }
 
 }

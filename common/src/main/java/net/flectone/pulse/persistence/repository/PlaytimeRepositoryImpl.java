@@ -11,12 +11,13 @@ import net.flectone.pulse.persistence.database.dao.TimeDAO;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlaytimeRepositoryImpl implements PlaytimeRepository {
+
+    private static final PlayTime MISSING = new PlayTime(-1, -1, 0, 0, 0, 0);
 
     private final @Named("playtime") Cache<UUID, PlayTime> playTimeCache;
 
@@ -44,13 +45,9 @@ public class PlaytimeRepositoryImpl implements PlaytimeRepository {
 
     @Override
     public @Nullable PlayTime getPlayTime(FPlayer fPlayer) {
-        PlayTime cached = playTimeCache.getIfPresent(fPlayer.uuid());
-        if (cached != null) return cached;
+        PlayTime playTime = playTimeCache.get(fPlayer.uuid(), _ -> timeDAO.getByPlayer(fPlayer).orElse(MISSING));
 
-        Optional<PlayTime> playTime = timeDAO.getByPlayer(fPlayer);
-        playTime.ifPresent(time -> playTimeCache.put(fPlayer.uuid(), time));
-
-        return playTime.orElse(null);
+        return playTime == MISSING ? null : playTime;
     }
 
     @Override

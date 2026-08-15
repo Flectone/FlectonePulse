@@ -274,6 +274,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class PlatformInjector extends AbstractModule {
 
@@ -501,14 +502,14 @@ public abstract class PlatformInjector extends AbstractModule {
     @Provides
     @Singleton
     @Named("animation")
-    public Cache<AnimationModule.AnimationKey, Integer> provideAnimationCache(CacheRegistryImpl cacheRegistry) {
+    public Cache<AnimationModule.AnimationKey, AtomicInteger> provideAnimationCache(CacheRegistryImpl cacheRegistry) {
         return cacheRegistry.getCache(CacheName.ANIMATION);
     }
 
     @Provides
     @Singleton
     @Named("cooldown")
-    public Cache<CooldownRepository.CooldownKey, Long> provideCooldownCache(CacheRegistryImpl cacheRegistry) {
+    public Cache<CooldownRepository.CooldownKey, AtomicLong> provideCooldownCache(CacheRegistryImpl cacheRegistry) {
         return cacheRegistry.getCache(CacheName.COOLDOWN);
     }
 

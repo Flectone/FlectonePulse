@@ -67,12 +67,7 @@ public class ICUModuleImpl implements ICUModule {
         if (moduleController.isDisabledFor(this, receiver)) return text;
         if (!receiver.isConsole() && !integrationModule.isBedrockPlayer(receiver)) return text;
 
-        String processedText = messageCache.get(text, _ -> icuIntegration.get().process(text));
-        if (processedText == null) {
-            processedText = icuIntegration.get().process(text);
-        }
-
-        return processedText;
+        return messageCache.get(text, _ -> icuIntegration.get().process(text));
     }
 
     private void loadLibraries(LibraryResolver libraryResolver) {

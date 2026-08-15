@@ -58,16 +58,11 @@ public class ClearmailModuleImpl implements ClearmailModule {
                 .required(promptId, commandParserProvider.integerParser(), SuggestionProvider.blockingStrings((commandContext, _) -> {
                     FPlayer fPlayer = commandContext.sender();
 
-                    List<String> cache = suggestionCache.getIfPresent(fPlayer.uuid());
-                    if (cache != null) return cache;
-
-                    List<String> suggestion = socialService.getSenderMails(fPlayer)
+                    return suggestionCache.get(fPlayer.uuid(), _ -> socialService.getSenderMails(fPlayer)
                             .stream()
                             .map(mail -> String.valueOf(mail.id()))
-                            .toList();
-                    suggestionCache.put(fPlayer.uuid(), suggestion);
-
-                    return suggestion;
+                            .toList()
+                    );
                 }))
         );
     }

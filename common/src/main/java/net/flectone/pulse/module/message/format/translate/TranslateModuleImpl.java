@@ -73,13 +73,7 @@ public class TranslateModuleImpl implements TranslateModule {
 
     @Override
     public UUID saveMessage(String message) {
-        UUID uuid = messageCache.getIfPresent(message);
-        if (uuid == null) {
-            uuid = UUID.randomUUID();
-            messageCache.put(message, uuid);
-        }
-
-        return uuid;
+        return messageCache.get(message, _ -> UUID.randomUUID());
     }
 
     @Override

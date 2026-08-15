@@ -13,12 +13,13 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CooldownRepositoryImpl implements CooldownRepository {
 
-    private final @Named("cooldown") Cache<CooldownKey, Long> cooldownCache;
+    private final @Named("cooldown") Cache<CooldownKey, AtomicLong> cooldownCache;
     private final ProxyRegistry proxyRegistry;
     private final ProxySender proxySender;
     private final TaskScheduler taskScheduler;
@@ -29,26 +30,23 @@ public class CooldownRepositoryImpl implements CooldownRepository {
 
         CooldownKey cooldownKey = new CooldownKey(playerUUID, cooldownOwner);
 
-        Long expireTime = cooldownCache.getIfPresent(cooldownKey);
+        AtomicLong expireTime = cooldownCache.getIfPresent(cooldownKey);
         if (expireTime == null) return 0;
 
-        return Math.max(0, expireTime - System.currentTimeMillis());
+        return Math.max(0, expireTime.get() - System.currentTimeMillis());
     }
 
     @Override
     public boolean updateCache(UUID playerUUID, String cooldownClass, long newExpireTime) {
         CooldownKey cooldownKey = new CooldownKey(playerUUID, cooldownClass);
+        long currentTime = System.currentTimeMillis();
 
-        Long expireTime = cooldownCache.getIfPresent(cooldownKey);
-        if (expireTime == null || expireTime < System.currentTimeMillis()) {
-            // do not update time if it is less than the current one
-            if (expireTime != null && newExpireTime < expireTime) return true;
+        AtomicLong expireTime = cooldownCache.get(cooldownKey, _ -> new AtomicLong());
 
-            cooldownCache.put(cooldownKey, newExpireTime);
-            return true;
-        }
+        long previous = expireTime.getAndAccumulate(newExpireTime, (current, candidate) ->
+                current >= currentTime || candidate < current ? current : candidate);
 
-        return false;
+        return previous < currentTime;
     }
 
     @Override

@@ -26,11 +26,7 @@ public class ModerationRepositoryImpl implements ModerationRepository {
 
     @Override
     public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
-        Map<String, List<Moderation>> playerModerations = moderationCache.getIfPresent(player.uuid());
-        if (playerModerations == null) {
-            playerModerations = new ConcurrentHashMap<>();
-            moderationCache.put(player.uuid(), playerModerations);
-        }
+        Map<String, List<Moderation>> playerModerations = moderationCache.get(player.uuid(), _ -> new ConcurrentHashMap<>());
 
         String typeServerKey = type.name() + server;
         List<Moderation> moderations = playerModerations.get(typeServerKey);

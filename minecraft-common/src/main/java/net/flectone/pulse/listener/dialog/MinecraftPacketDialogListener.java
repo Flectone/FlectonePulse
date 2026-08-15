@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftPacketDialogListener implements PacketListener {
 
+    private static final int MAX_CLICKS = 5;
+
     private final @Named("dialogClick") Cache<UUID, AtomicInteger> dialogClickCache;
     private final MinecraftDialogController dialogController;
 
@@ -39,14 +41,9 @@ public class MinecraftPacketDialogListener implements PacketListener {
     }
 
     public boolean isSpam(UUID uuid) {
-        AtomicInteger count = dialogClickCache.getIfPresent(uuid);
-        if (count == null) {
-            count = new AtomicInteger(0);
-            dialogClickCache.put(uuid, count);
-        }
+        AtomicInteger count = dialogClickCache.get(uuid, _ -> new AtomicInteger());
 
-        int current = count.incrementAndGet();
-        return current > 5;
+        return count.incrementAndGet() > MAX_CLICKS;
     }
 
 }

@@ -118,12 +118,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
         String contextMessage = messageContext.message();
         if (StringUtils.isEmpty(contextMessage)) return messageContext;
 
-        String formattedMessage = messageCache.get(contextMessage, _ -> processMessage(sender, contextMessage));
-        if (formattedMessage == null) {
-            formattedMessage = processMessage(sender, contextMessage);
-        }
-
-        return messageContext.withMessage(formattedMessage);
+        return messageContext.withMessage(messageCache.get(contextMessage, _ -> processMessage(sender, contextMessage)));
     }
 
     @Override

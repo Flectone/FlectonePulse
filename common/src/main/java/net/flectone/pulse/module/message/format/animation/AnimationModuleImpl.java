@@ -24,12 +24,13 @@ import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AnimationModuleImpl implements AnimationModule {
 
-    private final @Named("animation") Cache<AnimationKey, Integer> animationCache;
+    private final @Named("animation") Cache<AnimationKey, AtomicInteger> animationCache;
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
@@ -115,29 +116,24 @@ public class AnimationModuleImpl implements AnimationModule {
     @Override
     public int increment(UUID sender, UUID receiver, String animation, int maxInterval, int maxIndex) {
         AnimationKey animationKey = new AnimationKey(sender, receiver, animation);
-        Integer encodedIndex = animationCache.getIfPresent(animationKey);
 
-        int currentInterval;
-        int currentIndex;
-        if (encodedIndex == null) {
-            currentInterval = 0;
-            currentIndex = 0;
-        } else {
-            currentIndex = encodedIndex / (maxInterval + 1);
-            currentInterval = encodedIndex % (maxInterval + 1);
-        }
+        AtomicInteger encoded = animationCache.get(animationKey, _ -> new AtomicInteger());
 
-        if (maxInterval <= 0 || currentInterval >= maxInterval) {
-            currentInterval = 0;
-            currentIndex = (currentIndex + 1) % maxIndex;
-        } else {
-            currentInterval++;
-        }
+        int newEncoded = encoded.updateAndGet(encodedIndex -> {
+            int currentIndex = encodedIndex / (maxInterval + 1);
+            int currentInterval = encodedIndex % (maxInterval + 1);
 
-        int newEncoded = currentIndex * (maxInterval + 1) + currentInterval;
-        animationCache.put(animationKey, newEncoded);
+            if (maxInterval <= 0 || currentInterval >= maxInterval) {
+                currentInterval = 0;
+                currentIndex = (currentIndex + 1) % maxIndex;
+            } else {
+                currentInterval++;
+            }
 
-        return currentIndex;
+            return currentIndex * (maxInterval + 1) + currentInterval;
+        });
+
+        return newEncoded / (maxInterval + 1);
     }
 
 }

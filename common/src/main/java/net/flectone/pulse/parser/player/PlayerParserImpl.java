@@ -59,18 +59,7 @@ public class PlayerParserImpl implements PlayerParser {
     }
 
     protected List<String> getCachedSuggestion(FPlayer sender) {
-        List<String> cached = suggestionCache.getIfPresent(sender.uuid());
-        if (cached != null) return cached;
-
-        List<String> suggestions = createSuggestions(sender);
-
-        updateCache(sender, suggestions);
-
-        return suggestions;
-    }
-
-    protected void updateCache(FPlayer sender, List<String> suggestions) {
-        suggestionCache.put(sender.uuid(), suggestions);
+        return suggestionCache.get(sender.uuid(), _ -> createSuggestions(sender));
     }
 
     protected boolean isVisible(FPlayer sender, FPlayer fPlayer) {

@@ -74,12 +74,7 @@ public class LegacyColorConverter {
     }
 
     public String convert(String text) {
-        String convertedText = messageCache.get(text, _ -> convert(text, DEFAULT_OPTIONS));
-        if (convertedText == null) {
-            convertedText = convert(text, DEFAULT_OPTIONS);
-        }
-
-        return convertedText;
+        return messageCache.get(text, _ -> convert(text, DEFAULT_OPTIONS));
     }
 
     private String convert(String text, Collection<Option> options) {

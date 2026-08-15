@@ -98,12 +98,7 @@ public class MentionModuleImpl implements MentionModule {
         String contextMessage = messageContext.message();
         if (StringUtils.isEmpty(contextMessage)) return messageContext;
 
-        String formattedMessage = messageCache.get(contextMessage, _ -> replace(contextMessage));
-        if (formattedMessage == null) {
-            formattedMessage = replace(contextMessage);
-        }
-
-        return messageContext.withMessage(formattedMessage);
+        return messageContext.withMessage(messageCache.get(contextMessage, _ -> replace(contextMessage)));
     }
 
     @Override
