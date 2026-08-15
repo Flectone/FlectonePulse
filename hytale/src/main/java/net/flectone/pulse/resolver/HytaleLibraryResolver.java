@@ -76,6 +76,11 @@ public class HytaleLibraryResolver extends LibraryResolverImpl {
                         .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".cloud")
                         .build()
                 )
+                .relocate(Relocation.builder()
+                        .pattern("io{}leangen{}geantyref")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".geantyref")
+                        .build()
+                )
                 .build()
         );
 
