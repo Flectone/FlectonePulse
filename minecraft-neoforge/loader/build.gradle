@@ -9,7 +9,6 @@ neoForge {
 configurations.configureEach {
     resolutionStrategy {
         force "org.jspecify:jspecify:1.0.1"
-        force "commons-io:commons-io:2.22.0"
     }
 }
 
@@ -26,6 +25,8 @@ dependencies {
 
 shadowJar {
     configurations = [project.configurations.shade]
+
+    exclude("org/jspecify/**")
 
     from { project(":minecraft-neoforge").tasks.shadowJar.archiveFile }
     dependsOn(":minecraft-neoforge:shadowJar")

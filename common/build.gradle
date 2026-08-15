@@ -4,6 +4,7 @@ dependencies {
     compileOnly "org.mapstruct:mapstruct:$mapstruct_version"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
 
+    compileOnly "org.apache.logging.log4j:log4j-core:$apache_logging_log4j_version"
     compileOnly libraries.platform
     compileOnly libraries.adventure
     compileOnly libraries.database
