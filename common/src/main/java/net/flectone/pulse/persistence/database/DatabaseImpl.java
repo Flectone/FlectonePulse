@@ -193,9 +193,9 @@ public class DatabaseImpl implements Database {
             // file the current h2 refuses to open, it has to be rewritten before the pool can start
             if (config().type() == DatabaseType.H2) {
                 try {
-                    h2StoreMigrator.migrate(h2DatabaseFile(), h2ConnectionURL(), driver);
-
-                    return new HikariDataSource(createHikariConfig(driver));
+                    if (h2StoreMigrator.migrate(h2DatabaseFile(), h2ConnectionURL(), driver)) {
+                        return new HikariDataSource(createHikariConfig(driver));
+                    }
                 } catch (DatabaseMigrationException migrationException) {
                     migrationException.addSuppressed(e);
 
