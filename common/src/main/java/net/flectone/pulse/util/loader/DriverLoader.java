@@ -116,8 +116,39 @@ public class DriverLoader {
         };
     }
 
+    public Driver loadLegacyH2(@NonNull String version) {
+        String loaderId = "h2-" + version;
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}h2database")
+                .artifactId("h2")
+                .version(version)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
+                .resolveTransitiveDependencies(true)
+                .excludeTransitiveDependency("org.slf4j", "slf4j-api")
+                .isolatedLoad(true)
+                .loaderId(loaderId)
+                .build()
+        );
+
+        return create(loaderId, "org.h2.Driver");
+    }
+
     @NonNull
     private Driver register(@NonNull String loaderId, @NonNull String driverClassName) {
+        Driver driver = create(loaderId, driverClassName);
+
+        try {
+            DriverManager.registerDriver(new DriverWrapper(driver));
+        } catch (SQLException e) {
+            throw new LibraryLoadException("Failed to register isolated JDBC driver " + driverClassName, e);
+        }
+
+        return driver;
+    }
+
+    @NonNull
+    private Driver create(@NonNull String loaderId, @NonNull String driverClassName) {
         try {
             IsolatedClassLoader classLoader = libraryResolver.getIsolatedClassLoaderById(loaderId);
             if (classLoader == null) {
@@ -125,13 +156,10 @@ public class DriverLoader {
             }
 
             Class<?> driverClass = Class.forName(driverClassName, true, classLoader);
-            Driver driver = (Driver) driverClass.getDeclaredConstructor().newInstance();
 
-            DriverManager.registerDriver(new DriverWrapper(driver));
-
-            return driver;
-        } catch (ReflectiveOperationException | SQLException e) {
-            throw new LibraryLoadException("Failed to register isolated JDBC driver " + driverClassName, e);
+            return (Driver) driverClass.getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new LibraryLoadException("Failed to create isolated JDBC driver " + driverClassName, e);
         }
     }
 

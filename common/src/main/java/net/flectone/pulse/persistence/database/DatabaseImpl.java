@@ -8,6 +8,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.constant.DatabaseType;
+import net.flectone.pulse.exception.DatabaseMigrationException;
 import net.flectone.pulse.exception.DatabaseNotInitializedException;
 import net.flectone.pulse.exception.UnsupportedDatabaseOperationException;
 import net.flectone.pulse.file.FileFacade;
@@ -20,6 +21,7 @@ import net.flectone.pulse.persistence.database.dao.FColorDao;
 import net.flectone.pulse.persistence.database.dao.FPlayerDAO;
 import net.flectone.pulse.persistence.database.dao.VersionDAO;
 import net.flectone.pulse.persistence.database.driver.DriverBackedDataSource;
+import net.flectone.pulse.persistence.database.migration.H2StoreMigrator;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.LazyInstance;
@@ -59,6 +61,7 @@ public class DatabaseImpl implements Database {
     private final LazyInstance<VersionDAO> versionDAO;
     private final BackupCreator backupCreator;
     private final DriverLoader driverLoader;
+    private final H2StoreMigrator h2StoreMigrator;
 
     @Nullable private volatile HikariDataSource dataSource;
     @Nullable private volatile Jdbi jdbi;
@@ -71,9 +74,8 @@ public class DatabaseImpl implements Database {
     @Override
     public void connect() throws IOException {
         Driver driver = driverLoader.getOrLoad(config().type());
-        HikariConfig hikariConfig = createHikariConfig(driver);
 
-        HikariDataSource newDataSource = new HikariDataSource(hikariConfig);
+        HikariDataSource newDataSource = createDataSource(driver);
 
         try {
             Jdbi newJdbi = Jdbi.create(newDataSource);
@@ -183,6 +185,40 @@ public class DatabaseImpl implements Database {
         return hikariDataSource == null || hikariDataSource.isClosed();
     }
 
+    private HikariDataSource createDataSource(Driver driver) {
+        try {
+            return new HikariDataSource(createHikariConfig(driver));
+        } catch (RuntimeException e) {
+            // servers that once ran with another plugin's older h2 on the class path are left with a
+            // file the current h2 refuses to open, it has to be rewritten before the pool can start
+            if (config().type() == DatabaseType.H2) {
+                try {
+                    h2StoreMigrator.migrate(h2DatabaseFile(), h2ConnectionURL(), driver);
+
+                    return new HikariDataSource(createHikariConfig(driver));
+                } catch (DatabaseMigrationException migrationException) {
+                    migrationException.addSuppressed(e);
+
+                    throw migrationException;
+                }
+            }
+
+            throw e;
+        }
+    }
+
+    private String h2ConnectionURL() {
+        return "jdbc:h2:file:./" +
+                projectPath +
+                File.separator +
+                systemVariableResolver.substituteEnvVars(config().name()) + ".h2" +
+                ";TRACE_LEVEL_FILE=0;DB_CLOSE_DELAY=-1;MODE=MySQL";
+    }
+
+    private Path h2DatabaseFile() {
+        return projectPath.resolve(systemVariableResolver.substituteEnvVars(config().name()) + ".h2.mv.db");
+    }
+
     private HikariConfig createHikariConfig(Driver driver) {
         HikariConfig hikariConfig = new HikariConfig();
 
@@ -206,11 +242,7 @@ public class DatabaseImpl implements Database {
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
             }
             case H2 -> {
-                connectionURL = connectionURL +
-                        "file:./" + projectPath.toString() +
-                        File.separator +
-                        systemVariableResolver.substituteEnvVars(config().name()) + ".h2" +
-                        ";TRACE_LEVEL_FILE=0;DB_CLOSE_DELAY=-1;MODE=MySQL";
+                connectionURL = h2ConnectionURL();
 
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
