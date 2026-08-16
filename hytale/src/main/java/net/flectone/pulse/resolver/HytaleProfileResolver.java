@@ -44,6 +44,7 @@ public class HytaleProfileResolver extends ProfileResolverImpl {
         HttpRequest request = HttpRequest.newBuilder()
                 .header("User-Agent", WebUtil.USER_AGENT)
                 .uri(URI.create(url))
+                .timeout(WebUtil.REQUEST_TIMEOUT)
                 .build();
 
         try {

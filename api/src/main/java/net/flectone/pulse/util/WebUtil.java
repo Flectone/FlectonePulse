@@ -3,6 +3,7 @@ package net.flectone.pulse.util;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.file.Path;
+import java.time.Duration;
 
 /**
  * Small helpers for the plugin's outgoing http requests.
@@ -14,6 +15,11 @@ public interface WebUtil {
      * The user agent sent with every outgoing request.
      */
     String USER_AGENT = "FlectonePulse/1.0";
+
+    /**
+     * The timeout applied to every outgoing request.
+     */
+    Duration REQUEST_TIMEOUT = Duration.ofSeconds(15);
 
     /**
      * Downloads a file to disk.

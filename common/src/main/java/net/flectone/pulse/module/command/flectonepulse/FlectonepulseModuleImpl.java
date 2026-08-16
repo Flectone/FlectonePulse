@@ -232,6 +232,7 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
                 .uri(API_PASTES_DEV)
                 .header("Content-Type", "text/json")
                 .header("User-Agent", WebUtil.USER_AGENT)
+                .timeout(WebUtil.REQUEST_TIMEOUT)
                 .POST(HttpRequest.BodyPublishers.ofString(prettyJson))
                 .build();
 

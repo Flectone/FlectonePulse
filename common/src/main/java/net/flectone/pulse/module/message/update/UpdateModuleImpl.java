@@ -21,6 +21,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.version.VersionComparator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -111,6 +112,7 @@ public class UpdateModuleImpl implements UpdateModule {
             try {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("https://api.github.com/repos/Flectone/FlectonePulse/releases/latest"))
+                        .timeout(WebUtil.REQUEST_TIMEOUT)
                         .build();
                 HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
                 if (response.statusCode() != 200) return;
