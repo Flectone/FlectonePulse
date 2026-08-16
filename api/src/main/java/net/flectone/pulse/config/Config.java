@@ -95,7 +95,8 @@ public record Config(
             Boolean allowCoreThreadTimeout,
             WorkQueue workQueue,
             DurationUnit keepAlive,
-            DurationUnit shutdownTimeout
+            DurationUnit shutdownTimeout,
+            DurationUnit stallTimeout
     ) {
 
         @With

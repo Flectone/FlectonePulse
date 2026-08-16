@@ -30,6 +30,9 @@ executor:
   shutdown_timeout:
     duration: 5
     time_unit: "SECONDS"
+  stall_timeout:
+    duration: 30
+    time_unit: "SECONDS"
 proxy:
   clusters: []
   bungeecord: false

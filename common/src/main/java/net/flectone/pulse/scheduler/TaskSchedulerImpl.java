@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 public class TaskSchedulerImpl implements TaskScheduler {
 
     private static final String THREAD_PREFIX = "FlectonePulse Thread #";
+    private static final long STALL_CHECK_PERIOD_TICKS = 100L;
 
     private final AtomicLong currentTick = new AtomicLong(0L);
     private final AtomicLong threadCounter = new AtomicLong(0L);
@@ -36,6 +37,9 @@ public class TaskSchedulerImpl implements TaskScheduler {
     @Getter
     private ExecutorService executorService;
     private Config.Executor config;
+
+    private long completedTasks = -1L;
+    private long stalledSince = 0L;
 
     private volatile boolean disabled = false;
 
@@ -212,7 +216,49 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     @Override
     public void onTick() {
-        processTasks(currentTick.getAndIncrement());
+        long tick = currentTick.getAndIncrement();
+
+        processTasks(tick);
+
+        if (tick % STALL_CHECK_PERIOD_TICKS == 0) {
+            checkQueue();
+        }
+    }
+
+    private void checkQueue() {
+        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executorService;
+
+        long completed = threadPoolExecutor.getCompletedTaskCount();
+        boolean stalled = !threadPoolExecutor.getQueue().isEmpty() && completed == completedTasks;
+
+        completedTasks = completed;
+
+        if (!stalled) {
+            stalledSince = 0L;
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        if (stalledSince == 0L) {
+            stalledSince = now;
+            return;
+        }
+
+        long timeout = config.stallTimeout().timeUnit().toMillis(config.stallTimeout().duration());
+        if (now - stalledSince < timeout) return;
+
+        stalledSince = 0L;
+        resetPool(threadPoolExecutor, timeout);
+    }
+
+    private void resetPool(ThreadPoolExecutor threadPoolExecutor, long timeout) {
+        fLogger.warning("No task has finished in %s seconds. Cancelling existing threads and starting a new ones", timeout / 1000L);
+
+        executorService = createExecutorService();
+        completedTasks = -1L;
+
+        threadPoolExecutor.getQueue().clear();
+        threadPoolExecutor.shutdownNow();
     }
 
     private boolean isAsyncThread() {
