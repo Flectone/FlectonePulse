@@ -197,6 +197,7 @@ command:
     format: "<fcolor:4><message>"
   flectonepulse:
     dump_error: "<color:#ff7171>An error occurred while uploading the dump: <error>"
+    database_error: "<color:#ff7171>An error occurred while working with the database file <file>"
     null_host_editor: "<color:#ff7171>Host parameter must be configured in command.yml, field port"
     null_port_editor: "<color:#ff7171>Port <port> is unavailable, choose another one in command.yml, field port"
     null_file: "<color:#ff7171>File <file> does not exist"
@@ -208,6 +209,8 @@ command:
     format_editor: "<fcolor:1>[*] Web editing link <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"
     format_export: "<fcolor:1>[*] Files exported to <fcolor:2><file>"
     format_import: "<fcolor:1>[*] Files imported from <fcolor:2><file>"
+    format_database_export: "<fcolor:1>[*] Database exported to <fcolor:2><file>"
+    format_database_import: "<fcolor:1>[*] Database imported from <fcolor:2><file>"
   geolocate:
     null_player: "<color:#ff7171>This player does not exist"
     null_or_error: "<color:#ff7171>Problem receiving information, try again"

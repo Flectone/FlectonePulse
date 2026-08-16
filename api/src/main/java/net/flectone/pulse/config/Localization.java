@@ -396,6 +396,7 @@ public record Localization(
         @Builder(toBuilder = true)
         public record Flectonepulse(
                 String dumpError,
+                String databaseError,
                 String nullHostEditor,
                 String nullPortEditor,
                 String nullFile,
@@ -406,7 +407,9 @@ public record Localization(
                 String formatDump,
                 String formatEditor,
                 String formatExport,
-                String formatImport
+                String formatImport,
+                String formatDatabaseExport,
+                String formatDatabaseImport
         ) implements LocalizationSetting {
         }
 

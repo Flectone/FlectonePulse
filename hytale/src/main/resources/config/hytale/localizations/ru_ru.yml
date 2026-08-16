@@ -197,6 +197,7 @@ command:
     format: "<fcolor:4><message>"
   flectonepulse:
     dump_error: "<color:#ff7171>Возникла проблема при загрузке дампа: <error>"
+    database_error: "<color:#ff7171>Возникла проблема при работе с файлом базы данных <file>"
     null_host_editor: "<color:#ff7171>Параметр host должен быть настроен в command.yml в строке port"
     null_port_editor: "<color:#ff7171>Порт <port> недоступен, выбери другой в command.yml в строке port"
     null_file: "<color:#ff7171>Файл <file> не существует"
@@ -208,6 +209,8 @@ command:
     format_editor: "<fcolor:1>[*] Ссылка для веб-редактирования <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"
     format_export: "<fcolor:1>[*] Файлы экспортированы в <fcolor:2><file>"
     format_import: "<fcolor:1>[*] Файлы импортированы из <fcolor:2><file>"
+    format_database_export: "<fcolor:1>[*] База данных экспортирована в <fcolor:2><file>"
+    format_database_import: "<fcolor:1>[*] База данных импортирована из <fcolor:2><file>"
   geolocate:
     null_player: "<color:#ff7171>Игрок не найден"
     null_or_error: "<color:#ff7171>Ошибка, попробуй чуть позже"

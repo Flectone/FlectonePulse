@@ -26,6 +26,8 @@ import net.flectone.pulse.model.event.message.context.ComponentMessageContext;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
+import net.flectone.pulse.persistence.database.dump.DatabaseExporter;
+import net.flectone.pulse.persistence.database.dump.DatabaseImporter;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -85,6 +87,8 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     private final MetricsService metricsService;
     private final MessagePipeline messagePipeline;
     private final SocialService socialService;
+    private final DatabaseExporter databaseExporter;
+    private final DatabaseImporter databaseImporter;
     private final Gson gson;
     private final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     private final HttpClient httpClient;
@@ -134,6 +138,11 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
                 yield false;
             }
             case IMPORT -> commandImport(fPlayer, operation, commandContext);
+            case DATABASE_EXPORT -> {
+                commandDatabaseExport(fPlayer, operation, commandContext);
+                yield false;
+            }
+            case DATABASE_IMPORT -> commandDatabaseImport(fPlayer, operation, commandContext);
             case RELOAD -> {
                 sendMessageStarting(fPlayer, operation);
                 yield true;
@@ -472,9 +481,88 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
         return false;
     }
 
+    private boolean commandDatabaseExport(FPlayer fPlayer, Operation operation, CommandContext<FPlayer> commandContext) {
+        Path dumpFile = projectPath.resolve(getFilenameDatabase(commandContext));
+        if (Files.exists(dumpFile)) {
+            sendMessageFile(fPlayer, localization(fPlayer).fileExist(), dumpFile);
+
+            return false;
+        }
+
+        sendMessageStarting(fPlayer, operation);
+
+        try {
+            databaseExporter.export(dumpFile);
+        } catch (Exception e) {
+            fLogger.warning(e);
+            sendMessageFile(fPlayer, localization(fPlayer).databaseError(), dumpFile);
+
+            return false;
+        }
+
+        sendMessageDatabase(fPlayer, localization(fPlayer).formatDatabaseExport(), dumpFile);
+
+        return true;
+    }
+
+    private boolean commandDatabaseImport(FPlayer fPlayer, Operation operation, CommandContext<FPlayer> commandContext) {
+        Path dumpFile = projectPath.resolve(getFilenameDatabase(commandContext));
+        if (!Files.exists(dumpFile)) {
+            sendMessageFile(fPlayer, localization(fPlayer).nullFile(), dumpFile);
+
+            return false;
+        }
+
+        sendMessageStarting(fPlayer, operation);
+
+        try {
+            databaseImporter.load(dumpFile, fileFacade.getPreInitVersion());
+        } catch (Exception e) {
+            fLogger.warning(e);
+            sendMessageFile(fPlayer, localization(fPlayer).databaseError(), dumpFile);
+
+            return false;
+        }
+
+        sendMessageDatabase(fPlayer, localization(fPlayer).formatDatabaseImport(), dumpFile);
+
+        return true;
+    }
+
+    private void sendMessageFile(FPlayer fPlayer, String message, Path file) {
+        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(Strings.CS.replace(message, "<file>", file.getFileName().toString()))
+                        .build()
+                )
+                .build()
+        );
+    }
+
+    private void sendMessageDatabase(FPlayer fPlayer, String message, Path file) {
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(Strings.CS.replace(message, "<file>", file.getFileName().toString()))
+                        .build()
+                )
+                .build()
+        );
+    }
+
     private String getFilenameExported(CommandContext<FPlayer> commandContext) {
         Optional<String> optionalFileName = commandContext.optional(commandModuleController.getPrompt(this, 1));
         return optionalFileName.orElse("export_" + simpleDateFormat.format(new Date())) + ".zip";
+    }
+
+    private String getFilenameDatabase(CommandContext<FPlayer> commandContext) {
+        Optional<String> optionalFileName = commandContext.optional(commandModuleController.getPrompt(this, 1));
+        return optionalFileName.orElse("database_" + simpleDateFormat.format(new Date())) + ".json";
     }
 
     private void sendMessageStarting(FPlayer fPlayer, Operation operation) {
@@ -534,7 +622,9 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
         EXPORT,
         EXPORT_ALL,
         RELOAD,
-        IMPORT
+        IMPORT,
+        DATABASE_EXPORT,
+        DATABASE_IMPORT
 
     }
 }
