@@ -91,6 +91,6 @@ public class LuckPermsIntegration implements FIntegration {
         User user = luckPerms.getUserManager().getUser(fPlayer.uuid());
         if (user != null || fPlayer.isUnknown() || fPlayer.isConsole()) return user;
 
-        return luckPerms.getUserManager().loadUser(fPlayer.uuid()).join();
+        return taskScheduler.await(luckPerms.getUserManager().loadUser(fPlayer.uuid()), null, "User " + fPlayer.name() + " in LuckPerms");
     }
 }

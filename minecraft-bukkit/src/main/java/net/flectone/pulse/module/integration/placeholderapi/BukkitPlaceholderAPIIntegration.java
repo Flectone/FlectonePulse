@@ -288,7 +288,7 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
                 String finalMessage = message;
                 taskScheduler.runRegion(regionFPlayer, () -> completableFuture.complete(setPlaceholders(fPlayer, fReceiver, finalMessage, false)));
 
-                return completableFuture.join();
+                return taskScheduler.await(completableFuture, finalMessage, "Placeholders of " + fPlayer.name());
             }
         }
 

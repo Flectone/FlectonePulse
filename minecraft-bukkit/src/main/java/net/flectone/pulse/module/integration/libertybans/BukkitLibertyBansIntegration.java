@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import space.arim.libertybans.api.LibertyBans;
 import space.arim.libertybans.api.PlayerOperator;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class BukkitLibertyBansIntegration implements FIntegration {
 
     private final FPlayerService fPlayerService;
+    private final TaskScheduler taskScheduler;
     @Getter private final FLogger fLogger;
 
     private LibertyBans libertyBans;
@@ -87,13 +89,16 @@ public class BukkitLibertyBansIntegration implements FIntegration {
             UUID uuid = fPlayer.uuid();
             InetAddress ip = InetAddress.getByName(fPlayer.ip());
 
-            return libertyBans.getSelector()
-                    .selectionByApplicabilityBuilder(uuid, ip)
-                    .type(PunishmentType.MUTE)
-                    .build()
-                    .getFirstSpecificPunishment()
-                    .toCompletableFuture()
-                    .join();
+            return taskScheduler.await(
+                    libertyBans.getSelector()
+                            .selectionByApplicabilityBuilder(uuid, ip)
+                            .type(PunishmentType.MUTE)
+                            .build()
+                            .getFirstSpecificPunishment()
+                            .toCompletableFuture(),
+                    Optional.empty(),
+                    "Mute of " + fPlayer.name() + " in LibertyBans"
+            );
         } catch (UnknownHostException _) {
             return Optional.empty();
         }

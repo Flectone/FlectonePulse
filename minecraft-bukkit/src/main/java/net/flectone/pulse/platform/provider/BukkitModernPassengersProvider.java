@@ -1,10 +1,10 @@
 package net.flectone.pulse.platform.provider;
 
-import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.resolver.ReflectionResolver;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -16,9 +16,8 @@ import java.util.concurrent.CompletableFuture;
 public class BukkitModernPassengersProvider implements BukkitPassengersProvider {
 
     private final ReflectionResolver reflectionResolver;
-
-    // UniversalScheduler implementation
     private final TaskScheduler taskScheduler;
+    private final com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler platformTaskScheduler;
 
     @Override
     public List<Integer> getPassengers(Player player) {
@@ -28,14 +27,14 @@ public class BukkitModernPassengersProvider implements BukkitPassengersProvider 
         if (reflectionResolver.isFolia()) {
             CompletableFuture<List<Integer>> completableFuture = new CompletableFuture<>();
 
-            taskScheduler.runTask(player, () ->
+            platformTaskScheduler.runTask(player, () ->
                     completableFuture.complete(passengers.stream()
                             .map(Entity::getEntityId)
                             .toList()
                     )
             );
 
-            return completableFuture.join();
+            return taskScheduler.await(completableFuture, List.of(), "Passengers of " + player.getName());
         }
 
         return passengers.stream()

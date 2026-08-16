@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.PlayTime;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.serializer.HytaleComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -50,6 +51,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
 
     private final FileFacade fileFacade;
     private final HytaleComponentSerializer componentSerializer;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public int getEntityId(@NonNull UUID uuid) {
@@ -247,7 +249,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
             ));
         });
 
-        return completableFuture.join();
+        return taskScheduler.await(completableFuture, null, "Player statistics " + playerRef.getUsername());
     }
 
     @Override
@@ -311,7 +313,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         Store<EntityStore> store = ref.getStore();
         World world = store.getExternalData().getWorld();
 
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
 
         world.execute(() -> {
             EntityStatMap statMap = store.getComponent(ref, EntityStatMap.getComponentType());
@@ -324,10 +326,10 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
                 }
             }
 
-            future.complete(isDead);
+            completableFuture.complete(isDead);
         });
 
-        return future.join();
+        return taskScheduler.await(completableFuture, false, "Dead status " + playerRef.getUsername());
     }
 
     @Override
@@ -376,7 +378,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
             completableFuture.complete(hotbarComponent.getActiveItem());
         });
 
-        return completableFuture.join();
+        return taskScheduler.await(completableFuture, null, "Player item " + playerRef.getUsername());
     }
 
     @Override

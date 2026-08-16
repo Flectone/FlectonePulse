@@ -291,7 +291,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
 
         });
 
-        return completableFuture.join();
+        return taskScheduler.await(completableFuture, null, "Placeholders of " + fPlayer.name());
     }
 
     private String setPlaceholders(Universe universe, FPlayer fPlayer, FPlayer fReceiver, PlayerRef offlinePlayer, String message) {

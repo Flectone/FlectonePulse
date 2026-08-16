@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.LazyInstance;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     @Override
     public void start() {
+        disabled = false;
         executorService = createExecutorService();
     }
 
@@ -173,6 +175,25 @@ public class TaskSchedulerImpl implements TaskScheduler {
     @Override
     public CompletableFuture<Void> runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long delay, long period) {
         return runAsyncTimer(() -> fPlayerService.get().getPlatformFPlayers().forEach(fPlayerConsumer), delay, period);
+    }
+
+    @Override
+    public <T> T await(CompletableFuture<T> future, T fallback, Duration timeout, String description) {
+        try {
+            return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+        } catch (TimeoutException _) {
+            future.cancel(false);
+
+            fLogger.warning("%s did not answer within %s ms, continuing without it", description, timeout.toMillis());
+        } catch (ExecutionException e) {
+            fLogger.warning("%s failed", e.getCause(), description);
+        } catch (CancellationException _) {
+            // someone else gave up on the same task first
+        } catch (InterruptedException _) {
+            Thread.currentThread().interrupt();
+        }
+
+        return fallback;
     }
 
     @Override

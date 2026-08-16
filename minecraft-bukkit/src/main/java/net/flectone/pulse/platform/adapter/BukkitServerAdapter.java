@@ -53,6 +53,8 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitServerAdapter implements PlatformServerAdapter {
 
+    private static final String UNKNOWN_TPS = "";
+
     private final LazyInstance<FPlayerService> fPlayerService;
     private final LazyInstance<MessagePipeline> messagePipeline;
     private final LazyInstance<SocialService> socialService;
@@ -85,7 +87,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
             taskScheduler.runRegion(regionFPlayer, () -> completableFuture.complete(getTPS()));
 
-            return completableFuture.join();
+            return taskScheduler.await(completableFuture, UNKNOWN_TPS, "TPS of the region of " + regionFPlayer.name());
         }
 
         return getTPS();
@@ -101,7 +103,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
             double tps = Math.min(Math.round(recentTps[0] * 10.0) / 10.0, 20.0);
             return String.valueOf(tps);
         } catch (Throwable _) {
-            return "";
+            return UNKNOWN_TPS;
         }
     }
 

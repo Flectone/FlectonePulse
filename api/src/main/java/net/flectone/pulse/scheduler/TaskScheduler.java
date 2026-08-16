@@ -2,6 +2,7 @@ package net.flectone.pulse.scheduler;
 
 import net.flectone.pulse.model.entity.FPlayer;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -20,11 +21,41 @@ import java.util.function.Consumer;
 public interface TaskScheduler {
 
     /**
+     * How long {@link #await(CompletableFuture, Object, String)} gives a task before it gives up.
+     */
+    Duration DEFAULT_AWAIT_TIMEOUT = Duration.ofSeconds(3);
+
+    /**
      * The pool the async tasks run on.
      *
      * @return the executor
      */
     ExecutorService getExecutorService();
+
+    /**
+     * Waits for a task running elsewhere and hands back a fallback if it does not answer in time.
+     *
+     * @param future what to wait for
+     * @param fallback what to return when it does not answer, fails or is interrupted
+     * @param timeout how long to wait
+     * @param description what is being waited for, for the warning in the console
+     * @param <T> the result type
+     * @return the result, or the fallback
+     */
+    <T> T await(CompletableFuture<T> future, T fallback, Duration timeout, String description);
+
+    /**
+     * Waits for a task running elsewhere for {@link #DEFAULT_AWAIT_TIMEOUT}.
+     *
+     * @param future what to wait for
+     * @param fallback what to return when it does not answer, fails or is interrupted
+     * @param description what is being waited for, for the warning in the console
+     * @param <T> the result type
+     * @return the result, or the fallback
+     */
+    default <T> T await(CompletableFuture<T> future, T fallback, String description) {
+        return await(future, fallback, DEFAULT_AWAIT_TIMEOUT, description);
+    }
 
     /**
      * Runs the pending tasks and clears the queue.
