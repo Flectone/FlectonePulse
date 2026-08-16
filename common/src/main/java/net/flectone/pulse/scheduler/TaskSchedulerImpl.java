@@ -103,7 +103,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
         // we don't need to create a task to do this in async
         CompletableFuture<Void> completableFuture = new CompletableFuture<>();
 
-        execute(wrapExceptionRunnable(runnable, completableFuture));
+        executorService.execute(wrapExceptionRunnable(runnable, completableFuture));
 
         return completableFuture;
     }
@@ -245,22 +245,13 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
         Runnable runnable = wrapExceptionRunnable(scheduledTask);
         if (scheduledTask.async()) {
-            execute(runnable);
+            executorService.execute(runnable);
         } else {
             runnable.run();
         }
 
         if (scheduledTask.isRepeating() && !scheduledTask.future().isCancelled()) {
             rescheduleTask(scheduledTask, currentProcessedTick);
-        }
-    }
-
-    private void execute(Runnable runnable) {
-        try {
-            executorService.execute(runnable);
-        } catch (RejectedExecutionException _) {
-            fLogger.warning("Executor overloaded, increase 'max_pool_size' or switch 'work_queue' to 'LINKED_BLOCKING' in config.yml. Running in current thread...");
-            runnable.run();
         }
     }
 
@@ -336,7 +327,11 @@ public class TaskSchedulerImpl implements TaskScheduler {
                 config.maxPoolSize() == -1 ? Integer.MAX_VALUE : config.maxPoolSize(),
                 config.keepAlive().duration(), config.keepAlive().timeUnit(),
                 config.workQueue() == Config.Executor.WorkQueue.SYNCHRONOUS ? new SynchronousQueue<>() : new LinkedBlockingQueue<>(),
-                factory
+                factory,
+                (runnable, _) -> {
+                    fLogger.warning("Executor overloaded, increase 'max_pool_size' or switch 'work_queue' to 'LINKED_BLOCKING' in config.yml. Running in current thread...");
+                    runnable.run();
+                }
         );
 
         threadPoolExecutor.allowCoreThreadTimeOut(config.allowCoreThreadTimeout());
