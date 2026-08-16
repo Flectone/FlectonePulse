@@ -254,11 +254,13 @@ public class TaskSchedulerImpl implements TaskScheduler {
     private void resetPool(ThreadPoolExecutor threadPoolExecutor, long timeout) {
         fLogger.warning("No task has finished in %s seconds. Cancelling existing threads and starting a new ones", timeout / 1000L);
 
-        executorService = createExecutorService();
         completedTasks = -1L;
 
         threadPoolExecutor.getQueue().clear();
-        threadPoolExecutor.shutdownNow();
+
+        Thread.getAllStackTraces().keySet().stream()
+                .filter(thread -> thread.getName().startsWith(THREAD_PREFIX))
+                .forEach(Thread::interrupt);
     }
 
     private boolean isAsyncThread() {
