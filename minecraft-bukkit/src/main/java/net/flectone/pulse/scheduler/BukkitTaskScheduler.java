@@ -53,7 +53,7 @@ public class BukkitTaskScheduler extends TaskSchedulerImpl {
         }
 
         Object entity = platformPlayerAdapter.get().convertToPlatformPlayer(convertUnknownFPlayer(fPlayer));
-        if (!(entity instanceof Entity bukkitEntity)) {
+        if (!(entity instanceof Entity bukkitEntity) || !bukkitEntity.isValid()) {
             return runAsync(runnable);
         }
 
