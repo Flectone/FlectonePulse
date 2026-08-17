@@ -139,8 +139,8 @@ public class MentionModuleImpl implements MentionModule {
                 }
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
-                if (!mentionFPlayer.isUnknown() && mentionFPlayer.isOnline() && socialService.canSeeVanished(mentionFPlayer, sender)) {
-                    if (mentionFPlayer.equals(receiver)) {
+                if (!mentionFPlayer.isUnknown()) {
+                    if (mentionFPlayer.equals(receiver) && socialService.canSeeVanished(mentionFPlayer, sender)) {
                         sendMention(mentionFPlayer);
                     }
 
