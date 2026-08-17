@@ -15,6 +15,7 @@ import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
 import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -34,6 +35,9 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -49,9 +53,18 @@ public class MentionModuleImpl implements MentionModule {
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final FLogger fLogger;
+
+    private Pattern mentionPattern;
 
     @Override
     public void onEnable() {
+        try {
+            mentionPattern = Pattern.compile(Strings.CS.replace(config().namePattern(), "<trigger>", Pattern.quote(config().trigger())));
+        } catch (PatternSyntaxException e) {
+            fLogger.warning(e);
+        }
+
         listenerRegistry.register(PulseMentionListener.class);
     }
 
@@ -66,6 +79,7 @@ public class MentionModuleImpl implements MentionModule {
 
     @Override
     public void onDisable() {
+        mentionPattern = null;
         messageCache.invalidateAll();
     }
 
@@ -162,20 +176,20 @@ public class MentionModuleImpl implements MentionModule {
 
     private String replace(String message) {
         if (!message.contains(config().trigger())) return message;
+        if (mentionPattern == null) return message;
 
-        String[] words = message.split(" ", -1);
+        Matcher matcher = mentionPattern.matcher(message);
+        if (matcher.groupCount() == 0) return message;
 
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i];
-            if (!word.startsWith(config().trigger())) continue;
-
-            String wordWithoutPrefix = Strings.CS.replaceOnce(word, config().trigger(), "");
-            if (isMention(wordWithoutPrefix)) {
-                words[i] = "<mention:" + wordWithoutPrefix + ">";
+        StringBuilder result = new StringBuilder();
+        while (matcher.find()) {
+            String name = matcher.group(1);
+            if (isMention(name)) {
+                matcher.appendReplacement(result, Matcher.quoteReplacement("<mention:" + name + ">"));
             }
         }
 
-        return String.join(" ", words);
+        return matcher.appendTail(result).toString();
     }
 
     private boolean isMention(String word) {

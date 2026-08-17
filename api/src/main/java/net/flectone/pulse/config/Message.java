@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
 import lombok.With;
-import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.*;
 import net.flectone.pulse.constant.AdventureTag;
 import net.flectone.pulse.model.event.Event;
@@ -376,6 +375,7 @@ public record Message(
         public record Mention(
                 Boolean enable,
                 String trigger,
+                String namePattern,
                 String everyoneTag,
                 Destination destination,
                 Sound sound

@@ -177,6 +177,7 @@ format:
   mention:
     enable: true
     trigger: "@"
+    name_pattern: "<trigger>([\\p{L}\\p{N}_.]*[\\p{L}\\p{N}_])"
     everyone_tag: "here"
     destination:
       type: "TOAST"
