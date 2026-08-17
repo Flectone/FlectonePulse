@@ -2,6 +2,8 @@ package net.flectone.pulse.module.command.flectonepulse;
 
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.relocation.Relocation;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -60,8 +62,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Singleton
@@ -71,6 +75,13 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     private static final String SPARK_CLASS = BuildConfig.RELOCATED_PATTERN + ".spark.Service";
     private static final String PASTES_DEV_URL = "https://pastes.dev/";
     private static final URI API_PASTES_DEV = URI.create("https://api.pastes.dev/post");
+    private static final String ZIP_EXTENSION = ".zip";
+    private static final String JSON_EXTENSION = ".json";
+
+    private final Cache<String, List<Suggestion>> suggestionCache = Caffeine.newBuilder()
+            .expireAfterWrite(5, TimeUnit.SECONDS)
+            .maximumSize(10)
+            .build();
 
     private final LazyInstance<SparkServer> sparkServer;
     private final LazyInstance<UrlService> urlService;
@@ -102,7 +113,7 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
-                .optional(file, commandParserProvider.singleMessageParser())
+                .optional(file, commandParserProvider.singleMessageParser(), fileSuggestion())
         );
 
         if (reflectionResolver.hasClass(SPARK_CLASS)) {
@@ -558,12 +569,12 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
 
     private String getFilenameExported(CommandContext<FPlayer> commandContext) {
         Optional<String> optionalFileName = commandContext.optional(commandModuleController.getPrompt(this, 1));
-        return optionalFileName.orElse("export_" + simpleDateFormat.format(new Date())) + ".zip";
+        return optionalFileName.orElse("export_" + simpleDateFormat.format(new Date())) + ZIP_EXTENSION;
     }
 
     private String getFilenameDatabase(CommandContext<FPlayer> commandContext) {
         Optional<String> optionalFileName = commandContext.optional(commandModuleController.getPrompt(this, 1));
-        return optionalFileName.orElse("database_" + simpleDateFormat.format(new Date())) + ".json";
+        return optionalFileName.orElse("database_" + simpleDateFormat.format(new Date())) + JSON_EXTENSION;
     }
 
     private void sendMessageStarting(FPlayer fPlayer, Operation operation) {
@@ -581,6 +592,10 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
 
     private Operation getOperation(CommandContext<FPlayer> commandContext) {
         String type = commandModuleController.getArgument(this, commandContext, 0);
+        return getOperation(type);
+    }
+
+    private Operation getOperation(String type) {
         return Arrays.stream(Operation.values())
                 .filter(operation -> operation.name().equalsIgnoreCase(type))
                 .findAny()
@@ -598,6 +613,36 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
         return (_, _) -> Arrays.stream(Operation.values())
                 .map(operation -> Suggestion.suggestion(operation.name().toLowerCase()))
                 .toList();
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> fileSuggestion() {
+        return (commandContext, _) -> {
+            Optional<String> optionalType = commandContext.optional(commandModuleController.getPrompt(this, 0));
+
+            List<Suggestion> suggestions = switch (optionalType.map(this::getOperation).orElse(Operation.RELOAD)) {
+                case IMPORT -> suggestionCache.get(ZIP_EXTENSION, this::findFiles);
+                case DATABASE_IMPORT -> suggestionCache.get(JSON_EXTENSION, this::findFiles);
+                default -> List.of();
+            };
+
+            return suggestions;
+        };
+    }
+
+    private List<Suggestion> findFiles(String extension) {
+        try (Stream<Path> filesStream = Files.list(projectPath)) {
+            return filesStream
+                    .filter(Files::isRegularFile)
+                    .map(path -> path.getFileName().toString())
+                    .filter(fileName -> Strings.CI.endsWith(fileName, extension))
+                    .map(fileName -> fileName.substring(0, fileName.length() - extension.length()))
+                    .map(Suggestion::suggestion)
+                    .toList();
+        } catch (IOException e) {
+            fLogger.warning(e);
+
+            return List.of();
+        }
     }
 
     private void loadSparkLibrary(LibraryResolver libraryResolver) {
