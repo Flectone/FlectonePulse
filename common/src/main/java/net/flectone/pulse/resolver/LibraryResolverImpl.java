@@ -284,9 +284,6 @@ public class LibraryResolverImpl extends LibraryManager implements LibraryResolv
         addRepository(BuildConfig.MAVEN_REPOSITORY);
         addRepository(BuildConfig.CODEMC_REPOSITORY);
         addRepository(BuildConfig.JITPACK_REPOSITORY);
-
-        addSonatype();
-        addJCenter();
     }
 
 }
