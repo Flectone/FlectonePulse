@@ -194,7 +194,7 @@ twitch:
   sound:
     enable: false
 vault:
-  enable: true
+  enable: false
 yandex:
   enable: false
   token: ""
