@@ -2,11 +2,18 @@ package net.flectone.pulse.module.integration;
 
 import net.flectone.pulse.logging.FLogger;
 
+import java.time.Duration;
+
 /**
  * One hook into another plugin. Implementations report their name and log when they are wired up or torn down.
  * @author TheFaser
  */
 public interface FIntegration {
+
+    /**
+     * How long a message waits for {@link #hook()} to finish before it is sent anyway.
+     */
+    Duration HOOK_TIMEOUT = Duration.ofMinutes(3);
 
     /**
      * The name of the plugin this hooks into, as written in the log.

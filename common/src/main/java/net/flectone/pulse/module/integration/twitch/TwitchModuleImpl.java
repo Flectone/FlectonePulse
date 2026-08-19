@@ -16,6 +16,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.TwitchPulseListener;
 import net.flectone.pulse.module.integration.twitch.sender.TwitchSender;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -29,6 +30,8 @@ import net.flectone.pulse.util.LazyInstance;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 @Singleton
@@ -45,18 +48,23 @@ public class TwitchModuleImpl implements TwitchModule {
     private final LazyInstance<TwitchIntegration> twitchIntegration;
     private final LazyInstance<TwitchSender> twitchSender;
 
+    @SuppressWarnings("java:S3077")
+    private volatile CompletableFuture<Void> hookFuture = CompletableFuture.completedFuture(null);
+
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("com.github.twitch4j.TwitchClient", this::loadLibraries);
 
-        taskScheduler.runAsync(() -> {
-            twitchIntegration.get().hook();
-            listenerRegistry.register(TwitchPulseListener.class);
-        }, true);
+        hookFuture = taskScheduler.runAsync(() -> twitchIntegration.get().hook(), true)
+                .completeOnTimeout(null, FIntegration.HOOK_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
+
+        listenerRegistry.register(TwitchPulseListener.class);
     }
 
     @Override
     public void onDisable() {
+        hookFuture = CompletableFuture.completedFuture(null);
+
         twitchIntegration.get().unhook();
     }
 
@@ -82,6 +90,18 @@ public class TwitchModuleImpl implements TwitchModule {
 
     @Override
     public void sendMessage(@NonNull ModuleName moduleName, @NonNull MessageContext messageContext, @NonNull IntegrationMessageFormat integrationMessageFormat) {
+        CompletableFuture<Void> hook = hookFuture;
+        if (hook.isDone()) {
+            sendHookedMessage(moduleName, messageContext, integrationMessageFormat);
+            return;
+        }
+
+        hook.whenComplete((_, _) -> taskScheduler.runAsync(() ->
+                sendHookedMessage(moduleName, messageContext, integrationMessageFormat)
+        ));
+    }
+
+    private void sendHookedMessage(@NonNull ModuleName moduleName, @NonNull MessageContext messageContext, @NonNull IntegrationMessageFormat integrationMessageFormat) {
         // skip empty message names
         List<String> messageNames = integrationFormatter.getExistedMessageNames(moduleName, integrationMessageFormat, config());
         if (messageNames.isEmpty()) return;

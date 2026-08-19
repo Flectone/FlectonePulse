@@ -15,6 +15,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.TelegramPulseListener;
 import net.flectone.pulse.module.integration.telegram.sender.TelegramSender;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -28,6 +29,8 @@ import net.flectone.pulse.util.LazyInstance;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 @Singleton
@@ -44,18 +47,23 @@ public class TelegramModuleImpl implements TelegramModule {
     private final LazyInstance<TelegramIntegration> telegramIntegration;
     private final LazyInstance<TelegramSender> telegramSender;
 
+    @SuppressWarnings("java:S3077")
+    private volatile CompletableFuture<Void> hookFuture = CompletableFuture.completedFuture(null);
+
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient", this::loadLibraries);
 
-        taskScheduler.runAsync(() -> {
-            telegramIntegration.get().hook();
-            listenerRegistry.register(TelegramPulseListener.class);
-        }, true);
+        hookFuture = taskScheduler.runAsync(() -> telegramIntegration.get().hook(), true)
+                .completeOnTimeout(null, FIntegration.HOOK_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
+
+        listenerRegistry.register(TelegramPulseListener.class);
     }
 
     @Override
     public void onDisable() {
+        hookFuture = CompletableFuture.completedFuture(null);
+
         telegramIntegration.get().unhook();
     }
 
@@ -110,6 +118,18 @@ public class TelegramModuleImpl implements TelegramModule {
 
     @Override
     public void sendMessage(@NonNull ModuleName moduleName, @NonNull MessageContext messageContext, @NonNull IntegrationMessageFormat integrationMessageFormat) {
+        CompletableFuture<Void> hook = hookFuture;
+        if (hook.isDone()) {
+            sendHookedMessage(moduleName, messageContext, integrationMessageFormat);
+            return;
+        }
+
+        hook.whenComplete((_, _) -> taskScheduler.runAsync(() ->
+                sendHookedMessage(moduleName, messageContext, integrationMessageFormat)
+        ));
+    }
+
+    private void sendHookedMessage(@NonNull ModuleName moduleName, @NonNull MessageContext messageContext, @NonNull IntegrationMessageFormat integrationMessageFormat) {
         // skip empty message names
         List<String> messageNames = integrationFormatter.getExistedMessageNames(moduleName, integrationMessageFormat, config());
         if (messageNames.isEmpty()) return;

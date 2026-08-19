@@ -16,6 +16,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.DiscordPulseListener;
 import net.flectone.pulse.module.integration.discord.sender.DiscordSender;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -29,6 +30,8 @@ import net.flectone.pulse.util.LazyInstance;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 @Singleton
@@ -45,18 +48,23 @@ public class DiscordModuleImpl implements DiscordModule {
     private final LazyInstance<DiscordIntegration> discordIntegration;
     private final LazyInstance<DiscordSender> discordSender;
 
+    @SuppressWarnings("java:S3077")
+    private volatile CompletableFuture<Void> hookFuture = CompletableFuture.completedFuture(null);
+
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("discord4j.core.DiscordClient", this::loadLibraries);
 
-        taskScheduler.runAsync(() -> {
-            discordIntegration.get().hook();
-            listenerRegistry.register(DiscordPulseListener.class);
-        }, true);
+        hookFuture = taskScheduler.runAsync(() -> discordIntegration.get().hook(), true)
+                .completeOnTimeout(null, FIntegration.HOOK_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
+
+        listenerRegistry.register(DiscordPulseListener.class);
     }
 
     @Override
     public void onDisable() {
+        hookFuture = CompletableFuture.completedFuture(null);
+
         discordIntegration.get().unhook();
     }
 
@@ -108,6 +116,18 @@ public class DiscordModuleImpl implements DiscordModule {
 
     @Override
     public void sendMessage(@NonNull ModuleName moduleName, @NonNull MessageContext messageContext, @NonNull IntegrationMessageFormat integrationMessageFormat) {
+        CompletableFuture<Void> hook = hookFuture;
+        if (hook.isDone()) {
+            sendHookedMessage(moduleName, messageContext, integrationMessageFormat);
+            return;
+        }
+
+        hook.whenComplete((_, _) -> taskScheduler.runAsync(() ->
+                sendHookedMessage(moduleName, messageContext, integrationMessageFormat)
+        ));
+    }
+
+    private void sendHookedMessage(@NonNull ModuleName moduleName, @NonNull MessageContext messageContext, @NonNull IntegrationMessageFormat integrationMessageFormat) {
         // skip empty message names
         List<String> messageNames = integrationFormatter.getExistedMessageNames(moduleName, integrationMessageFormat, config());
         if (messageNames.isEmpty()) return;
