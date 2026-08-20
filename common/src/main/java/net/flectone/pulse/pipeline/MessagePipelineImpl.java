@@ -13,24 +13,21 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.serializer.ComponentSerializer;
+import net.flectone.pulse.util.tag.CachingTagResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.intellij.lang.annotations.Subst;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiFunction;
-
-import static net.flectone.pulse.pipeline.MessagePipelineImpl.ReplacementTag.emptyResolver;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -131,12 +128,7 @@ public class MessagePipelineImpl implements MessagePipeline {
     @NonNull
     private Component deserialize(MessageContext messageContext) {
         if (messageContext.isFlag(MessageFlag.REMOVE_DISABLED_TAGS) && !messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
-            TagResolver tagResolver = messageContext.tagResolver();
-            messageContext = messageContext.addTagResolvers(Arrays.stream(ReplacementTag.values())
-                    .filter(tag -> !tagResolver.has(tag.getTagName()))
-                    .map(ReplacementTag::emptyResolver)
-                    .toArray(TagResolver[]::new)
-            );
+            messageContext = messageContext.addTagResolver(ReplacementTag.emptyResolver(messageContext.tagResolver()));
         }
 
         try {
@@ -175,7 +167,7 @@ public class MessagePipelineImpl implements MessagePipeline {
 
     @Override
     public TagResolver targetTag(@TagPattern String tag, String formatTarget, FPlayer receiver, @Nullable FEntity target) {
-        if (target == null) return emptyResolver(tag);
+        if (target == null) return ReplacementTag.emptyResolver(tag);
 
         return resolver(tag, (argumentQueue, _) -> {
             int targetIndex = 0;
@@ -228,115 +220,9 @@ public class MessagePipelineImpl implements MessagePipeline {
         return resolver(names, (_, _) -> Tag.selfClosingInserting(component));
     }
 
-    // wait for https://github.com/PaperMC/adventure/issues/1424
     @Override
     public @NonNull TagResolver resolver(@NonNull Set<String> names, @NonNull BiFunction<ArgumentQueue, Context, Tag> handler) {
-        return new TagResolver() {
-
-            private String cachedKey;
-            private Tag cachedTag;
-            private Map<String, Tag> cachedTags; // lazy map
-
-            @Override
-            public @Nullable Tag resolve(@NonNull String name, @NonNull ArgumentQueue arguments, @NonNull Context context) throws ParsingException {
-                if (!names.contains(name)) return null;
-
-                // build cache key from tag name + all arguments
-                String key = name + ":" + arguments;
-
-                // multiple unique keys seen, use map
-                if (cachedTags != null) {
-                    return cachedTags.computeIfAbsent(key, _ -> handler.apply(arguments, context));
-                }
-
-                // first call, store in fields to avoid map allocation
-                if (cachedKey == null) {
-                    cachedKey = key;
-                    cachedTag = handler.apply(arguments, context);
-                    return cachedTag;
-                }
-
-                // same key as before, return cached result
-                if (cachedKey.equals(key)) return cachedTag;
-
-                // second unique key seen, upgrade to map
-                cachedTags = new HashMap<>();
-                cachedTags.put(cachedKey, cachedTag);
-
-                try {
-                    // create tag
-                    Tag tag = handler.apply(arguments, context);
-
-                    // save to cache
-                    cachedTags.put(key, tag);
-
-                    // return tag
-                    return tag;
-                } catch (ParsingException e) {
-                    fLogger.warning(e);
-                }
-
-                return null;
-            }
-
-            @Override
-            public boolean has(final @NonNull String name) {
-                return names.contains(name);
-            }
-
-        };
+        return new CachingTagResolver(names, handler, fLogger);
     }
 
-    public enum ReplacementTag {
-        AFK,
-        ANIMATION,
-        CONDITION,
-        MUTE,
-        STREAM,
-        SERVER,
-        SUFFIX,
-        PREFIX,
-        DELETE,
-        DISPLAY_NAME,
-        PLAYER,
-        NICKNAME,
-        CONSTANT,
-        REPLACEMENT,
-        MENTION,
-        TOPONLINE,
-        ONLINE,
-        PADDING,
-        SWEAR,
-        QUESTION,
-        TRANSLATION,
-        WORLD,
-        PLAYER_HEAD,
-        PLAYER_HEAD_OR,
-        SPRITE,
-        SPRITE_OR,
-        TEXTURE,
-        TEXTURE_OR,
-        FADING,
-        FCOLOR;
-
-        public static TagResolver emptyResolver(@TagPattern String tag) {
-            return TagResolver.resolver(tag, (_, _) ->
-                    Tag.selfClosingInserting(Component.empty())
-            );
-        }
-
-        public static Tag emptyTag() {
-            return Tag.selfClosingInserting(Component.empty());
-        }
-
-        @Subst("")
-        public String getTagName() {
-            return name().toLowerCase();
-        }
-
-        public TagResolver emptyResolver() {
-            return emptyResolver(getTagName());
-        }
-
-    }
 }

@@ -13,9 +13,12 @@ import org.intellij.lang.annotations.Subst;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * Turns a raw message into what the client finally sees. It resolves the MiniMessage tags,
@@ -221,6 +224,15 @@ public interface MessagePipeline {
         FADING,
         FCOLOR;
 
+        private static final Tag EMPTY_TAG = Tag.selfClosingInserting(Component.empty());
+
+        private static final Set<String> TAG_NAMES = Arrays.stream(values())
+                .map(ReplacementTag::getTagName)
+                .collect(Collectors.toUnmodifiableSet());
+
+        @Subst("")
+        private final String tagName = name().toLowerCase(Locale.ROOT);
+
         /**
          * A resolver that erases a tag, used when the module behind it is switched off.
          *
@@ -228,9 +240,31 @@ public interface MessagePipeline {
          * @return the resolver
          */
         public static TagResolver emptyResolver(@TagPattern String tag) {
-            return TagResolver.resolver(tag, (_, _) ->
-                    Tag.selfClosingInserting(Component.empty())
-            );
+            return TagResolver.resolver(tag, (_, _) -> EMPTY_TAG);
+        }
+
+        /**
+         * A resolver that erases every replacement tag the given resolver does not serve itself
+         *
+         * @param tagResolver the resolvers already in scope
+         * @return the resolver
+         */
+        public static @NonNull TagResolver emptyResolver(@NonNull TagResolver tagResolver) {
+            return new TagResolver() {
+
+                @Override
+                public @Nullable Tag resolve(@NonNull String name, @NonNull ArgumentQueue arguments, @NonNull Context ctx) {
+                    if (!TAG_NAMES.contains(name) || tagResolver.has(name)) return null;
+
+                    return EMPTY_TAG;
+                }
+
+                @Override
+                public boolean has(@NonNull String name) {
+                    return TAG_NAMES.contains(name);
+                }
+
+            };
         }
 
         /**
@@ -239,7 +273,7 @@ public interface MessagePipeline {
          * @return the empty tag
          */
         public static Tag emptyTag() {
-            return Tag.selfClosingInserting(Component.empty());
+            return EMPTY_TAG;
         }
 
         /**
@@ -249,16 +283,7 @@ public interface MessagePipeline {
          */
         @Subst("")
         public String getTagName() {
-            return name().toLowerCase();
-        }
-
-        /**
-         * A resolver that erases this tag.
-         *
-         * @return the resolver
-         */
-        public TagResolver emptyResolver() {
-            return emptyResolver(getTagName());
+            return tagName;
         }
 
     }

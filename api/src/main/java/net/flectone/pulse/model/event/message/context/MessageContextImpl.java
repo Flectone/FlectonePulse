@@ -5,6 +5,7 @@ import lombok.With;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.util.tag.LazyTagResolver;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jspecify.annotations.NonNull;
 
@@ -103,11 +104,7 @@ record MessageContextImpl(
         public MessageContextImplBuilder tagResolver(@org.jspecify.annotations.Nullable TagResolver tagResolver) {
             if (tagResolver == null) return this;
 
-            if (this.tagResolver == null) {
-                this.tagResolver = tagResolver;
-            } else {
-                this.tagResolver = TagResolver.resolver(this.tagResolver, tagResolver);
-            }
+            this.tagResolver = LazyTagResolver.append(this.tagResolver, tagResolver);
 
             return this;
         }
@@ -121,11 +118,7 @@ record MessageContextImpl(
         public MessageContextImplBuilder tagResolvers(@NonNull TagResolver... resolvers) {
             if (resolvers.length == 0) return this;
 
-            if (this.tagResolver == null) {
-                this.tagResolver = TagResolver.resolver(resolvers);
-            } else {
-                this.tagResolver = TagResolver.resolver(this.tagResolver, TagResolver.resolver(resolvers));
-            }
+            this.tagResolver = LazyTagResolver.appendAll(this.tagResolver, resolvers);
 
             return this;
         }
@@ -139,8 +132,8 @@ record MessageContextImpl(
         if (receiver == null) receiver = sender instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
         if (uuid == null) uuid = UUID.randomUUID();
 
-        flags = Map.copyOf(new EnumMap<>(flags != null && !flags.isEmpty() ? flags : new EnumMap<>(MessageFlag.class)));
-        tagResolver = tagResolver == null ? TagResolver.builder().build() : tagResolver;
+        flags = flags == null || flags.isEmpty() ? Map.of() : Map.copyOf(flags);
+        tagResolver = tagResolver == null ? TagResolver.empty() : tagResolver;
     }
 
     @Override
