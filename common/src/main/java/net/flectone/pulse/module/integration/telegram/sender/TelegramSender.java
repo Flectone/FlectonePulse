@@ -53,6 +53,8 @@ public class TelegramSender {
         SendMessage.SendMessageBuilder<?, ?> sendMessage = SendMessage
                 .builder()
                 .chatId(chatId)
+                .disableNotification(telegramModule.config().disableNotification())
+                .protectContent(telegramModule.config().protectContent())
                 .text(Strings.CS.replace(text, "<id>", chatId));
 
         if (message.isTopicMessage()) {
@@ -87,6 +89,8 @@ public class TelegramSender {
 
             SendMessage.SendMessageBuilder<?, ?> sendMessageBuilder = SendMessage.builder()
                     .chatId(chat)
+                    .disableNotification(telegramModule.config().disableNotification())
+                    .protectContent(telegramModule.config().protectContent())
                     .text(message);
 
             if (chat.contains("_")) {

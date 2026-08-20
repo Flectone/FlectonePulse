@@ -365,6 +365,8 @@ public record Integration(
     public record Telegram(
             Boolean enable,
             Boolean ignoreAllBots,
+            Boolean disableNotification,
+            Boolean protectContent,
             Mode parseMode,
             String token,
             Proxy proxy,
