@@ -902,7 +902,17 @@ public record Localization(
                     String content,
                     String webhookName,
                     String webhookAvatar,
+                    AllowedMentions allowedMentions,
                     Embed embed
+            ) {
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            public record AllowedMentions(
+                    List<String> types,
+                    List<String> users,
+                    List<String> roles
             ) {
             }
 

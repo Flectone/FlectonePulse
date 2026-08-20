@@ -7,7 +7,6 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Webhook;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
-import discord4j.discordjson.json.AllowedMentionsData;
 import discord4j.discordjson.json.ImmutableWebhookExecuteRequest;
 import discord4j.discordjson.json.WebhookData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
@@ -27,6 +26,7 @@ import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.discord.model.DiscordClient;
 import net.flectone.pulse.module.integration.discord.model.DiscordMessageContext;
+import net.flectone.pulse.module.integration.discord.parser.DiscordAllowedMentionsParser;
 import net.flectone.pulse.module.integration.discord.parser.DiscordSnowflakeParser;
 import net.flectone.pulse.module.integration.discord.provider.DiscordClientProvider;
 import net.flectone.pulse.module.integration.discord.service.DiscordWebhookService;
@@ -53,6 +53,7 @@ public class DiscordSender {
     private final DiscordModule discordModule;
     private final DiscordClientProvider discordClientProvider;
     private final DiscordSnowflakeParser discordSnowflakeParser;
+    private final DiscordAllowedMentionsParser discordAllowedMentionsParser;
     private final DiscordWebhookService discordWebhookService;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
@@ -72,7 +73,7 @@ public class DiscordSender {
             if (channel.isEmpty()) return;
 
             Localization.Integration.Discord localization = discordModule.localization(discordClient.sender());
-            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed("<final_message>", null, null, null));
+            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed("<final_message>", null, null, null, null));
             sendMessage(sender, channel.get(), channelEmbed, discordString);
         });
     }
@@ -83,7 +84,7 @@ public class DiscordSender {
         if (discordClient == null) return;
 
         MessageCreateSpec.Builder messageCreateSpecBuilder = MessageCreateSpec.builder()
-                .allowedMentions(AllowedMentions.suppressAll())
+                .allowedMentions(AllowedMentions.builder().parseType(AllowedMentions.Type.USER).build())
                 .content(text);
 
         discordClient.client().getChannelById(channel)
@@ -131,7 +132,7 @@ public class DiscordSender {
             }
 
             ImmutableWebhookExecuteRequest.Builder webhookBuilder = WebhookExecuteRequest.builder()
-                    .allowedMentions(AllowedMentionsData.builder().build())
+                    .allowedMentions(discordAllowedMentionsParser.parse(channelEmbed.allowedMentions()).toData())
                     .username(StringUtils.isEmpty(channelEmbed.webhookName()) || "<player>".equals(channelEmbed.webhookName())
                             ? sender.name()
                             : messagePipeline.buildPlain(MessageContext.builder()
@@ -159,7 +160,7 @@ public class DiscordSender {
         }
 
         MessageCreateSpec.Builder messageCreateSpecBuilder = MessageCreateSpec.builder()
-                .allowedMentions(AllowedMentions.suppressAll());
+                .allowedMentions(discordAllowedMentionsParser.parse(channelEmbed.allowedMentions()));
 
         if (embed != null) {
             messageCreateSpecBuilder.addEmbed(embed);
