@@ -38,29 +38,34 @@ public class BukkitCMIIntegration implements FIntegration {
     }
 
     public boolean isMuted(FEntity fEntity) {
-        if (cmi == null) return false;
-
-        CMIUser user = cmi.getPlayerManager().getUser(fEntity.name());
+        CMIUser user = getUser(fEntity);
         if (user == null) return false;
 
         return user.isMuted();
     }
 
     public ExternalModeration getMute(FEntity fEntity) {
-        if (cmi == null) return null;
-
-        CMIUser user = cmi.getPlayerManager().getUser(fEntity.uuid());
+        CMIUser user = getUser(fEntity);
         if (user == null) return null;
+
+        long mutedUntil = user.getMutedUntil();
+        boolean permanent = mutedUntil <= 0 || mutedUntil == Long.MAX_VALUE;
 
         return new ExternalModeration(
                 fEntity.name(),
                 fPlayerService.get().getConsole().name(),
                 user.getMutedReason(),
                 0,
-                Math.max(user.getMutedUntil() - System.currentTimeMillis(), System.currentTimeMillis()),
-                user.getMutedUntil(),
-                false
+                System.currentTimeMillis(),
+                mutedUntil,
+                permanent
         );
+    }
+
+    private CMIUser getUser(FEntity fEntity) {
+        if (cmi == null) return null;
+
+        return cmi.getPlayerManager().getUser(fEntity.uuid());
     }
 
     public boolean isHooked() {
