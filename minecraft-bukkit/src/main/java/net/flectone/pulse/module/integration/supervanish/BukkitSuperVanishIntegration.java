@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
+import de.myzelyam.api.vanish.PlayerVanishStateChangeEvent;
 import de.myzelyam.api.vanish.VanishAPI;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,17 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
     @Override
     public String getIntegrationName() {
         return "SuperVanish";
+    }
+
+    // SuperVanish triggers vanish for player after join event, so this needs to be checked separately
+    @EventHandler
+    public void onStateChange(PlayerVanishStateChangeEvent event) {
+        if (!event.isVanishing()) return;
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUUID());
+        if (socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) == null) {
+            socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, "1");
+        }
     }
 
     @EventHandler
