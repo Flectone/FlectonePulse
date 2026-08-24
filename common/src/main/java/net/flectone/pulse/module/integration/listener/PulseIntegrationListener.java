@@ -13,12 +13,15 @@ import net.flectone.pulse.model.event.lifecycle.DisableEvent;
 import net.flectone.pulse.model.event.lifecycle.EnableEvent;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.player.PlayerQuitEvent;
+import net.flectone.pulse.service.ExternalMuteService;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PulseIntegrationListener implements PulseListener {
 
     private final EventDispatcher eventDispatcher;
+    private final ExternalMuteService externalMuteService;
 
     @Pulse
     public void onEnableEvent(EnableEvent event) {
@@ -46,6 +49,11 @@ public class PulseIntegrationListener implements PulseListener {
                 .integration()
                 .build())
         );
+    }
+
+    @Pulse
+    public void onPlayerQuitEvent(PlayerQuitEvent event) {
+        externalMuteService.invalidate(event.player().uuid());
     }
 
 }

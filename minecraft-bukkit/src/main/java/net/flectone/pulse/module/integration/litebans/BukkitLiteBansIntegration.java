@@ -4,20 +4,27 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import litebans.api.Database;
 import litebans.api.Entry;
+import litebans.api.Events;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.service.ExternalMuteService;
+
+import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitLiteBansIntegration implements FIntegration {
 
+    private final ExternalMuteService externalMuteService;
     @Getter private final FLogger fLogger;
 
     @Getter private boolean hooked;
+
+    private Events.Listener listener;
 
     @Override
     public String getIntegrationName() {
@@ -27,11 +34,41 @@ public class BukkitLiteBansIntegration implements FIntegration {
     @Override
     public void hook() {
         hooked = true;
+
+        listener = new Events.Listener() {
+            @Override
+            public void entryAdded(Entry entry) {
+                invalidateIfMute(entry);
+            }
+
+            @Override
+            public void entryRemoved(Entry entry) {
+                invalidateIfMute(entry);
+            }
+        };
+
+        try {
+            Events.get().register(listener);
+        } catch (Exception e) {
+            listener = null;
+            fLogger.warning("Failed to listen for LiteBans punishment events", e);
+        }
+
         logHook();
     }
 
     @Override
     public void unhook() {
+        if (listener != null) {
+            try {
+                Events.get().unregister(listener);
+            } catch (Exception _) {
+                // ignore
+            }
+
+            listener = null;
+        }
+
         hooked = false;
         logUnhook();
     }
@@ -54,4 +91,16 @@ public class BukkitLiteBansIntegration implements FIntegration {
                 mute.isPermanent()
         );
     }
+
+    private void invalidateIfMute(Entry entry) {
+        if (!"mute".equalsIgnoreCase(entry.getType())) return;
+        if (entry.getUuid() == null) return;
+
+        try {
+            externalMuteService.invalidate(UUID.fromString(entry.getUuid()));
+        } catch (IllegalArgumentException _) {
+            // ignore
+        }
+    }
+
 }

@@ -27,6 +27,7 @@ import net.flectone.pulse.listener.proxy.ProxyMessageProcessorImpl;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.logging.filter.LogFilter;
 import net.flectone.pulse.logging.filter.LogFilterImpl;
+import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -471,6 +472,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(WhitelistModerationParser.class).to(WhitelistModerationParserImpl.class);
 
         // service
+        bind(ExternalMuteService.class).to(ExternalMuteServiceImpl.class);
         bind(FPlayerService.class).to(FPlayerServiceImpl.class);
         bind(MetricsService.class).to(MetricsServiceImpl.class);
         bind(ModerationService.class).to(ModerationServiceImpl.class);
@@ -623,6 +625,13 @@ public abstract class PlatformInjector extends AbstractModule {
     @Named("playerSetting")
     public Cache<UUID, SocialRepository.Settings> providePlayerSettingCache(CacheRegistryImpl cacheRegistry) {
         return cacheRegistry.getCache(CacheName.PLAYER_SETTING);
+    }
+
+    @Provides
+    @Singleton
+    @Named("externalModeration")
+    public Cache<UUID, Optional<ExternalModeration>> provideExternalModerationCache(CacheRegistryImpl cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.EXTERNAL_MODERATION);
     }
 
     @Provides

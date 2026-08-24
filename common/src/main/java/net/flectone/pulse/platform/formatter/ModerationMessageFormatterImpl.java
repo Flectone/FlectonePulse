@@ -13,12 +13,12 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.model.value.Moderation;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.service.ExternalMuteService;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
@@ -36,7 +36,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
     private final FileFacade fileFacade;
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
-    private final LazyInstance<IntegrationModule> integrationModule;
+    private final ExternalMuteService externalMuteService;
     private final LazyInstance<CapsModule> capsModule;
     private final LazyInstance<FloodModule> floodModule;
     private final LazyInstance<NewbieModule> newbieModule;
@@ -68,8 +68,10 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
                 yield Optional.of(muteContext);
             }
             case EXTERNAL -> {
-                ExternalModeration mute = integrationModule.get().getMute(fPlayer);
-                if (mute == null) yield Optional.empty();
+                Optional<ExternalModeration> optionalMute = externalMuteService.get(fPlayer);
+                if (optionalMute.isEmpty()) yield Optional.empty();
+
+                ExternalModeration mute = optionalMute.get();
 
                 String format = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute().person();
 

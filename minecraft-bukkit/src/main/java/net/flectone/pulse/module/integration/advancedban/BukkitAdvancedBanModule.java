@@ -28,6 +28,7 @@ public class BukkitAdvancedBanModule implements ModuleSimple {
         advancedBanIntegration.hook();
 
         listenerRegistry.register(BukkitPulseAdvancedBanListener.class);
+        listenerRegistry.register(BukkitAdvancedBanIntegration.class);
     }
 
     @Override
