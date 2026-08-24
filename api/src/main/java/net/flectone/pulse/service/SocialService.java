@@ -40,64 +40,64 @@ public interface SocialService {
     void invalidate(UUID uuid);
 
     /**
-     * Gets a player's setting value as a string by module name.
+     * Gets a player's setting value
      *
      * @param fPlayer the player to get the setting for
-     * @param moduleName the module name to retrieve the setting for
-     * @return the setting value as a string
-     */
-    @NonNull String getSetting(@NonNull FPlayer fPlayer, @NonNull ModuleName moduleName);
-
-    /**
-     * Gets a player's text setting value by SettingText enum.
-     *
-     * @param fPlayer the player to get the setting for
-     * @param settingText the SettingText enum representing the setting type
+     * @param setting the setting
      * @return the text setting value, or null if not set
      */
-    @Nullable String getSetting(@NonNull FPlayer fPlayer, @Nullable SettingText settingText);
+    @Nullable String getSetting(@NonNull FPlayer fPlayer, @Nullable SettingText setting);
 
     /**
-     * Gets a player's boolean setting value as a string ("1" or "0").
+     * Gets a player's setting value
      *
      * @param fPlayer the player to get the setting for
-     * @param moduleName the setting name to retrieve
-     * @return "1" if the setting is true or not set, "0" if false
+     * @param setting the setting
+     * @return the text setting value, or null if not set
      */
-    @NonNull String getSetting(@NonNull FPlayer fPlayer, @Nullable String moduleName);
+    @Nullable String getSetting(@NonNull FPlayer fPlayer, @Nullable String setting);
 
     /**
-     * Checks if a player has a boolean setting enabled by module name.
+     *  Checks if a player has a boolean setting enabled by name
      *
-     * @param fPlayer the player to check the setting for
-     * @param messageType the module name to check
+     * @param fPlayer the player to check
+     * @param setting the setting
      * @return true if the setting is enabled or not set, false if disabled
      */
-    boolean isSetting(@NonNull FPlayer fPlayer, @NonNull ModuleName messageType);
+    boolean isSetting(@NonNull FPlayer fPlayer, @Nullable ModuleName setting);
 
     /**
-     * Checks if a player has a boolean setting enabled by name.
+     *  Checks if a player has a boolean setting enabled by name
      *
-     * @param fPlayer the player to check the setting for
-     * @param moduleName the setting name to check
+     * @param fPlayer the player to check
+     * @param setting the setting
      * @return true if the setting is enabled or not set, false if disabled
      */
-    boolean isSetting(@NonNull FPlayer fPlayer, @Nullable String moduleName);
+    boolean isSetting(@NonNull FPlayer fPlayer, @Nullable String setting);
 
     /**
-     * Saves a text setting for a player and notifies proxy if enabled.
+     * Saves a player's text setting
      *
      * @param fPlayer the player to save the setting for
-     * @param setting the SettingText enum representing the setting type
+     * @param setting the setting
      * @param value the text value to set, can be null
      */
     void saveSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting, @Nullable String value);
 
     /**
-     * Saves a boolean setting for a player and notifies proxy if enabled.
+     * Saves a player's text setting
      *
      * @param fPlayer the player to save the setting for
-     * @param setting the setting name to save
+     * @param setting the stored key
+     * @param value the value, or null to remove it
+     */
+    void saveSetting(@NonNull FPlayer fPlayer, @NonNull String setting, @Nullable String value);
+
+    /**
+     * Saves a boolean setting for a player
+     *
+     * @param fPlayer the player to save the setting for
+     * @param setting the stored key
      * @param value the boolean value to set
      */
     void saveSetting(@NonNull FPlayer fPlayer, @NonNull String setting, boolean value);

@@ -45,33 +45,41 @@ public class SocialServiceImpl implements SocialService {
     }
 
     @Override
-    public @NonNull String getSetting(@NonNull FPlayer fPlayer, @NonNull ModuleName moduleName) {
-        return getSetting(fPlayer, moduleName.name());
+    public @Nullable String getSetting(@NonNull FPlayer fPlayer, @Nullable SettingText setting) {
+        if (setting == null) return null;
+
+        return getSetting(fPlayer, setting.name());
     }
 
     @Override
-    public @Nullable String getSetting(@NonNull FPlayer fPlayer, @Nullable SettingText settingText) {
-        return loadSettings(fPlayer).texts().get(settingText);
+    public @Nullable String getSetting(@NonNull FPlayer fPlayer, @Nullable String setting) {
+        if (setting == null) return null;
+
+        return loadSettings(fPlayer).values().get(setting);
     }
 
     @Override
-    public @NonNull String getSetting(@NonNull FPlayer fPlayer, @Nullable String moduleName) {
-        return isSetting(fPlayer, moduleName) ? "1" : "0";
+    public boolean isSetting(@NonNull FPlayer fPlayer, @Nullable ModuleName setting) {
+        if (setting == null) return true;
+
+        return isSetting(fPlayer, setting.name());
     }
 
     @Override
-    public boolean isSetting(@NonNull FPlayer fPlayer, @NonNull ModuleName messageType) {
-        return isSetting(fPlayer, messageType.name());
-    }
+    public boolean isSetting(@NonNull FPlayer fPlayer, @Nullable String setting) {
+        if (setting == null) return true;
 
-    @Override
-    public boolean isSetting(@NonNull FPlayer fPlayer, @Nullable String moduleName) {
-        Boolean value = loadSettings(fPlayer).booleans().get(moduleName);
-        return value == null || value;
+        String value = loadSettings(fPlayer).values().get(setting);
+        return value == null || "1".equals(value);
     }
 
     @Override
     public void saveSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting, @Nullable String value) {
+        saveSetting(fPlayer, setting.name(), value);
+    }
+
+    @Override
+    public void saveSetting(@NonNull FPlayer fPlayer, @NonNull String setting, @Nullable String value) {
         socialRepository.saveOrUpdateSetting(fPlayer, setting, value);
 
         if (proxyRegistry.hasEnabledProxy()) {

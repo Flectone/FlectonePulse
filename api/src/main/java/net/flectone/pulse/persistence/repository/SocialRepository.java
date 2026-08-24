@@ -1,9 +1,8 @@
 package net.flectone.pulse.persistence.repository;
 
 import lombok.With;
-import net.flectone.pulse.constant.SettingText;
-import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import org.jspecify.annotations.NonNull;
@@ -149,24 +148,22 @@ public interface SocialRepository {
      * @param setting the SettingText enum representing the text setting type
      * @param value the text value to set, can be null to remove the setting
      */
-    void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting, @Nullable String value);
+    void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull String setting, @Nullable String value);
 
     /**
-     * A player's stored chat settings, split by value type.
+     * A player's stored settings
      *
-     * @param booleans the on/off options
-     * @param texts the text options such as the chosen locale
+     * @param values every stored setting, keyed by its stored key
      */
     @With
     record Settings(
-            Map<String, Boolean> booleans,
-            Map<SettingText, String> texts
+            Map<String, String> values
     ){
 
         /**
          * Settings for a player who has changed nothing.
          */
-        public static final Settings EMPTY = new Settings(Map.of(), Map.of());
+        public static final Settings EMPTY = new Settings(Map.of());
 
     }
 

@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -127,40 +126,25 @@ public class SocialRepositoryImpl implements SocialRepository {
 
     @Override
     public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull String setting, boolean value) {
-        // save setting to database
-        settingDAO.insertOrUpdate(fPlayer, setting, value ? "1" : "0");
-
-        Settings settings = loadSettings(fPlayer);
-
-        Map<String, Boolean> newBooleans = new HashMap<>(settings.booleans());
-
-        newBooleans.put(setting, value);
-
-        settings = settings.withBooleans(Map.copyOf(newBooleans));
-
-        playerSettingCache.put(fPlayer.uuid(), settings);
+        saveOrUpdateSetting(fPlayer, setting, value ? "1" : "0");
     }
 
     @Override
-    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting, @Nullable String value) {
+    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull String setting, @Nullable String value) {
         // save setting to database
-        settingDAO.insertOrUpdate(fPlayer, setting.name(), value);
+        settingDAO.insertOrUpdate(fPlayer, setting, value);
 
         Settings settings = loadSettings(fPlayer);
 
-        Map<SettingText, String> newTexts = settings.texts().isEmpty()
-                ? new EnumMap<>(SettingText.class)
-                : new EnumMap<>(settings.texts());
+        Map<String, String> newValues = new HashMap<>(settings.values());
 
         if (value == null) {
-            newTexts.remove(setting);
+            newValues.remove(setting);
         } else {
-            newTexts.put(setting, value);
+            newValues.put(setting, value);
         }
 
-        settings = settings.withTexts(Map.copyOf(newTexts));
-
-        playerSettingCache.put(fPlayer.uuid(), settings);
+        playerSettingCache.put(fPlayer.uuid(), settings.withValues(Collections.unmodifiableMap(newValues)));
     }
 
 }

@@ -3,7 +3,6 @@ package net.flectone.pulse.persistence.database.dao;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.persistence.database.DatabaseImpl;
 import net.flectone.pulse.persistence.database.sql.setting.*;
@@ -11,9 +10,9 @@ import net.flectone.pulse.persistence.repository.SocialRepository;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.EnumMap;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -43,22 +42,9 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
 
         int id = player.id();
 
-        Map<String, Boolean> settingsBoolean = new HashMap<>();
-        Map<SettingText, String> settingsText = new EnumMap<>(SettingText.class);
+        Map<String, String> values = withHandle(sql -> sql.findByPlayer(id));
 
-        withHandle(sql -> sql.findByPlayer(id)).forEach((key, value) -> {
-            if (value == null) return;
-
-            SettingText setting = SettingText.fromString(key);
-            if (setting != null) {
-                settingsText.put(setting, value);
-                return;
-            }
-
-            settingsBoolean.put(key.toUpperCase(), "1".equals(value));
-        });
-
-        return Optional.of(new SocialRepository.Settings(Map.copyOf(settingsBoolean), Map.copyOf(settingsText)));
+        return Optional.of(new SocialRepository.Settings(Collections.unmodifiableMap(values)));
     }
 
     public void insertOrUpdate(@NonNull FPlayer player, @NonNull String setting, @Nullable String value) {
