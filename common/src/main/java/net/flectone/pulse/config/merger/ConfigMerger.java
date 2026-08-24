@@ -1,9 +1,13 @@
 package net.flectone.pulse.config.merger;
 
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.constant.CacheName;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * MapStruct mapper for merging {@link Config} configuration objects.
@@ -50,7 +54,24 @@ public interface ConfigMerger {
 
     Config.Logger mergeLogger(@MappingTarget Config.Logger.LoggerBuilder target, Config.Logger source);
 
-    Config.Cache mergeCache(@MappingTarget Config.Cache.CacheBuilder target, Config.Cache source);
+    default Config.Cache mergeCache(@MappingTarget Config.Cache.CacheBuilder target, Config.Cache source) {
+        Map<CacheName, Config.Cache.CacheSetting> merged = new EnumMap<>(CacheName.class);
+
+        Map<CacheName, Config.Cache.CacheSetting> defaults = target.build().types();
+        if (defaults != null) {
+            merged.putAll(defaults);
+        }
+
+        if (source != null && source.types() != null) {
+            source.types().forEach((cacheName, cacheSetting) -> {
+                if (cacheName != null && cacheSetting != null) {
+                    merged.put(cacheName, cacheSetting);
+                }
+            });
+        }
+
+        return target.types(merged).build();
+    }
 
     Config.Metrics mergeMetrics(@MappingTarget Config.Metrics.MetricsBuilder target, Config.Metrics source);
 
