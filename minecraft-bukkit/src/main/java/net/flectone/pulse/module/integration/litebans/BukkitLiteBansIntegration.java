@@ -10,8 +10,9 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.value.ExternalModeration;
+import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.service.ExternalMuteService;
+import net.flectone.pulse.service.ExternalModerationService;
 
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitLiteBansIntegration implements FIntegration {
 
-    private final ExternalMuteService externalMuteService;
+    private final ExternalModerationService externalModerationService;
     @Getter private final FLogger fLogger;
 
     @Getter private boolean hooked;
@@ -97,7 +98,7 @@ public class BukkitLiteBansIntegration implements FIntegration {
         if (entry.getUuid() == null) return;
 
         try {
-            externalMuteService.invalidate(UUID.fromString(entry.getUuid()));
+            externalModerationService.invalidate(UUID.fromString(entry.getUuid()), Moderation.Type.MUTE);
         } catch (IllegalArgumentException _) {
             // ignore
         }

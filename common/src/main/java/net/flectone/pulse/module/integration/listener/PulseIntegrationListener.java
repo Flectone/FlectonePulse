@@ -14,14 +14,15 @@ import net.flectone.pulse.model.event.lifecycle.EnableEvent;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.service.ExternalMuteService;
+import net.flectone.pulse.model.value.Moderation;
+import net.flectone.pulse.service.ExternalModerationService;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PulseIntegrationListener implements PulseListener {
 
     private final EventDispatcher eventDispatcher;
-    private final ExternalMuteService externalMuteService;
+    private final ExternalModerationService externalModerationService;
 
     @Pulse
     public void onEnableEvent(EnableEvent event) {
@@ -53,7 +54,7 @@ public class PulseIntegrationListener implements PulseListener {
 
     @Pulse
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        externalMuteService.invalidate(event.player().uuid());
+        externalModerationService.invalidate(event.player().uuid(), Moderation.Type.MUTE);
     }
 
 }

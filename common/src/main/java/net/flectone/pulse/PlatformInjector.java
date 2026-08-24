@@ -472,7 +472,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(WhitelistModerationParser.class).to(WhitelistModerationParserImpl.class);
 
         // service
-        bind(ExternalMuteService.class).to(ExternalMuteServiceImpl.class);
+        bind(ExternalModerationService.class).to(ExternalModerationServiceImpl.class);
         bind(FPlayerService.class).to(FPlayerServiceImpl.class);
         bind(MetricsService.class).to(MetricsServiceImpl.class);
         bind(ModerationService.class).to(ModerationServiceImpl.class);
@@ -630,7 +630,7 @@ public abstract class PlatformInjector extends AbstractModule {
     @Provides
     @Singleton
     @Named("externalModeration")
-    public Cache<UUID, Optional<ExternalModeration>> provideExternalModerationCache(CacheRegistryImpl cacheRegistry) {
+    public Cache<ExternalModerationService.ExternalModerationKey, Optional<ExternalModeration>> provideExternalModerationCache(CacheRegistryImpl cacheRegistry) {
         return cacheRegistry.getCache(CacheName.EXTERNAL_MODERATION);
     }
 

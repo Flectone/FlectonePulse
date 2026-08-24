@@ -18,7 +18,7 @@ import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.service.ExternalMuteService;
+import net.flectone.pulse.service.ExternalModerationService;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
@@ -36,7 +36,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
     private final FileFacade fileFacade;
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
-    private final ExternalMuteService externalMuteService;
+    private final ExternalModerationService externalModerationService;
     private final LazyInstance<CapsModule> capsModule;
     private final LazyInstance<FloodModule> floodModule;
     private final LazyInstance<NewbieModule> newbieModule;
@@ -68,7 +68,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
                 yield Optional.of(muteContext);
             }
             case EXTERNAL -> {
-                Optional<ExternalModeration> optionalMute = externalMuteService.get(fPlayer);
+                Optional<ExternalModeration> optionalMute = externalModerationService.get(fPlayer, Moderation.Type.MUTE);
                 if (optionalMute.isEmpty()) yield Optional.empty();
 
                 ExternalModeration mute = optionalMute.get();

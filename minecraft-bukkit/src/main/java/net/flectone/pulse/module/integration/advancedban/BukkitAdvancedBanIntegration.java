@@ -13,8 +13,9 @@ import me.leoko.advancedban.utils.PunishmentType;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.value.ExternalModeration;
+import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.service.ExternalMuteService;
+import net.flectone.pulse.service.ExternalModerationService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -24,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitAdvancedBanIntegration implements Listener, FIntegration {
 
-    private final ExternalMuteService externalMuteService;
+    private final ExternalModerationService externalModerationService;
     @Getter private final FLogger fLogger;
 
     @Getter private boolean hooked;
@@ -88,7 +89,7 @@ public class BukkitAdvancedBanIntegration implements Listener, FIntegration {
         UUID uuid = UUIDManager.get().fromString(storedUuid);
         if (uuid == null) return;
 
-        externalMuteService.invalidate(uuid);
+        externalModerationService.invalidate(uuid, Moderation.Type.MUTE);
     }
 
 }

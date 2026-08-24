@@ -9,7 +9,7 @@ import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
-import net.flectone.pulse.service.ExternalMuteService;
+import net.flectone.pulse.service.ExternalModerationService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.LazyInstance;
 
@@ -18,7 +18,7 @@ import net.flectone.pulse.util.LazyInstance;
 public class MuteCheckerImpl implements MuteChecker {
 
     private final ModerationService moderationService;
-    private final LazyInstance<ExternalMuteService> externalMuteService;
+    private final LazyInstance<ExternalModerationService> externalMuteService;
     private final LazyInstance<CapsModule> capsModule;
     private final LazyInstance<FloodModule> floodModule;
     private final LazyInstance<NewbieModule> newbieModule;
@@ -46,7 +46,7 @@ public class MuteCheckerImpl implements MuteChecker {
             return Status.SWEAR;
         }
 
-        if (externalMuteService.get().isMuted(fPlayer)) {
+        if (externalMuteService.get().isPresent(fPlayer, Moderation.Type.MUTE)) {
             return Status.EXTERNAL;
         }
 

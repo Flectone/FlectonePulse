@@ -8,9 +8,10 @@ import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.ExternalModeration;
+import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.service.ExternalMuteService;
+import net.flectone.pulse.service.ExternalModerationService;
 import net.flectone.pulse.service.FPlayerService;
 import space.arim.libertybans.api.*;
 import space.arim.libertybans.api.event.PostPardonEvent;
@@ -32,7 +33,7 @@ public class BukkitLibertyBansIntegration implements FIntegration {
 
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
-    private final ExternalMuteService externalMuteService;
+    private final ExternalModerationService externalModerationService;
     @Getter private final FLogger fLogger;
 
     private LibertyBans libertyBans;
@@ -58,13 +59,13 @@ public class BukkitLibertyBansIntegration implements FIntegration {
             punishListener = omnibus.getEventBus().registerListener(PostPunishEvent.class, ListenerPriorities.NORMAL, event -> {
                 if (event.getPunishment().getType() != PunishmentType.MUTE) return;
 
-                extractPlayerUuid(event.getPunishment().getVictim()).ifPresent(externalMuteService::invalidate);
+                extractPlayerUuid(event.getPunishment().getVictim()).ifPresent(uuid -> externalModerationService.invalidate(uuid, Moderation.Type.MUTE));
             });
 
             pardonListener = omnibus.getEventBus().registerListener(PostPardonEvent.class, ListenerPriorities.NORMAL, event -> {
                 if (event.getPunishment().getType() != PunishmentType.MUTE) return;
 
-                extractPlayerUuid(event.getPunishment().getVictim()).ifPresent(externalMuteService::invalidate);
+                extractPlayerUuid(event.getPunishment().getVictim()).ifPresent(uuid -> externalModerationService.invalidate(uuid, Moderation.Type.MUTE));
             });
 
             logHook();
