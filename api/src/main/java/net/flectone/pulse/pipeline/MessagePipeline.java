@@ -77,6 +77,15 @@ public interface MessagePipeline {
     @NonNull Component build(MessageContext messageContext);
 
     /**
+     * Runs the formatting modules over a message and hands back the text they produced, stopping
+     * before it is turned into a component.
+     *
+     * @param messageContext the message and its context
+     * @return the message text after the modules have rewritten it
+     */
+    @NonNull String parse(MessageContext messageContext);
+
+    /**
      * A resolver inserting an already rendered component.
      *
      * @param message the component

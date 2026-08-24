@@ -125,6 +125,14 @@ public class MessagePipelineImpl implements MessagePipeline {
         return component;
     }
 
+    @Override
+    public @NonNull String parse(MessageContext messageContext) {
+        String message = messageContext.message();
+        if (StringUtils.isEmpty(message)) return "";
+
+        return eventDispatcher.dispatch(new MessageFormattingEvent(messageContext)).context().message();
+    }
+
     @NonNull
     private Component deserialize(MessageContext messageContext) {
         if (messageContext.isFlag(MessageFlag.REMOVE_DISABLED_TAGS) && !messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {

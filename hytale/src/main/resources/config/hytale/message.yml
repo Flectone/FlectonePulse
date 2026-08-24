@@ -224,6 +224,9 @@ format:
   names:
     enable: true
     should_check_invisibility: false
+    ticker:
+      enable: true
+      period: 20
   object:
     enable: false
     player_head_tag:

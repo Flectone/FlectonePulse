@@ -17,13 +17,17 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.ComponentMessageContext;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.Ticker;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.format.names.listener.PulseConstantListener;
 import net.flectone.pulse.module.message.format.names.listener.PulseNamesListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.resolver.ProfileResolver;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -41,16 +45,27 @@ public class NamesModuleImpl implements NamesModule {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final PermissionChecker permissionChecker;
     private final ProfileResolver profileResolver;
+    private final TaskScheduler taskScheduler;
     private final SocialService socialService;
 
     @Override
     public void onEnable() {
+        if (proxyRegistry.hasEnabledProxy()) {
+            Ticker ticker = config().ticker();
+            if (ticker.enable()) {
+                taskScheduler.runPlayerAsyncTimer(this::updateConstant, ticker.period());
+            }
+
+            listenerRegistry.register(PulseConstantListener.class);
+        }
+
         listenerRegistry.register(PulseNamesListener.class);
     }
 
@@ -139,19 +154,8 @@ public class NamesModuleImpl implements NamesModule {
         return messageContext
                 .addTagResolvers(
                         messagePipeline.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, _) -> {
-                            List<Component> constants = fPlayer.constants();
-                            if (constants.isEmpty()) {
-                                List<String> stringConstants = localization(fPlayer).constant();
-                                if (stringConstants.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
-
-                                constants = stringConstants.stream()
-                                        .map(string -> messagePipeline.build(MessageContext.builder()
-                                                .sender(fPlayer)
-                                                .message(string)
-                                                .build())
-                                        )
-                                        .toList();
-                            }
+                            List<String> constants = localization(fPlayer).constant();
+                            if (constants.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
                             int constantIndex = 0;
                             if (argumentQueue.hasNext()) {
@@ -161,7 +165,20 @@ public class NamesModuleImpl implements NamesModule {
                                 }
                             }
 
-                            return Tag.inserting(constants.get(constantIndex));
+                            String constant = proxyRegistry.hasEnabledProxy()
+                                    ? socialService.getSetting(fPlayer, SettingText.CONSTANT.name() + "_" + constantIndex)
+                                    : constants.get(constantIndex);
+
+                            if (StringUtils.isEmpty(constant)) return MessagePipeline.ReplacementTag.emptyTag();
+
+                            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fReceiver)
+                                    .message(constant)
+                                    .flags(messageContext.flags())
+                                    .flag(MessageFlag.PLAYER_MESSAGE, false)
+                                    .build()
+                            ));
                         }),
                         messagePipeline.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, _) -> {
                             Localization.Message.Format.Names localization = localization(fReceiver);
@@ -275,6 +292,29 @@ public class NamesModuleImpl implements NamesModule {
         }
 
         return Tag.preProcessParsed(messagePipeline.buildStandard(tagContext));
+    }
+
+    @Override
+    public void updateConstant(FPlayer fPlayer) {
+        if (!proxyRegistry.hasEnabledProxy()) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
+        if (!fPlayer.isOnline()) return;
+
+        List<String> constants = localization(fPlayer).constant();
+
+        for (int index = 0; index < constants.size(); index++) {
+            String setting = SettingText.CONSTANT.name() + "_" + index;
+
+            String newConstant = messagePipeline.parse(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(constants.get(index))
+                    .build()
+            );
+
+            if (newConstant.equals(socialService.getSetting(fPlayer, setting))) continue;
+
+            socialService.saveSetting(fPlayer, setting, newConstant);
+        }
     }
 
 }

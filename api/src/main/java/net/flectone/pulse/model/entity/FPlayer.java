@@ -1,9 +1,7 @@
 package net.flectone.pulse.model.entity;
 
 import net.flectone.pulse.service.FPlayerService;
-import net.kyori.adventure.text.Component;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -94,13 +92,6 @@ public interface FPlayer extends FEntity {
     String ip();
 
     /**
-     * The extra name parts resolved once and carried along, so another server need not resolve them again.
-     *
-     * @return the constants
-     */
-    List<Component> constants();
-
-    /**
      * Returns a copy with a different name.
      *
      * @param name the new name
@@ -139,14 +130,6 @@ public interface FPlayer extends FEntity {
      * @return the copy
      */
     FPlayer withIp(String ip);
-
-    /**
-     * Returns a copy with different constants.
-     *
-     * @param constants the new constants
-     * @return the copy
-     */
-    FPlayer withConstants(List<Component> constants);
 
     /**
      * Starts a builder pre-filled with this player's values.

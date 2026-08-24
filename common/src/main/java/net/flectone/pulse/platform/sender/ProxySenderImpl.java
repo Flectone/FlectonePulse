@@ -6,9 +6,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.exception.ProxyMessageCreateException;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.value.Range;
@@ -22,7 +20,6 @@ import net.flectone.pulse.logging.FLogger;
 import org.jspecify.annotations.NonNull;
 
 import java.io.*;
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -32,7 +29,6 @@ public class ProxySenderImpl implements ProxySender {
 
     private final ProxyRegistry proxyRegistry;
     private final FileFacade fileFacade;
-    private final MessagePipeline messagePipeline;
     private final PlatformServerAdapter platformServerAdapter;
     private final Gson gson;
     private final FLogger fLogger;
@@ -99,20 +95,6 @@ public class ProxySenderImpl implements ProxySender {
                         @NonNull UUID metadataUUID) {
         if (!proxyRegistry.hasEnabledProxy()) return false;
         if (FlectonePulseAPI.isDisabling()) return false;
-
-        if (sender instanceof FPlayer fPlayer) {
-            List<String> constant = fileFacade.localization().message().format().names().constant();
-            if (!constant.isEmpty()) {
-                sender = fPlayer.withConstants(constant.stream()
-                        .map(string -> messagePipeline.build(MessageContext.builder()
-                                .sender(fPlayer)
-                                .message(string)
-                                .build()
-                        ))
-                        .toList()
-                );
-            }
-        }
 
         byte[] message;
         try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();

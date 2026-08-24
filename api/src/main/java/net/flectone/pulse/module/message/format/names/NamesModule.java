@@ -54,4 +54,11 @@ public interface NamesModule extends ModuleLocalization {
      */
     boolean isInvisible(FEntity entity);
 
+    /**
+     * Parses this player's constants
+     *
+     * @param fPlayer the player
+     */
+    void updateConstant(FPlayer fPlayer);
+
 }

@@ -463,7 +463,8 @@ public record Message(
         @Builder(toBuilder = true)
         public record Names(
                 Boolean enable,
-                Boolean shouldCheckInvisibility
+                Boolean shouldCheckInvisibility,
+                Ticker ticker
         ) implements EnableSetting {
         }
 

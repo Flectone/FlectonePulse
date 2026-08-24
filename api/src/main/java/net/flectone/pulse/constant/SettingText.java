@@ -20,7 +20,8 @@ public enum SettingText {
     SPY_STATUS,
     VANISH_STATUS,
     AFK_SUFFIX,
-    NICKNAME;
+    NICKNAME,
+    CONSTANT;
 
     private static final Map<String, SettingText> ENUM_BY_KEY = Arrays.stream(SettingText.values())
             .collect(Collectors.toUnmodifiableMap(

@@ -5,7 +5,6 @@ import lombok.With;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -18,7 +17,6 @@ import java.util.UUID;
  * @param id the database id
  * @param online whether they are connected right now
  * @param ip their address, or null if it is not known
- * @param constants the extra name parts resolved once and carried across the proxy
  * @param showEntityName the name shown on hover, or null to use the plain name
  */
 @Builder(toBuilder = true)
@@ -30,7 +28,6 @@ public record FPlayerImpl(
         Integer id,
         boolean online,
         @Nullable String ip,
-        List<Component> constants,
         @Nullable Component showEntityName
 ) implements FPlayer {
 
@@ -39,7 +36,6 @@ public record FPlayerImpl(
         if (uuid == null) uuid = FEntity.UNKNOWN_UUID;
         if (type == null) type = PLAYER_TYPE;
         if (id == null) id = UNKNOWN_ID;
-        if (constants == null) constants = List.of();
     }
 
     @Override
@@ -70,21 +66,6 @@ public record FPlayerImpl(
     @Override
     public int hashCode() {
         return Objects.hash(uuid, id, type);
-    }
-
-    @Override
-    public FPlayer withConstants(@Nullable List<Component> constants) {
-        if (constants == null || constants.isEmpty()) {
-            if (this.constants.isEmpty()) return this;
-
-            return toBuilder()
-                    .constants(List.of())
-                    .build();
-        }
-
-        return toBuilder()
-                .constants(List.copyOf(constants))
-                .build();
     }
 
 }
