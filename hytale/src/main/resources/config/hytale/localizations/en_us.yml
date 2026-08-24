@@ -582,8 +582,8 @@ message:
     null_chat: "<color:#ff7171>Chat is disabled on this server"
     null_receiver: "<color:#ff7171>Nobody heard you"
     types:
-      global: "<delete><display_name> <world>»<fcolor:4> <message>"
-      local: "<delete><display_name><fcolor:3>: <message>"
+      global: "<delete><display_name> <world>»<fcolor:4> <message><reset><translation>"
+      local: "<delete><display_name><fcolor:3>: <message><reset><translation>"
   format:
     animation:
       values:
