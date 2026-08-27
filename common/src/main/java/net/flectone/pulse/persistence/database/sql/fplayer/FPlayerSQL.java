@@ -35,7 +35,7 @@ public interface FPlayerSQL extends SQL {
     @SqlUpdate(
             """
             UPDATE `fp_player` SET `online` = false
-            WHERE `id` IN (
+            WHERE `online` = true AND `id` IN (
                 SELECT p.`id` FROM `fp_player` p
                 LEFT JOIN `fp_setting` s ON s.`player` = p.`id` AND s.`type` = 'server'
                 WHERE s.`value` IS NULL OR s.`value` = :server
