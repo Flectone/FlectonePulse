@@ -72,10 +72,4 @@ public abstract class ScoreboardModuleImpl implements ScoreboardModule {
         return !config().nameVisible() || config().hideNameWhenSneaking() && platformPlayerAdapter.isSneaking(fPlayer);
     }
 
-    @Override
-    public abstract void createOrUpdate(@NonNull FPlayer fPlayer);
-
-    @Override
-    public abstract void remove(@NonNull FPlayer fPlayer);
-
 }
