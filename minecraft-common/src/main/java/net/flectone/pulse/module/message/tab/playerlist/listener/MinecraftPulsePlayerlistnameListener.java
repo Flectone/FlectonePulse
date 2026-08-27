@@ -11,23 +11,25 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
+import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftPulsePlayerlistnameListener implements PulseListener {
 
     private final MinecraftPlayerlistnameModule playerlistnameModule;
+    private final FPlayerService fPlayerService;
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        playerlistnameModule.update();
+        playerlistnameModule.update(event.player());
     }
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
         if (!event.reload()) return;
 
-        playerlistnameModule.update();
+        playerlistnameModule.update(event.player());
     }
 
     @Pulse
@@ -38,13 +40,17 @@ public class MinecraftPulsePlayerlistnameListener implements PulseListener {
     @Pulse
     public void onProxyMessageEvent(ProxyMessageEvent event) {
         if (event.name() == ModuleName.PLAYER_DISCONNECTED || event.name() == ModuleName.PLAYER_CONNECTED) {
-            if (!event.sentByThisServer()) {
-                // remove from proxy cache
-                playerlistnameModule.remove(event.sender().uuid());
+            if (event.sentByThisServer()) return;
 
-                // do not wait for ticker, update it
-                playerlistnameModule.update();
+            // remove from proxy cache
+            playerlistnameModule.remove(event.sender().uuid());
+
+            // do not wait for ticker, update it
+            if (event.name() == ModuleName.PLAYER_CONNECTED) {
+                playerlistnameModule.update(fPlayerService.getFPlayer(event.sender().uuid()));
             }
+
+            playerlistnameModule.updateProxyPlayers();
         }
     }
 

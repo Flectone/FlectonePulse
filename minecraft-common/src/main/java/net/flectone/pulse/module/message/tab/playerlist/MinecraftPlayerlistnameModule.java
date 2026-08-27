@@ -128,25 +128,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
 
         taskScheduler.runAsync(() -> {
             fPlayerService.getOnlineFPlayers().forEach(this::update);
-
-            if (proxyPlayers.isEmpty()) return;
-
-            proxyPlayers.forEach((key, value) -> value.stream()
-                    .filter(uuid -> {
-                        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-                        FPlayer fReceiver = fPlayerService.getFPlayer(key);
-                        return !fPlayer.isOnline() || !socialService.canSeeVanished(fPlayer, fReceiver);
-                    })
-                    .forEach(uuid -> {
-                        packetSender.send(key, new WrapperPlayServerPlayerInfoRemove(uuid));
-
-                        value.remove(uuid);
-
-                        if (value.isEmpty()) {
-                            proxyPlayers.remove(key);
-                        }
-                    })
-            );
+            updateProxyPlayers();
         });
     }
 
@@ -211,6 +193,27 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         );
 
         packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(proxyPlayer ? WrapperPlayServerPlayerInfo.Action.ADD_PLAYER : WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerData));
+    }
+
+    public void updateProxyPlayers() {
+        if (proxyPlayers.isEmpty()) return;
+
+        proxyPlayers.forEach((key, value) -> value.stream()
+                .filter(uuid -> {
+                    FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+                    FPlayer fReceiver = fPlayerService.getFPlayer(key);
+                    return !fPlayer.isOnline() || !socialService.canSeeVanished(fPlayer, fReceiver);
+                })
+                .forEach(uuid -> {
+                    packetSender.send(key, new WrapperPlayServerPlayerInfoRemove(uuid));
+
+                    value.remove(uuid);
+
+                    if (value.isEmpty()) {
+                        proxyPlayers.remove(key);
+                    }
+                })
+        );
     }
 
     public void remove(UUID uuid) {
