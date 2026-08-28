@@ -7,7 +7,6 @@ import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
-import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.protocol.MountController;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -37,6 +36,8 @@ import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -112,8 +113,8 @@ public class HytaleBubbleRender implements BubbleRender {
 
                 MountedComponent mounted = entityStore.getStore().getComponent(bubbleEntity.entityRef(), MountedComponent.getComponentType());
                 if (mounted != null) {
-                    Rotation3f currentOffset = mounted.getAttachmentOffset();
-                    Rotation3f newOffset = new Rotation3f(currentOffset.x(), currentOffset.y() + bubble.getInteractionHeight(), currentOffset.z());
+                    Vector3fc currentOffset = mounted.getAttachmentOffset();
+                    Vector3f newOffset = new Vector3f(currentOffset.x(), currentOffset.y() + bubble.getInteractionHeight(), currentOffset.z());
                     MountedComponent newMounted = new MountedComponent(playerRef.getReference(), newOffset, mounted.getControllerType());
                     entityStore.getStore().putComponent(bubbleEntity.entityRef(), MountedComponent.getComponentType(), newMounted);
                 }
@@ -154,7 +155,7 @@ public class HytaleBubbleRender implements BubbleRender {
             holder.putComponent(MountedComponent.getComponentType(),
                     new MountedComponent(
                             playerRef.getReference(),
-                            new Rotation3f(0.0F, (float) baseHeight, 0.0F),
+                            new Vector3f(0.0F, (float) baseHeight, 0.0F),
                             MountController.Minecart
                     )
             );

@@ -56,11 +56,6 @@ public class HytaleRegistrationHandler implements CommandRegistrationHandler<FPl
             return null;
         }
 
-        @Override
-        protected boolean canGeneratePermission() {
-            return false;
-        }
-
     }
 
 }
