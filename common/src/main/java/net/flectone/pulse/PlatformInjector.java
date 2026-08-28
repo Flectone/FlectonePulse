@@ -32,6 +32,7 @@ import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.value.Moderation;
+import net.flectone.pulse.model.value.MultilineString;
 import net.flectone.pulse.model.value.PlayTime;
 import net.flectone.pulse.module.Module;
 import net.flectone.pulse.module.ModuleImpl;
@@ -723,6 +724,30 @@ public abstract class PlatformInjector extends AbstractModule {
 
                             @Override
                             public String getAbsentValue(DeserializationContext ctxt) {
+                                // a missing key is not an empty value, keep it null so the merger restores the default
+                                return null;
+                            }
+
+                        })
+                        .addDeserializer(MultilineString.class, new ValueDeserializer<>() {
+
+                            @Override
+                            public MultilineString deserialize(JsonParser p, DeserializationContext ctxt) {
+                                return MultilineString.fromJson(ctxt.readValue(p, Object.class));
+                            }
+
+                            @Override
+                            public MultilineString getNullValue(DeserializationContext ctxt) {
+                                return MultilineString.EMPTY;
+                            }
+
+                            @Override
+                            public MultilineString getEmptyValue(DeserializationContext ctxt) {
+                                return MultilineString.EMPTY;
+                            }
+
+                            @Override
+                            public MultilineString getAbsentValue(DeserializationContext ctxt) {
                                 // a missing key is not an empty value, keep it null so the merger restores the default
                                 return null;
                             }

@@ -1,6 +1,7 @@
 package net.flectone.pulse.module;
 
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.value.MultilineString;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -47,15 +48,14 @@ public interface ModuleListLocalization extends ModuleLocalization {
     void savePlayerIndex(int id, int playerIndex);
 
     /**
-     * Flattens a list of blocks into a list of lines, joining each block with a line break so a
-     * multi-line entry still counts as one rotation step.
+     * Flattens a list of blocks into a list of lines, joining the lines of each block with a line.
      *
      * @param values the blocks
      * @return one string per block
      */
-    default List<String> joinMultiList(List<List<String>> values) {
+    default List<String> joinMultiList(List<MultilineString> values) {
         return values.stream()
-                .map(strings -> String.join("<reset><br>", strings))
+                .map(MultilineString::value)
                 .toList();
     }
 

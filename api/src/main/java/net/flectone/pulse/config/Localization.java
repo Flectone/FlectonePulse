@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.With;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
+import net.flectone.pulse.model.value.MultilineString;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1142,7 +1143,7 @@ public record Localization(
             @With
             @Builder(toBuilder = true)
             public record Condition(
-                    Map<String, Map<String, String>> values
+                    Map<String, Map<String, MultilineString>> values
             ) implements LocalizationSetting {
             }
 
@@ -1344,7 +1345,7 @@ public record Localization(
         @With
         @Builder(toBuilder = true)
         public record Sidebar(
-                List<List<String>> values
+                List<MultilineString> values
         ) implements LocalizationSetting {
         }
 
@@ -1364,7 +1365,7 @@ public record Localization(
             @With
             @Builder(toBuilder = true)
             public record MOTD(
-                    List<List<String>> values
+                    List<MultilineString> values
             ) implements LocalizationSetting {
             }
 
@@ -1406,14 +1407,14 @@ public record Localization(
             @With
             @Builder(toBuilder = true)
             public record Footer(
-                    List<List<String>> lists
+                    List<MultilineString> lists
             ) implements LocalizationSetting {
             }
 
             @With
             @Builder(toBuilder = true)
             public record Header(
-                    List<List<String>> lists
+                    List<MultilineString> lists
             ) implements LocalizationSetting {
             }
 
