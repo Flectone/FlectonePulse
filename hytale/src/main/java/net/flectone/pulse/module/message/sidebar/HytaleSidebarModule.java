@@ -11,6 +11,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -51,8 +52,9 @@ public class HytaleSidebarModule extends SidebarModuleImpl {
                                ModuleController moduleController,
                                RandomGenerator randomUtil,
                                ComponentSerializer componentSerializer,
-                               SocialService socialService) {
-        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil, socialService);
+                               SocialService socialService,
+                               ConditionModule conditionModule) {
+        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil, socialService, conditionModule);
 
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.permissionChecker = permissionChecker;
@@ -114,7 +116,7 @@ public class HytaleSidebarModule extends SidebarModuleImpl {
     }
 
     private HudBuilder createHudBuilder(FPlayer fPlayer, PlayerRef playerRef) {
-        String format = getNextMessage(fPlayer, config().random());
+        String format = getNextFormat(fPlayer);
         if (format == null) return null;
 
         String[] lines = format.split("<br>");

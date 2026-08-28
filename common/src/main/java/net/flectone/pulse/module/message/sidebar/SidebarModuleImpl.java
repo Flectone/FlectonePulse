@@ -8,12 +8,14 @@ import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.Ticker;
+import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.module.message.sidebar.listener.PulseSidebarListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.random.RandomGenerator;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -30,19 +32,22 @@ public abstract class SidebarModuleImpl implements SidebarModule {
     private final FPlayerService fPlayerService;
     private final RandomGenerator randomUtil;
     private final SocialService socialService;
+    private final ConditionModule conditionModule;
 
     protected SidebarModuleImpl(FileFacade fileFacade,
                             TaskScheduler taskScheduler,
                             ListenerRegistry listenerRegistry,
                             FPlayerService fPlayerService,
                             RandomGenerator randomUtil,
-                            SocialService socialService) {
+                            SocialService socialService,
+                            ConditionModule conditionModule) {
         this.fileFacade = fileFacade;
         this.taskScheduler = taskScheduler;
         this.listenerRegistry = listenerRegistry;
         this.fPlayerService = fPlayerService;
         this.randomUtil = randomUtil;
         this.socialService = socialService;
+        this.conditionModule = conditionModule;
     }
 
     @Override
@@ -103,19 +108,17 @@ public abstract class SidebarModuleImpl implements SidebarModule {
     }
 
     @Override
-    public abstract void remove(FPlayer fPlayer);
-
-    @Override
-    public abstract void update(FPlayer fPlayer);
-
-    @Override
     public void create(UUID uuid) {
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
         create(fPlayer);
     }
 
-    @Override
-    public abstract void create(FPlayer fPlayer);
+    protected @Nullable String getNextFormat(FPlayer fPlayer) {
+        String format = getNextMessage(fPlayer, config().random());
+        if (format == null) return null;
+
+        return conditionModule.replaceCondition(format, fPlayer);
+    }
 
     protected String getObjectiveName(FPlayer fPlayer) {
         return "sb_" + fPlayer.uuid();

@@ -12,6 +12,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
@@ -52,8 +53,9 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
                                   PermissionChecker permissionChecker,
                                   ModuleController moduleController,
                                   RandomGenerator randomUtil,
-                                  SocialService socialService) {
-        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil, socialService);
+                                  SocialService socialService,
+                                  ConditionModule conditionModule) {
+        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil, socialService, conditionModule);
 
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
@@ -105,7 +107,7 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
 
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-            String format = getNextMessage(fPlayer, config().random());
+            String format = getNextFormat(fPlayer);
             if (format == null) return;
 
             String[] lines = format.split("<br>");
