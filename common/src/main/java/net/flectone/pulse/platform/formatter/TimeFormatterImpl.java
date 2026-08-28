@@ -25,6 +25,9 @@ public class TimeFormatterImpl implements TimeFormatter {
 
     @Override
     public String format(FPlayer fPlayer, long time) {
+        if (time < 0) {
+            time = 0;
+        }
 
         Localization.Time message = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).time();
         if (message.format().isEmpty()) return "";
@@ -79,7 +82,6 @@ public class TimeFormatterImpl implements TimeFormatter {
 
     @Override
     public String format(FPlayer fPlayer, long time, String message) {
-        if (time < 0) time = 0;
         return Strings.CS.replace(message, "<time>", format(fPlayer, time));
     }
 
