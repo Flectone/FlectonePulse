@@ -52,6 +52,9 @@ public class BukkitCMIIntegration implements FIntegration {
         CMIUser user = cmi.getPlayerManager().getUser(fEntity.uuid());
         if (user == null) return null;
 
+        long mutedUntil = user.getMutedUntil();
+        boolean permanent = mutedUntil <= 0 || mutedUntil == Long.MAX_VALUE;
+
         return new ExternalModeration(
                 fEntity.name(),
                 fPlayerService.get().getConsole().name(),
@@ -59,7 +62,7 @@ public class BukkitCMIIntegration implements FIntegration {
                 0,
                 Math.max(user.getMutedUntil() - System.currentTimeMillis(), System.currentTimeMillis()),
                 user.getMutedUntil(),
-                false
+                permanent
         );
     }
 
