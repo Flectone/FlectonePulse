@@ -6,7 +6,6 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.constant.ModuleName;
 
 import java.util.UUID;
 
@@ -15,15 +14,6 @@ import java.util.UUID;
  * @author TheFaser
  */
 public interface SwearModule extends ModuleLocalization {
-
-    @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Format.Moderation.Swear config();

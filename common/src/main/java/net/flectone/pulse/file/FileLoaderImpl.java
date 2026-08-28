@@ -94,7 +94,7 @@ public class FileLoaderImpl implements FileLoader {
 
         try {
             return yamlMapper.readTree(pathToFile.toFile()).path("version").asString(defaultVersion);
-        } catch (Exception e) {
+        } catch (Exception _) {
             return defaultVersion;
         }
     }

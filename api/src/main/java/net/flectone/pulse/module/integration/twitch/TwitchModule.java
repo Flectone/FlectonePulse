@@ -17,9 +17,6 @@ import org.jspecify.annotations.NonNull;
 public interface TwitchModule extends ModuleLocalization {
 
     @Override
-    ModuleName name();
-
-    @Override
     Integration.Twitch config();
 
     @Override

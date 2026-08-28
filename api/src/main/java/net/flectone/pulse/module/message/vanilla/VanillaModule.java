@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.vanilla;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
@@ -19,9 +18,6 @@ public interface VanillaModule extends ModuleLocalization {
      * The tag prefix under which each vanilla message argument is exposed.
      */
     String ARGUMENT = "argument";
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Vanilla config();

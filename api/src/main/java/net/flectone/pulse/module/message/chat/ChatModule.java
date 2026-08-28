@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.chat;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.chat.model.Chat;
@@ -16,9 +15,6 @@ import java.util.function.Predicate;
  * @author TheFaser
  */
 public interface ChatModule extends ModuleLocalization {
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Chat config();

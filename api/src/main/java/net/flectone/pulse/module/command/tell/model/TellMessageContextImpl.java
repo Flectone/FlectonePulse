@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.command.tell;
+package net.flectone.pulse.module.command.tell.model;
 
 import lombok.Builder;
 import lombok.With;

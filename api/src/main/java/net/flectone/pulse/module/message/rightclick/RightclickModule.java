@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.rightclick;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 
@@ -14,9 +13,6 @@ import java.util.UUID;
  * @author TheFaser
  */
 public interface RightclickModule extends ModuleLocalization {
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Rightclick config();

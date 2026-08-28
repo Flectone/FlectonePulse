@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.scoreboard;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 import org.jspecify.annotations.NonNull;
@@ -13,9 +12,6 @@ import org.jspecify.annotations.NonNull;
  * @author TheFaser
  */
 public interface ScoreboardModule extends ModuleLocalization {
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Scoreboard config();

@@ -20,12 +20,6 @@ import java.util.Set;
 public interface IntegrationModule extends ModuleSimple {
 
     @Override
-    void onEnable();
-
-    @Override
-    ModuleName name();
-
-    @Override
     Integration config();
 
     @Override

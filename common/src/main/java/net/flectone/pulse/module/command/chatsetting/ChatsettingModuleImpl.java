@@ -9,7 +9,6 @@ import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.listener.ChatsettingProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -173,8 +172,6 @@ public abstract class ChatsettingModuleImpl implements ChatsettingModule {
         String messageType = optionalType.get().toUpperCase();
         saveSetting(fTarget, messageType, !socialService.isSetting(fTarget, messageType));
     }
-
-    protected abstract MenuBuilder getMenuBuilder();
 
     private void open(FPlayer fPlayer, FPlayer fTarget) {
         getMenuBuilder().open(fPlayer, fTarget.uuid());

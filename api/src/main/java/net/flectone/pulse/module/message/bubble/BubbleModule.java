@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.bubble;
 
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
 import org.jspecify.annotations.NonNull;
@@ -14,9 +13,6 @@ import java.util.Set;
  * @author TheFaser
  */
 public interface BubbleModule extends ModuleSimple {
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Bubble config();

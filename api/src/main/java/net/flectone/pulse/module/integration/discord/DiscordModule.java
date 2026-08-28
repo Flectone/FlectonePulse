@@ -17,9 +17,6 @@ import org.jspecify.annotations.NonNull;
 public interface DiscordModule extends ModuleLocalization {
 
     @Override
-    ModuleName name();
-
-    @Override
     Integration.Discord config();
 
     @Override

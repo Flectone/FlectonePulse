@@ -3,10 +3,8 @@ package net.flectone.pulse.module.command.helper;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
-import org.incendo.cloud.context.CommandContext;
 
 import java.util.function.Predicate;
 
@@ -15,18 +13,6 @@ import java.util.function.Predicate;
  * @author TheFaser
  */
 public interface HelperModule extends ModuleCommand {
-
-    @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
-    void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
-    @Override
-    ModuleName name();
 
     @Override
     Command.Helper config();

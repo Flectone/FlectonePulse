@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.book;
 
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
 
@@ -13,9 +12,6 @@ import java.util.Optional;
  * @author TheFaser
  */
 public interface BookModule extends ModuleSimple {
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Book config();

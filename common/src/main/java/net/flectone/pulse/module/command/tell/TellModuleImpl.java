@@ -18,6 +18,7 @@ import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.module.command.tell.listener.PulseTellListener;
 import net.flectone.pulse.module.command.tell.listener.TellProxyMessageListener;
+import net.flectone.pulse.module.command.tell.model.TellMessageContext;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;

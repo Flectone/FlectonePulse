@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.format.names;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -14,12 +13,6 @@ import net.flectone.pulse.module.ModuleLocalization;
  * @author TheFaser
  */
 public interface NamesModule extends ModuleLocalization {
-
-    @Override
-    void onEnable();
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Format.Names config();

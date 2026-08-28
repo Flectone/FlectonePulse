@@ -3,12 +3,10 @@ package net.flectone.pulse.module.command.online;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.TimeType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
-import org.incendo.cloud.context.CommandContext;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -16,18 +14,6 @@ import org.jspecify.annotations.NonNull;
  * @author TheFaser
  */
 public interface OnlineModule extends ModuleCommand {
-
-    @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
-    void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
-    @Override
-    ModuleName name();
 
     @Override
     Command.Online config();

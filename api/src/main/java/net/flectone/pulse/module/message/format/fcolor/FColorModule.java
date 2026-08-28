@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.format.fcolor;
 
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
 
@@ -11,12 +10,6 @@ import net.flectone.pulse.module.ModuleSimple;
  * @author TheFaser
  */
 public interface FColorModule extends ModuleSimple {
-
-    @Override
-    void onEnable();
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Format.FColor config();

@@ -43,7 +43,7 @@ public class HytaleChatsettingModule extends ChatsettingModuleImpl {
     }
 
     @Override
-    protected MenuBuilder getMenuBuilder() {
+    public MenuBuilder getMenuBuilder() {
         return hytaleMenuBuilder.get();
     }
 

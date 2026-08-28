@@ -6,7 +6,6 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.constant.ModuleName;
 
 import java.util.UUID;
 
@@ -17,13 +16,7 @@ import java.util.UUID;
 public interface AnimationModule extends ModuleLocalization {
 
     @Override
-    void onEnable();
-
-    @Override
     Localization.Message.Format.Animation localization(FPlayer fPlayer);
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Format.Animation config();

@@ -52,7 +52,7 @@ public class MinecraftChatSettingModule extends ChatsettingModuleImpl {
 
 
     @Override
-    protected MenuBuilder getMenuBuilder() {
+    public MenuBuilder getMenuBuilder() {
         return config().modern().enable() && isNewerThanOrEqualsV_1_21_6
                 ? dialogMenuBuilder.get()
                 : inventoryMenuBuilder.get();

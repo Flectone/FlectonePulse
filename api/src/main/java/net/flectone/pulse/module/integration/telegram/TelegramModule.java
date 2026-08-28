@@ -17,9 +17,6 @@ import org.jspecify.annotations.NonNull;
 public interface TelegramModule extends ModuleLocalization {
 
     @Override
-    ModuleName name();
-
-    @Override
     Integration.Telegram config();
 
     @Override

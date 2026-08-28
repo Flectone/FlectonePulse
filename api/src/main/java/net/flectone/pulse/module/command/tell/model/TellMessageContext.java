@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.command.tell;
+package net.flectone.pulse.module.command.tell.model;
 
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.StringMessageContext;

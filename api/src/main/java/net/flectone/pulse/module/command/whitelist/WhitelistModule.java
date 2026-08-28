@@ -3,12 +3,10 @@ package net.flectone.pulse.module.command.whitelist;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.ModuleCommand;
-import org.incendo.cloud.context.CommandContext;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -19,25 +17,13 @@ import org.jspecify.annotations.Nullable;
 public interface WhitelistModule extends ModuleCommand {
 
     @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
     Localization.Command.Whitelist localization(FPlayer fPlayer);
-
-    @Override
-    ModuleName name();
 
     @Override
     Command.Whitelist config();
 
     @Override
     Permission.Command.Whitelist permission();
-
-    @Override
-    void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
 
     @Nullable Moderation add(@NonNull FPlayer fModerator, @NonNull FPlayer fTarget, long time, @Nullable String reason);
 

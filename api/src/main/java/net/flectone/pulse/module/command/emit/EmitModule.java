@@ -3,29 +3,15 @@ package net.flectone.pulse.module.command.emit;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.Destination;
 import net.flectone.pulse.module.ModuleCommand;
-import org.incendo.cloud.context.CommandContext;
 
 /**
  * The /emit command, which sends a raw formatted message to a chosen destination.
  * @author TheFaser
  */
 public interface EmitModule extends ModuleCommand {
-
-    @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
-    void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
-    @Override
-    ModuleName name();
 
     @Override
     Command.Emit config();

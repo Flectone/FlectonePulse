@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.format.replacement;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -14,15 +13,6 @@ import net.kyori.adventure.text.Component;
  * @author TheFaser
  */
 public interface ReplacementModule extends ModuleLocalization {
-
-    @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Format.Replacement config();

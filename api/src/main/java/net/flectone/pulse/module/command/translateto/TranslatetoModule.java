@@ -3,28 +3,14 @@ package net.flectone.pulse.module.command.translateto;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
-import org.incendo.cloud.context.CommandContext;
 
 /**
  * The /translateto command, which translates a message into another language.
  * @author TheFaser
  */
 public interface TranslatetoModule extends ModuleCommand {
-
-    @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
-    void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
-    @Override
-    ModuleName name();
 
     @Override
     Command.Translateto config();

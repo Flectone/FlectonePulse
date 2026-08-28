@@ -3,11 +3,9 @@ package net.flectone.pulse.module.command.maintenance;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.ModuleCommand;
-import org.incendo.cloud.context.CommandContext;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -18,18 +16,6 @@ import java.util.Optional;
  * @author TheFaser
  */
 public interface MaintenanceModule extends ModuleCommand {
-
-    @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
-    void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
-    @Override
-    ModuleName name();
 
     @Override
     Command.Maintenance config();

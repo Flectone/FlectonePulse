@@ -3,7 +3,6 @@ package net.flectone.pulse.module.command.nickname;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -18,15 +17,6 @@ import java.util.UUID;
  */
 public interface NicknameModule extends ModuleCommand {
 
-    @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
-    void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
     /**
      * Runs the form of the command that changes someone else's nickname.
      *
@@ -34,9 +24,6 @@ public interface NicknameModule extends ModuleCommand {
      * @param commandContext the parsed arguments
      */
     void executeOther(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
-    @Override
-    ModuleName name();
 
     @Override
     Command.Nickname config();

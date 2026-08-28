@@ -3,29 +3,16 @@ package net.flectone.pulse.module.command.chatsetting;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
-import org.incendo.cloud.context.CommandContext;
+import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 
 /**
  * The /chatsetting command, which opens the menu where a player toggles their personal chat options.
  * @author TheFaser
  */
 public interface ChatsettingModule extends ModuleCommand {
-
-    @Override
-    void onEnable();
-
-    @Override
-    void onDisable();
-
-    @Override
-    void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
-    @Override
-    ModuleName name();
 
     @Override
     Command.Chatsetting config();
@@ -53,6 +40,13 @@ public interface ChatsettingModule extends ModuleCommand {
      * @param value the new value
      */
     void saveSetting(FPlayer fPlayer, SettingText settingText, String value);
+
+    /**
+     * Returns the menu builder
+     *
+     * @return the menu builder
+     */
+    MenuBuilder getMenuBuilder();
 
     /**
      * The chat a player currently writes to.

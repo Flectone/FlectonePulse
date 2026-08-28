@@ -6,16 +6,12 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.constant.ModuleName;
 
 /**
  * Keeps players quiet until they have been on the server long enough.
  * @author TheFaser
  */
 public interface NewbieModule extends ModuleLocalization {
-
-    @Override
-    ModuleName name();
 
     @Override
     Message.Format.Moderation.Newbie config();
