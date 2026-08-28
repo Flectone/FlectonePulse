@@ -64,4 +64,26 @@ public interface ConditionModule extends ModuleLocalization {
     @Nullable
     String getConditionValue(String conditionName, FEntity fPlayer, FPlayer fReceiver, Map<MessageFlag, Boolean> flags);
 
+    /**
+     * Parses condition tag in a raw string
+     *
+     * @param message the raw text
+     * @param fPlayer whose conditions are read
+     * @return the text with condition
+     */
+    @Nullable
+    String replaceCondition(String message, FPlayer fPlayer);
+
+    /**
+     * Parses condition tag in a raw string
+     *
+     * @param message the raw text
+     * @param fPlayer who wrote the message
+     * @param fReceiver who reads it
+     * @param flags the formatting switches
+     * @return the text with condition
+     */
+    @Nullable
+    String replaceCondition(String message, FEntity fPlayer, FPlayer fReceiver, Map<MessageFlag, Boolean> flags);
+
 }

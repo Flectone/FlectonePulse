@@ -15,6 +15,7 @@ import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.MultilineString;
 import net.flectone.pulse.module.message.format.condition.listener.PulseConditionListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -26,12 +27,20 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ConditionModuleImpl implements ConditionModule {
+
+    private static final Pattern CONDITION_PATTERN = Pattern.compile(
+            "<" + MessagePipeline.ReplacementTag.CONDITION.getTagName() + ":([^<>]+)>",
+            Pattern.CASE_INSENSITIVE
+    );
 
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
@@ -107,10 +116,10 @@ public class ConditionModuleImpl implements ConditionModule {
         if (criteria == null) return null;
         if (!permissionChecker.check(fPlayer, permission().values().get(conditionName))) return null;
 
-        Map<String, String> values = localization(fReceiver).values().get(conditionName);
+        Map<String, MultilineString> values = localization(fReceiver).values().get(conditionName);
         if (values == null || values.isEmpty()) return null;
 
-        String conditionValue = switch (criteria.type()) {
+        MultilineString conditionValue = switch (criteria.type()) {
             case NUMBER -> {
                 try {
                     double number = Double.parseDouble(buildCriteriaString(fPlayer, fReceiver, criteria.value(), flags));
@@ -146,7 +155,38 @@ public class ConditionModuleImpl implements ConditionModule {
             }
         };
 
-        return conditionValue != null ? conditionValue : values.get("default");
+        MultilineString value = conditionValue != null ? conditionValue : values.get("default");
+        return value != null ? value.value() : null;
+    }
+
+    @Nullable
+    @Override
+    public String replaceCondition(String message, FPlayer fPlayer) {
+        return replaceCondition(message, fPlayer, fPlayer, Map.of());
+    }
+
+    @Nullable
+    @Override
+    public String replaceCondition(String message, FEntity fPlayer, FPlayer fReceiver, Map<MessageFlag, Boolean> flags) {
+        if (StringUtils.isEmpty(message)) return message;
+        if (moduleController.isDisabledFor(this, fPlayer)) return message;
+        if (!message.contains("<condition")) return message;
+
+        Matcher matcher = CONDITION_PATTERN.matcher(message);
+        if (!matcher.find()) return message;
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        do {
+            String conditionName = StringUtils.strip(matcher.group(1).trim(), "'\"").toLowerCase(Locale.ROOT);
+            String conditionValue = getConditionValue(conditionName, fPlayer, fReceiver, flags);
+            matcher.appendReplacement(stringBuilder, Matcher.quoteReplacement(conditionValue == null ? "" : conditionValue));
+        } while (matcher.find());
+
+        matcher.appendTail(stringBuilder);
+
+        String replacedMessage = stringBuilder.toString();
+        return replaceCondition(replacedMessage, fPlayer, fReceiver, flags);
     }
 
     private String buildCriteriaString(FEntity fPlayer, FPlayer fReceiver, String value, Map<MessageFlag, Boolean> flags) {
