@@ -29,6 +29,19 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
         return ModerationSQL.class;
     }
 
+    public List<Moderation> getAll(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
+        if (database.isClosed()) return List.of();
+        if (player.isUnknown()) return List.of();
+
+        return withHandle(sql -> sql.findByPlayerAndType(
+                player.id(),
+                type.name(),
+                server,
+                limit,
+                offset
+        ));
+    }
+
     public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
         if (database.isClosed()) return List.of();
         if (player.isUnknown()) return List.of();
@@ -71,6 +84,16 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
         return withHandle(sql -> sql.findValidPlayerNamesByType(
                 type.name(),
                 System.currentTimeMillis(),
+                server
+        ));
+    }
+
+    public int getTotalCount(FPlayer fPlayer, Moderation.Type type, @Nullable String server) {
+        if (database.isClosed()) return 0;
+
+        return withHandle(sql -> sql.getTotalCountByPlayerAndType(
+                fPlayer.id(),
+                type.name(),
                 server
         ));
     }

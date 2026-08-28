@@ -125,6 +125,11 @@ public class ModerationServiceImpl implements ModerationService {
     }
 
     @Override
+    public List<Moderation> getAll(FPlayer fPlayer, Moderation.Type type, @Nullable String server, int limit, int offset) {
+        return moderationRepository.getAll(fPlayer, type, server, limit, offset);
+    }
+
+    @Override
     public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type, @Nullable String server, int limit, int offset) {
         return moderationRepository.getValid(fPlayer, type, server, limit, offset);
     }
@@ -147,6 +152,11 @@ public class ModerationServiceImpl implements ModerationService {
     @Override
     public List<String> getValidNames(Moderation.Type type) {
         return moderationRepository.getValidNames(type, getServer(type));
+    }
+
+    @Override
+    public int getTotalCount(FPlayer fPlayer, Moderation.Type type, @Nullable String server) {
+        return moderationRepository.getTotalCount(fPlayer, type, server);
     }
 
     @Override

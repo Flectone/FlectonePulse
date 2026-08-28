@@ -68,7 +68,7 @@ public class ModerationListSenderImpl implements ModerationListSender {
         Localization.ListTypeMessage localizationType;
         if (listArgument.target() != null) {
             nextPageCommand+= " " + listArgument.target().name();
-            size = moderationService.getTotalValidCount(listArgument.target(), type, moderationService.getServer(type));
+            size = moderationService.getTotalCount(listArgument.target(), type, moderationService.getServer(type));
             localizationType = localization.apply(fPlayer).player();
         } else {
             size = moderationService.getTotalValidCount(type, moderationService.getServer(type));
@@ -105,7 +105,7 @@ public class ModerationListSenderImpl implements ModerationListSender {
 
         List<Moderation> moderations;
         if (listArgument.target() != null) {
-            moderations = moderationService.getValid(listArgument.target(), type, perPage, (listArgument.page() - 1) * perPage);
+            moderations = moderationService.getAll(listArgument.target(), type, moderationService.getServer(type), perPage, (listArgument.page() - 1) * perPage);
         } else {
             moderations = moderationService.getValid(type, perPage, (listArgument.page() - 1) * perPage);
         }
@@ -124,11 +124,13 @@ public class ModerationListSenderImpl implements ModerationListSender {
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
             // line
+            String line = Strings.CS.replace(moderation.isActive() ? localizationType.line() : localizationType.lineNotActive(), "<command>", unmoderationCommand.apply(fTarget));
+
             // <target:...> -> <target_x:...>
             // <moderator:...> -> <moderator_x:...>
             stringBuilder
                     .append(StringUtils.replaceEach(
-                            moderationMessageFormatter.replacePlaceholders(Strings.CS.replace(localizationType.line(), "<command>", unmoderationCommand.apply(fTarget)), fPlayer, moderation),
+                            moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation),
                             new String[]{"<target", "<moderator"},
                             new String[]{"<target_" + i, "<moderator_" + i}
                     ))

@@ -54,6 +54,11 @@ public class ModerationRepositoryImpl implements ModerationRepository {
     }
 
     @Override
+    public List<Moderation> getAll(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
+        return moderationDAO.getAll(player, type, server, limit, offset);
+    }
+
+    @Override
     public void invalidate(@NonNull UUID playerId, Moderation.Type type, @Nullable String server) {
         Map<String, List<Moderation>> playerModerations = moderationCache.getIfPresent(playerId);
         if (playerModerations == null) return;
@@ -94,6 +99,11 @@ public class ModerationRepositoryImpl implements ModerationRepository {
     @Override
     public List<String> getValidNames(Moderation.Type type, @Nullable String server) {
         return moderationDAO.getValidPlayersNames(type, server);
+    }
+
+    @Override
+    public int getTotalCount(FPlayer fPlayer, Moderation.Type type, @Nullable String server) {
+        return moderationDAO.getTotalCount(fPlayer, type, server);
     }
 
     @Override

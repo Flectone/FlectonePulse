@@ -1447,6 +1447,7 @@ public record Localization(
     public record ListTypeMessage(
             String header,
             String line,
+            String lineNotActive,
             String footer
     ) {
     }

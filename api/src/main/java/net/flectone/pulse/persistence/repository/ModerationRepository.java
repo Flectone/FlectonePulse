@@ -32,6 +32,19 @@ public interface ModerationRepository {
     List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset);
 
     /**
+     * Retrieves all moderations for a player regardless of their validity status.
+     * Includes both active and expired/invalidated moderation entries.
+     *
+     * @param player the player to retrieve moderations for
+     * @param type the moderation type to filter by
+     * @param server the server ID (can be null for global search)
+     * @param limit maximum number of results to return
+     * @param offset number of results to skip for pagination
+     * @return list of all moderation actions matching the criteria
+     */
+    List<Moderation> getAll(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset);
+
+    /**
      * Invalidates cache for a specific player and moderation type.
      *
      * @param playerId the player UUID
@@ -95,6 +108,17 @@ public interface ModerationRepository {
      * @return list of player names
      */
     List<String> getValidNames(Moderation.Type type, @Nullable String server);
+
+    /**
+     * Counts the total number of moderation records for a specific player and type,
+     * regardless of their validity status.
+     *
+     * @param fPlayer the player to count moderations for
+     * @param type the moderation type to filter by
+     * @param server the server ID (can be null for global count)
+     * @return the total count of moderation records matching the criteria
+     */
+    int getTotalCount(FPlayer fPlayer, Moderation.Type type, @Nullable String server);
 
     /**
      * Counts the total number of valid moderations for a specific player and type.

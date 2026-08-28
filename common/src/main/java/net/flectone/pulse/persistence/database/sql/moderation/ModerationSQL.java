@@ -12,6 +12,9 @@ import java.util.Optional;
 
 public interface ModerationSQL extends SQL {
 
+    @SqlQuery("SELECT * FROM `fp_moderation` WHERE `player` = :player AND `type` = :type AND (:server IS NULL OR `server` IS NULL OR `server` = :server) ORDER BY `id` DESC LIMIT :limit OFFSET :offset")
+    List<Moderation> findByPlayerAndType(@Bind("player") int playerId, @Bind("type") String type, @Bind("server") String server, @Bind("limit") int limit, @Bind("offset") int offset);
+
     @SqlQuery("SELECT * FROM `fp_moderation` WHERE `player` = :player AND `type` = :type AND `valid` = true AND (`time` = -1 OR `time` > :currentTime) AND (:server IS NULL OR `server` IS NULL OR `server` = :server) ORDER BY `id` DESC LIMIT :limit OFFSET :offset")
     List<Moderation> findValidByPlayerAndType(@Bind("player") int playerId, @Bind("type") String type, @Bind("currentTime") long currentTime, @Bind("server") String server, @Bind("limit") int limit, @Bind("offset") int offset);
 
@@ -23,6 +26,9 @@ public interface ModerationSQL extends SQL {
 
     @SqlQuery("SELECT `p`.`name` FROM `fp_moderation` `m` JOIN `fp_player` `p` ON `p`.`id` = `m`.`player` WHERE `m`.`type` = :type AND `m`.`valid` = true AND (`m`.`time` = -1 OR `m`.`time` > :currentTime) AND (:server IS NULL OR `m`.`server` IS NULL OR `m`.`server` = :server) AND NOT `player` = -1")
     List<String> findValidPlayerNamesByType(@Bind("type") String type, @Bind("currentTime") long currentTime, @Bind("server") String server);
+
+    @SqlQuery("SELECT COUNT(id) FROM `fp_moderation` WHERE `player` = :player AND `type` = :type AND (:server IS NULL OR `server` IS NULL OR `server` = :server)")
+    int getTotalCountByPlayerAndType(@Bind("player") int playerId, @Bind("type") String type, @Bind("server") String server);
 
     @SqlQuery("SELECT COUNT(id) FROM `fp_moderation` WHERE `player` = :player AND `type` = :type AND `valid` = true AND (`time` = -1 OR `time` > :currentTime) AND (:server IS NULL OR `server` IS NULL OR `server` = :server)")
     int getTotalValidCountByPlayerAndType(@Bind("player") int playerId, @Bind("type") String type, @Bind("currentTime") long currentTime, @Bind("server") String server);

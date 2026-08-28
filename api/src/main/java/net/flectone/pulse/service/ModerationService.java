@@ -149,6 +149,18 @@ public interface ModerationService {
     boolean hasValid(FPlayer fTarget, Moderation.Type type, int id);
 
     /**
+     * Retrieves all moderation records for a player, including expired and invalidated ones.
+     *
+     * @param fPlayer the player to retrieve moderations for
+     * @param type the moderation type to filter by
+     * @param server the server ID (can be null for global search)
+     * @param limit maximum number of results to return
+     * @param offset number of results to skip for pagination
+     * @return list of all moderation records matching the criteria
+     */
+    List<Moderation> getAll(FPlayer fPlayer, Moderation.Type type, @Nullable String server, int limit, int offset);
+
+    /**
      * The active punishment of a type for a player.
      *
      * @param fPlayer the player to check
@@ -206,6 +218,16 @@ public interface ModerationService {
      * @return the player names
      */
     List<String> getValidNames(Moderation.Type type);
+
+    /**
+     * Counts the total number of moderation records for a player, regardless of validity status.
+     *
+     * @param fPlayer the player to count moderations for
+     * @param type the moderation type to filter by
+     * @param server the server ID (can be null for global count)
+     * @return the total count of moderation records matching the criteria
+     */
+    int getTotalCount(FPlayer fPlayer, Moderation.Type type, @Nullable String server);
 
     /**
      * How many active punishments of a type a player has, used to size the list pages.

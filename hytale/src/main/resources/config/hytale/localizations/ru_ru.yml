@@ -70,10 +70,12 @@ command:
     global:
       header: "<fcolor:2>| Блокировки: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      line_not_active: "<color:#929493>[ ]</color:#929493> <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <fcolor:2><click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
     player:
       header: "<fcolor:2>| Все блокировки: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      line_not_active: "<color:#929493>[ ]</color:#929493> <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
   broadcast:
     format: "<br><color:#ffd500>| [!] Сообщение для всех <br>|<br>| Автор <display_name> <br>|<br>| <fcolor:1><message> <br>"
@@ -300,10 +302,12 @@ command:
     global:
       header: "<fcolor:2>| Муты: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      line_not_active: "<color:#929493>[ ]</color:#929493> <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
     player:
       header: "<fcolor:2>| Все муты: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      line_not_active: "<color:#929493>[ ]</color:#929493> <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
   nickname:
     null_player: "<color:#ff7171>Игрок не найден"
@@ -479,10 +483,12 @@ command:
     global:
       header: "<fcolor:2>| Предупреждения: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      line_not_active: "<color:#929493>[ ]</color:#929493> <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
     player:
       header: "<fcolor:2>| Все предупреждения: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      line_not_active: "<color:#929493>[ ]</color:#929493> <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
   whitelist:
     empty: "<color:#98FB98> Белый список пустой"
@@ -507,10 +513,12 @@ command:
     global:
       header: "<fcolor:2>| Игроки в белом списке: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      line_not_active: "<color:#929493>[ ]</color:#929493> <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
     player:
       header: "<fcolor:2>| Записи игрока в белом списке: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      line_not_active: "<color:#929493>[ ]</color:#929493> <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
   whois:
     empty: "<color:#ff7171>Игроков с таким айпи не найдено"
