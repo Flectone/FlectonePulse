@@ -135,10 +135,10 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
 
     private void handleLoginSuccess(PacketSendEvent event) {
         if (event.getPacketType() != PacketType.Login.Server.LOGIN_SUCCESS) return;
+        if (!fileFacade.config().internal().usePacketLoginListener()) return;
 
-        // only for 1.20.2 and newer versions
-        // because there is a configuration stage and there are no problems
-        if (!fileFacade.config().internal().usePacketLoginListener() && !packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) return;
+        // only for 1.20.2 and newer versions because there is a configuration stage and there are no problems
+        if (!packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) return;
 
         WrapperLoginServerLoginSuccess wrapper = new WrapperLoginServerLoginSuccess(event);
         UserProfile userProfile = wrapper.getUserProfile();

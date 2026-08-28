@@ -27,18 +27,19 @@ public class PaperPlayerLoginListener implements Listener {
     public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
         if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) return;
 
-        // in older versions (1.20.1 and older), there is no configuration stage, so we use Bukkit API
-        if (!fileFacade.config().internal().usePacketLoginListener() || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)) {
-            UUID uuid = event.getUniqueId();
-            String name = event.getName();
+        // in older versions (1.20.1 and older), there is no configuration stage
+        if (fileFacade.config().internal().usePacketLoginListener()
+                && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) return;
 
-            playerPreLoginProcessor.processLogin(uuid, name, loginEvent -> {
-                event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
+        UUID uuid = event.getUniqueId();
+        String name = event.getName();
 
-                String reason = componentSerializer.toJson(loginEvent);
-                event.kickMessage(GsonComponentSerializer.gson().deserialize(reason));
-            });
-        }
+        playerPreLoginProcessor.processLogin(uuid, name, loginEvent -> {
+            event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
+
+            String reason = componentSerializer.toJson(loginEvent);
+            event.kickMessage(GsonComponentSerializer.gson().deserialize(reason));
+        });
     }
 
 }
