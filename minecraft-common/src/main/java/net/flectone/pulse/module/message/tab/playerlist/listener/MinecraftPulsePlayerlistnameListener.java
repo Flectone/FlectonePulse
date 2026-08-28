@@ -50,7 +50,7 @@ public class MinecraftPulsePlayerlistnameListener implements PulseListener {
                 playerlistnameModule.update(fPlayerService.getFPlayer(event.sender().uuid()));
             }
 
-            playerlistnameModule.updateProxyPlayers();
+            playerlistnameModule.removeOfflineProxyPlayers();
         }
     }
 
