@@ -258,15 +258,12 @@ public class SocialServiceImpl implements SocialService {
     }
 
     @Override
-    public boolean isVanished(@NonNull FEntity fEntity) {
-        return isVanished(fEntity, false);
+    public boolean hasVanishIntegration() {
+        return integrationModule.get().hasVanishIntegration();
     }
 
     @Override
-    public boolean isVanished(@NonNull FEntity fEntity, boolean checkVanishIntegration) {
-        IntegrationModule integrationModuleInstance = integrationModule.get();
-        if (checkVanishIntegration && !integrationModuleInstance.hasVanishIntegration()) return false;
-
+    public boolean isVanished(@NonNull FEntity fEntity) {
         if (fEntity instanceof FPlayer fPlayer) {
             FileFacade fileFacadeInstance = fileFacade.get();
             if (fileFacadeInstance.integration().supervanish().enable()
@@ -276,7 +273,7 @@ public class SocialServiceImpl implements SocialService {
             }
         }
 
-        return integrationModuleInstance.isVanished(fEntity);
+        return integrationModule.get().isVanished(fEntity);
     }
 
     @Override

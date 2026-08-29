@@ -258,6 +258,14 @@ public interface SocialService {
     boolean updateLocale(@NonNull FPlayer fPlayer, @NonNull String newLocale);
 
     /**
+     * Checks whether any vanish integrations are currently registered and active.
+     * Used to determine if vanish functionality should be enabled.
+     *
+     * @return true if vanish integrations exist, false otherwise
+     */
+    boolean hasVanishIntegration();
+
+    /**
      * Checks whether a given entity is currently in vanish mode (invisible to other players).
      * <p>
      * This method first checks if the entity is a player with a configured vanish status setting.
@@ -267,18 +275,6 @@ public interface SocialService {
      * @return true if the entity is vanished, false otherwise
      */
     boolean isVanished(@NonNull FEntity fEntity);
-
-    /**
-     * Checks whether a given entity is currently in vanish mode (invisible to other players).
-     * <p>
-     * This method first checks if the entity is a player with a configured vanish status setting.
-     * If not found locally, it delegates to the integration module to check external vanish providers.
-     *
-     * @param fEntity the entity to check for vanish status
-     * @param checkVanishIntegration whether to enforce that a vanish integration is present; if true and no integration is available, returns false immediately
-     * @return true if the entity is vanished, false otherwise
-     */
-    boolean isVanished(@NonNull FEntity fEntity, boolean checkVanishIntegration);
 
     /**
      * Determines whether a viewer can see a target entity that may be in vanish mode.
