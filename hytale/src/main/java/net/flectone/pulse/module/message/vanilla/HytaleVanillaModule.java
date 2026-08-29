@@ -126,7 +126,7 @@ public class HytaleVanillaModule extends VanillaModuleImpl {
                 .integration(() -> IntegrationMessageFormat.builder()
                         .messageNames(StringUtils.isNotEmpty(vanillaMessageName)
                                 ? List.of(vanillaMessageName.toUpperCase(), parsedComponent.translationKey())
-                                : List.of()
+                                : List.of(parsedComponent.translationKey())
                         )
                         .build()
                 )
