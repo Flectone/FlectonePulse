@@ -34,7 +34,7 @@ public class MinecraftPulsePlayerlistnameListener implements PulseListener {
 
     @Pulse
     public void onPlayerPersistAndDisposeEvent(PlayerPersistAndDisposeEvent event) {
-        playerlistnameModule.clearProxyPlayers(event.player().uuid());
+        playerlistnameModule.clearPlayer(event.player().uuid());
     }
 
     @Pulse

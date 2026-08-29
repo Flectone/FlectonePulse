@@ -28,6 +28,7 @@ import net.flectone.pulse.model.value.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.scoreboard.MinecraftScoreboardModule;
+import net.flectone.pulse.module.message.tab.playerlist.listener.MinecraftPacketPlayerlistnameListener;
 import net.flectone.pulse.module.message.tab.playerlist.listener.MinecraftPulsePlayerlistnameListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -69,6 +70,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     );
 
     private final Map<UUID, Set<UUID>> proxyPlayers = new ConcurrentHashMap<>();
+    private final Map<UUID, Map<UUID, PlayerlistnameEntry>> sentEntries = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -95,6 +97,12 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         }
 
         listenerRegistry.register(MinecraftPulsePlayerlistnameListener.class);
+        listenerRegistry.register(MinecraftPacketPlayerlistnameListener.class);
+    }
+
+    @Override
+    public void onDisable() {
+        sentEntries.clear();
     }
 
     @Override
@@ -153,10 +161,16 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
 
     public void sendPlayerInfos(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
         List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfoList = onlinePlayers.stream().map(fSender -> {
-            if (!socialService.canSeeVanished(fSender, fReceiver)) return null;
+            if (!socialService.canSeeVanished(fSender, fReceiver)) {
+                forgetEntry(fReceiver.uuid(), fSender.uuid());
+                return null;
+            }
 
             Pair<UserProfile, Boolean> userProfilePair = createUserProfile(fSender, fReceiver);
-            if (userProfilePair == null) return null;
+            if (userProfilePair == null) {
+                forgetEntry(fReceiver.uuid(), fSender.uuid());
+                return null;
+            }
 
             Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fSender, config().range());
 
@@ -172,25 +186,33 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                     gameMode != GameMode.SPECTATOR || config().spectatorListOrder() ? integrationModule.getGroupWeight(fSender) : 0
             );
 
+            PlayerlistnameEntry entry = PlayerlistnameEntry.of(playerInfo);
+            PlayerlistnameEntry sentEntry = rememberEntry(fReceiver, fSender, entry);
             if (userProfilePair.getRight()) {
-                packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(ADD_ACTIONS, playerInfo));
+                packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(ADD_ACTIONS, playerInfo), true);
                 return null;
             }
 
-            return playerInfo;
+            return entry.equals(sentEntry) ? null : playerInfo;
         }).filter(Objects::nonNull).toList();
 
         if (!playerInfoList.isEmpty()) {
-            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(UPDATE_ACTIONS, playerInfoList));
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(UPDATE_ACTIONS, playerInfoList), true);
         }
     }
 
     public void sendPlayerData(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
         List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList = onlinePlayers.stream().map(fSender -> {
-            if (!socialService.canSeeVanished(fSender, fReceiver)) return null;
+            if (!socialService.canSeeVanished(fSender, fReceiver)) {
+                forgetEntry(fReceiver.uuid(), fSender.uuid());
+                return null;
+            }
 
             Pair<UserProfile, Boolean> userProfilePair = createUserProfile(fSender, fReceiver);
-            if (userProfilePair == null) return null;
+            if (userProfilePair == null) {
+                forgetEntry(fReceiver.uuid(), fSender.uuid());
+                return null;
+            }
 
             WrapperPlayServerPlayerInfo.PlayerData playerData = new WrapperPlayServerPlayerInfo.PlayerData(
                     buildFPlayerName(fSender, fReceiver),
@@ -199,16 +221,18 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                     platformPlayerAdapter.getPing(fSender)
             );
 
+            PlayerlistnameEntry entry = PlayerlistnameEntry.of(playerData);
+            PlayerlistnameEntry sentEntry = rememberEntry(fReceiver, fSender, entry);
             if (userProfilePair.getRight()) {
-                packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, playerData));
+                packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, playerData), true);
                 return null;
             }
 
-            return playerData;
+            return entry.equals(sentEntry) ? null : playerData;
         }).filter(Objects::nonNull).toList();
 
         if (!playerDataList.isEmpty()) {
-            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerDataList));
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerDataList), true);
         }
     }
 
@@ -223,6 +247,8 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                 })
                 .forEach(uuid -> {
                     packetSender.send(key, new WrapperPlayServerPlayerInfoRemove(uuid));
+
+                    forgetEntry(key, uuid);
 
                     value.remove(uuid);
 
@@ -239,12 +265,17 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
             scoreboardModule.remove(fPlayerService.getFPlayer(uuid));
         }
 
+        sentEntries.values().forEach(entries -> entries.remove(uuid));
+
         platformPlayerAdapter.getOnlinePlayers().forEach(onlineUUID ->
                 packetSender.send(onlineUUID, new WrapperPlayServerPlayerInfoRemove(uuid))
         );
     }
 
-    public void clearProxyPlayers(UUID uuid) {
+    public void clearPlayer(UUID uuid) {
+        sentEntries.remove(uuid);
+        sentEntries.values().forEach(entries -> entries.remove(uuid));
+
         if (isProxyMode()) {
             proxyPlayers.remove(uuid);
         }
@@ -252,6 +283,18 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
 
     public boolean isProxyMode() {
         return moduleController.isEnable(this) && config().range().is(Range.Type.PROXY) && proxyRegistry.hasEnabledProxy();
+    }
+
+    private MinecraftPlayerlistnameModule.@Nullable PlayerlistnameEntry rememberEntry(FPlayer fReceiver, FPlayer fSender, PlayerlistnameEntry entry) {
+        return sentEntries.computeIfAbsent(fReceiver.uuid(), _ -> new ConcurrentHashMap<>())
+                .put(fSender.uuid(), entry);
+    }
+
+    public void forgetEntry(UUID receiver, UUID sender) {
+        Map<UUID, PlayerlistnameEntry> receiverEntries = sentEntries.get(receiver);
+        if (receiverEntries != null) {
+            receiverEntries.remove(sender);
+        }
     }
 
     @Nullable
@@ -308,6 +351,22 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                 .flag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, fReceiver.uuid().version() == 3)
                 .build()
         );
+    }
+
+    private record PlayerlistnameEntry(
+            int displayName,
+            boolean listed,
+            int listOrder
+    ) {
+
+        static PlayerlistnameEntry of(WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo) {
+            return new PlayerlistnameEntry(Objects.hashCode(playerInfo.getDisplayName()), playerInfo.isListed(), playerInfo.getListOrder());
+        }
+
+        static PlayerlistnameEntry of(WrapperPlayServerPlayerInfo.PlayerData playerData) {
+            return new PlayerlistnameEntry(Objects.hashCode(playerData.getDisplayName()), false, 0);
+        }
+
     }
 
 }
