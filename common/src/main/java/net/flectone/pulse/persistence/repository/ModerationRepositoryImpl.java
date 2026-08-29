@@ -11,64 +11,67 @@ import net.flectone.pulse.persistence.database.dao.ModerationDAO;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationRepositoryImpl implements ModerationRepository {
+
+    private static final UUID SHARED_KEY = UUID.nameUUIDFromBytes("flectonepulse:moderation:shared".getBytes(StandardCharsets.UTF_8));
+
+    private static final String VALID_KEY = "valid";
+    private static final String ALL_KEY = "all";
 
     private final @Named("moderation") Cache<UUID, Map<String, List<Moderation>>> moderationCache;
     private final ModerationDAO moderationDAO;
 
     @Override
     public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
-        Map<String, List<Moderation>> playerModerations = moderationCache.get(player.uuid(), _ -> new ConcurrentHashMap<>());
+        if (player.isUnknown()) return moderationDAO.getValid(player, type, server, limit, offset);
 
-        String typeServerKey = type.name() + server;
-        List<Moderation> moderations = playerModerations.get(typeServerKey);
-        if (moderations == null) {
-            // get from database
-            moderations = moderationDAO.getValid(player, type, server, limit, offset);
-
-            // add to cache
-            playerModerations.put(typeServerKey, moderations);
-
-            return moderations;
-        }
-
-        if (moderations.stream().allMatch(Moderation::isActive)) {
-            return moderations;
-        }
-
-        List<Moderation> valid = moderations.stream()
-                .filter(Moderation::isActive)
-                .toList();
-
-        playerModerations.put(typeServerKey, valid);
-
-        return valid;
+        return getValidCache(player.uuid(), cacheKey(type, server, VALID_KEY, limit, offset), () -> moderationDAO.getValid(player, type, server, limit, offset));
     }
 
     @Override
     public List<Moderation> getAll(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
-        return moderationDAO.getAll(player, type, server, limit, offset);
+        if (player.isUnknown()) return moderationDAO.getAll(player, type, server, limit, offset);
+
+        return getAllCache(player.uuid(), cacheKey(type, server, ALL_KEY, limit, offset), () -> moderationDAO.getAll(player, type, server, limit, offset));
+    }
+
+    @Override
+    public List<Moderation> getValid(Moderation.Type type, @Nullable String server, int limit, int offset) {
+        return getValidCache(SHARED_KEY, cacheKey(type, server, VALID_KEY, limit, offset), () -> moderationDAO.getValid(type, server, limit, offset));
+    }
+
+    @Override
+    public Optional<Moderation> getValid(@Nullable String server, int id) {
+        List<Moderation> moderations = getValidCache(SHARED_KEY, "id:" + server + ":" + id, () -> moderationDAO.getValidById(server, id)
+                .map(List::of)
+                .orElseGet(List::of)
+        );
+
+        return moderations.stream().findAny();
     }
 
     @Override
     public void invalidate(@NonNull UUID playerId, Moderation.Type type, @Nullable String server) {
         Map<String, List<Moderation>> playerModerations = moderationCache.getIfPresent(playerId);
-        if (playerModerations == null) return;
+        if (playerModerations != null) {
+            playerModerations.keySet().removeIf(key -> key.startsWith(type.name()));
 
-        playerModerations.remove(type.name() + server);
-
-        // remove cache key if map empty
-        if (playerModerations.isEmpty()) {
-            moderationCache.invalidate(playerId);
+            if (playerModerations.isEmpty()) {
+                moderationCache.invalidate(playerId);
+            }
         }
+
+        moderationCache.invalidate(SHARED_KEY);
     }
 
     @Override
@@ -79,21 +82,16 @@ public class ModerationRepositoryImpl implements ModerationRepository {
     @Override
     public void invalidateAll(@NonNull UUID playerId) {
         moderationCache.invalidate(playerId);
+        moderationCache.invalidate(SHARED_KEY);
     }
 
     @Override
     public Moderation save(@NonNull FPlayer fTarget, long date, long time, String reason, int moderatorID, Moderation.Type type, String server) {
-        return moderationDAO.insert(fTarget, date, time, reason, moderatorID, type, server);
-    }
+        Moderation moderation = moderationDAO.insert(fTarget, date, time, reason, moderatorID, type, server);
 
-    @Override
-    public List<Moderation> getValid(Moderation.Type type, @Nullable String server, int limit, int offset) {
-        return moderationDAO.getValid(type, server, limit, offset);
-    }
+        invalidate(fTarget.uuid(), type, server);
 
-    @Override
-    public Optional<Moderation> getValid(@Nullable String server, int id) {
-        return moderationDAO.getValidById(server, id);
+        return moderation;
     }
 
     @Override
@@ -119,11 +117,55 @@ public class ModerationRepositoryImpl implements ModerationRepository {
     @Override
     public void updateValid(int id, @Nullable String server) {
         moderationDAO.updateValid(id, server);
+        moderationCache.invalidate(SHARED_KEY);
     }
 
     @Override
     public void updateValid(int playerId, Moderation.@NonNull Type type, @Nullable String server) {
         moderationDAO.updateValid(playerId, type, server);
+        moderationCache.invalidate(SHARED_KEY);
+    }
+
+    private List<Moderation> getValidCache(UUID cacheKey, String key, Supplier<List<Moderation>> loader) {
+        Map<String, List<Moderation>> moderations = moderationCache.get(cacheKey, _ -> new ConcurrentHashMap<>());
+
+        List<Moderation> cached = moderations.get(key);
+        if (cached == null) {
+            List<Moderation> loaded = loader.get();
+
+            moderations.put(key, loaded);
+
+            return loaded;
+        }
+
+        if (cached.stream().allMatch(Moderation::isActive)) {
+            return cached;
+        }
+
+        List<Moderation> active = cached.stream()
+                .filter(Moderation::isActive)
+                .toList();
+
+        moderations.put(key, active);
+
+        return active;
+    }
+
+    private List<Moderation> getAllCache(UUID cacheKey, String key, Supplier<List<Moderation>> loader) {
+        Map<String, List<Moderation>> moderations = moderationCache.get(cacheKey, _ -> new ConcurrentHashMap<>());
+
+        List<Moderation> cached = moderations.get(key);
+        if (cached != null) return cached;
+
+        List<Moderation> loaded = loader.get();
+
+        moderations.put(key, loaded);
+
+        return loaded;
+    }
+
+    private String cacheKey(Moderation.Type type, @Nullable String server, String kind, int limit, int offset) {
+        return type.name() + ":" + server + ":" + kind + ":" + limit + ":" + offset;
     }
 
 }
