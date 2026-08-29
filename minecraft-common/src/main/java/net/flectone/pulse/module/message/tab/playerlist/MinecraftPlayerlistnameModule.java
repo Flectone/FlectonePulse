@@ -257,35 +257,33 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     @Nullable
     private Pair<UserProfile, Boolean> createUserProfile(FPlayer fSender, FPlayer fReceiver) {
         User user = packetProvider.getUser(fSender);
-
-        UserProfile userProfile;
-
-        boolean proxyPlayer = false;
-        if (user == null) {
-            if (!isProxyMode()) {
-                return null;
-            }
-
-            Set<UUID> forPlayers = proxyPlayers.getOrDefault(fReceiver.uuid(), new CopyOnWriteArraySet<>());
-            if (!forPlayers.contains(fSender.uuid())) {
-                forPlayers.add(fSender.uuid());
-                proxyPlayer = true;
-            }
-
-            proxyPlayers.put(fReceiver.uuid(), forPlayers);
-
-            if (!scoreboardModule.hasTeam(fSender, fReceiver)) {
-                scoreboardModule.createOrUpdate(fSender);
-            }
-
-            PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(fSender);
-            List<TextureProperty> textureProperties = List.of(new TextureProperty(profileProperty.name(), profileProperty.value(), profileProperty.signature()));
-            userProfile = new UserProfile(fSender.uuid(), fSender.name(), textureProperties);
-        } else {
-            userProfile = user.getProfile();
+        if (user != null) {
+            return Pair.of(user.getProfile(), false);
         }
 
-        return Pair.of(userProfile, proxyPlayer);
+        if (!isProxyMode()) {
+            return null;
+        }
+
+        boolean addProxyPlayer = false;
+
+        Set<UUID> receiverProxyPlayers = proxyPlayers.getOrDefault(fReceiver.uuid(), new CopyOnWriteArraySet<>());
+        if (!receiverProxyPlayers.contains(fSender.uuid())) {
+            receiverProxyPlayers.add(fSender.uuid());
+            addProxyPlayer = true;
+        }
+
+        proxyPlayers.put(fReceiver.uuid(), receiverProxyPlayers);
+
+        if (!scoreboardModule.hasTeam(fSender, fReceiver)) {
+            scoreboardModule.createOrUpdate(fSender);
+        }
+
+        PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(fSender);
+        List<TextureProperty> textureProperties = List.of(new TextureProperty(profileProperty.name(), profileProperty.value(), profileProperty.signature()));
+        UserProfile userProfile = new UserProfile(fSender.uuid(), fSender.name(), textureProperties);
+
+        return Pair.of(userProfile, addProxyPlayer);
     }
 
     private boolean isListed(FPlayer fPlayer, FPlayer fReceiver, GameMode gameMode) {
