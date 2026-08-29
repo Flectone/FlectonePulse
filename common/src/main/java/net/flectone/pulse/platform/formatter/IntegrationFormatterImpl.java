@@ -35,7 +35,7 @@ public class IntegrationFormatterImpl implements IntegrationFormatter {
 
     @Override
     public boolean isVanished(MessageContext messageContext) {
-        return messageContext instanceof VanishMessageContext vanishMessageContext && vanishMessageContext.fakeMessage() && vanishMessageContext.vanished();
+        return messageContext instanceof VanishMessageContext vanishMessageContext && !vanishMessageContext.fakeMessage() && vanishMessageContext.vanished();
     }
 
     @NonNull
