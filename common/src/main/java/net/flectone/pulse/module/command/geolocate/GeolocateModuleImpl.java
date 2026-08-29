@@ -23,6 +23,7 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +56,7 @@ public class GeolocateModuleImpl implements GeolocateModule {
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final SocialService socialService;
+    private final TaskScheduler taskScheduler;
     private final FLogger fLogger;
 
     @Override
@@ -89,6 +91,11 @@ public class GeolocateModuleImpl implements GeolocateModule {
             ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.ip();
         }
 
+        // the lookup goes to another server, the command thread does not wait for it
+        taskScheduler.runAsync(name(), () -> sendGeolocation(fPlayer, fTarget, ip));
+    }
+
+    private void sendGeolocation(FPlayer fPlayer, FPlayer fTarget, @Nullable String ip) {
         IpResponse response = getGeolocation(ip);
         if (response == null || !response.isSuccess()) {
             if (fTarget.isUnknown()) {

@@ -137,7 +137,7 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
         Operation operation = getOperation(commandContext);
         boolean needReload = switch (operation) {
             case DUMP -> {
-                commandDump(fPlayer, operation);
+                taskScheduler.runAsync(name(), () -> commandDump(fPlayer, operation));
                 yield false;
             }
             case EDITOR -> {

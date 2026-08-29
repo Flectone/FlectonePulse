@@ -110,17 +110,22 @@ public class SpriteModuleImpl implements SpriteModule {
             return;
         }
 
-        if (!atlasSpritesMap.containsKey(atlas)) {
-            messageDispatcher.dispatch(this, EventMetadata.builder()
-                    .messageContext(fResolver -> MessageContext.builder()
-                            .sender(fPlayer)
-                            .receiver(fResolver)
-                            .message(Strings.CS.replace(localization(fResolver).atlasDownloading(), "<atlas>", atlas))
-                            .build()
-                    )
-                    .build()
-            );
+        if (atlasSpritesMap.containsKey(atlas)) {
+            sendSprites(fPlayer, atlas, commandContext);
+            return;
+        }
 
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(Strings.CS.replace(localization(fResolver).atlasDownloading(), "<atlas>", atlas))
+                        .build()
+                )
+                .build()
+        );
+
+        taskScheduler.runAsync(name(), () -> {
             int responseCode = downloadAtlasFile(atlas);
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
@@ -136,8 +141,31 @@ public class SpriteModuleImpl implements SpriteModule {
             }
 
             lazyLoadLocalAtlases();
-        }
+            sendSprites(fPlayer, atlas, commandContext);
+        });
+    }
 
+    @Override
+    public ModuleName name() {
+        return ModuleName.COMMAND_SPRITE;
+    }
+
+    @Override
+    public Command.Sprite config() {
+        return fileFacade.command().sprite();
+    }
+
+    @Override
+    public Permission.Command.Sprite permission() {
+        return fileFacade.permission().command().sprite();
+    }
+
+    @Override
+    public Localization.Command.Sprite localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().sprite();
+    }
+
+    private void sendSprites(FPlayer fPlayer, String atlas, CommandContext<FPlayer> commandContext) {
         List<String> sprites = atlasSpritesMap.get(atlas);
         if (sprites == null || sprites.isEmpty()) {
             messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
@@ -231,26 +259,6 @@ public class SpriteModuleImpl implements SpriteModule {
                 )
                 .build()
         );
-    }
-
-    @Override
-    public ModuleName name() {
-        return ModuleName.COMMAND_SPRITE;
-    }
-
-    @Override
-    public Command.Sprite config() {
-        return fileFacade.command().sprite();
-    }
-
-    @Override
-    public Permission.Command.Sprite permission() {
-        return fileFacade.permission().command().sprite();
-    }
-
-    @Override
-    public Localization.Command.Sprite localization(FPlayer fPlayer) {
-        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().sprite();
     }
 
     private void lazyLoadLocalAtlases() {

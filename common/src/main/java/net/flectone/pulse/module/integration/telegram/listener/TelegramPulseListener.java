@@ -29,7 +29,7 @@ public class TelegramPulseListener implements PulseListener {
         if (moduleName == ModuleName.INTEGRATION_TELEGRAM) return;
 
         MessageContext messageContext = event.messageContext();
-        taskScheduler.runAsync(() ->
+        taskScheduler.runAsync(ModuleName.INTEGRATION_TELEGRAM, () ->
                 telegramModule.sendMessage(moduleName, messageContext, integrationMessageFormat)
         );
     }

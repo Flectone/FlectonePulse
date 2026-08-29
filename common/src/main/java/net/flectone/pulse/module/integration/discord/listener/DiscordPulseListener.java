@@ -29,7 +29,7 @@ public class DiscordPulseListener implements PulseListener {
         if (moduleName == ModuleName.INTEGRATION_DISCORD) return;
 
         MessageContext messageContext = event.messageContext();
-        taskScheduler.runAsync(() ->
+        taskScheduler.runAsync(ModuleName.INTEGRATION_DISCORD, () ->
                 discordModule.sendMessage(moduleName, messageContext, integrationMessageFormat)
         );
     }

@@ -13,6 +13,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.discord.sender.DiscordSender;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +53,7 @@ public class DiscordCommandDispatcher {
             Localization.Integration.Discord.ChannelEmbed channelEmbed = discordModule.localization(FPlayer.UNKNOWN).customCommand().get(commandEntry.getKey());
             if (channelEmbed == null) return true;
 
-            taskScheduler.runAsync(() -> discordSender.sendMessage(fPlayer, channel, channelEmbed, string -> buildMessage(fPlayer, string)));
+            taskScheduler.runAsync(ModuleName.INTEGRATION_DISCORD, () -> discordSender.sendMessage(fPlayer, channel, channelEmbed, string -> buildMessage(fPlayer, string)));
             return true;
         }
 

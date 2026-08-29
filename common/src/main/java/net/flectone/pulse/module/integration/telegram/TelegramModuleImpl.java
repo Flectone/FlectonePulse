@@ -124,7 +124,7 @@ public class TelegramModuleImpl implements TelegramModule {
             return;
         }
 
-        hook.whenComplete((_, _) -> taskScheduler.runAsync(() ->
+        hook.whenComplete((_, _) -> taskScheduler.runAsync(ModuleName.INTEGRATION_TELEGRAM, () ->
                 sendHookedMessage(moduleName, messageContext, integrationMessageFormat)
         ));
     }

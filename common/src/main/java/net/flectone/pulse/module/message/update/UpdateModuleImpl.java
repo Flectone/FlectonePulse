@@ -108,7 +108,7 @@ public class UpdateModuleImpl implements UpdateModule {
     }
 
     private void checkAndUpdateLatestVersion() {
-        taskScheduler.runAsync(() -> {
+        taskScheduler.runAsync(name(), () -> {
             try {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("https://api.github.com/repos/Flectone/FlectonePulse/releases/latest"))

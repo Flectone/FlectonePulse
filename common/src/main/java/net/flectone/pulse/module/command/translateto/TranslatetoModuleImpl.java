@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.WebUtil;
@@ -58,6 +59,7 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
     private final ListenerRegistry listenerRegistry;
     private final ProxyRegistry proxyRegistry;
     private final SocialService socialService;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void onEnable() {
@@ -102,6 +104,11 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
             messageToTranslate = message;
         }
 
+        String finalMessageToTranslate = messageToTranslate;
+        taskScheduler.runAsync(name(), () -> sendTranslation(fPlayer, message, mainLang, targetLang, finalMessageToTranslate));
+    }
+
+    private void sendTranslation(FPlayer fPlayer, String message, String mainLang, String targetLang, String messageToTranslate) {
         String translatedMessage = translate(fPlayer, mainLang, targetLang, messageToTranslate);
         if (translatedMessage.isEmpty()) {
             messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
@@ -117,7 +124,6 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
             return;
         }
 
-        String finalMessageToTranslate = messageToTranslate;
         messageDispatcher.dispatch(this, EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
@@ -132,13 +138,13 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
                         )
                         .string(translatedMessage)
                         .targetLanguage(targetLang)
-                        .messageToTranslate(finalMessageToTranslate)
+                        .messageToTranslate(messageToTranslate)
                         .build()
                 )
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeUTF(targetLang);
                     dataOutputStream.writeUTF(message);
-                    dataOutputStream.writeUTF(finalMessageToTranslate);
+                    dataOutputStream.writeUTF(messageToTranslate);
                 })
                 .integration(() -> IntegrationMessageFormat.builder()
                         .format(string -> Strings.CS.replace(string, "<language>", targetLang))

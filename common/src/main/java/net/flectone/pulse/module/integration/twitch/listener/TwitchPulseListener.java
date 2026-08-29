@@ -29,7 +29,7 @@ public class TwitchPulseListener implements PulseListener {
         if (moduleName == ModuleName.INTEGRATION_TWITCH) return;
 
         MessageContext messageContext = event.messageContext();
-        taskScheduler.runAsync(() ->
+        taskScheduler.runAsync(ModuleName.INTEGRATION_TWITCH, () ->
                 twitchModule.sendMessage(moduleName, messageContext, integrationMessageFormat)
         );
     }

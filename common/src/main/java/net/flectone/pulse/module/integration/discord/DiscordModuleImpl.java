@@ -122,7 +122,7 @@ public class DiscordModuleImpl implements DiscordModule {
             return;
         }
 
-        hook.whenComplete((_, _) -> taskScheduler.runAsync(() ->
+        hook.whenComplete((_, _) -> taskScheduler.runAsync(ModuleName.INTEGRATION_DISCORD, () ->
                 sendHookedMessage(moduleName, messageContext, integrationMessageFormat)
         ));
     }

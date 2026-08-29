@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.With;
 import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -30,6 +31,8 @@ public class TaskSchedulerImpl implements TaskScheduler {
     private final AtomicLong currentTick = new AtomicLong(0L);
     private final AtomicLong threadCounter = new AtomicLong(0L);
     private final ConcurrentNavigableMap<Long, List<ScheduledTask>> scheduledTasks = new ConcurrentSkipListMap<>();
+    private final Map<ModuleName, CompletableFuture<Void>> moduleChains = new ConcurrentHashMap<>();
+
     private final FLogger fLogger;
     private final LazyInstance<FPlayerService> fPlayerService;
     private final LazyInstance<FileFacade> fileFacade;
@@ -110,6 +113,24 @@ public class TaskSchedulerImpl implements TaskScheduler {
         executorService.execute(wrapExceptionRunnable(runnable, completableFuture));
 
         return completableFuture;
+    }
+
+    @Override
+    public CompletableFuture<Void> runAsync(ModuleName moduleName, SchedulerRunnable runnable) {
+        if (isDisabled()) return runImmediately(runnable);
+
+        return moduleChains.compute(moduleName, (_, chain) -> {
+            CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+            Runnable task = wrapExceptionRunnable(runnable, completableFuture);
+
+            if (chain == null || chain.isDone()) {
+                executorService.execute(task);
+            } else {
+                chain.handle((_, _) -> null).thenRunAsync(task, executorService);
+            }
+
+            return completableFuture;
+        });
     }
 
     @Override

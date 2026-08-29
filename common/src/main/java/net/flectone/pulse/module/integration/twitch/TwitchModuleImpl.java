@@ -96,7 +96,7 @@ public class TwitchModuleImpl implements TwitchModule {
             return;
         }
 
-        hook.whenComplete((_, _) -> taskScheduler.runAsync(() ->
+        hook.whenComplete((_, _) -> taskScheduler.runAsync(ModuleName.INTEGRATION_TWITCH, () ->
                 sendHookedMessage(moduleName, messageContext, integrationMessageFormat)
         ));
     }

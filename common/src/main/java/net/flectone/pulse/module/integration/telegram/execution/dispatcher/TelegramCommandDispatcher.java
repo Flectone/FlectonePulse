@@ -11,6 +11,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.telegram.sender.TelegramSender;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +50,7 @@ public class TelegramCommandDispatcher {
             String localizationString = telegramModule.localization(FPlayer.UNKNOWN).customCommand().get(commandEntry.getKey());
             if (StringUtils.isEmpty(localizationString)) return true;
 
-            taskScheduler.runAsync(() -> telegramSender.sendMessage(message, buildMessage(fPlayer, localizationString)));
+            taskScheduler.runAsync(ModuleName.INTEGRATION_TELEGRAM, () -> telegramSender.sendMessage(message, buildMessage(fPlayer, localizationString)));
             return true;
         }
 

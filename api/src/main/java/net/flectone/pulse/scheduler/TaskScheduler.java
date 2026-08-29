@@ -1,5 +1,6 @@
 package net.flectone.pulse.scheduler;
 
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 
 import java.time.Duration;
@@ -93,6 +94,16 @@ public interface TaskScheduler {
      * @return a CompletableFuture that completes when the task finishes
      */
     CompletableFuture<Void> runAsync(SchedulerRunnable runnable, boolean independent);
+
+    /**
+     * Schedules a task to run asynchronously and associates it with a specific module.
+     * Tasks for the same module are executed sequentially in a chain.
+     *
+     * @param moduleName the module to associate with this task
+     * @param runnable the task to execute
+     * @return a CompletableFuture that completes when the task finishes
+     */
+    CompletableFuture<Void> runAsync(ModuleName moduleName, SchedulerRunnable runnable);
 
     /**
      * Schedules a task to run asynchronously after a default delay of 20 ticks.
