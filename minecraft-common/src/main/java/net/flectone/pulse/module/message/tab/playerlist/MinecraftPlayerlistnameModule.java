@@ -152,7 +152,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     }
 
     public void sendPlayerInfos(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
-        List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfos = onlinePlayers.stream().map(fSender -> {
+        List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfoList = onlinePlayers.stream().map(fSender -> {
             if (!socialService.canSeeVanished(fSender, fReceiver)) return null;
 
             Pair<UserProfile, Boolean> userProfilePair = createUserProfile(fSender, fReceiver);
@@ -180,11 +180,13 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
             return playerInfo;
         }).filter(Objects::nonNull).toList();
 
-        packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(UPDATE_ACTIONS, playerInfos));
+        if (!playerInfoList.isEmpty()) {
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(UPDATE_ACTIONS, playerInfoList));
+        }
     }
 
     public void sendPlayerData(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
-        List<WrapperPlayServerPlayerInfo.PlayerData> playerInfos = onlinePlayers.stream().map(fSender -> {
+        List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList = onlinePlayers.stream().map(fSender -> {
             if (!socialService.canSeeVanished(fSender, fReceiver)) return null;
 
             Pair<UserProfile, Boolean> userProfilePair = createUserProfile(fSender, fReceiver);
@@ -205,7 +207,9 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
             return playerData;
         }).filter(Objects::nonNull).toList();
 
-        packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerInfos));
+        if (!playerDataList.isEmpty()) {
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerDataList));
+        }
     }
 
     public void removeOfflineProxyPlayers() {
