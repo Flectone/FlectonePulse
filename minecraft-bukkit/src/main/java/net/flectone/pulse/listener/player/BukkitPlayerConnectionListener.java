@@ -25,7 +25,7 @@ public class BukkitPlayerConnectionListener implements Listener {
     private final EventDispatcher eventDispatcher;
     private final TaskScheduler taskScheduler;
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoinEvent(org.bukkit.event.player.PlayerJoinEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
 
@@ -41,7 +41,7 @@ public class BukkitPlayerConnectionListener implements Listener {
         });
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuitEvent(org.bukkit.event.player.PlayerQuitEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
 
