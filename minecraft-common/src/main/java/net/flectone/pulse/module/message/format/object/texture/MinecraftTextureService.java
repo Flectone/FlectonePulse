@@ -9,6 +9,7 @@ import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.file.FileWriter;
 import net.flectone.pulse.logging.FLogger;
@@ -107,7 +108,7 @@ public class MinecraftTextureService {
                 })
                 .forEach(textureMap::remove);
 
-        taskScheduler.runAsync(this::loadTextures, true);
+        taskScheduler.runAsync(ModuleName.MESSAGE_FORMAT_OBJECT, this::loadTextures);
     }
 
     public void loadTextures() {

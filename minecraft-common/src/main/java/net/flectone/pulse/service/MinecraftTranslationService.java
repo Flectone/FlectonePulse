@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
@@ -51,7 +52,7 @@ public class MinecraftTranslationService implements TranslationService {
 
     @Override
     public void reload() {
-        taskScheduler.runAsync(() -> {
+        taskScheduler.runAsync(ModuleName.MODULE, () -> {
             String newLanguage = getLastLanguage();
             if (newLanguage.equals(lastLanguage) && !translations.isEmpty()) return;
 
@@ -63,7 +64,7 @@ public class MinecraftTranslationService implements TranslationService {
                 initGlobalTranslator();
             }
 
-        }, true);
+        });
     }
 
     @Override

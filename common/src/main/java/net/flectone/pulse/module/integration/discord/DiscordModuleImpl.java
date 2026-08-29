@@ -55,7 +55,11 @@ public class DiscordModuleImpl implements DiscordModule {
     public void onEnable() {
         reflectionResolver.hasClassOrElse("discord4j.core.DiscordClient", this::loadLibraries);
 
-        hookFuture = taskScheduler.runAsync(() -> discordIntegration.get().hook(), true)
+        DiscordIntegration integration = discordIntegration.get();
+        long taskId = integration.requestHook();
+
+        hookFuture = taskScheduler.runAsync(name(), () -> integration.hook(taskId))
+                .copy()
                 .completeOnTimeout(null, FIntegration.HOOK_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
 
         listenerRegistry.register(DiscordPulseListener.class);

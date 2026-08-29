@@ -179,24 +179,24 @@ public abstract class ChatsettingModuleImpl implements ChatsettingModule {
 
     @Override
     public void saveSetting(FPlayer fPlayer, String messageType, boolean value) {
-        taskScheduler.runAsync(() -> {
+        taskScheduler.runAsync(name(), () -> {
             socialService.saveSetting(fPlayer, messageType, value);
 
             if (proxyRegistry.hasEnabledProxy()) {
                 proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
             }
-        }, true);
+        });
     }
 
     @Override
     public void saveSetting(FPlayer fPlayer, SettingText settingText, String value) {
-        taskScheduler.runAsync(() -> {
+        taskScheduler.runAsync(name(), () -> {
             socialService.saveSetting(fPlayer, settingText, value);
 
             if (proxyRegistry.hasEnabledProxy()) {
                 proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
             }
-        }, true);
+        });
     }
 
 

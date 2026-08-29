@@ -86,16 +86,6 @@ public interface TaskScheduler {
     CompletableFuture<Void> runAsync(SchedulerRunnable runnable);
 
     /**
-     * Schedules a task to run asynchronously with control over independent execution.
-     * If not independent and already on an async thread, runs immediately to avoid unnecessary threading.
-     *
-     * @param runnable the task to execute
-     * @param independent if true, always schedules even if already on async thread; if false, may run immediately
-     * @return a CompletableFuture that completes when the task finishes
-     */
-    CompletableFuture<Void> runAsync(SchedulerRunnable runnable, boolean independent);
-
-    /**
      * Schedules a task to run asynchronously and associates it with a specific module.
      * Tasks for the same module are executed sequentially in a chain.
      *

@@ -55,7 +55,11 @@ public class TwitchModuleImpl implements TwitchModule {
     public void onEnable() {
         reflectionResolver.hasClassOrElse("com.github.twitch4j.TwitchClient", this::loadLibraries);
 
-        hookFuture = taskScheduler.runAsync(() -> twitchIntegration.get().hook(), true)
+        TwitchIntegration integration = twitchIntegration.get();
+        long taskId = integration.requestHook();
+
+        hookFuture = taskScheduler.runAsync(name(), () -> integration.hook(taskId))
+                .copy()
                 .completeOnTimeout(null, FIntegration.HOOK_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
 
         listenerRegistry.register(TwitchPulseListener.class);

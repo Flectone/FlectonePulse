@@ -40,9 +40,17 @@ public class TwitchIntegration implements FIntegration {
         return "Twitch";
     }
 
+    public long requestHook() {
+        return taskGeneration.incrementAndGet();
+    }
+
     @Override
     public void hook() {
-        long taskId = taskGeneration.incrementAndGet();
+        hook(requestHook());
+    }
+
+    public void hook(long taskId) {
+        if (taskGeneration.get() != taskId) return;
 
         try {
             TwitchClient twitchClient = twitchClientProvider.create();

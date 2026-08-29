@@ -71,6 +71,8 @@ public class TaskSchedulerImpl implements TaskScheduler {
     public void shutdown() {
         disabled = true;
 
+        moduleChains.clear();
+
         ExecutorService currentExecutorService = executorService;
         if (currentExecutorService == null) {
             scheduledTasks.clear();
@@ -96,18 +98,9 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     @Override
     public CompletableFuture<Void> runAsync(SchedulerRunnable runnable) {
-        return runAsync(runnable, false);
-    }
-
-    @Override
-    public CompletableFuture<Void> runAsync(SchedulerRunnable runnable, boolean independent) {
         if (isDisabled()) return runImmediately(runnable);
+        if (isAsyncThread()) return runImmediately(runnable);
 
-        if (!independent && isAsyncThread()) {
-            return runImmediately(runnable);
-        }
-
-        // we don't need to create a task to do this in async
         CompletableFuture<Void> completableFuture = new CompletableFuture<>();
 
         executorService.execute(wrapExceptionRunnable(runnable, completableFuture));
@@ -119,14 +112,15 @@ public class TaskSchedulerImpl implements TaskScheduler {
     public CompletableFuture<Void> runAsync(ModuleName moduleName, SchedulerRunnable runnable) {
         if (isDisabled()) return runImmediately(runnable);
 
+        ExecutorService currentExecutorService = executorService;
         return moduleChains.compute(moduleName, (_, chain) -> {
             CompletableFuture<Void> completableFuture = new CompletableFuture<>();
             Runnable task = wrapExceptionRunnable(runnable, completableFuture);
 
             if (chain == null || chain.isDone()) {
-                executorService.execute(task);
+                currentExecutorService.execute(task);
             } else {
-                chain.handle((_, _) -> null).thenRunAsync(task, executorService);
+                chain.handle((_, _) -> null).thenRunAsync(task, currentExecutorService);
             }
 
             return completableFuture;

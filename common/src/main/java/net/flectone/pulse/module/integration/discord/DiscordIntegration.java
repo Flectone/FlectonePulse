@@ -44,9 +44,17 @@ public class DiscordIntegration implements FIntegration {
         return "Discord";
     }
 
+    public long requestHook() {
+        return taskGeneration.incrementAndGet();
+    }
+
     @Override
     public void hook() {
-        long taskId = taskGeneration.incrementAndGet();
+        hook(requestHook());
+    }
+
+    public void hook(long taskId) {
+        if (taskGeneration.get() != taskId) return;
 
         try {
             DiscordClient discordClient = discordClientProvider.create();

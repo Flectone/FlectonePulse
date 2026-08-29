@@ -49,9 +49,17 @@ public class TelegramIntegration implements FIntegration {
         return "Telegram";
     }
 
+    public long requestHook() {
+        return taskGeneration.incrementAndGet();
+    }
+
     @Override
     public void hook() {
-        long taskId = taskGeneration.incrementAndGet();
+        hook(requestHook());
+    }
+
+    public void hook(long taskId) {
+        if (taskGeneration.get() != taskId) return;
 
         try {
             TelegramClient telegramClient = telegramClientProvider.create();

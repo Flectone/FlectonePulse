@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -25,7 +26,7 @@ public class HytaleTranslationService implements TranslationService {
 
     @Override
     public void reload() {
-        taskScheduler.runAsync(this::initGlobalTranslator, true);
+        taskScheduler.runAsync(ModuleName.MODULE, this::initGlobalTranslator);
     }
 
     @Override
