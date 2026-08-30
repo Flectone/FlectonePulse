@@ -102,9 +102,14 @@ public class QuitModuleImpl implements QuitModule {
 
     @Override
     public void send(FPlayer fPlayer, boolean fakeMessage, boolean vanished) {
+        send(fPlayer, fakeMessage, vanished, true);
+    }
+
+    @Override
+    public void send(FPlayer fPlayer, boolean fakeMessage, boolean vanished, boolean integration) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        EventMetadata.Builder eventMetadataBuilder = EventMetadata.builder()
                 .range(config().range().is(Range.Type.PROXY) && !fakeMessage ? Range.get(Range.Type.SERVER) : config().range())
                 .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(fPlayer, fReceiver))
                 .destination(config().destination())
@@ -120,13 +125,16 @@ public class QuitModuleImpl implements QuitModule {
                         .vanished(vanished)
                         .build()
                 )
-                .integration()
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeBoolean(fakeMessage);
                     dataOutputStream.writeBoolean(vanished);
-                })
-                .build()
-        );
+                });
+
+        if (integration) {
+            eventMetadataBuilder.integration();
+        }
+
+        messageDispatcher.dispatch(this, eventMetadataBuilder.build());
     }
 
 }

@@ -45,4 +45,14 @@ public interface QuitModule extends ModuleLocalization {
      */
     void send(FPlayer fPlayer, boolean fakeMessage, boolean vanished);
 
+    /**
+     * Announces a quit.
+     *
+     * @param fPlayer the leaving player
+     * @param fakeMessage whether this is a stand-in produced by vanishing
+     * @param vanished whether the player was hidden at the time
+     * @param integration whether the integrations are told about it
+     */
+    void send(FPlayer fPlayer, boolean fakeMessage, boolean vanished, boolean integration);
+
 }
