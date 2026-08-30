@@ -112,14 +112,17 @@ public class MinecraftBelownameModule implements ModuleLocalization {
     public void updateScore(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        fPlayerService.getOnlineFPlayers().stream()
-                .filter(vanishedPlayer -> socialService.canSeeVanished(vanishedPlayer, fPlayer))
-                .forEach(fObjective -> {
-                    Localization.Message.Scoreboard.Objective.Belowname localization = localization(fPlayer);
-                    Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat(), false);
+        fPlayerService.getOnlineFPlayers().forEach(fObjective -> {
+            if (!socialService.canSeeVanished(fObjective, fPlayer)) {
+                objectiveModule.forgetScore(fPlayer, fObjective, ScoreboardPosition.BELOWNAME);
+                return;
+            }
 
-                    objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.BELOWNAME);
-                });
+            Localization.Message.Scoreboard.Objective.Belowname localization = localization(fPlayer);
+            Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat(), false);
+
+            objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.BELOWNAME);
+        });
     }
 
     public void remove(FPlayer fPlayer) {

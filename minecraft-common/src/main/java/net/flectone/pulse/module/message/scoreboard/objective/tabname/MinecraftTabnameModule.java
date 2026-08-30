@@ -83,14 +83,17 @@ public class MinecraftTabnameModule implements ModuleLocalization {
     public void updateScore(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        fPlayerService.getOnlineFPlayers().stream()
-                .filter(vanishedPlayer -> socialService.canSeeVanished(vanishedPlayer, fPlayer))
-                .forEach(fObjective -> {
-                    Localization.Message.Scoreboard.Objective.Tabname localization = localization(fPlayer);
-                    Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat());
+        fPlayerService.getOnlineFPlayers().forEach(fObjective -> {
+            if (!socialService.canSeeVanished(fObjective, fPlayer)) {
+                objectiveModule.forgetScore(fPlayer, fObjective, ScoreboardPosition.TABLIST);
+                return;
+            }
 
-                    objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.TABLIST);
-                });
+            Localization.Message.Scoreboard.Objective.Tabname localization = localization(fPlayer);
+            Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat());
+
+            objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.TABLIST);
+        });
     }
 
     public void remove(FPlayer fPlayer) {

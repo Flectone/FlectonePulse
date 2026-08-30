@@ -35,6 +35,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -171,7 +172,16 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
     }
 
     public void send(@NonNull UUID receiver, @NonNull Team team, WrapperPlayServerTeams.@NonNull TeamMode teamMode) {
-        packetSender.send(receiver, new WrapperPlayServerTeams(team.name(), teamMode, team.info(), List.of(team.owner())));
+        packetSender.send(receiver, new WrapperPlayServerTeams(team.name(), teamMode, team.info(), List.of(team.owner())), true);
+    }
+
+    public void forgetTeam(@NonNull UUID receiver, @NonNull String owner) {
+        playerReceiverTeamMap.values().forEach(teamMap -> {
+            Team team = teamMap.get(receiver);
+            if (team != null && team.owner().equals(owner)) {
+                teamMap.remove(receiver);
+            }
+        });
     }
 
     public void sendForAll(boolean visible) {
@@ -207,6 +217,8 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
         Optional<Team> optionalTeam = getTeam(fPlayer, fReceiver);
         if (optionalTeam.isPresent()) {
             Team oldTeam = optionalTeam.get();
+            if (newTeam.contents() == oldTeam.contents()) return;
+
             if (newTeam.name().equals(oldTeam.name())) {
                 send(fReceiver, newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
             } else {
@@ -247,19 +259,23 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
 
         String teamName = getSortedName(fPlayer);
 
+        WrapperPlayServerTeams.NameTagVisibility tagVisibility = isInvisibleNameFor(fPlayer) && !isModernPlayer(fReceiver.uuid())
+                ? WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS
+                : WrapperPlayServerTeams.NameTagVisibility.ALWAYS;
+
+        NamedTextColor color = getColor(fPlayer, fReceiver);
+
         WrapperPlayServerTeams.ScoreBoardTeamInfo info = new WrapperPlayServerTeams.ScoreBoardTeamInfo(
                 Component.text(teamName),
                 prefix,
                 suffix,
-                // if name distance is -1 then player's name will be hidden anyway by attribute,
-                // so we can choose not to use scoreboard for that
-                isInvisibleNameFor(fPlayer) && !isModernPlayer(fReceiver.uuid()) ? WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS : WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
+                tagVisibility,
                 WrapperPlayServerTeams.CollisionRule.ALWAYS,
-                getColor(fPlayer, fReceiver),
+                color,
                 WrapperPlayServerTeams.OptionData.NONE
         );
 
-        return new Team(teamName, fPlayer.name(), info);
+        return new Team(teamName, fPlayer.name(), info, Objects.hash(teamName, fPlayer.name(), prefix, suffix, tagVisibility, color));
     }
 
     @NonNull
