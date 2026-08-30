@@ -57,15 +57,12 @@ public class NamesModuleImpl implements NamesModule {
 
     @Override
     public void onEnable() {
-        if (proxyRegistry.hasEnabledProxy()) {
-            Ticker ticker = config().ticker();
-            if (ticker.enable()) {
-                taskScheduler.runPlayerAsyncTimer(this::updateConstant, ticker.period());
-            }
-
-            listenerRegistry.register(PulseConstantListener.class);
+        Ticker ticker = config().ticker();
+        if (ticker.enable()) {
+            taskScheduler.runPlayerAsyncTimer(this::updateConstant, ticker.period());
         }
 
+        listenerRegistry.register(PulseConstantListener.class);
         listenerRegistry.register(PulseNamesListener.class);
     }
 
@@ -296,7 +293,6 @@ public class NamesModuleImpl implements NamesModule {
 
     @Override
     public void updateConstant(FPlayer fPlayer) {
-        if (!proxyRegistry.hasEnabledProxy()) return;
         if (moduleController.isDisabledFor(this, fPlayer)) return;
         if (!fPlayer.isOnline()) return;
 
