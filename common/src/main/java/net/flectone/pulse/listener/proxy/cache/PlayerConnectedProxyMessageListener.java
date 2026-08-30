@@ -35,7 +35,7 @@ public class PlayerConnectedProxyMessageListener implements PulseListener {
             boolean firstTime = proxyPayload.readBoolean();
 
             if (event.sentByThisServer()) {
-                if (firstTime) {
+                if (firstTime && joinModule.isProxyMode()) {
                     joinModule.send((FPlayer) event.sender(), false, false);
                 }
             } else {
