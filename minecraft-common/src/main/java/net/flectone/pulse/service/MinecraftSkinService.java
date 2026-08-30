@@ -53,8 +53,8 @@ public class MinecraftSkinService implements SkinService {
 
         profileProperty = getProfileProperty(entity);
 
-        // not save profileProperty for offline player
-        if (entity instanceof FPlayer fPlayer && !platformPlayerAdapter.isOnline(fPlayer) && profileProperty.signature() == null) {
+        // not save profileProperty for offline player without textures
+        if (entity instanceof FPlayer fPlayer && !platformPlayerAdapter.isOnline(fPlayer) && profileProperty.value().isEmpty()) {
             return profileProperty;
         }
 
@@ -79,8 +79,7 @@ public class MinecraftSkinService implements SkinService {
                 TextureProperty textureProperty = textureProperties.getFirst();
                 return PlayerHeadObjectContents.property(
                         "textures",
-                        textureProperty.getValue(),
-                        textureProperty.getSignature()
+                        textureProperty.getValue()
                 );
             }
         }

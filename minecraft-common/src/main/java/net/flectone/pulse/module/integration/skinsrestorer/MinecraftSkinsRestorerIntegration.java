@@ -122,8 +122,7 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
     private PlayerHeadObjectContents.ProfileProperty convertToProfileProperty(SkinProperty skinProperty) {
         return PlayerHeadObjectContents.property(
                 "textures",
-                skinProperty.getValue(),
-                skinProperty.getSignature()
+                skinProperty.getValue()
         );
     }
 }

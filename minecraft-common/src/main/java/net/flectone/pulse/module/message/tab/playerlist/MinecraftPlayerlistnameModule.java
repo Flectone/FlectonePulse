@@ -323,7 +323,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         }
 
         PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(fSender);
-        List<TextureProperty> textureProperties = List.of(new TextureProperty(profileProperty.name(), profileProperty.value(), profileProperty.signature()));
+        List<TextureProperty> textureProperties = List.of(new TextureProperty(profileProperty.name(), profileProperty.value(), null));
         UserProfile userProfile = new UserProfile(fSender.uuid(), fSender.name(), textureProperties);
 
         return Pair.of(userProfile, addProxyPlayer);
