@@ -153,7 +153,7 @@ public class MinecraftObjectModule extends ObjectModuleImpl {
             playerHeadBuilder.hat(!"false".equals(playerHead));
 
             FEntity sender = messageContext.sender();
-            applyFPlayerProfileProperty(sender, playerHeadBuilder, builder -> builder.name(sender.name()));
+            applyFPlayerProfileProperty(sender, playerHeadBuilder, builder -> builder.id(sender.uuid()));
 
             Component playerHeadComponent = Component.object().contents(playerHeadBuilder.build()).build();
             return applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace());
@@ -167,7 +167,13 @@ public class MinecraftObjectModule extends ObjectModuleImpl {
             FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
 
             // apply custom property
-            applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));
+            applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> {
+                if (fPlayer.isUnknown()) {
+                    builder.name(playerHead);
+                } else {
+                    builder.id(fPlayer.uuid());
+                }
+            });
         } else {
             // second check player uuid
             UUID playerHeadUUID = uuidParser.parse(playerHead);
