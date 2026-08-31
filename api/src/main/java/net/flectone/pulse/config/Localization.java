@@ -863,6 +863,7 @@ public record Localization(
         public record Whois(
                 String empty,
                 String nullPage,
+                String lowerWeightGroup,
                 String online,
                 String offline,
                 String header,

@@ -927,6 +927,7 @@ whitelist:
     enable: false
 whois:
   enable: false
+  check_group_weight: true
   per_page: 4
   aliases:
     - "whois"

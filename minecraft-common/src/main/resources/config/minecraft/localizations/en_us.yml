@@ -523,6 +523,7 @@ command:
   whois:
     empty: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>No players with that IP found"
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Page not found"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot view a player with equal or higher permissions"
     online: "<hover:show_text:\"<color:#98FB98>Online\"><white><sprite_or:\"☑\":gui:icon/ping_5></white></hover>"
     offline: "<hover:show_text:\"<color:#ff7171>Offline\"><white><sprite_or:\"☒\":gui:icon/ping_unknown></white></hover>"
     header: "<fcolor:2>▋ <fcolor:1>Players with IP <fcolor:2><ip><fcolor:1>: <fcolor:2><count> <br>"

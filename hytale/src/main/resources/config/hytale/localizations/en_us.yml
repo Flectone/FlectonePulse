@@ -523,6 +523,7 @@ command:
   whois:
     empty: "<color:#ff7171>No players with that IP found"
     null_page: "<color:#ff7171>Page not found"
+    lower_weight_group: "<color:#ff7171>You cannot view a player with equal or higher permissions"
     online: "<hover:show_text:\"<color:#98FB98>Online\"><color:#98FB98>[+]</color></hover>"
     offline: "<hover:show_text:\"<color:#ff7171>Offline\"><color:#ff7171>[-]</color></hover>"
     header: "<fcolor:2>▋ <fcolor:1>Players with IP <fcolor:2><ip><fcolor:1>: <fcolor:2><count> <br>"

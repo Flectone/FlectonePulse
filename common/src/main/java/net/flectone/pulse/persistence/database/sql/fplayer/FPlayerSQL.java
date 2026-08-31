@@ -47,11 +47,8 @@ public interface FPlayerSQL extends SQL {
     @SqlQuery("SELECT * FROM `fp_player` WHERE `online` = true")
     List<FPlayerDAO.PlayerInfo> getOnlinePlayers();
 
-    @SqlQuery("SELECT COUNT(id) FROM `fp_player` WHERE `ip` = :ip")
-    int getTotalPlayersCountByIp(@Bind("ip") String ip);
-
-    @SqlQuery("SELECT * FROM `fp_player` WHERE `ip` = :ip ORDER BY `id` DESC LIMIT :limit OFFSET :offset")
-    List<FPlayerDAO.PlayerInfo> getPlayersByIp(@Bind("ip") String ip, @Bind("limit") int limit, @Bind("offset") int offset);
+    @SqlQuery("SELECT * FROM `fp_player` WHERE `ip` = :ip ORDER BY `id` DESC")
+    List<FPlayerDAO.PlayerInfo> getPlayersByIp(@Bind("ip") String ip);
 
     @SqlQuery("SELECT * FROM `fp_player`")
     List<FPlayerDAO.PlayerInfo> getAllPlayers();

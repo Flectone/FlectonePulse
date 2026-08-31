@@ -144,16 +144,10 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
         return withHandle(sql -> convertToFPlayers(sql.getOnlinePlayers()));
     }
 
-    public int getTotalFPlayersCountByIp(@NonNull String ip) {
-        if (database.isClosed()) return 0;
-
-        return withHandle(sql -> sql.getTotalPlayersCountByIp(ip));
-    }
-
-    public List<FPlayer> getFPlayersByIp(@NonNull String ip, int limit, int offset) {
+    public List<FPlayer> getFPlayersByIp(@NonNull String ip) {
         if (database.isClosed()) return List.of();
 
-        return withHandle(sql -> convertToFPlayers(sql.getPlayersByIp(ip, limit, offset)));
+        return withHandle(sql -> convertToFPlayers(sql.getPlayersByIp(ip)));
     }
 
     public List<FPlayer> getFPlayers() {

@@ -523,6 +523,7 @@ command:
   whois:
     empty: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игроков с таким айпи не найдено"
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь посмотреть игрока с такими же или большими правами"
     online: "<hover:show_text:\"<color:#98FB98>В сети\"><white><sprite_or:\"☑\":gui:icon/ping_5></white></hover>"
     offline: "<hover:show_text:\"<color:#ff7171>Не в сети\"><white><sprite_or:\"☒\":gui:icon/ping_unknown></white></hover>"
     header: "<fcolor:2>▋ <fcolor:1>Игроков с IP <fcolor:2><ip><fcolor:1>: <fcolor:2><count> <br>"

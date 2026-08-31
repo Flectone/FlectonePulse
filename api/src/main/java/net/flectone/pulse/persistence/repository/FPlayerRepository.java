@@ -145,22 +145,12 @@ public interface FPlayerRepository {
     void saveOrIgnore(@NonNull FPlayer fPlayer);
 
     /**
-     * Gets the total count of players with the specified IP address.
-     *
-     * @param ip the IP address to count players for
-     * @return the total number of players with the given IP
-     */
-    int getTotalPlayersCountByIp(@NonNull String ip);
-
-    /**
-     * Gets a paginated list of players with the specified IP address.
+     * Gets the list of players with the specified IP address.
      *
      * @param ip the IP address to filter players by
-     * @param limit the maximum number of players to return
-     * @param offset the number of players to skip
      * @return list of players matching the IP, ordered by ID descending
      */
-    List<FPlayer> getPlayersByIp(@NonNull String ip, int limit, int offset);
+    List<FPlayer> getPlayersByIp(@NonNull String ip);
 
     /**
      * Gets all players from the database.

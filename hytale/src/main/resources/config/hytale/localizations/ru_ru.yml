@@ -523,6 +523,7 @@ command:
   whois:
     empty: "<color:#ff7171>Игроков с таким айпи не найдено"
     null_page: "<color:#ff7171>Страница не найдена"
+    lower_weight_group: "<color:#ff7171>Ты не можешь посмотреть игрока с такими же или большими правами"
     online: "<hover:show_text:\"<color:#98FB98>В сети\"><color:#98FB98>[+]</color></hover>"
     offline: "<hover:show_text:\"<color:#ff7171>Не в сети\"><color:#ff7171>[-]</color></hover>"
     header: "<fcolor:2>▋ <fcolor:1>Игроков с IP <fcolor:2><ip><fcolor:1>: <fcolor:2><count> <br>"

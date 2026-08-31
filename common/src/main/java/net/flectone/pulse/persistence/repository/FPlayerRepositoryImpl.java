@@ -207,13 +207,8 @@ public class FPlayerRepositoryImpl implements FPlayerRepository {
     }
 
     @Override
-    public int getTotalPlayersCountByIp(@NonNull String ip) {
-        return fPlayerDAO.getTotalFPlayersCountByIp(ip);
-    }
-
-    @Override
-    public List<FPlayer> getPlayersByIp(@NonNull String ip, int limit, int offset) {
-        return fPlayerDAO.getFPlayersByIp(ip, limit, offset);
+    public List<FPlayer> getPlayersByIp(@NonNull String ip) {
+        return fPlayerDAO.getFPlayersByIp(ip);
     }
 
     @Override

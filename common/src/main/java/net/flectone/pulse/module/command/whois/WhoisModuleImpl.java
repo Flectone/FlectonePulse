@@ -25,6 +25,7 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +46,7 @@ public class WhoisModuleImpl implements WhoisModule {
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final SocialService socialService;
+    private final ModerationService moderationService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     private final MutelistModule mutelistModule;
@@ -80,6 +82,20 @@ public class WhoisModuleImpl implements WhoisModule {
         int page = optionalPage.orElse(1);
 
         FPlayer fTargetOrIp = fPlayerService.getFPlayer(playerNameOrIp);
+        if (config().checkGroupWeight() && !fTargetOrIp.isUnknown() && !fPlayer.equals(fTargetOrIp)
+                && !moderationService.hasHigherGroupThan(fPlayer, fTargetOrIp)) {
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).lowerWeightGroup())
+                            .build()
+                    )
+                    .build()
+            );
+            return;
+        }
+
         String ip = fTargetOrIp.isUnknown()
                 ? playerNameOrIp
                 : platformPlayerAdapter.isOnline(fTargetOrIp) ? platformPlayerAdapter.getIp(fTargetOrIp) : fTargetOrIp.ip();
@@ -97,7 +113,9 @@ public class WhoisModuleImpl implements WhoisModule {
             return;
         }
 
-        int size = fPlayerService.getTotalFPlayersCountByIp(ip);
+        List<FPlayer> fTargets = getFPlayersByIp(fPlayer, ip);
+
+        int size = fTargets.size();
         if (size == 0) {
             messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
@@ -126,7 +144,7 @@ public class WhoisModuleImpl implements WhoisModule {
             return;
         }
 
-        List<FPlayer> fPlayers = fPlayerService.getFPlayersByIp(ip, perPage, (page - 1) * perPage);
+        List<FPlayer> fPlayers = fTargets.subList((page - 1) * perPage, Math.min(page * perPage, size));
 
         Localization.Command.Whois localization = localization(fPlayer);
 
@@ -151,7 +169,7 @@ public class WhoisModuleImpl implements WhoisModule {
                     .append(StringUtils.replaceEach(
                             localization.line(),
                             new String[]{"<ip>", "<target_name>", "<online>", "<command_mutelist>", "<command_banlist>", "<command_warnlist>", "<command_whitelist>", "<command_geolocate>", "<command_online>", "<target"},
-                            new String[]{ip, fTarget.name(), fTarget.isOnline() ? localization.online() : localization.offline(),
+                            new String[]{ip, fTarget.name(), fTarget.isOnline() && socialService.canSeeVanished(fTarget, fPlayer) ? localization.online() : localization.offline(),
                                     commandModuleController.getCommandName(mutelistModule),
                                     commandModuleController.getCommandName(banlistModule),
                                     commandModuleController.getCommandName(warnlistModule),
@@ -189,6 +207,15 @@ public class WhoisModuleImpl implements WhoisModule {
                 )
                 .build()
         );
+    }
+
+    private List<FPlayer> getFPlayersByIp(FPlayer fPlayer, String ip) {
+        List<FPlayer> fTargets = fPlayerService.getFPlayersByIp(ip);
+        if (!config().checkGroupWeight()) return fTargets;
+
+        return fTargets.stream()
+                .filter(fTarget -> fPlayer.equals(fTarget) || moderationService.hasHigherGroupThan(fPlayer, fTarget))
+                .toList();
     }
 
     @Override

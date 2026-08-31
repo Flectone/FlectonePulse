@@ -283,14 +283,9 @@ public class FPlayerServiceImpl implements FPlayerService {
     }
 
     @Override
-    public int getTotalFPlayersCountByIp(@NonNull String ip) {
-        return fPlayerRepository.getTotalPlayersCountByIp(ip);
-    }
-
-    @Override
     @NonNull
-    public List<FPlayer> getFPlayersByIp(String ip, int limit, int offset) {
-        return fPlayerRepository.getPlayersByIp(ip, limit, offset);
+    public List<FPlayer> getFPlayersByIp(String ip) {
+        return fPlayerRepository.getPlayersByIp(ip);
     }
 
     @Override

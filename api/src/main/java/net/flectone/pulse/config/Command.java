@@ -882,6 +882,7 @@ public record Command(
     @Builder(toBuilder = true)
     public record Whois(
             Boolean enable,
+            Boolean checkGroupWeight,
             Integer perPage,
             List<String> aliases,
             Cooldown cooldown,
