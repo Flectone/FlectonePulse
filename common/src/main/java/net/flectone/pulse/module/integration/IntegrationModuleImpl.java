@@ -159,6 +159,14 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
     }
 
     @Override
+    public int getSortWeight(FPlayer fPlayer) {
+        if (!moduleController.isEnable(this)) return 0;
+        if (!containsEnabledChild(ModuleName.INTEGRATION_LUCKPERMS)) return 0;
+
+        return luckPermsModule.get().getSortWeight(fPlayer);
+    }
+
+    @Override
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {
         if (moduleController.isDisabledFor(this, sender)) return text;
         if (containsEnabledChild(ModuleName.INTEGRATION_DEEPL)) {

@@ -97,6 +97,7 @@ luckperms:
   enable: true
   always_have_true: false
   tab_sort: true
+  group_order: []
 maintenance:
   enable: true
   disable_flectonepulse_maintenance: true

@@ -13,6 +13,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.LazyInstance;
 
+import java.util.List;
 import java.util.Set;
 
 @Singleton
@@ -70,9 +71,28 @@ public class LuckPermsModuleImpl implements LuckPermsModule {
     @Override
     public int getGroupWeight(FPlayer fPlayer) {
         if (!moduleController.isEnable(this)) return 0;
-        if (!config().tabSort()) return 0;
 
         return luckPermsIntegration.get().getGroupWeight(fPlayer);
+    }
+
+    @Override
+    public int getSortWeight(FPlayer fPlayer) {
+        if (!moduleController.isEnable(this)) return 0;
+        if (!config().tabSort()) return 0;
+
+        List<String> tabSortGroups = config().groupOrder();
+        if (tabSortGroups.isEmpty()) return luckPermsIntegration.get().getGroupWeight(fPlayer);
+
+        String groupName = luckPermsIntegration.get().getGroupName(fPlayer);
+        if (groupName == null) return 0;
+
+        for (int index = 0; index < tabSortGroups.size(); index++) {
+            if (tabSortGroups.get(index).equalsIgnoreCase(groupName)) {
+                return tabSortGroups.size() - index;
+            }
+        }
+
+        return 0;
     }
 
     @Override

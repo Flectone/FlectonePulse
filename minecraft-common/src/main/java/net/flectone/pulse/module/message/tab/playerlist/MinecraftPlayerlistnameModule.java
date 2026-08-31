@@ -183,7 +183,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                     gameMode,
                     buildFPlayerName(fSender, fReceiver),
                     null,
-                    gameMode != GameMode.SPECTATOR || config().spectatorListOrder() ? integrationModule.getGroupWeight(fSender) : 0
+                    gameMode != GameMode.SPECTATOR || config().spectatorListOrder() ? integrationModule.getSortWeight(fSender) : 0
             );
 
             PlayerlistnameEntry entry = PlayerlistnameEntry.of(playerInfo);

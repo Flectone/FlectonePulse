@@ -154,6 +154,14 @@ public interface IntegrationModule extends ModuleSimple {
     int getGroupWeight(FPlayer fPlayer);
 
     /**
+     * The weight a player is sorted by in the tab list.
+     *
+     * @param fPlayer the player
+     * @return the weight
+     */
+    int getSortWeight(FPlayer fPlayer);
+
+    /**
      * Translates text through DeepL, if that integration is enabled.
      *
      * @param sender who asked

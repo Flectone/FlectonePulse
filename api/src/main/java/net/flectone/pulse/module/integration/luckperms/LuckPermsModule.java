@@ -44,6 +44,14 @@ public interface LuckPermsModule extends ModuleSimple {
     int getGroupWeight(FPlayer fPlayer);
 
     /**
+     * The weight a player is sorted by in the tab list.
+     *
+     * @param fPlayer the player
+     * @return the weight
+     */
+    int getSortWeight(FPlayer fPlayer);
+
+    /**
      * The prefix LuckPerms gives a player.
      *
      * @param fPlayer the player

@@ -292,7 +292,7 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
 
     @NonNull
     private String getSortedName(@NonNull FPlayer fPlayer) {
-        int weight = integrationModule.get().getGroupWeight(fPlayer);
+        int weight = integrationModule.get().getSortWeight(fPlayer);
 
         // 32767 limit
         if (isNewerThanOrEqualsV118) {

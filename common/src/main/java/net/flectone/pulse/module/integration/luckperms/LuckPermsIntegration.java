@@ -52,15 +52,20 @@ public class LuckPermsIntegration implements FIntegration {
     }
 
     public int getGroupWeight(FPlayer fPlayer) {
-        User user = getUser(fPlayer);
-        if (user == null) return 0;
-
-        String groupName = user.getPrimaryGroup();
+        String groupName = getGroupName(fPlayer);
+        if (groupName == null) return 0;
 
         Group group = luckPerms.getGroupManager().getGroup(groupName);
         if (group == null) return 0;
 
         return group.getWeight().orElse(0);
+    }
+
+    public String getGroupName(FPlayer fPlayer) {
+        User user = getUser(fPlayer);
+        if (user == null) return null;
+
+        return user.getPrimaryGroup();
     }
 
     public String getPrefix(FPlayer fPlayer) {

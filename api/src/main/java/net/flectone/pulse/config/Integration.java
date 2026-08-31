@@ -3,7 +3,6 @@ package net.flectone.pulse.config;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
 import lombok.With;
-import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.config.setting.MessageChannelSetting;
 import net.flectone.pulse.config.setting.SoundConfigSetting;
@@ -292,7 +291,8 @@ public record Integration(
     public record Luckperms(
             Boolean enable,
             Boolean alwaysHaveTrue,
-            Boolean tabSort
+            Boolean tabSort,
+            List<String> groupOrder
     ) implements EnableSetting {
     }
 
