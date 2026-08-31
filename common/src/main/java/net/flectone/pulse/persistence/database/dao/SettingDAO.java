@@ -49,6 +49,7 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
 
     public void insertOrUpdate(@NonNull FPlayer player, @NonNull String setting, @Nullable String value) {
         if (database.isClosed()) return;
+        if (player.isUnknown()) return;
 
         useHandle(sql -> insertOrUpdate(sql, player, setting, value));
     }

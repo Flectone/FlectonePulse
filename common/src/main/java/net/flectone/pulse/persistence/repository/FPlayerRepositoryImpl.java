@@ -138,6 +138,8 @@ public class FPlayerRepositoryImpl implements FPlayerRepository {
         offlinePlayersCache.invalidate(uuid);
 
         FPlayer fPlayer = get(uuid);
+        if (fPlayer.isUnknown()) return;
+
         saveToCacheOnline(fPlayer);
     }
 
@@ -157,6 +159,8 @@ public class FPlayerRepositoryImpl implements FPlayerRepository {
 
     @Override
     public void add(@NonNull FPlayer fPlayer) {
+        if (fPlayer.isUnknown()) return;
+
         onlinePlayers.put(fPlayer.uuid(), fPlayer);
         addToIndexes(fPlayer);
         offlinePlayersCache.invalidate(fPlayer.uuid());
