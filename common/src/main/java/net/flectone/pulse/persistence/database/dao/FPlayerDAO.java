@@ -82,7 +82,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
 
                 sql.update(playerInfo.id(), online, uuid.toString(), name, ip);
             } else {
-                Optional<PlayerInfo> existingByName = sql.findByName(name);
+                Optional<PlayerInfo> existingByName = findByName(sql, name);
                 if (existingByName.isPresent()) {
                     PlayerInfo playerInfo = existingByName.get();
 
@@ -159,7 +159,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     public FPlayer getFPlayer(@NonNull String name) {
         if (database.isClosed()) return FPlayer.UNKNOWN;
 
-        return withHandle(sql -> sql.findByName(name)
+        return withHandle(sql -> findByName(sql, name)
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().id(nextRandomId()).name(name).uuid(UUID.randomUUID()).build())
         );
@@ -190,6 +190,13 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().id(id).uuid(UUID.randomUUID()).build())
         );
+    }
+
+    private Optional<PlayerInfo> findByName(FPlayerSQL sql, String name) {
+        Optional<PlayerInfo> playerInfo = sql.findByExactName(name);
+        if (playerInfo.isPresent()) return playerInfo;
+
+        return sql.findByName(name);
     }
 
     private int nextRandomId() {

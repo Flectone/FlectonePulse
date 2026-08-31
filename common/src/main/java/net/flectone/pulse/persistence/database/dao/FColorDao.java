@@ -7,7 +7,6 @@ import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.persistence.database.DatabaseImpl;
 import net.flectone.pulse.persistence.database.sql.fcolor.*;
-import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.mapper.Nested;
 import org.jspecify.annotations.NonNull;
 
@@ -46,9 +45,7 @@ public class FColorDao implements BaseDAO<FColorSQL> {
             return;
         }
 
-        useCustomTransaction(handle -> {
-            FColorSQL sql = getSQL(handle);
-
+        useTransaction(sql -> {
             Map<FColor.Type, Set<FColor>> oldFColors = findFColors(sql, fPlayer);
             if (colors.equals(oldFColors)) return;
 
@@ -58,7 +55,7 @@ public class FColorDao implements BaseDAO<FColorSQL> {
             }
 
             Arrays.stream(FColor.Type.values()).forEach(type ->
-                    saveType(handle, sql, fPlayer, type, colors.getOrDefault(type, Set.of()), oldFColors.getOrDefault(type, Set.of()))
+                    saveType(sql, fPlayer, type, colors.getOrDefault(type, Set.of()), oldFColors.getOrDefault(type, Set.of()))
             );
         });
     }
@@ -87,7 +84,7 @@ public class FColorDao implements BaseDAO<FColorSQL> {
                 ));
     }
 
-    private void saveType(Handle handle, FColorSQL sql, FPlayer fPlayer, FColor.Type type, @NonNull Set<FColor> newFColors, @NonNull Set<FColor> oldFColors) {
+    private void saveType(FColorSQL sql, FPlayer fPlayer, FColor.Type type, @NonNull Set<FColor> newFColors, @NonNull Set<FColor> oldFColors) {
         if (newFColors.equals(oldFColors)) return;
         if (newFColors.isEmpty()) {
             sql.deleteFColors(fPlayer.id(), type.name());
@@ -114,7 +111,7 @@ public class FColorDao implements BaseDAO<FColorSQL> {
 
             sql.insertFColorsIfAbsent(names);
 
-            Map<String, Integer> nameToId = sql.findFColorIdsByNames(handle, names);
+            Map<String, Integer> nameToId = sql.findFColorIdsByNames(names);
 
             sql.batchUpsertPlayerFColors(
                     fPlayer.id(),

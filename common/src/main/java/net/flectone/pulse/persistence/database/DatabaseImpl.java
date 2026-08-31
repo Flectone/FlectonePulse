@@ -34,6 +34,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
 import org.jdbi.v3.core.statement.SqlStatements;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.jdbi.v3.core.statement.TemplateEngine;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jspecify.annotations.Nullable;
 
@@ -174,9 +175,15 @@ public class DatabaseImpl implements Database {
             template = template.andThen(sql -> Strings.CS.replace(sql, "`", "\""));
         }
 
-        if (template != null) {
-            jdbi.getConfig(SqlStatements.class).setTemplateEngine(template::apply);
-        }
+        if (template == null) return;
+
+        SqlStatements sqlStatements = jdbi.getConfig(SqlStatements.class);
+        TemplateEngine templateEngine = sqlStatements.getTemplateEngine();
+        BiFunction<String, StatementContext, String> finalTemplate = template;
+
+        sqlStatements.setTemplateEngine((sql, statementContext) ->
+                finalTemplate.apply(templateEngine.render(sql, statementContext), statementContext)
+        );
     }
 
     @Override

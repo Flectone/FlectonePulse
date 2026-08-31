@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS `fp_version` (
 
 PRAGMA foreign_keys = ON;
 
+CREATE INDEX IF NOT EXISTS `idx_fp_player_name` ON `fp_player`(`name`);
 CREATE INDEX IF NOT EXISTS `idx_fp_player_ip` ON `fp_player`(`ip`);
 CREATE INDEX IF NOT EXISTS `idx_fp_player_online` ON `fp_player`(`online`);
 
@@ -97,6 +98,5 @@ CREATE INDEX IF NOT EXISTS `idx_fp_ignore_initiator_valid` ON `fp_ignore`(`initi
 
 CREATE INDEX IF NOT EXISTS `idx_fp_moderation_player_type_valid_time` ON `fp_moderation`(`player`, `type`, `valid`, `time`);
 CREATE INDEX IF NOT EXISTS `idx_fp_moderation_type_valid_time` ON `fp_moderation`(`type`, `valid`, `time`);
-CREATE INDEX IF NOT EXISTS `idx_fp_moderation_moderator` ON `fp_moderation`(`moderator`);
 
 CREATE INDEX IF NOT EXISTS `idx_fp_player_fcolor_player_type` ON `fp_player_fcolor`(`player`, `type`);

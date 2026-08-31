@@ -63,7 +63,7 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
 
         if (afk) {
             long newTotal = playTime.total() + (currentTime - playTime.last());
-            useHandle(sql -> sql.updateLastSeen(playTime.last() * -1.0, newTotal, fPlayer.id()));
+            useHandle(sql -> sql.updateLastSeen(-playTime.last(), newTotal, fPlayer.id()));
         } else {
             useHandle(sql -> sql.updateLastSeen(currentTime, playTime.total(), fPlayer.id()));
         }

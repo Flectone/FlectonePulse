@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface TimeSQL extends SQL {
 
     @SqlUpdate("UPDATE `fp_time` SET `last` = :last, `total` = :total WHERE `player` = :player")
-    void updateLastSeen(@Bind("last") double last, @Bind("total") double total, @Bind("player") int playerId);
+    void updateLastSeen(@Bind("last") long last, @Bind("total") long total, @Bind("player") int playerId);
 
     @SqlQuery("SELECT COUNT(*) FROM `fp_time`")
     int getTotalCount();

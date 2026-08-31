@@ -13,6 +13,9 @@ import java.util.Optional;
 
 public interface FPlayerSQL extends SQL {
 
+    @SqlQuery("SELECT * FROM `fp_player` WHERE `name` = :name LIMIT 1")
+    Optional<FPlayerDAO.PlayerInfo> findByExactName(@Bind("name") String name);
+
     @SqlQuery("SELECT * FROM `fp_player` WHERE UPPER(`name`) = UPPER(:name) LIMIT 1")
     Optional<FPlayerDAO.PlayerInfo> findByName(@Bind("name") String name);
 

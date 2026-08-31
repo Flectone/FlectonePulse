@@ -10,7 +10,7 @@ public interface FPlayerPostgreSQL extends FPlayerSQL {
         """
         INSERT INTO `fp_player` (`id`, `uuid`, `name`)
         VALUES (:id, :uuid, :name)
-        ON CONFLICT (`id`) DO NOTHING
+        ON CONFLICT DO NOTHING
         """
     )
     void insertOrIgnore(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name);

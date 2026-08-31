@@ -23,10 +23,6 @@ public interface BaseDAO<S extends SQL> {
         );
     }
 
-    default void useCustomTransaction(Consumer<Handle> action) {
-        database().getJdbi().useTransaction(action::accept);
-    }
-
     default <R> R inTransaction(Function<S, R> action) {
         return database().getJdbi().inTransaction(handle ->
                 action.apply(getSQL(handle))

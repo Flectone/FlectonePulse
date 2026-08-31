@@ -3,54 +3,25 @@ package net.flectone.pulse.persistence.database.sql.fcolor;
 import net.flectone.pulse.exception.UnsupportedDatabaseOperationException;
 import net.flectone.pulse.persistence.database.dao.FColorDao;
 import net.flectone.pulse.persistence.database.sql.SQL;
-import org.jdbi.v3.core.Handle;
-import org.jdbi.v3.core.statement.Query;
+import org.jdbi.v3.sqlobject.config.KeyColumn;
+import org.jdbi.v3.sqlobject.config.ValueColumn;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public interface FColorSQL extends SQL {
 
     @SqlQuery("SELECT `number`, `fp_fcolor`.`name`, `type` FROM `fp_player_fcolor` LEFT JOIN `fp_fcolor` ON `fp_player_fcolor`.`fcolor` = `fp_fcolor`.`id` WHERE `fp_player_fcolor`.`player` = :playerId")
     List<FColorDao.FColorInfo> findFColors(@Bind("playerId") int playerId);
 
-    // idk why this doesn't work
-    // @SqlQuery("SELECT `name`, `id` FROM `fp_fcolor` WHERE `name` IN (`<names>`)")
-    // @KeyColumn("name")
-    // @ValueColumn("id")
-    // Map<String, Integer> findFColorIdsByNames(@BindList("names") List<String> names);
-    default Map<String, Integer> findFColorIdsByNames(Handle handle, List<String> names) {
-        if (names == null || names.isEmpty()) {
-            return Map.of();
-        }
-
-        String placeholders = names.stream()
-                .map(_ -> "?")
-                .collect(Collectors.joining(", "));
-
-        String sql = "SELECT `name`, `id` FROM `fp_fcolor` WHERE `name` IN (" + placeholders + ")";
-
-        try (Query query = handle.createQuery(sql)) {
-            for (int i = 0; i < names.size(); i++) {
-                query.bind(i, names.get(i));
-            }
-
-            return query.reduceRows(new HashMap<>(), (map, rowView) -> {
-                map.put(
-                        rowView.getColumn("name", String.class),
-                        rowView.getColumn("id", Integer.class)
-                );
-
-                return map;
-            });
-        }
-    }
+    @KeyColumn("name")
+    @ValueColumn("id")
+    @SqlQuery("SELECT `name`, `id` FROM `fp_fcolor` WHERE `name` IN (<names>)")
+    Map<String, Integer> findFColorIdsByNames(@BindList("names") List<String> names);
 
     @SqlUpdate("DELETE FROM `fp_player_fcolor` WHERE `player` = :playerId")
     void deleteFColors(@Bind("playerId") int playerId);
