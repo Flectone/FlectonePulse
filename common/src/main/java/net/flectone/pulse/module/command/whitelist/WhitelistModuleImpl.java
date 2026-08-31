@@ -27,6 +27,7 @@ import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.module.command.whitelist.listener.PulseWhitelistListener;
 import net.flectone.pulse.module.command.whitelist.listener.WhitelistProxyMessageListener;
 import net.flectone.pulse.module.command.whitelist.model.WhitelistMessageContext;
+import net.flectone.pulse.parser.integer.DurationReasonParser;
 import net.flectone.pulse.parser.string.UUIDParser;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -66,6 +67,7 @@ public class WhitelistModuleImpl implements WhitelistModule {
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
     private final CommandParserProvider commandParserProvider;
+    private final DurationReasonParser durationReasonParser;
     private final ModuleCommandController commandModuleController;
     private final MessageDispatcher messageDispatcher;
     private final FPlayerService fPlayerService;
@@ -555,7 +557,11 @@ public class WhitelistModuleImpl implements WhitelistModule {
         String promptTime = commandModuleController.getPrompt(this, 3);
 
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
-        return optionalTime.orElse(Pair.of(-1L, null));
+        Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(-1L, null));
+        if (timeReasonPair.getLeft() != -1) return timeReasonPair;
+
+        String reason = timeReasonPair.getRight();
+        return Pair.of(durationReasonParser.parseTime(config().reasonTimes().getTime(reason)), reason);
     }
 
     @Nullable

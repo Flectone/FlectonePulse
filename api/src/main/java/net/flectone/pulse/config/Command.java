@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
 import lombok.With;
-import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.CommandSetting;
 import net.flectone.pulse.config.setting.CooldownConfigSetting;
 import net.flectone.pulse.config.setting.EnableSetting;
@@ -230,6 +229,7 @@ public record Command(
             Boolean checkDuplicate,
             Range range,
             Map<Integer, Long> timeLimits,
+            ReasonTimeMap reasonTimes,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,
@@ -534,6 +534,7 @@ public record Command(
             Boolean enable,
             Boolean filterByServer,
             Range range,
+            ReasonTimeMap reasonTimes,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,
@@ -577,6 +578,7 @@ public record Command(
             Boolean checkDuplicate,
             Range range,
             Map<Integer, Long> timeLimits,
+            ReasonTimeMap reasonTimes,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,
@@ -836,6 +838,7 @@ public record Command(
             Boolean checkGroupWeight,
             Range range,
             Map<Integer, Long> timeLimits,
+            ReasonTimeMap reasonTimes,
             List<String> aliases,
             Map<Integer, String> actions,
             Destination destination,
@@ -867,6 +870,7 @@ public record Command(
             Integer perPage,
             Range range,
             String subCommandPlayer,
+            ReasonTimeMap reasonTimes,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,
@@ -883,6 +887,26 @@ public record Command(
             Cooldown cooldown,
             Sound sound
     ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
+    }
+
+    public static class ReasonTimeMap extends LinkedHashMap<String, String> {
+
+        public ReasonTimeMap() {
+            super(new LinkedHashMap<>());
+        }
+
+        public ReasonTimeMap(Map<String, String> map) {
+            super(map);
+        }
+
+        public String getTime(String reason) {
+            if (reason == null || reason.isEmpty()) {
+                return super.get("default");
+            }
+
+            return super.getOrDefault(reason, super.get("default"));
+        }
+
     }
 
 }

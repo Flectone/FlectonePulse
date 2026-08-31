@@ -20,6 +20,7 @@ import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.model.value.Pair;
 import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.module.command.warn.listener.WarnProxyMessageListener;
+import net.flectone.pulse.parser.integer.DurationReasonParser;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -49,6 +50,7 @@ public class WarnModuleImpl implements WarnModule {
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandParserProvider commandParserProvider;
+    private final DurationReasonParser durationReasonParser;
     private final PlatformServerAdapter platformServerAdapter;
     private final ProxySender proxySender;
     private final MessagePipeline messagePipeline;
@@ -92,7 +94,9 @@ public class WarnModuleImpl implements WarnModule {
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(Duration.ofHours(1).toMillis(), null));
 
-        long time = timeReasonPair.getLeft() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.getLeft();
+        long time = timeReasonPair.getLeft() == -1
+                ? durationReasonParser.parseTime(config().reasonTimes().getTime(timeReasonPair.getRight()))
+                : timeReasonPair.getLeft();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
             messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()

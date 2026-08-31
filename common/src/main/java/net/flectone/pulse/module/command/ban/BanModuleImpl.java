@@ -22,6 +22,7 @@ import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.module.command.ban.listener.BanProxyMessageListener;
 import net.flectone.pulse.module.command.ban.listener.PulseBanListener;
 import net.flectone.pulse.module.command.unban.UnbanModule;
+import net.flectone.pulse.parser.integer.DurationReasonParser;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -55,6 +56,7 @@ public class BanModuleImpl implements BanModule {
     private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
     private final CommandParserProvider commandParserProvider;
+    private final DurationReasonParser durationReasonParser;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
@@ -96,8 +98,10 @@ public class BanModuleImpl implements BanModule {
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(-1L, null));
 
-        long time = timeReasonPair.getLeft();
         String reason = timeReasonPair.getRight();
+        long time = timeReasonPair.getLeft() == -1
+                ? durationReasonParser.parseTime(config().reasonTimes().getTime(reason))
+                : timeReasonPair.getLeft();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
             messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()

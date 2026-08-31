@@ -19,6 +19,7 @@ import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.maintenance.listener.MinecraftPacketMaintenanceListener;
+import net.flectone.pulse.parser.integer.DurationReasonParser;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -61,6 +62,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModuleImpl {
                                       ModuleCommandController commandModuleController,
                                       IconConverter iconConverter,
                                       CommandParserProvider commandParserProvider,
+                                      DurationReasonParser durationReasonParser,
                                       TaskScheduler taskScheduler,
                                       ModerationService moderationService,
                                       ProxySender proxySender,
@@ -72,7 +74,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModuleImpl {
                                       Gson gson) {
         super(fileFacade, permissionChecker, listenerRegistry, projectPath, iconPath, platformServerAdapter, platformPlayerAdapter,
                 fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconConverter,
-                commandParserProvider, taskScheduler, moderationService, proxySender, moderationMessageFormatter, proxyRegistry, socialService, fLogger, gson);
+                commandParserProvider, durationReasonParser, taskScheduler, moderationService, proxySender, moderationMessageFormatter, proxyRegistry, socialService, fLogger, gson);
 
         this.fPlayerService = fPlayerService;
         this.moduleController = moduleController;

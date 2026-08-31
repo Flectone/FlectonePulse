@@ -11,4 +11,18 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
  * @author TheFaser
  */
 public interface DurationReasonParser extends ArgumentParser<FPlayer, Pair<Long, String>>, BlockingSuggestionProvider.Strings<FPlayer> {
+
+    /**
+     * The time returned when the text is not a duration.
+     */
+    long UNKNOWN_TIME = -1L;
+
+    /**
+     * Reads a duration.
+     *
+     * @param value the text
+     * @return the duration in milliseconds
+     */
+    long parseTime(String value);
+
 }

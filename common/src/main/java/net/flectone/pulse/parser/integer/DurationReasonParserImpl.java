@@ -43,14 +43,27 @@ public class DurationReasonParserImpl implements DurationReasonParser {
         }
 
         if (rawDuration.isEmpty()) {
-            return ArgumentParseResult.success(Pair.of(-1L, null));
+            return ArgumentParseResult.success(Pair.of(UNKNOWN_TIME, null));
         }
 
         String otherInput = stringJoiner.toString();
-        Matcher matcher = DURATION_PATTERN.matcher(rawDuration.toLowerCase());
-        Duration duration = Duration.ZERO;
 
+        long duration = parseTime(rawDuration);
+        if (duration != UNKNOWN_TIME) {
+            return ArgumentParseResult.success(Pair.of(duration, otherInput));
+        }
+
+        return ArgumentParseResult.success(Pair.of(UNKNOWN_TIME, otherInput.isEmpty() ? rawDuration : rawDuration + " " + otherInput));
+    }
+
+    @Override
+    public long parseTime(String value) {
+        if (value == null || value.isEmpty()) return UNKNOWN_TIME;
+
+        Matcher matcher = DURATION_PATTERN.matcher(value.toLowerCase());
+        Duration duration = Duration.ZERO;
         int length = 0;
+
         while (matcher.find()) {
             String group = matcher.group();
             String timeUnit = group.substring(group.length() - 1);
@@ -73,11 +86,9 @@ public class DurationReasonParserImpl implements DurationReasonParser {
             length += group.length();
         }
 
-        if (!duration.isZero() && length == rawDuration.length()) {
-            return ArgumentParseResult.success(Pair.of(duration.toMillis(), otherInput));
-        }
+        if (duration.isZero() || length != value.length()) return UNKNOWN_TIME;
 
-        return ArgumentParseResult.success(Pair.of(-1L, rawDuration + " " + otherInput));
+        return duration.toMillis();
     }
 
     @Override

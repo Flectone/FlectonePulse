@@ -40,6 +40,8 @@ ban:
   range: "PROXY"
   time_limits:
     0: -1
+  reason_times:
+    default: "-1"
   aliases:
   - "ban"
   - "tempban"
@@ -541,6 +543,8 @@ maintenance:
   enable: true
   filter_by_server: true
   range: "SERVER"
+  reason_times:
+    default: "-1"
   aliases:
   - "maintenance"
   destination:
@@ -581,6 +585,8 @@ mute:
   range: "PROXY"
   time_limits:
     0: -1
+  reason_times:
+    default: "1h"
   aliases:
   - "mute"
   destination:
@@ -876,6 +882,8 @@ warn:
   range: "PROXY"
   time_limits:
     0: -1
+  reason_times:
+    default: "1h"
   aliases:
   - "warn"
   actions:
@@ -907,6 +915,8 @@ whitelist:
   per_page: 4
   range: "PLAYER"
   sub_command_player: "player"
+  reason_times:
+    default: "-1"
   aliases:
     - "whitelist"
   destination:
