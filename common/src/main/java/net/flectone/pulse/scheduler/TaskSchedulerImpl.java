@@ -226,7 +226,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
 
     @Override
     public boolean isDisabled() {
-        return disabled || FlectonePulseAPI.isDisabling();
+        return disabled || FlectonePulseAPI.isDisabling() || executorService == null || executorService.isShutdown();
     }
 
     @Override
@@ -392,7 +392,10 @@ public class TaskSchedulerImpl implements TaskScheduler {
                 config.workQueue() == Config.Executor.WorkQueue.SYNCHRONOUS ? new SynchronousQueue<>() : new LinkedBlockingQueue<>(),
                 factory,
                 (runnable, _) -> {
-                    fLogger.warning("Executor overloaded, increase 'max_pool_size' or switch 'work_queue' to 'LINKED_BLOCKING' in config.yml. Running in current thread...");
+                    if (!isDisabled()) {
+                        fLogger.warning("Executor overloaded, increase 'max_pool_size' or switch 'work_queue' to 'LINKED_BLOCKING' in config.yml. Running in current thread...");
+                    }
+
                     runnable.run();
                 }
         );
