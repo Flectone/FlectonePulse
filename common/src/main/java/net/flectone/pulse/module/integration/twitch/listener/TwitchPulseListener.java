@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.twitch.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.listener.PulseListener;
@@ -27,6 +28,7 @@ public class TwitchPulseListener implements PulseListener {
 
         ModuleName moduleName = event.moduleName();
         if (moduleName == ModuleName.INTEGRATION_TWITCH) return;
+        if (FlectonePulseAPI.isDisabling() && moduleName != ModuleName.SERVER_DISABLE) return;
 
         MessageContext messageContext = event.messageContext();
         taskScheduler.runAsync(ModuleName.INTEGRATION_TWITCH, () ->
