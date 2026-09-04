@@ -71,8 +71,6 @@ public class TaskSchedulerImpl implements TaskScheduler {
     public void shutdown() {
         disabled = true;
 
-        moduleChains.clear();
-
         ExecutorService currentExecutorService = executorService;
         if (currentExecutorService == null) {
             scheduledTasks.clear();
