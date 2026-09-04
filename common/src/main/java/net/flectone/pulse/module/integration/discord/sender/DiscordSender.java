@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -57,6 +58,7 @@ public class DiscordSender {
     private final DiscordWebhookService discordWebhookService;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final FLogger fLogger;
 
     public void sendMessage(@NonNull FEntity sender,
                             @NonNull String messageName,
@@ -89,7 +91,7 @@ public class DiscordSender {
 
         discordClient.client().getChannelById(channel)
                 .createMessage(messageCreateSpecBuilder.build().asRequest())
-                .subscribe();
+                .subscribe(null, fLogger::warning);
     }
 
     public void sendMessage(@NonNull FEntity sender,
@@ -134,12 +136,12 @@ public class DiscordSender {
             ImmutableWebhookExecuteRequest.Builder webhookBuilder = WebhookExecuteRequest.builder()
                     .allowedMentions(discordAllowedMentionsParser.parse(channelEmbed.allowedMentions()).toData())
                     .username(StringUtils.isEmpty(channelEmbed.webhookName()) || "<player>".equals(channelEmbed.webhookName())
-                            ? sender.name()
-                            : messagePipeline.buildPlain(MessageContext.builder()
-                                                         .sender(sender)
-                                                         .receiver(FPlayer.UNKNOWN)
-                                                         .message(channelEmbed.webhookName())
-                                                         .build()
+                                    ? sender.name()
+                                    : messagePipeline.buildPlain(MessageContext.builder()
+                                    .sender(sender)
+                                    .receiver(FPlayer.UNKNOWN)
+                                    .message(channelEmbed.webhookName())
+                                    .build()
                             )
                     )
                     .avatarUrl(replaceSkin.apply(webhookAvatar))
@@ -154,7 +156,7 @@ public class DiscordSender {
                     webhookData.token().get(),
                     false,
                     MultipartRequest.ofRequest(webhookBuilder.build())
-            ).subscribe();
+            ).subscribe(null, fLogger::warning);
 
             return;
         }
@@ -173,7 +175,7 @@ public class DiscordSender {
 
         discordClient.client().getChannelById(channel)
                 .createMessage(messageCreateSpecBuilder.build().asRequest())
-                .subscribe();
+                .subscribe(null, fLogger::warning);
     }
 
     public void sendMessage(@NonNull String channelId,

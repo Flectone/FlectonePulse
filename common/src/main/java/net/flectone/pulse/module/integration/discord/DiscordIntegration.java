@@ -78,7 +78,7 @@ public class DiscordIntegration implements FIntegration {
                 discordClient.gateway().getEventDispatcher()
                         .on(discordMessageListenerInstance.getEventType())
                         .flatMap(discordMessageListenerInstance::execute)
-                        .subscribe();
+                        .subscribe(null, fLogger::warning);
             }
 
             discordWebhookService.initialize();
@@ -94,8 +94,13 @@ public class DiscordIntegration implements FIntegration {
         DiscordClient discordClient = discordClientProvider.get();
         if (discordClient == null) return;
 
-        discordClient.gateway().logout().block();
-        discordWebhookService.clearAll();
+        try {
+            discordClient.gateway().logout().block();
+            discordWebhookService.clearAll();
+            discordClientProvider.dispose();
+        } catch (Exception e) {
+            fLogger.warning(e);
+        }
 
         logUnhook();
     }
@@ -117,7 +122,7 @@ public class DiscordIntegration implements FIntegration {
                             .message(entry.getValue())
                             .build()
                     )).build(), null))
-                    .subscribe();
+                    .subscribe(null, fLogger::warning);
         }
     }
 
