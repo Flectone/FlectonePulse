@@ -111,6 +111,8 @@ public class DiscordClientProvider {
     }
 
     public void dispose() {
+        discordClient = null;
+
         ConnectionProvider currentConnectionProvider = connectionProvider;
         if (currentConnectionProvider == null) return;
 
