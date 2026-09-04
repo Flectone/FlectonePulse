@@ -263,15 +263,13 @@ public class TaskSchedulerImpl implements TaskScheduler {
         if (now - stalledSince < timeout) return;
 
         stalledSince = 0L;
-        resetPool(threadPoolExecutor, timeout);
+        resetPool(timeout);
     }
 
-    private void resetPool(ThreadPoolExecutor threadPoolExecutor, long timeout) {
+    private void resetPool(long timeout) {
         fLogger.warning("No task has finished in %s seconds. Cancelling existing threads and starting a new ones", timeout / 1000L);
 
         completedTasks = -1L;
-
-        threadPoolExecutor.getQueue().clear();
 
         Thread.getAllStackTraces().keySet().stream()
                 .filter(thread -> thread.getName().startsWith(THREAD_PREFIX))
