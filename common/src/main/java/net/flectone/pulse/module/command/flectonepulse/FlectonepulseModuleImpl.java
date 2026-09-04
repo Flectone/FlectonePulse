@@ -311,20 +311,16 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
 
         int port = config().editor().port();
         if (!isPortAvailable(port)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
-                    .messageContext(fResolver -> MessageContext.builder()
-                            .sender(fPlayer)
-                            .receiver(fResolver)
-                            .message(Strings.CS.replace(localization(fResolver).nullPortEditor(), "<port>", String.valueOf(port)))
-                            .build()
-                    )
-                    .build()
-            );
-
+            sendNullPortMessage(fPlayer, port);
             return false;
         }
 
         enableSpark();
+
+        if (!sparkServer.get().isEnable()) {
+            sendNullPortMessage(fPlayer, port);
+            return false;
+        }
 
         messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(config().destination())
@@ -339,6 +335,18 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
         );
 
         return true;
+    }
+
+    private void sendNullPortMessage(FPlayer fPlayer, int port) {
+        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(Strings.CS.replace(localization(fResolver).nullPortEditor(), "<port>", String.valueOf(port)))
+                        .build()
+                )
+                .build()
+        );
     }
 
     private boolean isPortAvailable(int port) {
