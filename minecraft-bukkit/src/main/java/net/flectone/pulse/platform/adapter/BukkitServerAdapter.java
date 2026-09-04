@@ -295,14 +295,16 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private @NonNull ItemStack buildLegacyItemStack(@NonNull Material material, @NonNull Component name, @NonNull List<Component> lore) {
         org.bukkit.inventory.ItemStack legacyItem = new org.bukkit.inventory.ItemStack(material);
         ItemMeta meta = legacyItem.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(componentSerializer.toLegacy(name));
+            meta.setLore(lore.stream()
+                    .map(componentSerializer::toLegacy)
+                    .toList()
+            );
 
-        meta.setDisplayName(componentSerializer.toLegacy(name));
-        meta.setLore(lore.stream()
-                .map(componentSerializer::toLegacy)
-                .toList()
-        );
+            legacyItem.setItemMeta(meta);
+        }
 
-        legacyItem.setItemMeta(meta);
         return SpigotConversionUtil.fromBukkitItemStack(legacyItem);
     }
 
@@ -354,7 +356,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
             }
         }
 
-        String displayName = itemStack.getItemMeta().getDisplayName();
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        String displayName = itemMeta == null ? null : itemMeta.getDisplayName();
         if (displayName == null) return Component.empty();
 
         MessagePipeline messagePipelineInstance = messagePipeline.get();
