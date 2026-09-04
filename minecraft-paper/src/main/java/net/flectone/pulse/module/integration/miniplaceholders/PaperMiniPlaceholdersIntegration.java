@@ -86,7 +86,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
 
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

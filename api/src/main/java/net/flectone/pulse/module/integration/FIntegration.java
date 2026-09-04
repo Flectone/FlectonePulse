@@ -55,7 +55,7 @@ public interface FIntegration {
      *
      * @param exception the exception that caused the failure
      */
-    default void lohHookFailed(Exception exception) {
+    default void logHookFailed(Exception exception) {
         getFLogger().warning("[-] Failed to load integration: %s", exception, getIntegrationName());
     }
 

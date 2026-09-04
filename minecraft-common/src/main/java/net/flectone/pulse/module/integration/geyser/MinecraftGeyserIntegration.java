@@ -30,7 +30,7 @@ public class MinecraftGeyserIntegration implements FIntegration {
             this.geyserApi = GeyserApi.api();
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

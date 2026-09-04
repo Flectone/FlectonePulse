@@ -25,7 +25,7 @@ public class MinecraftPlasmoVoiceModule implements ModuleSimple {
             PlasmoVoiceServer.getAddonsLoader().load(plasmoVoiceIntegration);
             plasmoVoiceIntegration.hook();
         } catch (Exception e) {
-            plasmoVoiceIntegration.lohHookFailed(e);
+            plasmoVoiceIntegration.logHookFailed(e);
         }
     }
 

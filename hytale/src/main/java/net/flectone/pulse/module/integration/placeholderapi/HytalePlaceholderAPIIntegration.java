@@ -121,7 +121,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
             taskScheduler.runSync(this::register);
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

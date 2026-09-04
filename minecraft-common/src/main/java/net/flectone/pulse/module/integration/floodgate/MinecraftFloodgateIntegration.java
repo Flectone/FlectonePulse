@@ -30,7 +30,7 @@ public class MinecraftFloodgateIntegration implements FIntegration {
             this.floodgateApi = FloodgateApi.getInstance();
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

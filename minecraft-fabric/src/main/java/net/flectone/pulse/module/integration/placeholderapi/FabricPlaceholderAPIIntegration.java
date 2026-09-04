@@ -84,7 +84,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
                 });
             }
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

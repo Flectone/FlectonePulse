@@ -85,7 +85,7 @@ public class DiscordIntegration implements FIntegration {
 
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

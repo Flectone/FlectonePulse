@@ -36,7 +36,7 @@ public class LuckPermsIntegration implements FIntegration {
             this.luckPerms = LuckPermsProvider.get();
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

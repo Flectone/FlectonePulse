@@ -89,7 +89,7 @@ public class FabricMiniPlaceholdersIntegration implements FIntegration, PulseLis
 
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

@@ -31,7 +31,7 @@ public class BukkitMaintenanceIntegration implements FIntegration {
             maintenance = MaintenanceProvider.get();
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

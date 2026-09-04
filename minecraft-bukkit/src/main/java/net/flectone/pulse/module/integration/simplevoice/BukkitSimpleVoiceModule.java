@@ -35,7 +35,7 @@ public class BukkitSimpleVoiceModule extends MinecraftSimpleVoiceModule {
             service.registerPlugin(simpleVoiceIntegration);
             super.onEnable();
         } catch (Exception e) {
-            simpleVoiceIntegration.lohHookFailed(e);
+            simpleVoiceIntegration.logHookFailed(e);
         }
     }
 

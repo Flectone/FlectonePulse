@@ -33,7 +33,7 @@ public class BukkitCMIIntegration implements FIntegration {
             cmi = CMI.getInstance();
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 

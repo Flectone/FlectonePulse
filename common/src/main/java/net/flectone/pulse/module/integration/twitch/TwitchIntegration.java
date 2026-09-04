@@ -107,7 +107,7 @@ public class TwitchIntegration implements FIntegration {
 
             logHook();
         } catch (Exception e) {
-            lohHookFailed(e);
+            logHookFailed(e);
         }
     }
 
