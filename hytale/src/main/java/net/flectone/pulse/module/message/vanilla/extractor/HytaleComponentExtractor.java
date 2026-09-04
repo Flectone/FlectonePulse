@@ -118,6 +118,8 @@ public class HytaleComponentExtractor extends ComponentExtractor<FormattedMessag
     private Object extractParamValue(ParamValue param) {
         return switch (param) {
             case StringParamValue stringParamValue -> {
+                if (StringUtils.isEmpty(stringParamValue.value)) yield "";
+
                 FPlayer fPlayer = fPlayerService.getFPlayer(stringParamValue.value);
                 yield fPlayer.isUnknown() ? stringParamValue.value : fPlayer;
             }
