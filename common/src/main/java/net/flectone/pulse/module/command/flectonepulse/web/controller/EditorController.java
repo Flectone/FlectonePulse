@@ -154,8 +154,7 @@ public class EditorController {
         if ("main".equals(fileType)) {
             Object file = configFiles.get(fileName);
             if (file != null) {
-                Files.writeString(filePathProvider.get(file), content);
-                fileFacade.reload();
+                saveAndReload(filePathProvider.get(file), content);
                 return;
             }
 
@@ -163,15 +162,28 @@ public class EditorController {
             List<LocalizationFile> files = localizationFiles.get(fileType);
             for (LocalizationFile file : files) {
                 if (file.fileName.equals(fileName)) {
-                    Path pathToFile = filePathProvider.get(file.localization);
-                    Files.writeString(pathToFile, content);
-                    fileFacade.reload();
+                    saveAndReload(filePathProvider.get(file.localization), content);
                     return;
                 }
             }
         }
 
         throw new FileNotFoundException("File not found: " + fileName);
+    }
+
+    private void saveAndReload(Path pathToFile, String content) throws IOException {
+        String previousContent = Files.readString(pathToFile);
+
+        Files.writeString(pathToFile, content);
+
+        try {
+            fileFacade.reload();
+        } catch (Exception e) {
+            Files.writeString(pathToFile, previousContent);
+            fileFacade.reload();
+
+            throw e;
+        }
     }
 
     private String renderEditor() {
