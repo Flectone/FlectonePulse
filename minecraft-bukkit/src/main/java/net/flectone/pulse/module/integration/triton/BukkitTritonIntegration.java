@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.rexcantor64.triton.api.TritonAPI;
 import com.rexcantor64.triton.api.events.PlayerChangeLanguageSpigotEvent;
-import com.rexcantor64.triton.api.players.LanguagePlayer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.constant.SettingText;
@@ -46,10 +45,7 @@ public class BukkitTritonIntegration implements Listener, FIntegration {
     }
 
     public @Nullable String getLocale(FPlayer fPlayer) {
-        LanguagePlayer languagePlayer = TritonAPI.getInstance().getPlayerManager().get(fPlayer.uuid());
-        if (languagePlayer == null) return null;
-
-        return languagePlayer.getLanguageId();
+        return TritonAPI.getInstance().getPlayerManager().get(fPlayer.uuid()).getLanguageId();
     }
 
 }
