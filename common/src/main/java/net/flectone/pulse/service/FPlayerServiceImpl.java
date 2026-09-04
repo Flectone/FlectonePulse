@@ -10,7 +10,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.persistence.repository.FPlayerRepository;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.random.RandomGenerator;
 import org.jspecify.annotations.NonNull;
@@ -34,7 +33,6 @@ public class FPlayerServiceImpl implements FPlayerService {
     private final RandomGenerator randomUtil;
     private final EventDispatcher eventDispatcher;
     private final TaskScheduler taskScheduler;
-    private final ProxyRegistry proxyRegistry;
     private final RandomGenerator randomGenerator;
 
     @Override
