@@ -114,7 +114,7 @@ public class HytaleScoreboardModule extends ScoreboardModuleImpl {
         storeRef.getStore().getExternalData().getWorld().execute(() -> {
             if (!storeRef.isValid()) return;
 
-            Nameplate nameplate = storeRef.getStore().getComponent(playerRef.getReference(), Nameplate.getComponentType());
+            Nameplate nameplate = storeRef.getStore().getComponent(storeRef, Nameplate.getComponentType());
             if (nameplate != null) {
                 nameplate.setText(newName);
             }
