@@ -81,17 +81,33 @@ public class DatabaseImporter {
 
         Map<DumpTable, Long> identities = new LinkedHashMap<>();
         long inserted = 0;
+        boolean formatRead = false;
+        boolean tablesRead = false;
 
         while (parser.nextToken() == JsonToken.PROPERTY_NAME) {
             String property = parser.currentName();
             parser.nextToken();
 
             switch (property) {
-                case DumpFormat.FORMAT -> checkFormat(parser.getIntValue());
+                case DumpFormat.FORMAT -> {
+                    checkFormat(parser.getIntValue());
+                    formatRead = true;
+                }
                 case DumpFormat.SOURCE -> fLogger.info("Database dump was written by %s", parser.getString());
-                case DumpFormat.TABLES -> inserted = readTables(parser, handle, identities);
+                case DumpFormat.TABLES -> {
+                    inserted = readTables(parser, handle, identities);
+                    tablesRead = true;
+                }
                 default -> parser.skipChildren();
             }
+        }
+
+        if (!formatRead) {
+            throw new DatabaseDumpException("The dump has no " + DumpFormat.FORMAT + ", it was not written by FlectonePulse");
+        }
+
+        if (!tablesRead) {
+            throw new DatabaseDumpException("The dump has no " + DumpFormat.TABLES);
         }
 
         identities.forEach((table, nextId) -> restartIdentity(handle, table, nextId));
