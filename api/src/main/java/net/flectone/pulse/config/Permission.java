@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
 import lombok.With;
-import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.CooldownPermissionSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.config.setting.SoundPermissionSetting;
