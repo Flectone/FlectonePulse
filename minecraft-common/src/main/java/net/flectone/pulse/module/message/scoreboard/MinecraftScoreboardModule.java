@@ -33,11 +33,7 @@ import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton

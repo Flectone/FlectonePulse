@@ -30,7 +30,10 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

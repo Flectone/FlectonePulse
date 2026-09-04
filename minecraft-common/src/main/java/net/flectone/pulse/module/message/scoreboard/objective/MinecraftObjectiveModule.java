@@ -21,11 +21,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton

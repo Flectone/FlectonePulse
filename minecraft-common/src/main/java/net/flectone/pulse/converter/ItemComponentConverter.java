@@ -29,11 +29,7 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 @Singleton

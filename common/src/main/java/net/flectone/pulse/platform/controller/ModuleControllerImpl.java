@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
@@ -16,8 +18,6 @@ import net.flectone.pulse.platform.registry.PermissionRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
-import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.constant.ModuleName;
 
 import java.util.EnumMap;
 import java.util.LinkedHashMap;

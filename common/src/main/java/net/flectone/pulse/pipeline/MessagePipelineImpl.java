@@ -26,7 +26,8 @@ import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 @Singleton

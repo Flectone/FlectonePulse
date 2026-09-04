@@ -17,12 +17,12 @@ import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.logging.FLogger;
-import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.FColor;
 import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
@@ -41,7 +41,10 @@ import net.flectone.pulse.util.LazyInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton

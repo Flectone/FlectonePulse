@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
@@ -12,7 +13,6 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.util.payload.ProxyPayload;
 
 import java.io.IOException;
