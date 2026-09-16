@@ -114,6 +114,11 @@ public class DiscordModuleImpl implements DiscordModule {
                         .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".discord.caffeine")
                         .build()
                 )
+                .relocate(Relocation.builder()
+                        .pattern("io{}micrometer")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".discord.micrometer")
+                        .build()
+                )
                 .build()
         );
     }
