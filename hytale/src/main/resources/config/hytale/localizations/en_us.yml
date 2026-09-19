@@ -1,5 +1,6 @@
 cooldown: "<color:#ff7171>Too fast, you'll be able to use it in <time>"
 time:
+  date: "yyyy.MM.dd HH:mm:ss"
   format: "dd'd' HH'h' mm'm' ss.SSS's'"
   permanent: "PERMANENT"
   zero: "0s"

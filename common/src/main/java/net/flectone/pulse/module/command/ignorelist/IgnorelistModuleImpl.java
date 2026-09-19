@@ -125,7 +125,7 @@ public class IgnorelistModuleImpl implements IgnorelistModule {
                     .append(StringUtils.replaceEach(
                             localization.line(),
                             new String[]{"<command>", "<date>", "<target"},
-                            new String[]{"/ignore " + fTarget.name(), timeFormatter.formatDate(ignore.date()), "<target_" + i}
+                            new String[]{"/ignore " + fTarget.name(), timeFormatter.formatDate(fPlayer, ignore.date()), "<target_" + i}
                     ))
                     .append("<br>");
 

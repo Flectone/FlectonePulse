@@ -11,14 +11,17 @@ import net.flectone.pulse.service.SocialService;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
-import java.text.Format;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TimeFormatterImpl implements TimeFormatter {
 
-    private static final Format SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final Map<Localization.Time, DateTimeFormatter> dateFormatters = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final SocialService socialService;
@@ -29,10 +32,10 @@ public class TimeFormatterImpl implements TimeFormatter {
             time = 0;
         }
 
-        Localization.Time message = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).time();
-        if (message.format().isEmpty()) return "";
+        Localization.Time localization = localization(fPlayer);
+        if (localization.format().isEmpty()) return "";
 
-        String formattedTime = DurationFormatUtils.formatDuration(time, message.format(), false);
+        String formattedTime = DurationFormatUtils.formatDuration(time, localization.format(), false);
 
         StringBuilder result = new StringBuilder();
         for (String part : formattedTime.split(" ")) {
@@ -42,7 +45,7 @@ public class TimeFormatterImpl implements TimeFormatter {
         }
 
         String finalResult = result.toString().trim();
-        return finalResult.isEmpty() ? message.zero() : finalResult;
+        return finalResult.isEmpty() ? localization.zero() : finalResult;
     }
 
     private boolean isZeroComponent(String part) {
@@ -86,7 +89,21 @@ public class TimeFormatterImpl implements TimeFormatter {
     }
 
     @Override
-    public String formatDate(long date) {
-        return SIMPLE_DATE_FORMAT.format(date);
+    public String formatDate(FPlayer fPlayer, long date) {
+        return dateFormatters
+                .computeIfAbsent(localization(fPlayer), localization -> DateTimeFormatter
+                        .ofPattern(localization.date())
+                        .withZone(ZoneId.systemDefault())
+                )
+                .format(Instant.ofEpochMilli(date));
+    }
+
+    @Override
+    public void invalidate() {
+        dateFormatters.clear();
+    }
+
+    private Localization.Time localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).time();
     }
 }

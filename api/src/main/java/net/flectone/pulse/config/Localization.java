@@ -47,6 +47,7 @@ public record Localization(
     @With
     @Builder(toBuilder = true)
     public record Time(
+            String date,
             String format,
             String permanent,
             String zero

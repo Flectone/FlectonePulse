@@ -17,6 +17,7 @@ import net.flectone.pulse.model.event.lifecycle.ReloadEvent;
 import net.flectone.pulse.persistence.database.Database;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -284,6 +285,9 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
 
         // load minecraft localizations
         instance.get(TranslationService.class).reload();
+
+        // clear formatters cache
+        instance.get(TimeFormatter.class).invalidate();
 
         // init proxies
         proxyRegistry.onEnable();

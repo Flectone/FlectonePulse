@@ -123,7 +123,7 @@ public class GeolocateModuleImpl implements GeolocateModule {
             return;
         }
 
-        String userCurrentTime = getUserCurrentTime(response);
+        long userCurrentTime = getUserCurrentTime(response);
 
         messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(config().destination())
@@ -134,7 +134,7 @@ public class GeolocateModuleImpl implements GeolocateModule {
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(localization(fResolver).format(),
                                         new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>", "<current_time>"},
-                                        new String[]{response.country(), response.region(), response.city(), response.timezone(), String.valueOf(response.mobile()), String.valueOf(response.proxy()), String.valueOf(response.hosting()), response.query(), userCurrentTime}
+                                        new String[]{response.country(), response.region(), response.city(), response.timezone(), String.valueOf(response.mobile()), String.valueOf(response.proxy()), String.valueOf(response.hosting()), response.query(), timeFormatter.format(fResolver, userCurrentTime)}
                                 ))
                                 .tagResolver(messagePipeline.targetTag(fResolver, fTarget))
                                 .build()
@@ -157,23 +157,22 @@ public class GeolocateModuleImpl implements GeolocateModule {
         }
     }
 
-    private String getUserCurrentTime(IpResponse response) {
+    private long getUserCurrentTime(IpResponse response) {
         try {
             if (response.offset() != null) {
                 int offsetSeconds = response.offset();
-                return timeFormatter.formatDate(Instant.now()
+                return Instant.now()
                         .atZone(ZoneId.of("UTC"))
                         .withZoneSameLocal(ZoneId.systemDefault())
                         .plusSeconds(offsetSeconds)
                         .toInstant()
-                        .toEpochMilli()
-                );
+                        .toEpochMilli();
             }
         } catch (Exception e) {
             fLogger.warning(e);
         }
 
-        return timeFormatter.formatDate(Instant.now().toEpochMilli());
+        return Instant.now().toEpochMilli();
     }
 
     @Override

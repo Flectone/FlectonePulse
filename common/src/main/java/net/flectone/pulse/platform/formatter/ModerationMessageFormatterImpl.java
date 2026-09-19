@@ -227,7 +227,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
     public String replacePlaceholders(String message, FPlayer fReceiver, long moderationId, long date, long time, String reason, boolean permanent) {
         Localization localization = fileFacade.localization(socialService.getSetting(fReceiver, SettingText.LOCALE));
 
-        String formatDate = timeFormatter.formatDate(date);
+        String formatDate = timeFormatter.formatDate(fReceiver, date);
         String formatTime = permanent
                 ? localization.time().permanent()
                 : timeFormatter.format(fReceiver, (Math.abs(date - time) + 500) / 1000 * 1000);

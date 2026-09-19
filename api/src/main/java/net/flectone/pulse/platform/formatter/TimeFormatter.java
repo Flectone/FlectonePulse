@@ -36,9 +36,15 @@ public interface TimeFormatter {
     /**
      * Renders a point in time using the format configured for the server.
      *
+     * @param fPlayer the reader
      * @param date the timestamp in milliseconds
      * @return the rendered date
      */
-    String formatDate(long date);
+    String formatDate(FPlayer fPlayer, long date);
+
+    /**
+     * Drops every cached formatter, forcing them to be rebuilt on the next render
+     */
+    void invalidate();
 
 }

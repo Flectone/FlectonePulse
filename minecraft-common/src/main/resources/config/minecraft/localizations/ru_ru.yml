@@ -1,5 +1,6 @@
 cooldown: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Слишком быстро, попробуй через <time>"
 time:
+  date: "yyyy.MM.dd HH:mm:ss"
   format: "dd'д' HH'ч' mm'м' ss.SSS'с'"
   permanent: "НАВСЕГДА"
   zero: "0с"
