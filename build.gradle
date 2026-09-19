@@ -62,7 +62,6 @@ subprojects {
         maven { url = "https://repo.plasmoverse.com/snapshots" }
         maven { url = "https://repo.loohpjames.com/repository" }
         maven { url = "https://repo.diogotc.com/releases" }
-        maven { url = "https://maven.devs.beer/" }
         maven { url = "https://maven.nucleoid.xyz/" }
         maven { url = "https://api.modrinth.com/maven" }
         maven { url = "https://repo.opencollab.dev/main/" }
