@@ -24,7 +24,7 @@ side="SERVER"
 [[dependencies.flectonepulse]]
 modId="minecraft"
 type="required"
-versionRange="[26.2,)"
+versionRange="[26.3,)"
 ordering="NONE"
 side="SERVER"
 
