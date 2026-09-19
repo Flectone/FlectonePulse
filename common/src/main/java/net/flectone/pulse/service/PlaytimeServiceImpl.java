@@ -36,7 +36,7 @@ public class PlaytimeServiceImpl implements PlaytimeService {
                 if (fPlayer.isUnknown() || fPlayer.isConsole()) return;
 
                 PlayTime platformPlayTime = platformPlayerAdapter.getPlayedTime(fPlayer);
-                if (platformPlayTime == null) return;
+                if (platformPlayTime == null || platformPlayTime.first() <= 0L || platformPlayTime.last() <= 0L || platformPlayTime.total() <= 0L) return;
 
                 playtimeRepository.saveJoinSession(platformPlayTime);
             });
