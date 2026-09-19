@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.constant.CacheName;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.model.file.FilePack;
+import net.flectone.pulse.model.value.Ticker;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.util.LazyInstance;
 import org.apache.commons.lang3.Strings;
@@ -120,6 +121,20 @@ public class FileMigratorImpl implements FileMigrator {
                 .withConfig(files.config()
                         .withCache(files.config().cache()
                                 .withTypes(cacheTypes)
+                        )
+                );
+    }
+
+    @Override
+    public FilePack migration_1_13_2(FilePack files) {
+        if (files.message().format().world().ticker().enable()) return files;
+
+        return files
+                .withMessage(files.message()
+                        .withFormat(files.message().format()
+                                .withWorld(files.message().format().world()
+                                        .withTicker(new Ticker(true, 20))
+                                )
                         )
                 );
     }

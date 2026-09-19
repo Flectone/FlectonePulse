@@ -323,7 +323,8 @@ format:
     enable: true
     mode: "TYPE"
     ticker:
-      enable: false
+      enable: true
+      period: 20
     values:
       normal: "<color:#98FB98>"
       world: "<color:#98FB98>"

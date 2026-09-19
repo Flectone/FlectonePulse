@@ -29,8 +29,6 @@ import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.MinecraftChatModule;
 import net.flectone.pulse.module.message.format.object.MinecraftObjectModule;
 import net.flectone.pulse.module.message.format.object.ObjectModuleImpl;
-import net.flectone.pulse.module.message.format.world.MinecraftWorldModule;
-import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.join.JoinModuleImpl;
 import net.flectone.pulse.module.message.join.MinecraftJoinModule;
 import net.flectone.pulse.module.message.quit.MinecraftQuitModule;
@@ -117,7 +115,6 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(ChatModule.class).to(MinecraftChatModule.class);
         bind(ObjectModuleImpl.class).to(MinecraftObjectModule.class);
         bind(ScoreboardModule.class).to(MinecraftScoreboardModule.class);
-        bind(WorldModule.class).to(MinecraftWorldModule.class);
         bind(JoinModuleImpl.class).to(MinecraftJoinModule.class);
         bind(ObjectiveModuleImpl.class).to(MinecraftObjectiveModule.class);
         bind(QuitModuleImpl.class).to(MinecraftQuitModule.class);

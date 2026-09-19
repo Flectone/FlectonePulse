@@ -12,6 +12,7 @@ import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.Ticker;
 import net.flectone.pulse.module.message.format.world.listener.PulseWorldListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -39,6 +40,11 @@ public class WorldModuleImpl implements WorldModule {
 
     @Override
     public void onEnable() {
+        Ticker ticker = config().ticker();
+        if (ticker.enable()) {
+            taskScheduler.runPlayerAsyncTimer(this::update, ticker.period());
+        }
+
         listenerRegistry.register(PulseWorldListener.class);
     }
 

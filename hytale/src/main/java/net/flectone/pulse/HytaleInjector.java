@@ -96,7 +96,6 @@ public class HytaleInjector extends PlatformInjector {
         bind(ChatModule.class).to(HytaleChatModule.class);
         bind(ScoreboardModule.class).to(HytaleScoreboardModule.class);
         bind(SidebarModule.class).to(HytaleSidebarModule.class);
-        bind(WorldModule.class).to(HytaleWorldModule.class);
         bind(VanillaModule.class).to(HytaleVanillaModule.class);
 
         // renders

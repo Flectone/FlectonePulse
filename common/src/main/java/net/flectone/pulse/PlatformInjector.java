@@ -195,6 +195,8 @@ import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.module.message.format.replacement.ReplacementModuleImpl;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModuleImpl;
+import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.module.message.format.world.WorldModuleImpl;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.greeting.GreetingModuleImpl;
 import net.flectone.pulse.module.message.join.JoinModule;
@@ -426,6 +428,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(SwearModule.class).to(SwearModuleImpl.class);
         bind(TabModule.class).to(TabModuleImpl.class);
         bind(TranslateModule.class).to(TranslateModuleImpl.class);
+        bind(WorldModule.class).to(WorldModuleImpl.class);
         bind(UpdateModule.class).to(UpdateModuleImpl.class);
 
         // platform
