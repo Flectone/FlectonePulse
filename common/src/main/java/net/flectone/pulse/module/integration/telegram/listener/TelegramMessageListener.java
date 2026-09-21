@@ -13,6 +13,7 @@ import net.flectone.pulse.module.integration.telegram.model.TelegramClient;
 import net.flectone.pulse.module.integration.telegram.provider.TelegramClientProvider;
 import net.flectone.pulse.module.integration.telegram.sender.TelegramSender;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -71,7 +72,10 @@ public class TelegramMessageListener implements TelegramEventListener {
         if (author == null) return;
 
         // always ignore ourselves
-        if (author.getIsBot() && (telegramModule.config().ignoreAllBots() || author.getId().equals(telegramClient.id()))) return;
+        if (author.getId().equals(telegramClient.id())) return;
+
+        boolean isAnonymousAdmin = message.getSenderChat() != null;
+        if (author.getIsBot() && !isAnonymousAdmin && telegramModule.config().ignoreAllBots()) return;
 
         String chat = message.getChat().getTitle();
         if (chat == null) return;
@@ -81,7 +85,7 @@ public class TelegramMessageListener implements TelegramEventListener {
             Message replied = message.getReplyToMessage();
             User user = replied.getFrom();
             if (user != null) {
-                reply = Pair.of(user.getUserName(), replied.getText());
+                reply = Pair.of(isAnonymousAdmin ? chat : user.getUserName(), replied.getText());
             }
         }
 
@@ -89,7 +93,15 @@ public class TelegramMessageListener implements TelegramEventListener {
         List<String> chats = telegramModule.config().messageChannel().get(telegramModule.name().name());
         if (chats == null || !chats.contains(chatId)) return;
 
-        telegramSender.sendMessage(author, chat, chatId, text, reply);
+        String userName = isAnonymousAdmin ? chat : StringUtils.defaultString(author.getUserName());
+        String firstName = isAnonymousAdmin ? chat : author.getFirstName();
+        String lastName = isAnonymousAdmin ? chat : StringUtils.defaultString(author.getLastName());
+        String userRole = message.getSenderTag();
+        if (StringUtils.isEmpty(userRole)) {
+            userRole = StringUtils.defaultString(message.getAuthorSignature());
+        }
+
+        telegramSender.sendMessage(userName, firstName, lastName, chat, chatId, text, userRole, reply);
     }
 
     private boolean isRealReply(@NonNull Message message) {

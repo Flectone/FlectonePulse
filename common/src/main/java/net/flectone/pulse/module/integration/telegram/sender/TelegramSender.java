@@ -26,7 +26,6 @@ import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -114,17 +113,16 @@ public class TelegramSender {
         }
     }
 
-    public void sendMessage(@NonNull User user,
+    public void sendMessage(@NonNull String userName,
+                            @NonNull String firstName,
+                            @NonNull String lastName,
                             @NonNull String chat,
                             @NonNull String chatId,
                             @NonNull String message,
+                            @NonNull String role,
                             @Nullable Pair<String, String> reply) {
         TelegramClient telegramClient = telegramClientProvider.get();
         if (telegramClient == null) return;
-
-        String userName = StringUtils.defaultString(user.getUserName());
-        String firstName = user.getFirstName();
-        String lastName = StringUtils.defaultString(user.getLastName());
 
         messageDispatcher.dispatch(telegramModule, EventMetadata.builder()
                 .range(Range.get(Range.Type.PROXY))
@@ -136,8 +134,8 @@ public class TelegramSender {
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(
                                         StringUtils.defaultString(telegramModule.localization(fResolver).messageChannel().get(telegramModule.name().name())),
-                                        new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
-                                        new String[]{userName, userName, firstName, lastName, chat}
+                                        new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>", "<role>"},
+                                        new String[]{userName, userName, firstName, lastName, chat, role}
                                 ))
                                 .tagResolvers(messagePipeline.messageTag(telegramClient.sender(), fResolver, message), messagePipeline.resolver("reply", (_, _) -> {
                                     if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
@@ -170,8 +168,8 @@ public class TelegramSender {
                 .integration(() -> IntegrationMessageFormat.builder()
                         .format(string -> StringUtils.replaceEach(
                                 string,
-                                new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
-                                new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
+                                new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>", "<role>"},
+                                new String[]{userName, userName, firstName, lastName, chat, role}
                         ))
                         .messageNames(List.of(telegramModule.name().name() + "_" + chatId, telegramModule.name().name() + "_" + chat.toUpperCase()))
                         .build()
