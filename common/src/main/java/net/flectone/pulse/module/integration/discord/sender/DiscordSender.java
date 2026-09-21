@@ -182,6 +182,7 @@ public class DiscordSender {
                             @Nullable Member member,
                             @Nullable Webhook webhook,
                             @NonNull String message,
+                            @NonNull String role,
                             @Nullable Pair<String, String> reply) {
         DiscordClient discordClient = discordClientProvider.get();
         if (discordClient == null) return;
@@ -204,8 +205,8 @@ public class DiscordSender {
                                     .receiver(fResolver)
                                     .message(channelEmbed == null ? "" : StringUtils.replaceEach(
                                             channelEmbed.content(),
-                                            new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                                            new String[]{globalName, globalName, nickname, displayName, userName}
+                                            new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>", "<role>"},
+                                            new String[]{globalName, globalName, nickname, displayName, userName, role}
                                     ))
                                     .tagResolvers(messagePipeline.messageTag(discordClient.sender(), fResolver, message), messagePipeline.resolver("reply", (_, _) -> {
                                         if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
@@ -238,8 +239,8 @@ public class DiscordSender {
                 .integration(() -> IntegrationMessageFormat.builder()
                         .format(string -> StringUtils.replaceEach(
                                 string,
-                                new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                                new String[]{globalName, globalName, nickname, displayName, userName}
+                                new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>", "<role>"},
+                                new String[]{globalName, globalName, nickname, displayName, userName, role}
                         ))
                         .messageNames(List.of(discordModule.name().name() + "_" + channelId))
                         .build()

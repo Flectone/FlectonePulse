@@ -78,11 +78,20 @@ public class DiscordMessageListener implements DiscordEventListener<MessageCreat
         if (discordCommandDispatcher.executeCommand(message)) return;
 
         String content = getMessageContent(message);
+        String role = "";
+        if (member != null) {
+            Role highestRole = member.getHighestRole().block();
+            if (highestRole != null) {
+                role = highestRole.getName();
+            }
+        }
+
         discordSender.sendMessage(
                 channelId,
                 member,
                 webhook,
                 content,
+                role,
                 retrieveReply(message).orElse(null)
         );
     }
