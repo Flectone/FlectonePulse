@@ -96,11 +96,7 @@ public class TelegramIntegration implements FIntegration {
         TelegramClient telegramClient = telegramClientProvider.get();
         if (telegramClient == null) return;
 
-        try {
-            telegramClient.application().close();
-        } catch (Exception e) {
-            fLogger.warning(e);
-        }
+        telegramClientProvider.dispose();
 
         logUnhook();
     }

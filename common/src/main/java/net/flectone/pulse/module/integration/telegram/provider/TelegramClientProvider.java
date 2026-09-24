@@ -24,6 +24,8 @@ import org.telegram.telegrambots.meta.api.methods.GetMe;
 import java.lang.reflect.Field;
 import java.net.*;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -37,6 +39,7 @@ public class TelegramClientProvider {
     private final FLogger fLogger;
 
     private volatile TelegramClient telegramClient;
+    private volatile ScheduledExecutorService pollingExecutor;
 
     @Nullable
     public TelegramClient create() {
@@ -56,9 +59,18 @@ public class TelegramClientProvider {
             // waiting for https://github.com/rubenlagus/TelegramBots/pull/1583
             Field okHttpClientCreatorField = TelegramBotsLongPollingApplication.class.getDeclaredField("okHttpClientCreator");
             okHttpClientCreatorField.setAccessible(true);
-            okHttpClientCreatorField.set(application, (Supplier<OkHttpClient>) () -> createHttpClient());
+            okHttpClientCreatorField.set(application, (Supplier<OkHttpClient>) this::createHttpClient);
 
-            // get bot id
+            pollingExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread thread = new Thread(r, "FlectonePulse-telegram-polling");
+                thread.setDaemon(true);
+                return thread;
+            });
+
+            Field executorSupplierField = TelegramBotsLongPollingApplication.class.getDeclaredField("executorSupplier");
+            executorSupplierField.setAccessible(true);
+            executorSupplierField.set(application, (Supplier<ScheduledExecutorService>) () -> pollingExecutor);
+
             long id = client.execute(new GetMe()).getId();
 
             FPlayer fPlayer = FPlayer.builder()
@@ -86,6 +98,35 @@ public class TelegramClientProvider {
     @Nullable
     public TelegramClient get() {
         return telegramClient;
+    }
+
+    public void dispose() {
+        TelegramClient currentClient = telegramClient;
+        if (currentClient != null) {
+            telegramClient = null;
+
+            try {
+                currentClient.application().close();
+            } catch (Exception _) {
+                // just ignore
+            }
+        }
+
+        ScheduledExecutorService currentExecutor = pollingExecutor;
+        if (currentExecutor != null) {
+            pollingExecutor = null;
+
+            currentExecutor.shutdown();
+
+            try {
+                if (!currentExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
+                    currentExecutor.shutdownNow();
+                }
+            } catch (InterruptedException _) {
+                currentExecutor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     @NonNull
