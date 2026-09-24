@@ -62,7 +62,7 @@ public class DiscordIntegration implements FIntegration {
             if (discordClient == null) return;
 
             if (taskGeneration.get() != taskId) {
-                discordClient.gateway().logout().block();
+                discordClient.gateway().logout().block(Duration.ofSeconds(10));
                 return;
             }
 
@@ -95,17 +95,7 @@ public class DiscordIntegration implements FIntegration {
         DiscordClient discordClient = discordClientProvider.get();
         if (discordClient == null) return;
 
-        try {
-            discordClient.gateway().logout().block(Duration.ofSeconds(10));
-        } catch (Exception _) {
-            // just ignore
-        }
-
-        try {
-            discordClientProvider.dispose();
-        } catch (Exception _) {
-            // just ignore
-        }
+        discordClientProvider.dispose();
 
         discordWebhookService.clearAll();
 

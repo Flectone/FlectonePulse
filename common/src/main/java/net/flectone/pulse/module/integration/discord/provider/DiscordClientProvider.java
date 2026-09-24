@@ -118,12 +118,23 @@ public class DiscordClientProvider {
                 .build();
     }
 
+    // why didn't Discord4J provide a simple method for this?
     public void dispose() {
-        discordClient = null;
+        DiscordClient currentClient = discordClient;
+        if (currentClient != null) {
+            discordClient = null;
+
+            try {
+                currentClient.gateway().logout().block(Duration.ofSeconds(10));
+            } catch (Exception _) {
+                // just ignore
+            }
+        }
 
         Scheduler currentTimerScheduler = timerScheduler;
         if (currentTimerScheduler != null) {
             timerScheduler = null;
+
             try {
                 currentTimerScheduler.disposeGracefully().block(Duration.ofSeconds(10));
             } catch (Exception _) {
@@ -134,6 +145,7 @@ public class DiscordClientProvider {
         LoopResources currentLoops = loopResources;
         if (currentLoops != null) {
             loopResources = null;
+
             try {
                 currentLoops.disposeLater(Duration.ZERO, Duration.ofSeconds(10)).block();
             } catch (Exception _) {
@@ -144,6 +156,7 @@ public class DiscordClientProvider {
         ConnectionProvider currentConnectionProvider = connectionProvider;
         if (currentConnectionProvider != null) {
             connectionProvider = null;
+
             try {
                 currentConnectionProvider.disposeLater().block(Duration.ofSeconds(30));
             } catch (Exception _) {
