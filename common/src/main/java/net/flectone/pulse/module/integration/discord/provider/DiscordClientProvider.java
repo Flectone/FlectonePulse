@@ -24,6 +24,8 @@ import net.flectone.pulse.util.random.RandomGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.resources.LoopResources;
@@ -45,6 +47,7 @@ public class DiscordClientProvider {
     private volatile DiscordClient discordClient;
     private volatile ConnectionProvider connectionProvider;
     private volatile LoopResources loopResources;
+    private volatile Scheduler timerScheduler;
 
     @Nullable
     public DiscordClient create() {
@@ -55,9 +58,10 @@ public class DiscordClientProvider {
 
         connectionProvider = createConnectionProvider();
         loopResources = LoopResources.create(BuildConfig.PROJECT_NAME + "-discord-io");
+        timerScheduler = Schedulers.newParallel(BuildConfig.PROJECT_NAME + "-discord-parallel", Schedulers.DEFAULT_POOL_SIZE, true);
 
         discord4j.core.DiscordClient discord4JClient = createDiscord4JClient(createHttpClient());
-        GatewayDiscordClient gateway = createGatewayClient(discord4JClient, createHttpClient(), createClientPresence());
+        GatewayDiscordClient gateway = createGatewayClient(discord4JClient, createClientPresence());
         if (gateway == null) return discordClient;
 
         ApplicationInfo applicationInfo = gateway.getApplicationInfo().block();
@@ -110,17 +114,28 @@ public class DiscordClientProvider {
                 .maxIdleTime(Duration.ofSeconds(30))
                 .maxLifeTime(Duration.ofMinutes(5))
                 .evictInBackground(Duration.ofSeconds(30))
+                .disposeTimeout(Duration.ofSeconds(10))
                 .build();
     }
 
     public void dispose() {
         discordClient = null;
 
+        Scheduler currentTimerScheduler = timerScheduler;
+        if (currentTimerScheduler != null) {
+            timerScheduler = null;
+            try {
+                currentTimerScheduler.disposeGracefully().block(Duration.ofSeconds(10));
+            } catch (Exception _) {
+                // just ignore
+            }
+        }
+
         LoopResources currentLoops = loopResources;
         if (currentLoops != null) {
             loopResources = null;
             try {
-                currentLoops.disposeLater().block(Duration.ofSeconds(5));
+                currentLoops.disposeLater(Duration.ZERO, Duration.ofSeconds(10)).block();
             } catch (Exception _) {
                 // just ignore
             }
@@ -165,15 +180,14 @@ public class DiscordClientProvider {
         return discord4j.core.DiscordClient.builder(systemVariableResolver.substituteEnvVars(discordModule.config().token()))
                 .setReactorResources(ReactorResources.builder()
                         .httpClient(httpClient)
+                        .timerTaskScheduler(timerScheduler)
                         .build()
                 )
                 .build();
     }
 
     @Nullable
-    private GatewayDiscordClient createGatewayClient(discord4j.core.@NonNull DiscordClient discordClient,
-                                                     @NonNull HttpClient httpClient,
-                                                     @Nullable ClientPresence clientPresence) {
+    private GatewayDiscordClient createGatewayClient(discord4j.core.@NonNull DiscordClient discordClient, @Nullable ClientPresence clientPresence) {
         GatewayBootstrap<?> gatewayBootstrap = discordClient.gateway()
                 .setEnabledIntents(IntentSet.nonPrivileged().or(IntentSet.of(Intent.MESSAGE_CONTENT, Intent.GUILD_PRESENCES)));
 
@@ -181,12 +195,9 @@ public class DiscordClientProvider {
             gatewayBootstrap = gatewayBootstrap.setInitialPresence(_ -> clientPresence);
         }
 
-        gatewayBootstrap = gatewayBootstrap.setGatewayReactorResources(reactorResources -> GatewayReactorResources.builder(reactorResources)
-                .httpClient(httpClient)
-                .build()
-        );
-
-        return gatewayBootstrap.login().block();
+        return gatewayBootstrap.setGatewayReactorResources(reactorResources -> GatewayReactorResources.builder(reactorResources).build())
+                .login()
+                .block();
     }
 
 }
