@@ -266,7 +266,7 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
                 prefix,
                 suffix,
                 tagVisibility,
-                WrapperPlayServerTeams.CollisionRule.ALWAYS,
+                config().playerCollisions() ? WrapperPlayServerTeams.CollisionRule.ALWAYS : WrapperPlayServerTeams.CollisionRule.NEVER,
                 color,
                 WrapperPlayServerTeams.OptionData.NONE
         );

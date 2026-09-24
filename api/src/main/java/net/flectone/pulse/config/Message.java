@@ -634,6 +634,7 @@ public record Message(
             Boolean enable,
             Boolean nameVisible,
             double nameDistance,
+            Boolean playerCollisions,
             Boolean hideNameWhenSneaking,
             String color,
             Ticker ticker,

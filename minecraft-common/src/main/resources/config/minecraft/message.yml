@@ -373,6 +373,7 @@ scoreboard:
   enable: true
   name_visible: false
   name_distance: -1
+  player_collisions: true
   hide_name_when_sneaking: false
   color: "<white>"
   ticker:
