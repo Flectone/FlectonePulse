@@ -21,6 +21,7 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.LazyInstance;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -95,12 +96,18 @@ public class DiscordIntegration implements FIntegration {
         if (discordClient == null) return;
 
         try {
-            discordClient.gateway().logout().block();
-            discordWebhookService.clearAll();
-            discordClientProvider.dispose();
-        } catch (Exception e) {
-            fLogger.warning(e);
+            discordClient.gateway().logout().block(Duration.ofSeconds(10));
+        } catch (Exception _) {
+            // just ignore
         }
+
+        try {
+            discordClientProvider.dispose();
+        } catch (Exception _) {
+            // just ignore
+        }
+
+        discordWebhookService.clearAll();
 
         logUnhook();
     }
