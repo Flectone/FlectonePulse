@@ -26,6 +26,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
+import reactor.netty.resources.LoopResources;
 import reactor.netty.transport.ProxyProvider;
 
 import java.net.InetSocketAddress;
@@ -43,6 +44,7 @@ public class DiscordClientProvider {
 
     private volatile DiscordClient discordClient;
     private volatile ConnectionProvider connectionProvider;
+    private volatile LoopResources loopResources;
 
     @Nullable
     public DiscordClient create() {
@@ -52,6 +54,7 @@ public class DiscordClientProvider {
         if (StringUtils.isEmpty(token)) return discordClient;
 
         connectionProvider = createConnectionProvider();
+        loopResources = LoopResources.create(BuildConfig.PROJECT_NAME + "-discord-io");
 
         discord4j.core.DiscordClient discord4JClient = createDiscord4JClient(createHttpClient());
         GatewayDiscordClient gateway = createGatewayClient(discord4JClient, createHttpClient(), createClientPresence());
@@ -113,24 +116,30 @@ public class DiscordClientProvider {
     public void dispose() {
         discordClient = null;
 
+        LoopResources currentLoops = loopResources;
+        if (currentLoops != null) {
+            loopResources = null;
+            try {
+                currentLoops.disposeLater().block(Duration.ofSeconds(5));
+            } catch (Exception _) {
+                // just ignore
+            }
+        }
+
         ConnectionProvider currentConnectionProvider = connectionProvider;
-        if (currentConnectionProvider == null) return;
-
-        connectionProvider = null;
-
-        try {
-            currentConnectionProvider.disposeLater().block(Duration.ofSeconds(30));
-        } catch (Exception _) {
-            // just ignore
+        if (currentConnectionProvider != null) {
+            connectionProvider = null;
+            try {
+                currentConnectionProvider.disposeLater().block(Duration.ofSeconds(30));
+            } catch (Exception _) {
+                // just ignore
+            }
         }
     }
 
     @NonNull
     private HttpClient createHttpClient() {
-        HttpClient httpClient = HttpClient.create(connectionProvider)
-                .compress(true)
-                .followRedirect(true)
-                .secure();
+        HttpClient httpClient = ReactorResources.newHttpClient(connectionProvider, loopResources);
 
         Integration.Proxy proxy = discordModule.config().proxy();
         if (proxy.type() == Proxy.Type.DIRECT) {
@@ -138,7 +147,6 @@ public class DiscordClientProvider {
         }
 
         return httpClient
-                .keepAlive(false)
                 .proxy(typeSpec -> {
                     ProxyProvider.Builder proxyProviderBuilder = typeSpec
                             .type(proxy.type() == Proxy.Type.HTTP ? ProxyProvider.Proxy.HTTP : ProxyProvider.Proxy.SOCKS5)
