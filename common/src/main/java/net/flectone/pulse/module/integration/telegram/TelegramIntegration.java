@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.TelegramMessageListener;
@@ -32,17 +32,13 @@ public class TelegramIntegration implements FIntegration {
 
     private final AtomicLong taskGeneration = new AtomicLong(0);
 
-    private final FileFacade fileFacade;
+    private final TelegramModule telegramModule;
     private final TelegramClientProvider telegramClientProvider;
     private final MessagePipeline messagePipeline;
     private final TaskScheduler taskScheduler;
     private final LazyInstance<TelegramMessageListener> telegramMessageListener;
 
     @Getter private final FLogger fLogger;
-
-    public Integration.Telegram config() {
-        return fileFacade.integration().telegram();
-    }
 
     @Override
     public String getIntegrationName() {
@@ -77,7 +73,7 @@ public class TelegramIntegration implements FIntegration {
             // register listener
             telegramClient.registerListener(telegramMessageListener.get());
 
-            Integration.ChannelInfo channelInfo = config().channelInfo();
+            Integration.ChannelInfo channelInfo = telegramModule.config().channelInfo();
 
             if (channelInfo.enable() && channelInfo.ticker().enable()) {
                 long period = channelInfo.ticker().period();
@@ -102,39 +98,41 @@ public class TelegramIntegration implements FIntegration {
     }
 
     public void updateChannelInfo() {
-        TelegramClient telegramClient = telegramClientProvider.get();
-        if (telegramClient == null) return;
-        if (!config().channelInfo().enable()) return;
+        taskScheduler.runAsync(telegramModule.name(), () -> {
+            TelegramClient telegramClient = telegramClientProvider.get();
+            if (telegramClient == null) return;
+            if (!telegramModule.config().channelInfo().enable()) return;
 
-        Localization.Integration.Telegram localization = fileFacade.localization().integration().telegram();
-        for (Map.Entry<String, String> entry : localization.infoChannel().entrySet()) {
-            BotApiMethod<?> botApiMethod;
+            Localization.Integration.Telegram localization = telegramModule.localization(FPlayer.UNKNOWN);
+            for (Map.Entry<String, String> entry : localization.infoChannel().entrySet()) {
+                BotApiMethod<?> botApiMethod;
 
-            String chatId = entry.getKey();
-            if (chatId.contains("_")) {
-                String[] ids = chatId.split("_");
-                if (ids.length != 2) continue;
-                if (!NumberUtils.isParsable(ids[0])) continue;
-                if (!NumberUtils.isParsable(ids[1])) continue;
+                String chatId = entry.getKey();
+                if (chatId.contains("_")) {
+                    String[] ids = chatId.split("_");
+                    if (ids.length != 2) continue;
+                    if (!NumberUtils.isParsable(ids[0])) continue;
+                    if (!NumberUtils.isParsable(ids[1])) continue;
 
-                botApiMethod = EditForumTopic.builder()
-                        .chatId(ids[0])
-                        .messageThreadId(Integer.parseInt(ids[1]))
-                        .name(getNewChatName(entry.getValue()))
-                        .build();
-            } else {
-                botApiMethod = SetChatTitle.builder()
-                        .chatId(chatId)
-                        .title(getNewChatName(entry.getValue()))
-                        .build();
+                    botApiMethod = EditForumTopic.builder()
+                            .chatId(ids[0])
+                            .messageThreadId(Integer.parseInt(ids[1]))
+                            .name(getNewChatName(entry.getValue()))
+                            .build();
+                } else {
+                    botApiMethod = SetChatTitle.builder()
+                            .chatId(chatId)
+                            .title(getNewChatName(entry.getValue()))
+                            .build();
+                }
+
+                try {
+                    telegramClient.executeMethod(botApiMethod);
+                } catch (TelegramApiException e) {
+                    fLogger.warning(e);
+                }
             }
-
-            try {
-                telegramClient.executeMethod(botApiMethod);
-            } catch (TelegramApiException e) {
-                fLogger.warning(e);
-            }
-        }
+        });
     }
 
     @NonNull
