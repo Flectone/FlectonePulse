@@ -103,24 +103,26 @@ public class DiscordIntegration implements FIntegration {
     }
 
     private void updateChannelInfo() {
-        DiscordClient discordClient = discordClientProvider.get();
-        if (discordClient == null) return;
-        if (!discordModule.config().channelInfo().enable()) return;
+        taskScheduler.runAsync(discordModule.name(), () -> {
+            DiscordClient discordClient = discordClientProvider.get();
+            if (discordClient == null) return;
+            if (!discordModule.config().channelInfo().enable()) return;
 
-        Localization.Integration.Discord localization = discordModule.localization(FPlayer.UNKNOWN);
-        for (Map.Entry<String, String> entry : localization.infoChannel().entrySet()) {
-            String id = entry.getKey();
-            if (!NumberUtils.isParsable(id)) continue;
+            Localization.Integration.Discord localization = discordModule.localization(FPlayer.UNKNOWN);
+            for (Map.Entry<String, String> entry : localization.infoChannel().entrySet()) {
+                String id = entry.getKey();
+                if (!NumberUtils.isParsable(id)) continue;
 
-            Snowflake snowflake = Snowflake.of(id);
-            discordClient.gateway().getChannelById(snowflake)
-                    .flatMap(channel -> channel.getRestChannel().modify(ChannelModifyRequest.builder().name(messagePipeline.buildPlain(MessageContext.builder()
-                            .sender(discordClient.sender())
-                            .message(entry.getValue())
-                            .build()
-                    )).build(), null))
-                    .subscribe(null, fLogger::warning);
-        }
+                Snowflake snowflake = Snowflake.of(id);
+                discordClient.gateway().getChannelById(snowflake)
+                        .flatMap(channel -> channel.getRestChannel().modify(ChannelModifyRequest.builder().name(messagePipeline.buildPlain(MessageContext.builder()
+                                .sender(discordClient.sender())
+                                .message(entry.getValue())
+                                .build()
+                        )).build(), null))
+                        .subscribe(null, fLogger::warning);
+            }
+        });
     }
 
 }
