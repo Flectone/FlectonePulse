@@ -99,38 +99,11 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
     private void privateSend(FPlayer fPlayer, ParsedComponent parsedComponent) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        Range range = parsedComponent.vanillaMessage().range();
-        if (parsedComponent.translationKey().startsWith("death.")) {
-            FEntity target = getDeathTarget(parsedComponent);
-            if (target instanceof FPlayer) {
-                if (!target.equals(fPlayer)) {
-                    if (parsedComponent.vanillaMessage().multiMessage()) return;
-                } else {
-                    sendPersonalDeath(fPlayer, messagePipeline.build(VanillaMessageContext.builder()
-                            .base(MessageContext.builder()
-                                    .module(this.name())
-                                    .sender(fPlayer)
-                                    .message(StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey())))
-                                    .tagResolver(argumentTag(fPlayer, parsedComponent))
-                                    .build()
-                            )
-                            .parsedComponent(parsedComponent)
-                            .build()
-                    ));
-                }
-            } else {
-                range = Range.get(Range.Type.PLAYER);
-            }
-        } else if (parsedComponent.vanillaMessage().multiMessage()) {
-            FEntity target = getDeathTarget(parsedComponent);
-            if (target != null && !fPlayer.equals(target)) return;
-        }
-
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
         boolean vanished = socialService.isVanished(fPlayer);
 
-        messageDispatcher.dispatch(EventMetadata.builder()
-                .range(range)
+        EventMetadata.Builder eventMetadataBuilder = EventMetadata.builder()
+                .range(parsedComponent.vanillaMessage().range())
                 .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
                 .filter(fResolver -> socialService.canSeeVanished(fPlayer, fResolver, vanished))
                 .destination(parsedComponent.vanillaMessage().destination())
@@ -159,9 +132,43 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
                     dataOutputStream.writeUTF(parsedComponent.translationKey());
                     dataOutputStream.writeUTF(gson.toJson(parsedComponent.arguments()));
                     dataOutputStream.writeBoolean(vanished);
-                })
-                .build()
-        );
+                });
+
+        if (parsedComponent.translationKey().startsWith("death.")) {
+            FEntity target = getDeathTarget(parsedComponent);
+            if (target instanceof FPlayer) {
+                if (!target.equals(fPlayer)) {
+                    if (parsedComponent.vanillaMessage().multiMessage()) return;
+                } else {
+                    sendPersonalDeath(fPlayer, messagePipeline.build(VanillaMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .module(this.name())
+                                    .sender(fPlayer)
+                                    .message(StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey())))
+                                    .tagResolver(argumentTag(fPlayer, parsedComponent))
+                                    .build()
+                            )
+                            .parsedComponent(parsedComponent)
+                            .build()
+                    ));
+                }
+            } else {
+                eventMetadataBuilder
+                        .range(Range.get(Range.Type.PLAYER))
+                        .integration(() -> IntegrationMessageFormat.builder()
+                                .messageNames(StringUtils.isNotEmpty(vanillaMessageName)
+                                        ? List.of(vanillaMessageName.toUpperCase() + "_PET", parsedComponent.translationKey() + ".pet")
+                                        : List.of(parsedComponent.translationKey() + ".pet")
+                                )
+                                .build()
+                        );
+            }
+        } else if (parsedComponent.vanillaMessage().multiMessage()) {
+            FEntity target = getDeathTarget(parsedComponent);
+            if (target != null && !fPlayer.equals(target)) return;
+        }
+
+        messageDispatcher.dispatch(eventMetadataBuilder.build());
     }
 
     private FEntity getDeathTarget(ParsedComponent parsedComponent) {
