@@ -62,7 +62,7 @@ public class PingModuleImpl implements PingModule {
                 || (!socialService.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
             messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
-                            .module(this.name())
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
