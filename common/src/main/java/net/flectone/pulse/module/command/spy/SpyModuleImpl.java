@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +47,7 @@ public class SpyModuleImpl implements SpyModule {
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ModerationService moderationService;
     private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
@@ -247,7 +249,8 @@ public class SpyModuleImpl implements SpyModule {
                 && !receivers.contains(fReceiver)
                 && permissionChecker.check(fReceiver, permission())
                 && socialService.getSetting(fReceiver, SettingText.SPY_STATUS) != null
-                && fReceiver.isOnline();
+                && fReceiver.isOnline()
+                && (!config().checkGroupWeight() || moderationService.hasHigherGroupThan(fReceiver, fPlayer));
     }
 
     protected boolean needToSpy(String category, String value) {

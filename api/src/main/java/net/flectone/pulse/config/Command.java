@@ -686,6 +686,7 @@ public record Command(
     @Builder(toBuilder = true)
     public record Spy(
             Boolean enable,
+            Boolean checkGroupWeight,
             Range range,
             List<String> aliases,
             Map<String, List<String>> categories,
