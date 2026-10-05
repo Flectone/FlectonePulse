@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @param type which of the two forms this range takes
  * @author TheFaser
  */
-public record Range(int value, Type type) {
+public record Range(Object value, Type type) {
 
     private static final Map<Type, Range> DEFAULT_RANGES = EnumSet.allOf(Type.class).stream()
             .filter(type -> type != Type.BLOCKS)
@@ -27,7 +27,7 @@ public record Range(int value, Type type) {
             ));
 
     public Range {
-        if (value < 0 && type == Type.BLOCKS) {
+        if (type == Type.BLOCKS && (int) value < 0) {
             throw new IllegalArgumentException("Block range cannot be negative: " + value);
         }
     }
@@ -36,6 +36,7 @@ public record Range(int value, Type type) {
      * Creates a range covering the given radius in blocks.
      *
      * @param value the radius in blocks, must not be negative
+     * @throws IllegalArgumentException if the value is negative
      */
     public Range(int value) {
         this(value, Type.BLOCKS);
@@ -91,9 +92,14 @@ public record Range(int value, Type type) {
             if (type == Range.Type.BLOCKS) {
                 return new Range(value);
             }
+
             return new Range(type);
         } catch (NumberFormatException _) {
             Range.Type type = Range.Type.fromString(string);
+            if (type == Type.PERMISSION && !Type.PERMISSION.name().equalsIgnoreCase(string)) {
+                return new Range(string, Type.PERMISSION);
+            }
+
             return new Range(type);
         }
     }
@@ -119,7 +125,7 @@ public record Range(int value, Type type) {
      */
     @JsonValue
     public Object toJson() {
-        if (this.type == Type.BLOCKS) {
+        if (this.type == Type.BLOCKS || isCustomPermission()) {
             return this.value;
         }
 
@@ -137,9 +143,20 @@ public record Range(int value, Type type) {
     }
 
     /**
+     * Whether this range is a permission scope carrying a custom permission
+     * rather than the plain {@link Type#PERMISSION}.
+     *
+     * @return true if the range is a custom permission
+     */
+    public boolean isCustomPermission() {
+        return this.type == Type.PERMISSION && !Objects.equals(this.value, Type.PERMISSION.value);
+    }
+
+    /**
      * The named scopes a range can take. Every scope except {@code BLOCKS} carries a fixed marker value.
      */
     public enum Type {
+        PERMISSION(-5),
         WORLD_TYPE(-4),
         WORLD_NAME(-3),
         PROXY(-2),
@@ -174,6 +191,8 @@ public record Range(int value, Type type) {
          * @throws IllegalArgumentException if the name is not a known scope
          */
         public static Type fromString(String string) {
+            if (string.contains(".")) return Type.PERMISSION;
+
             return Arrays.stream(Type.values())
                     .filter(enumType -> enumType != Type.BLOCKS)
                     .filter(enumType -> enumType.name().equalsIgnoreCase(string))

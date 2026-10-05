@@ -1,11 +1,13 @@
 package net.flectone.pulse.platform.filter;
 
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.value.Range;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -31,8 +33,22 @@ public interface RangeFilter {
      * @param filterPlayer the entity the range is measured from
      * @param range the range
      * @return the test a player must pass to receive the message
+     * @deprecated since 1.14.1, use {@link #createFilter(FEntity, Range, ModuleName)}
      */
-    @NonNull Predicate<FPlayer> createFilter(@NonNull FEntity filterPlayer, @NonNull Range range);
+    @Deprecated(since = "1.14.1")
+    default Predicate<FPlayer> createFilter(@NonNull FEntity filterPlayer, @NonNull Range range) {
+        return createFilter(filterPlayer, range, ModuleName.UNKNOWN);
+    }
+
+    /**
+     * Builds the receiver test for an explicit sender and range.
+     *
+     * @param filterPlayer the entity the range is measured from
+     * @param range the range
+     * @param moduleName the module the range belongs to
+     * @return the test a player must pass to receive the message
+     */
+    @NonNull Predicate<FPlayer> createFilter(@NonNull FEntity filterPlayer, @NonNull Range range, @NonNull ModuleName moduleName);
 
     /**
      * Whether two players are in the same world and within the given radius.
@@ -61,5 +77,15 @@ public interface RangeFilter {
      * @return true if the receiver is allowed
      */
     boolean checkWorldTypePermission(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver);
+
+    /**
+     * Whether the receiver has the permission required to bypass the range check for a module.
+     *
+     * @param fReceiver the candidate receiver
+     * @param permission the permission node, or null if the module has none
+     * @param moduleName the module the range belongs to
+     * @return true if the receiver is allowed
+     */
+    boolean checkRangePermission(@NonNull FPlayer fReceiver, @Nullable String permission, @NonNull ModuleName moduleName);
 
 }
