@@ -73,9 +73,10 @@ public class RightclickModuleImpl implements RightclickModule {
             if (config().shouldCheckSneaking() && !platformPlayerAdapter.isSneaking(fPlayer)) return;
             if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, PotionUtil.INVISIBILITY_POTION_NAME)) return;
 
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> RightClickMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(localization(fResolver).format())

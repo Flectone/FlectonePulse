@@ -52,12 +52,13 @@ public class WarnProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(warn.moderator());
             if (moduleController.isDisabledFor(warnModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(warnModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(warnModule.config().destination())
                     .sound(warnModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(warnModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

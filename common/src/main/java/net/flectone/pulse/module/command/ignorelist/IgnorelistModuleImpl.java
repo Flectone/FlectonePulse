@@ -63,8 +63,9 @@ public class IgnorelistModuleImpl implements IgnorelistModule {
 
         List<Ignore> ignoreList = socialService.loadIgnores(fPlayer);
         if (ignoreList.isEmpty()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).empty())
@@ -87,8 +88,9 @@ public class IgnorelistModuleImpl implements IgnorelistModule {
         Integer page = optionalPage.orElse(1);
 
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPage())
@@ -142,9 +144,10 @@ public class IgnorelistModuleImpl implements IgnorelistModule {
         String message = stringBuilder.toString();
         TagResolver finalTagResolver = tagResolvers;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(message)

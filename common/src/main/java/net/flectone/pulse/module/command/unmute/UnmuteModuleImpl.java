@@ -121,8 +121,9 @@ public class UnmuteModuleImpl implements UnmuteModule {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -135,8 +136,9 @@ public class UnmuteModuleImpl implements UnmuteModule {
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).lowerWeightGroup())
@@ -148,8 +150,9 @@ public class UnmuteModuleImpl implements UnmuteModule {
         }
 
         if (!moderationService.hasValid(fTarget, Moderation.Type.MUTE, id)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullId())
@@ -174,6 +177,7 @@ public class UnmuteModuleImpl implements UnmuteModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).format(), fResolver, unmute))
@@ -195,6 +199,6 @@ public class UnmuteModuleImpl implements UnmuteModule {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
+        messageDispatcher.dispatch(baseMetadataBuilder.build());
     }
 }

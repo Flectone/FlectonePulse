@@ -100,8 +100,9 @@ public class TictactoeModuleImpl implements TictactoeModule {
 
         FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
         if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -114,8 +115,9 @@ public class TictactoeModuleImpl implements TictactoeModule {
         }
 
         if (fReceiver.equals(fPlayer)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).myself())
@@ -132,10 +134,11 @@ public class TictactoeModuleImpl implements TictactoeModule {
 
         TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> TicTacToeMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).sender())
@@ -189,11 +192,12 @@ public class TictactoeModuleImpl implements TictactoeModule {
         if (!socialService.canSeeVanished(fPlayer, fReceiver)
                 || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .filter(fReceiver)
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> TicTacToeMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
@@ -217,9 +221,10 @@ public class TictactoeModuleImpl implements TictactoeModule {
                 || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> TicTacToeMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(getMoveMessage(fReceiver, fResolver, ticTacToe, typeTitle, move))
@@ -233,10 +238,11 @@ public class TictactoeModuleImpl implements TictactoeModule {
                 .build()
         );
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .filter(fReceiver)
                 .messageContext(fResolver -> TicTacToeMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
@@ -262,8 +268,9 @@ public class TictactoeModuleImpl implements TictactoeModule {
 
         TicTacToe ticTacToe = tictactoeService.get(tictactoeID);
         if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(finalFPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).wrongGame())
@@ -276,8 +283,9 @@ public class TictactoeModuleImpl implements TictactoeModule {
         }
 
         if (!ticTacToe.move(fPlayer, move)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(finalFPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).wrongMove())
@@ -292,8 +300,9 @@ public class TictactoeModuleImpl implements TictactoeModule {
         FPlayer fReceiver = fPlayerService.getFPlayer(ticTacToe.getNextPlayer());
         if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
             ticTacToe.setEnded(true);
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(finalFPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).wrongByPlayer())

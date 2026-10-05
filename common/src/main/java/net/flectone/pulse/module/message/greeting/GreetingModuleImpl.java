@@ -69,7 +69,7 @@ public class GreetingModuleImpl implements GreetingModule {
         taskScheduler.runAsyncLater(() -> {
             List<String> pixels = imagePixelConverter.convertOrGetCache(skinService.getAvatarUrl(fPlayer));
 
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .sound(soundOrThrow())
                     .messageContext(fResolver -> {
@@ -82,6 +82,7 @@ public class GreetingModuleImpl implements GreetingModule {
                         }
 
                         return MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(format)

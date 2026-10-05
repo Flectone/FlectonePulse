@@ -90,6 +90,7 @@ public class DiscordCommandDispatcher {
     private String buildMessage(@NonNull FPlayer fPlayer,
                                 @NonNull String localization) {
         return messagePipeline.buildPlain(MessageContext.builder()
+                .module(discordModule.name())
                 .sender(fPlayer)
                 .message(localization)
                 .flags(

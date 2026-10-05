@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -12,6 +13,7 @@ import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.SocialService;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -33,12 +35,12 @@ public class RangeFilterImpl implements RangeFilter {
             return filter;
         }
 
-        return filter.and(createFilter(messageContext.sender(), eventMetadata.range()));
+        return filter.and(createFilter(messageContext.sender(), eventMetadata.range(), messageContext.module()));
     }
 
     @NonNull
     @Override
-    public Predicate<FPlayer> createFilter(@NonNull FEntity filterPlayer, @NonNull Range range) {
+    public Predicate<FPlayer> createFilter(@NonNull FEntity filterPlayer, @NonNull Range range, @NonNull ModuleName moduleName) {
         if (range.is(Range.Type.PLAYER)) {
             return filterPlayer::equals;
         }
@@ -52,9 +54,10 @@ public class RangeFilterImpl implements RangeFilter {
             if (socialService.isIgnored(fReceiver, fPlayer)) return false;
 
             return switch (range.type()) {
-                case BLOCKS -> checkDistance(fPlayer, fReceiver, range.value());
+                case BLOCKS -> checkDistance(fPlayer, fReceiver, (int) range.value());
                 case WORLD_NAME -> checkWorldNamePermission(fPlayer, fReceiver);
                 case WORLD_TYPE -> checkWorldTypePermission(fPlayer, fReceiver);
+                case PERMISSION -> checkRangePermission(fReceiver, range.isCustomPermission() ? (String) range.value() : null, moduleName);
                 default -> true;
             };
         };
@@ -80,6 +83,11 @@ public class RangeFilterImpl implements RangeFilter {
         if (worldType.isEmpty()) return true;
 
         return permissionChecker.check(fReceiver, "flectonepulse.world.type." + worldType);
+    }
+
+    @Override
+    public boolean checkRangePermission(@NonNull FPlayer fReceiver, @Nullable String permission, @NonNull ModuleName moduleName) {
+        return permissionChecker.check(fReceiver, permission == null ? "flectonepulse.permission." + moduleName.name().toLowerCase() : permission);
     }
 
 }

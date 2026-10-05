@@ -164,12 +164,13 @@ public class QuestionAnswerModuleImpl implements QuestionAnswerModule {
         Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(question);
         Pair<Sound, PermissionSetting> sound = Pair.of(questionMessage.sound(), questionPermission == null ? null : questionPermission.sound());
 
-        taskScheduler.runAsyncLater(() -> messageDispatcher.dispatch(this, EventMetadata.builder()
+        taskScheduler.runAsyncLater(() -> messageDispatcher.dispatch(EventMetadata.builder()
                 .filter(fReceiver)
                 .destination(questionMessage.destination())
                 .sound(sound)
                 .messageContext(fResolver -> QuestionAnswerMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(sender)
                                 .receiver(fResolver)
                                 .message(localization(fReceiver).questions().getOrDefault(question, ""))

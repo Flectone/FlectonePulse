@@ -107,8 +107,9 @@ public class ChatcolorModuleImpl implements ChatcolorModule {
         };
 
         if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission().colors().get(fColorType.get().name()))) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullType())
@@ -160,8 +161,9 @@ public class ChatcolorModuleImpl implements ChatcolorModule {
         }
 
         if (newFColors.isEmpty()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullColor())
@@ -219,10 +221,11 @@ public class ChatcolorModuleImpl implements ChatcolorModule {
 
     @Override
     public void sendMessageWithUpdatedColors(FPlayer fPlayer, UUID metadataUUID) {
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .uuid(metadataUUID)
                         .sender(fPlayer)
                         .receiver(fResolver)

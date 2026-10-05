@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -41,6 +42,7 @@ public class MinecraftServerStatusFormatter {
         if (user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)
                 || user.getClientVersion().isNewerThan(ClientVersion.V_1_21_11)) {
             return messagePipeline.build(MessageContext.builder()
+                    .module(ModuleName.MESSAGE_STATUS)
                     .sender(fPlayer)
                     .message(message)
                     .flag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false)
@@ -50,6 +52,7 @@ public class MinecraftServerStatusFormatter {
         }
 
         return messagePipeline.build(MessageContext.builder()
+                .module(ModuleName.MESSAGE_STATUS)
                 .sender(fPlayer)
                 .message(message)
                 .flag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false)

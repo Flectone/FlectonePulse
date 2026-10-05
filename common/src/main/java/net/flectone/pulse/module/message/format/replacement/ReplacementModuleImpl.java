@@ -177,6 +177,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
                     }
 
                     yield Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                            .module(this.name())
                             .sender(sender)
                             .receiver(receiver)
                             .message(StringUtils.replaceEach(replacement, searchList, replacementList))
@@ -246,6 +247,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
 
         // "." to have the original context like ||%stats%||
         int length = componentSerializer.toPlain(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message("." + spoilerText)
@@ -266,6 +268,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
         );
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message(format)
@@ -279,6 +282,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
         if (!(messageContext.sender() instanceof FPlayer fPlayer)) return MessagePipeline.ReplacementTag.emptyTag();
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(fPlayer)
                 .receiver(messageContext.receiver())
                 .message(Strings.CS.replace(
@@ -297,6 +301,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
 
     private Tag tpsTag(MessageContext messageContext) {
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message(Strings.CS.replace(
@@ -315,6 +320,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
 
     private Tag onlineTag(MessageContext messageContext) {
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message(Strings.CS.replace(
@@ -336,6 +342,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
         if (coordinates == null) return MessagePipeline.ReplacementTag.emptyTag();
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message(StringUtils.replaceEach(
@@ -361,6 +368,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
         if (statistics == null) return MessagePipeline.ReplacementTag.emptyTag();
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message(StringUtils.replaceEach(
@@ -390,6 +398,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
 
         return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
                 .base(MessageContext.builder()
+                        .module(this.name())
                         .sender(messageContext.sender())
                         .receiver(messageContext.receiver())
                         .message(Strings.CS.replace(
@@ -416,6 +425,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
 
         return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
                 .base(MessageContext.builder()
+                        .module(this.name())
                         .sender(messageContext.sender())
                         .receiver(messageContext.receiver())
                         .message(localization(messageContext.receiver()).values().getOrDefault("item", ""))
@@ -438,6 +448,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
         if (messageContext.receiver().isUnknown() || messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message(Strings.CS.replace(
@@ -463,6 +474,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
 
         return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
                 .base(MessageContext.builder()
+                        .module(this.name())
                         .sender(messageContext.sender())
                         .receiver(messageContext.receiver())
                         .message(Strings.CS.replace(

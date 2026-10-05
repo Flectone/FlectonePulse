@@ -93,6 +93,7 @@ public class JoinModuleImpl implements JoinModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> JoinMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(hasPlayedBefore || !config().first() ? localization(fResolver).format() : localization(fResolver).formatFirstTime())
@@ -113,7 +114,7 @@ public class JoinModuleImpl implements JoinModule {
             });
         }
 
-        messageDispatcher.dispatch(this, eventMetadataBuilder.build());
+        messageDispatcher.dispatch(eventMetadataBuilder.build());
     }
 
 }

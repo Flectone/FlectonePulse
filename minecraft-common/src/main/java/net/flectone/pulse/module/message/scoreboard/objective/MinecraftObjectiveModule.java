@@ -111,12 +111,14 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
     public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String score, String format, boolean colorContextSender) {
         return messagePipeline.build(StringMessageContext.builder()
                 .base(MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fReceiver)
                         .message(format)
                         .flag(MessageFlag.COLOR_CONTEXT_SENDER, colorContextSender)
                         .tagResolver(messagePipeline.resolver("score", (_, _) ->
                                 Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                                .module(this.name())
                                                 .sender(fPlayer)
                                                 .receiver(fReceiver)
                                                 .message(score)

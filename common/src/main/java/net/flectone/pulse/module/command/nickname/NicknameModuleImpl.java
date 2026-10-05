@@ -118,8 +118,9 @@ public class NicknameModuleImpl implements NicknameModule {
         String playerName = commandModuleController.getArgument(this, commandContext, 1);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (fTarget.isUnknown() || !fTarget.isOnline()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -169,8 +170,9 @@ public class NicknameModuleImpl implements NicknameModule {
         boolean needClear = "clear".equalsIgnoreCase(nickname) || fTarget.name().equalsIgnoreCase(nickname);
 
         if (!needClear && allowedPredicate != null && !allowedPredicate.test(nickname)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullNickname())
@@ -197,11 +199,12 @@ public class NicknameModuleImpl implements NicknameModule {
 
     @Override
     public void sendMessageWithUpdatedNickname(FEntity fPlayer, String nickname, UUID metadataUUID) {
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> NicknameMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
@@ -236,6 +239,7 @@ public class NicknameModuleImpl implements NicknameModule {
             }
 
             return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(messageContext.sender())
                     .receiver(messageContext.receiver())
                     .message(Strings.CS.replace(

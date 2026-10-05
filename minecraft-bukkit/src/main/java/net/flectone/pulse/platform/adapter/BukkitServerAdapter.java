@@ -11,6 +11,7 @@ import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.converter.AdventureHoverConverter;
 import net.flectone.pulse.converter.IconConverter;
@@ -259,6 +260,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 : Arrays.stream(lore)
                 .map(message -> messagePipelineInstance
                         .build(MessageContext.builder()
+                                .module(ModuleName.MESSAGE_FORMAT_REPLACEMENT)
                                 .sender(fPlayer)
                                 .message(message)
                                 .build()
@@ -278,6 +280,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         if (title.isEmpty()) return Component.empty();
 
         return messagePipeline.get().build(MessageContext.builder()
+                .module(ModuleName.MESSAGE_FORMAT_REPLACEMENT)
                 .sender(fPlayer)
                 .message(title)
                 .build()
@@ -362,6 +365,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
         MessagePipeline messagePipelineInstance = messagePipeline.get();
         String clearedDisplayName = messagePipelineInstance.buildPlain(MessageContext.builder()
+                .module(ModuleName.MESSAGE_FORMAT_REPLACEMENT)
                 .message(displayName)
                 .build()
         );

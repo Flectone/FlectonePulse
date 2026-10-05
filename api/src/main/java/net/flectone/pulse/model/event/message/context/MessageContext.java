@@ -1,6 +1,7 @@
 package net.flectone.pulse.model.event.message.context;
 
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.tag.LazyTagResolver;
@@ -63,6 +64,15 @@ public interface MessageContext {
      */
     default @NonNull TagResolver tagResolver() {
         return base().tagResolver();
+    }
+
+    /**
+     * The module this message belongs to.
+     *
+     * @return the module
+     */
+    default @NonNull ModuleName module() {
+        return base().module();
     }
 
     /**
@@ -129,6 +139,16 @@ public interface MessageContext {
      */
     default MessageContext withTagResolver(@NonNull TagResolver tagResolver) {
         return withBase(base().withTagResolver(tagResolver));
+    }
+
+    /**
+     * Returns a copy with a different module.
+     *
+     * @param module the new module
+     * @return the copy
+     */
+    default MessageContext withModule(@NonNull ModuleName module) {
+        return withBase(base().withModule(module));
     }
 
     /**
@@ -249,6 +269,15 @@ public interface MessageContext {
     }
 
     /**
+     * Builds the cache key for this context.
+     *
+     * @return the key
+     */
+    default CacheKey createCacheKey() {
+        return base().createCacheKey();
+    }
+
+    /**
      * Identifies a rendered message so an identical one can be served from cache instead of
      * being formatted again. Each wrapping context contributes its own data to the key.
      */
@@ -261,15 +290,6 @@ public interface MessageContext {
          */
         CacheKey base();
 
-    }
-
-    /**
-     * Builds the cache key for this context.
-     *
-     * @return the key
-     */
-    default CacheKey createCacheKey() {
-        return base().createCacheKey();
     }
 
 }

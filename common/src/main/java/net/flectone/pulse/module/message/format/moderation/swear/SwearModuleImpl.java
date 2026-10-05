@@ -137,6 +137,7 @@ public class SwearModuleImpl implements SwearModule {
             Component component;
             if (permissionChecker.check(receiver, permission().see())) {
                 component = messagePipeline.build(MessageContext.builder()
+                        .module(this.name())
                         .sender(sender)
                         .receiver(receiver)
                         .message(localization.formatSee())
@@ -147,6 +148,7 @@ public class SwearModuleImpl implements SwearModule {
                 );
             } else {
                 component = messagePipeline.build(MessageContext.builder()
+                        .module(this.name())
                         .sender(sender)
                         .receiver(receiver)
                         .message(symbols)

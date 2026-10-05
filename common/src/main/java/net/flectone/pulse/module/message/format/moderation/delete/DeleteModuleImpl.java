@@ -101,6 +101,7 @@ public class DeleteModuleImpl implements DeleteModule {
             );
 
             Component componentPlaceholder = messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(sender)
                     .receiver(receiver)
                     .message(placeholder)
@@ -177,6 +178,7 @@ public class DeleteModuleImpl implements DeleteModule {
                     HistoryMessage historyMessage = history.get(i);
                     if (messageUUID.equals(historyMessage.uuid())) {
                         Component removedComponent = messagePipeline.build(MessageContext.builder()
+                                .module(this.name())
                                 .sender(sender)
                                 .receiver(fReceiver)
                                 .message(format)

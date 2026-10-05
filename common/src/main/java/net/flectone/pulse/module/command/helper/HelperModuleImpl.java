@@ -85,8 +85,9 @@ public class HelperModuleImpl implements HelperModule {
                 .toList();
 
         if (recipients.isEmpty() && config().nullHelper()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullHelper())
@@ -99,9 +100,10 @@ public class HelperModuleImpl implements HelperModule {
 
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(localization(fResolver).player())
@@ -110,13 +112,14 @@ public class HelperModuleImpl implements HelperModule {
                 .build()
         );
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(config().range())
                 .filter(getFilterSee())
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> StringMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).global())

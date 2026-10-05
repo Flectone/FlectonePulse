@@ -50,8 +50,9 @@ public class ModerationListSenderImpl implements ModerationListSender {
                      Function<FPlayer, String> unmoderationCommand) {
         Optional<ListArgument> optionalListArgument = getListArgument(module, commandContext, firstArgumentIndex);
         if (optionalListArgument.isEmpty()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization.apply(fResolver).nullPlayer())
@@ -76,8 +77,9 @@ public class ModerationListSenderImpl implements ModerationListSender {
         }
 
         if (size == 0) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization.apply(fResolver).empty())
@@ -91,8 +93,9 @@ public class ModerationListSenderImpl implements ModerationListSender {
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (listArgument.page() > countPage || listArgument.page() < 1) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization.apply(fResolver).nullPage())
@@ -153,9 +156,10 @@ public class ModerationListSenderImpl implements ModerationListSender {
         String message = stringBuilder.toString();
         TagResolver finalTagResolver = tagResolvers;
 
-        messageDispatcher.dispatch(module, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .sound(module.soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(module.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(message)

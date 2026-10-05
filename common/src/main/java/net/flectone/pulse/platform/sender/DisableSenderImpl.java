@@ -37,9 +37,10 @@ public class DisableSenderImpl implements DisableSender {
                 ? localization.disabledSelf()
                 : localization.disabledOther();
 
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .filter(fPlayer)
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.ERROR)
                         .sender(receiver)
                         .receiver(fResolver)
                         .message(disableMessage)

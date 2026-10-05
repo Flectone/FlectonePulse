@@ -3,6 +3,7 @@ package net.flectone.pulse.model.event;
 import lombok.Builder;
 import lombok.With;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.value.Destination;
@@ -49,6 +50,11 @@ public record EventMetadataImpl(
     @Override
     public @NonNull MessageContext resolveMessageContext(FPlayer fPlayer) {
         return messageContext.apply(fPlayer);
+    }
+
+    @Override
+    public @NonNull EventMetadata withModule(ModuleName moduleName) {
+        return withMessageContext(fReceiver -> messageContext.apply(fReceiver).withModule(moduleName));
     }
 
 }

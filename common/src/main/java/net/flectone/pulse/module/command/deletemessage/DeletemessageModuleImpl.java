@@ -65,8 +65,9 @@ public class DeletemessageModuleImpl implements DeletemessageModule {
 
         UUID uuid = commandModuleController.getArgument(this, commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullMessage())
@@ -83,11 +84,12 @@ public class DeletemessageModuleImpl implements DeletemessageModule {
                 UUID.randomUUID()
         );
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> DeletemessageMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).format())

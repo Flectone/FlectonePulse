@@ -51,6 +51,7 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
 
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
         Component header = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fPlayer)
                 .receiver(fTarget)
                 .message(localization.inventory().trim())
@@ -91,6 +92,7 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
         boolean enabled = socialService.isSetting(fTarget, messageType);
 
         Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fPlayer)
                 .receiver(fTarget)
                 .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled))
@@ -98,6 +100,7 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
         );
 
         Component componentLore = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fPlayer)
                 .receiver(fTarget)
                 .message(chatsettingModule.getCheckboxLore(fPlayer, enabled))
@@ -121,6 +124,7 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
                     boolean currentEnabled = status.toBoolean();
 
                     Component componentInvertTitle = messagePipeline.build(MessageContext.builder()
+                            .module(chatsettingModule.name())
                             .sender(fPlayer)
                             .receiver(finalFTarget)
                             .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled))
@@ -128,6 +132,7 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
                     );
 
                     Component componentInvertLore = messagePipeline.build(MessageContext.builder()
+                            .module(chatsettingModule.name())
                             .sender(fPlayer)
                             .receiver(finalFTarget)
                             .message(chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled))
@@ -160,12 +165,14 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
         String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
 
         Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fTarget)
                 .message(title)
                 .build()
         );
 
         Component componentLore = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fTarget)
                 .message(lore)
                 .build()
@@ -200,12 +207,14 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
         String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
 
         Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fTarget)
                 .message(title)
                 .build()
         );
 
         Component componentLore = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fTarget)
                 .message(lore)
                 .build()
@@ -259,12 +268,14 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
             String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
 
             Component componentTitle = messagePipeline.build(MessageContext.builder()
+                    .module(chatsettingModule.name())
                     .sender(fTarget)
                     .message(title)
                     .build()
             );
 
             Component componentLore = messagePipeline.build(MessageContext.builder()
+                    .module(chatsettingModule.name())
                     .sender(fTarget)
                     .message(lore)
                     .build()

@@ -84,8 +84,9 @@ public class WhoisModuleImpl implements WhoisModule {
         FPlayer fTargetOrIp = fPlayerService.getFPlayer(playerNameOrIp);
         if (config().checkGroupWeight() && !fTargetOrIp.isUnknown() && !fPlayer.equals(fTargetOrIp)
                 && !moderationService.hasHigherGroupThan(fPlayer, fTargetOrIp)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).lowerWeightGroup())
@@ -101,8 +102,9 @@ public class WhoisModuleImpl implements WhoisModule {
                 : platformPlayerAdapter.isOnline(fTargetOrIp) ? platformPlayerAdapter.getIp(fTargetOrIp) : fTargetOrIp.ip();
 
         if (StringUtils.isEmpty(ip)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).empty())
@@ -117,8 +119,9 @@ public class WhoisModuleImpl implements WhoisModule {
 
         int size = fTargets.size();
         if (size == 0) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).empty())
@@ -132,8 +135,9 @@ public class WhoisModuleImpl implements WhoisModule {
         int perPage = config().perPage();
         int countPage = (int) Math.ceil((double) size / perPage);
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPage())
@@ -196,9 +200,10 @@ public class WhoisModuleImpl implements WhoisModule {
         String message = stringBuilder.toString();
         TagResolver finalTagResolvers = tagResolvers;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(message)

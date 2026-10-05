@@ -59,8 +59,9 @@ public class IgnoreModuleImpl implements IgnoreModule {
         String targetName = commandModuleController.getArgument(this, commandContext, 0);
 
         if (fPlayer.name().equalsIgnoreCase(targetName)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).myself())
@@ -74,8 +75,9 @@ public class IgnoreModuleImpl implements IgnoreModule {
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fPlayer).nullPlayer())
@@ -107,11 +109,12 @@ public class IgnoreModuleImpl implements IgnoreModule {
             metadataIgnore = ignore.get();
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> IgnoreMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(optionalIgnore.isEmpty() ? localization(fResolver).formatTrue() : localization(fResolver).formatFalse())

@@ -47,11 +47,12 @@ public class PollProxyMessageListener implements PulseListener {
                     Poll poll = gson.fromJson(proxyPayload.readString(), Poll.class);
                     pollModule.saveAndUpdateLast(poll);
 
-                    messageDispatcher.dispatch(pollModule, EventMetadata.builder()
+                    messageDispatcher.dispatch(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
                             .sound(pollModule.soundOrThrow())
                             .messageContext(fResolver -> PollMessageContext.builder()
                                     .base(MessageContext.builder()
+                                            .module(pollModule.name())
                                             .uuid(event.uuid())
                                             .sender(event.sender())
                                             .receiver(fResolver)

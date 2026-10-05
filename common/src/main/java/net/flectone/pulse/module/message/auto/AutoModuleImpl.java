@@ -113,10 +113,11 @@ public class AutoModuleImpl implements AutoModule {
         String format = getNextMessage(fPlayer, type.random(), messages);
         if (StringUtils.isEmpty(format)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(type.destination())
                 .sound(sound)
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(format)

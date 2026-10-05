@@ -73,12 +73,13 @@ public class TryModuleImpl implements TryModule {
 
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> TryMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replacePercent(fResolver, random))

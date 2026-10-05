@@ -83,8 +83,9 @@ public class KickModuleImpl implements KickModule {
         String playerName = commandModuleController.getArgument(this, commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -97,8 +98,9 @@ public class KickModuleImpl implements KickModule {
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).lowerWeightGroup())
@@ -126,6 +128,7 @@ public class KickModuleImpl implements KickModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, moderation))
@@ -145,7 +148,7 @@ public class KickModuleImpl implements KickModule {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
+        messageDispatcher.dispatch(baseMetadataBuilder.build());
 
         kick(moderation);
     }
@@ -181,6 +184,7 @@ public class KickModuleImpl implements KickModule {
         String format = moderationMessageFormatter.replacePlaceholders(localization(fTarget).person(), fTarget, kick);
         platformPlayerAdapter.kick(fTarget, messagePipeline.build(ModerationMessageContext.builder()
                 .base(MessageContext.builder()
+                        .module(this.name())
                         .sender(fTarget)
                         .message(format)
                         .tagResolver(messagePipeline.targetTag("moderator", fTarget, fModerator))

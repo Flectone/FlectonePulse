@@ -102,9 +102,10 @@ public class BrandModuleImpl implements BrandModule {
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(format)

@@ -57,12 +57,13 @@ public class CoinModuleImpl implements CoinModule {
 
         int percent = randomUtil.nextInt(config().draw() ? 0 : 1, 101);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> CoinMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replaceResult(fResolver, percent))

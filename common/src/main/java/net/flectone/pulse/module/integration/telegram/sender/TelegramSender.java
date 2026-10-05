@@ -124,12 +124,13 @@ public class TelegramSender {
         TelegramClient telegramClient = telegramClientProvider.get();
         if (telegramClient == null) return;
 
-        messageDispatcher.dispatch(telegramModule, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(Range.get(Range.Type.PROXY))
                 .destination(telegramModule.config().destination())
                 .sound(telegramModule.soundOrThrow())
                 .messageContext(fResolver -> TelegramMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(telegramModule.name())
                                 .sender(telegramClient.sender())
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(
@@ -141,10 +142,12 @@ public class TelegramSender {
                                     if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
                                     return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                            .module(telegramModule.name())
                                             .message(telegramModule.localization(fResolver).formatReply())
                                             .tagResolvers(
                                                     messagePipeline.resolver("reply_user", Tag.inserting(Component.text(StringUtils.defaultString(reply.getLeft())))),
                                                     messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                                            .module(telegramModule.name())
                                                             .sender(telegramClient.sender())
                                                             .receiver(fResolver)
                                                             .message(reply.getRight())

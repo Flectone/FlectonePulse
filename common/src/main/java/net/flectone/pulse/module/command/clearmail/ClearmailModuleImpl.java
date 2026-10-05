@@ -84,8 +84,9 @@ public class ClearmailModuleImpl implements ClearmailModule {
                 .findAny();
 
         if (optionalMail.isEmpty()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullMail())
@@ -103,11 +104,12 @@ public class ClearmailModuleImpl implements ClearmailModule {
 
         socialService.deleteMail(mail);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> ClearMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(Strings.CS.replaceOnce(localization(fResolver).format(), "<id>", String.valueOf(mailID)))

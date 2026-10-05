@@ -39,13 +39,14 @@ public class HelperProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(helperModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .filter(helperModule.getFilterSee())
                     .destination(helperModule.config().destination())
                     .sound(helperModule.soundOrThrow())
                     .messageContext(fResolver -> StringMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(helperModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

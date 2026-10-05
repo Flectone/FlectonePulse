@@ -234,6 +234,7 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
         Component prefix = Component.empty();
         if (StringUtils.isNotEmpty(localization(fReceiver).prefix())) {
             prefix = messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .receiver(fReceiver)
                     .message(localization(fReceiver).prefix())
@@ -245,6 +246,7 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
         Component suffix = Component.empty();
         if (StringUtils.isNotEmpty(localization(fReceiver).suffix())) {
             suffix = messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .receiver(fReceiver)
                     .message(localization(fReceiver).suffix())
@@ -277,6 +279,7 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
     @NonNull
     private NamedTextColor getColor(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver) {
         TextColor color = messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(fPlayer)
                 .receiver(fReceiver)
                 .message(config().color())

@@ -121,8 +121,9 @@ public class UnwarnModuleImpl implements UnwarnModule {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -135,8 +136,9 @@ public class UnwarnModuleImpl implements UnwarnModule {
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).lowerWeightGroup())
@@ -149,8 +151,9 @@ public class UnwarnModuleImpl implements UnwarnModule {
         }
 
         if (!moderationService.hasValid(fTarget, Moderation.Type.WARN, id)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullId())
@@ -175,6 +178,7 @@ public class UnwarnModuleImpl implements UnwarnModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).format(), fResolver, moderation))
@@ -196,6 +200,6 @@ public class UnwarnModuleImpl implements UnwarnModule {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
+        messageDispatcher.dispatch(baseMetadataBuilder.build());
     }
 }

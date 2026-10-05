@@ -54,12 +54,13 @@ public class UnwarnProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(unwarn.moderator());
             if (moduleController.isDisabledFor(warnModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(unwarnModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(unwarnModule.config().destination())
                     .sound(unwarnModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(unwarnModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

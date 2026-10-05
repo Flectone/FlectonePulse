@@ -90,6 +90,7 @@ public class ConditionModuleImpl implements ConditionModule {
             if (StringUtils.isEmpty(conditionValue)) return MessagePipeline.ReplacementTag.emptyTag();
 
             return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(messageContext.sender())
                     .receiver(messageContext.receiver())
                     .message(conditionValue)
@@ -187,6 +188,7 @@ public class ConditionModuleImpl implements ConditionModule {
 
     private String buildCriteriaString(FEntity fPlayer, FPlayer fReceiver, String value, Map<MessageFlag, Boolean> flags) {
         return messagePipeline.buildPlain(MessageContext.builder()
+                .module(this.name())
                 .sender(fPlayer)
                 .receiver(fReceiver)
                 .message(value)

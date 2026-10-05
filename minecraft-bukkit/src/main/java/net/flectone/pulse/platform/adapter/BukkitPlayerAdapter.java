@@ -11,6 +11,7 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -287,6 +288,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             header = headerModuleInstance.getCurrentMessage(fPlayer);
             if (header != null) {
                 return messagePipeline.build(MessageContext.builder()
+                        .module(ModuleName.MESSAGE_TAB_HEADER)
                         .sender(fPlayer)
                         .message(header)
                         .build()
@@ -312,6 +314,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             footer = footerModuleInstance.getCurrentMessage(fPlayer);
             if (footer != null) {
                 return messagePipeline.build(MessageContext.builder()
+                        .module(ModuleName.MESSAGE_TAB_FOOTER)
                         .sender(fPlayer)
                         .message(footer)
                         .build()

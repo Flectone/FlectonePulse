@@ -16,6 +16,7 @@ import io.netty.buffer.PooledByteBufAllocator;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.FabricFlectonePulse;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.converter.AdventureHoverConverter;
 import net.flectone.pulse.converter.IconConverter;
@@ -285,6 +286,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
         MessagePipeline messagePipelineInstance = messagePipeline.get();
         String clearedDisplayName = messagePipelineInstance.buildPlain(MessageContext.builder()
+                .module(ModuleName.MESSAGE_FORMAT_REPLACEMENT)
                 .message(customName.getString())
                 .build()
         );
@@ -326,6 +328,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
                 : Arrays.stream(lore)
                 .map(message -> messagePipelineInstance
                         .build(MessageContext.builder()
+                                .module(ModuleName.MESSAGE_FORMAT_REPLACEMENT)
                                 .sender(fPlayer)
                                 .message(message)
                                 .build()
@@ -345,6 +348,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         if (title.isEmpty()) return Component.empty();
 
         return messagePipeline.get().build(MessageContext.builder()
+                .module(ModuleName.MESSAGE_FORMAT_REPLACEMENT)
                 .sender(fPlayer)
                 .message(title)
                 .build()

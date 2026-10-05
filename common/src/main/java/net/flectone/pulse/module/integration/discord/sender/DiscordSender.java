@@ -138,6 +138,7 @@ public class DiscordSender {
                     .username(StringUtils.isEmpty(channelEmbed.webhookName()) || "<player>".equals(channelEmbed.webhookName())
                                     ? sender.name()
                                     : messagePipeline.buildPlain(MessageContext.builder()
+                                    .module(discordModule.name())
                                     .sender(sender)
                                     .receiver(FPlayer.UNKNOWN)
                                     .message(channelEmbed.webhookName())
@@ -192,7 +193,7 @@ public class DiscordSender {
         String displayName = member != null ? member.getDisplayName() : globalName;
         String nickname = member != null ? member.getNickname().orElse(userName) : userName;
 
-        messageDispatcher.dispatch(discordModule, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(Range.get(Range.Type.PROXY))
                 .destination(discordModule.config().destination())
                 .sound(discordModule.soundOrThrow())
@@ -201,6 +202,7 @@ public class DiscordSender {
 
                     return DiscordMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(discordModule.name())
                                     .sender(discordClient.sender())
                                     .receiver(fResolver)
                                     .message(channelEmbed == null ? "" : StringUtils.replaceEach(
@@ -212,10 +214,12 @@ public class DiscordSender {
                                         if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
                                         return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                                .module(discordModule.name())
                                                 .message(discordModule.localization(fResolver).formatReply())
                                                 .tagResolvers(
                                                         messagePipeline.resolver("reply_user", Tag.inserting(Component.text(StringUtils.defaultString(reply.getLeft())))),
                                                         messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                                                .module(discordModule.name())
                                                                 .sender(discordClient.sender())
                                                                 .receiver(fResolver)
                                                                 .message(reply.getRight())

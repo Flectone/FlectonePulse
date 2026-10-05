@@ -92,6 +92,7 @@ public class MinecraftServerlinkModule implements ModuleLocalization {
                     String link = entry.getValue();
 
                     Component linkComponent = messagePipeline.build(MessageContext.builder()
+                            .module(this.name())
                             .sender(fPlayer)
                             .message(linksMessages.getOrDefault(entry.getKey(), link))
                             .build()

@@ -116,10 +116,11 @@ public class TellModuleImpl implements TellModule {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         if (fPlayer.name().equalsIgnoreCase(playerName)) {
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .messageContext(fResolver -> StringMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(localization(fResolver).myself())
@@ -141,8 +142,9 @@ public class TellModuleImpl implements TellModule {
         if (!fReceiver.isConsole()
                 && (fReceiver.isUnknown() || !fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)
                 || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -188,12 +190,13 @@ public class TellModuleImpl implements TellModule {
                      UUID metadataUUID) {
         boolean isSenderToSender = sender.equals(fReceiver);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .filter(fReceiver)
                 .destination(config().destination())
                 .sound(isSenderToSender ? null : soundOrThrow())
                 .messageContext(fResolver -> TellMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .uuid(metadataUUID)
                                 .sender(sender)
                                 .receiver(fResolver)

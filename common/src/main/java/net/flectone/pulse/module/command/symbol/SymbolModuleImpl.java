@@ -69,8 +69,9 @@ public class SymbolModuleImpl implements SymbolModule {
 
         String category = commandModuleController.getArgument(this, commandContext, 0);
         if (!config().categories().containsKey(category)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullCategory())
@@ -94,8 +95,9 @@ public class SymbolModuleImpl implements SymbolModule {
 
         int countPage = (int) Math.ceil((double) size / perPage);
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPage())
@@ -146,9 +148,10 @@ public class SymbolModuleImpl implements SymbolModule {
 
         String message = stringBuilder.toString();
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(message)

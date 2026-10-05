@@ -8,6 +8,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -131,6 +132,7 @@ public class HytaleSidebarModule extends SidebarModuleImpl {
         for (int i = 0; i < lines.length; i++) {
             String lineId = getLineId(i, fPlayer);
             Component line = messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .message(lines[i])
                     .build()

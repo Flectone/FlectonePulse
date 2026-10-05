@@ -51,12 +51,13 @@ public class EmitProxyMessageListener implements PulseListener {
             String message = proxyPayload.readString();
 
             if (fTarget.isConsole()) {
-                messageDispatcher.dispatch(emitModule, EventMetadata.builder()
+                messageDispatcher.dispatch(EventMetadata.builder()
                         .range(Range.get(Range.Type.SERVER))
                         .destination(destination)
                         .sound(emitModule.soundOrThrow())
                         .messageContext(fResolver -> StringMessageContext.builder()
                                 .base(MessageContext.builder()
+                                        .module(emitModule.name())
                                         .uuid(event.uuid())
                                         .sender(event.sender())
                                         .receiver(fResolver)
@@ -71,12 +72,13 @@ public class EmitProxyMessageListener implements PulseListener {
                         .build()
                 );
             } else {
-                messageDispatcher.dispatch(emitModule, EventMetadata.builder()
+                messageDispatcher.dispatch(EventMetadata.builder()
                         .filter(fTarget)
                         .destination(destination)
                         .sound(emitModule.soundOrThrow())
                         .messageContext(fResolver -> StringMessageContext.builder()
                                 .base(MessageContext.builder()
+                                        .module(emitModule.name())
                                         .uuid(event.uuid())
                                         .sender(event.sender())
                                         .receiver(fResolver)

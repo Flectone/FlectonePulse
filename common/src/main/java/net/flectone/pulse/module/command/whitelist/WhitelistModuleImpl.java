@@ -169,8 +169,9 @@ public class WhitelistModuleImpl implements WhitelistModule {
         if (action == null
                 || (action == Action.ON || action == Action.OFF || action == Action.IMPORT) && isPlayerCommand
                 || (action == Action.ADD || action == Action.REMOVE || action == Action.LIST) && !isPlayerCommand) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullType())
@@ -186,8 +187,9 @@ public class WhitelistModuleImpl implements WhitelistModule {
                 boolean turned = action == Action.ON;
                 boolean isAlreadyTurned = isTurnedOn();
                 if (turned && isAlreadyTurned) {
-                    messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    messageDispatcher.dispatch(EventMetadata.builder()
                             .messageContext(fResolver -> MessageContext.builder()
+                                    .module(ModuleName.ERROR)
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(localization(fResolver).alreadyOn())
@@ -199,8 +201,9 @@ public class WhitelistModuleImpl implements WhitelistModule {
                 }
 
                 if (!turned && !isAlreadyTurned) {
-                    messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    messageDispatcher.dispatch(EventMetadata.builder()
                             .messageContext(fResolver -> MessageContext.builder()
+                                    .module(ModuleName.ERROR)
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(localization(fResolver).alreadyOff())
@@ -288,6 +291,7 @@ public class WhitelistModuleImpl implements WhitelistModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> WhitelistMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(turned ? localization(fResolver).formatOn() : localization(fResolver).formatOff(), fResolver, moderation))
@@ -308,7 +312,7 @@ public class WhitelistModuleImpl implements WhitelistModule {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
+        messageDispatcher.dispatch(baseMetadataBuilder.build());
 
         if (moderation.type() == Moderation.Type.WHITELIST) {
             kickOnlinePlayers(moderation);
@@ -349,8 +353,9 @@ public class WhitelistModuleImpl implements WhitelistModule {
     private void actionImport(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         File whitelistFile = platformServerAdapter.getWhitelistFile();
         if (!whitelistFile.exists()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).empty())
@@ -396,6 +401,7 @@ public class WhitelistModuleImpl implements WhitelistModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> WhitelistMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).formatAdd(), fResolver, whitelist))
@@ -419,7 +425,7 @@ public class WhitelistModuleImpl implements WhitelistModule {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
+        messageDispatcher.dispatch(baseMetadataBuilder.build());
     }
 
     private void actionRemove(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
@@ -433,8 +439,9 @@ public class WhitelistModuleImpl implements WhitelistModule {
 
         FPlayer fTarget = uuid != null ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(playerName);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -466,8 +473,9 @@ public class WhitelistModuleImpl implements WhitelistModule {
         }
 
         if (!moderationService.hasValid(fTarget, Moderation.Type.WHITELIST, id)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).alreadyRemove())
@@ -492,6 +500,7 @@ public class WhitelistModuleImpl implements WhitelistModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> WhitelistMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).formatRemove(), fResolver, unwhitelist))
@@ -515,7 +524,7 @@ public class WhitelistModuleImpl implements WhitelistModule {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
+        messageDispatcher.dispatch(baseMetadataBuilder.build());
 
         kickPlayer(fPlayer, fTarget);
     }
@@ -538,8 +547,9 @@ public class WhitelistModuleImpl implements WhitelistModule {
         String promptPlayer = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
         if (optionalPlayer.isEmpty()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -571,8 +581,9 @@ public class WhitelistModuleImpl implements WhitelistModule {
 
         FPlayer fTarget = isUuid ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(uuidOrName);
         if (fTarget.isConsole() || !isUuid && !validNameChecker.check(uuidOrName)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -585,8 +596,9 @@ public class WhitelistModuleImpl implements WhitelistModule {
 
         if (!fTarget.isUnknown()) {
             if (config().checkDuplicate() && isWhitelisted(fTarget)) {
-                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                messageDispatcher.dispatch(EventMetadata.builder()
                         .messageContext(fResolver -> MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).alreadyAdd())
@@ -647,6 +659,7 @@ public class WhitelistModuleImpl implements WhitelistModule {
         if (isWhitelisted(fTarget)) return;
 
         platformPlayerAdapter.kick(fTarget, messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(fModerator)
                 .receiver(fTarget)
                 .message(localization(fTarget).person())

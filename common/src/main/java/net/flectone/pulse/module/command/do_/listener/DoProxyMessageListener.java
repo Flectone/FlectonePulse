@@ -39,12 +39,13 @@ public class DoProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(doModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(doModule.config().destination())
                     .sound(doModule.soundOrThrow())
                     .messageContext(fResolver -> StringMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(doModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

@@ -110,8 +110,9 @@ public class ChatModuleImpl implements ChatModule {
 
         Chat playerChat = getPlayerChat(fPlayer, rawString);
         if (playerChat.config() == null || !playerChat.config().enable()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullChat())
@@ -157,13 +158,14 @@ public class ChatModuleImpl implements ChatModule {
         String chatName = playerChat.name();
         if (chatName == null) return;
 
-        Set<FPlayer> receivers = messageDispatcher.dispatch(this, EventMetadata.builder()
+        Set<FPlayer> receivers = messageDispatcher.dispatch(EventMetadata.builder()
                 .range(playerChat.config().range())
                 .filter(permissionFilter(chatName))
                 .destination(playerChat.config().destination())
                 .sound(playerChat.sound())
                 .messageContext(fResolver -> ChatMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(StringUtils.defaultString(localization(fResolver).types().get(chatName)))
@@ -213,9 +215,10 @@ public class ChatModuleImpl implements ChatModule {
         if (localReceivers.stream().anyMatch(filterReceivers(fPlayer, playerChat.name()))) return;
 
         if (playerChat.config().range().is(Range.Type.BLOCKS) || noGlobalReceiversFor(fPlayer, playerChat.name())) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(playerChat.config().nullReceiver().destination())
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullReceiver())

@@ -42,12 +42,13 @@ public class SpyProxyMessageListener implements PulseListener {
             String action = proxyPayload.readString();
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(spyModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .filter(spyModule.createFilter(event.sender() instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN, Set.of()))
                     .destination(spyModule.config().destination())
                     .messageContext(fResolver -> SpyMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(spyModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

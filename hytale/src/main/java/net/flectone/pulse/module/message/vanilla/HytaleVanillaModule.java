@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.protocol.packets.interface_.ServerMessage;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
@@ -105,13 +106,14 @@ public class HytaleVanillaModule extends VanillaModuleImpl {
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
 
         boolean vanished = socialService.isVanished(fPlayer);
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(range)
                 .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
                 .filter(fResolver -> socialService.canSeeVanished(fPlayer, fResolver, vanished))
                 .destination(parsedComponent.vanillaMessage().destination())
                 .messageContext(fResolver -> VanillaMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(StringUtils.defaultString(localization(fResolver).types().get(parsedComponent.translationKey())))
@@ -183,6 +185,7 @@ public class HytaleVanillaModule extends VanillaModuleImpl {
     private Component buildFEntityComponent(FEntity fTarget, FPlayer fResolver) {
         Localization.Message.Vanilla localization = localization(fResolver);
         return messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(fTarget)
                 .receiver(fResolver)
                 .message(fTarget.type().equals(FPlayer.PLAYER_TYPE)

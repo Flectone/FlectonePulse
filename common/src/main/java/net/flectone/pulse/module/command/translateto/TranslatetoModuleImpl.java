@@ -111,8 +111,9 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
     private void sendTranslation(FPlayer fPlayer, String message, String mainLang, String targetLang, String messageToTranslate) {
         String translatedMessage = translate(fPlayer, mainLang, targetLang, messageToTranslate);
         if (translatedMessage.isEmpty()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullOrError())
@@ -124,12 +125,13 @@ public class TranslatetoModuleImpl implements TranslatetoModule {
             return;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> TranslatetoMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replaceLanguage(fResolver, targetLang))

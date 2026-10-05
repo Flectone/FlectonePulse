@@ -54,6 +54,7 @@ public class SignModuleImpl implements SignModule {
 
         // disable Object for sign because they don't work correctly
         return Optional.of(messagePipeline.buildJson(MessageContext.builder()
+                .module(this.name())
                 .sender(fPlayer)
                 .message(string)
                 .flags(

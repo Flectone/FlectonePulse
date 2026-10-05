@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -138,6 +139,7 @@ public class TelegramIntegration implements FIntegration {
     @NonNull
     private String getNewChatName(@NonNull String value) {
         return messagePipeline.buildPlain(MessageContext.builder()
+                .module(telegramModule.name())
                 .message(value)
                 .build()
         );

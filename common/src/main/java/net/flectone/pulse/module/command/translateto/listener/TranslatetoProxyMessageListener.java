@@ -41,12 +41,13 @@ public class TranslatetoProxyMessageListener implements PulseListener {
             String message = proxyPayload.readString();
             String messageToTranslate = proxyPayload.readString();
 
-            messageDispatcher.dispatch(translatetoModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(translatetoModule.config().destination())
                     .sound(translatetoModule.soundOrThrow())
                     .messageContext(fResolver -> TranslatetoMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(translatetoModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

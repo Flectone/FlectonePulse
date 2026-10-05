@@ -108,6 +108,7 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
                 } else {
                     sendPersonalDeath(fPlayer, messagePipeline.build(VanillaMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .message(StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey())))
                                     .tagResolver(argumentTag(fPlayer, parsedComponent))
@@ -128,13 +129,14 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
         boolean vanished = socialService.isVanished(fPlayer);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(range)
                 .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
                 .filter(fResolver -> socialService.canSeeVanished(fPlayer, fResolver, vanished))
                 .destination(parsedComponent.vanillaMessage().destination())
                 .messageContext(fResolver -> VanillaMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(StringUtils.defaultString(localization(fResolver).types().get(parsedComponent.translationKey())))
@@ -275,6 +277,7 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
     private Component buildFEntityComponent(FEntity fTarget, FPlayer fResolver) {
         Localization.Message.Vanilla localization = localization(fResolver);
         return messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(fTarget)
                 .receiver(fResolver)
                 .message(fTarget.type().equals(FPlayer.PLAYER_TYPE)

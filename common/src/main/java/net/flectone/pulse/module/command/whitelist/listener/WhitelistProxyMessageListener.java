@@ -54,12 +54,13 @@ public class WhitelistProxyMessageListener implements PulseListener {
 
                     boolean turnedOn = action == WhitelistModule.Action.ON;
 
-                    messageDispatcher.dispatch(whitelistModule, EventMetadata.builder()
+                    messageDispatcher.dispatch(EventMetadata.builder()
                             .range(Range.Type.SERVER)
                             .destination(whitelistModule.config().destination())
                             .sound(whitelistModule.soundOrThrow())
                             .messageContext(fResolver -> WhitelistMessageContext.builder()
                                     .base(MessageContext.builder()
+                                            .module(whitelistModule.name())
                                             .sender(event.sender())
                                             .receiver(fResolver)
                                             .message(turnedOn ? whitelistModule.localization(fResolver).formatOn() : whitelistModule.localization(fResolver).formatOff())
@@ -77,12 +78,13 @@ public class WhitelistProxyMessageListener implements PulseListener {
                     FPlayer fModerator = fPlayerService.getFPlayer(whitelist.moderator());
                     if (moduleController.isDisabledFor(whitelistModule, fModerator)) return event.withProcessed(true);
 
-                    messageDispatcher.dispatch(whitelistModule, EventMetadata.builder()
+                    messageDispatcher.dispatch(EventMetadata.builder()
                             .range(Range.Type.SERVER)
                             .destination(whitelistModule.config().destination())
                             .sound(whitelistModule.soundOrThrow())
                             .messageContext(fResolver -> WhitelistMessageContext.builder()
                                     .base(MessageContext.builder()
+                                            .module(whitelistModule.name())
                                             .uuid(event.uuid())
                                             .sender(event.sender())
                                             .receiver(fResolver)
@@ -102,12 +104,13 @@ public class WhitelistProxyMessageListener implements PulseListener {
                     FPlayer fModerator = fPlayerService.getFPlayer(unwhitelist.moderator());
                     if (moduleController.isDisabledFor(whitelistModule, fModerator)) return event.withProcessed(true);
 
-                    messageDispatcher.dispatch(whitelistModule, EventMetadata.builder()
+                    messageDispatcher.dispatch(EventMetadata.builder()
                             .range(Range.Type.SERVER)
                             .destination(whitelistModule.config().destination())
                             .sound(whitelistModule.soundOrThrow())
                             .messageContext(fResolver -> WhitelistMessageContext.builder()
                                     .base(MessageContext.builder()
+                                            .module(whitelistModule.name())
                                             .uuid(event.uuid())
                                             .sender(event.sender())
                                             .receiver(fResolver)

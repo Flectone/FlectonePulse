@@ -54,6 +54,7 @@ public class MinecraftDialogPollBuilder {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).modern();
 
         Component headerName = messagePipeline.build(MessageContext.builder()
+                .module(pollModule.name())
                 .sender(fPlayer)
                 .message(poll.header())
                 .build()
@@ -62,6 +63,7 @@ public class MinecraftDialogPollBuilder {
         DialogBody dialogBody = new PlainMessageDialogBody(new PlainMessage(Component.empty(), 10));
 
         Component inputNameComponent = messagePipeline.build(MessageContext.builder()
+                .module(pollModule.name())
                 .sender(fPlayer)
                 .message(poll.inputName())
                 .build()
@@ -76,6 +78,7 @@ public class MinecraftDialogPollBuilder {
         ));
 
         Component multipleNameComponent = messagePipeline.build(MessageContext.builder()
+                .module(pollModule.name())
                 .sender(fPlayer)
                 .message(poll.multipleName())
                 .build()
@@ -89,6 +92,7 @@ public class MinecraftDialogPollBuilder {
         ));
 
         Component endTimeNameComponent = messagePipeline.build(MessageContext.builder()
+                .module(pollModule.name())
                 .sender(fPlayer)
                 .message(poll.endTimeName())
                 .build()
@@ -102,6 +106,7 @@ public class MinecraftDialogPollBuilder {
         ));
 
         Component repeatTimeNameComponent = messagePipeline.build(MessageContext.builder()
+                .module(pollModule.name())
                 .sender(fPlayer)
                 .message(poll.repeatTimeName())
                 .build()
@@ -118,6 +123,7 @@ public class MinecraftDialogPollBuilder {
 
         for (int i = 0; i < answers.size(); i++) {
             Component answerNameComponent = messagePipeline.build(MessageContext.builder()
+                    .module(pollModule.name())
                     .sender(fPlayer)
                     .message(Strings.CS.replace(poll.inputAnswerName(), "<number>", String.valueOf(i + 1)))
                     .build()
@@ -158,6 +164,7 @@ public class MinecraftDialogPollBuilder {
 
         String newAnswerButtonId = "fp_new_answer";
         Component buttonNameComponent = messagePipeline.build(MessageContext.builder()
+                .module(pollModule.name())
                 .sender(fPlayer)
                 .message(poll.newAnswerButtonName())
                 .build()
@@ -193,6 +200,7 @@ public class MinecraftDialogPollBuilder {
 
         String newAnswerButtonId = "fp_remove_answer";
         Component buttonNameComponent = messagePipeline.build(MessageContext.builder()
+                .module(pollModule.name())
                 .sender(fPlayer)
                 .message(poll.removeAnswerButtonName())
                 .build()
@@ -226,6 +234,7 @@ public class MinecraftDialogPollBuilder {
     private MinecraftDialog.Builder addCreateButton(FPlayer fPlayer, MinecraftDialog.Builder builder) {
         String createId = "fp_create";
         Component buttonNameComponent = messagePipeline.build(MessageContext.builder()
+                .module(pollModule.name())
                 .sender(fPlayer)
                 .message(pollModule.localization(fPlayer).modern().createButtonName())
                 .build()

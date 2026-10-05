@@ -55,13 +55,14 @@ public class ChatProxyMessageListener implements PulseListener {
 
             Chat playerChat = new Chat(proxyChatName, chatType, chatModule.permission().types().get(proxyChatName));
 
-            messageDispatcher.dispatch(chatModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.Type.SERVER)
                     .filter(chatModule.permissionFilter(proxyChatName))
                     .destination(chatType != null ? chatType.destination() : Destination.EMPTY_CHAT)
                     .sound(playerChat.sound())
                     .messageContext(fResolver -> ChatMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(chatModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

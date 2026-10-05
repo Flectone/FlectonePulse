@@ -107,6 +107,7 @@ public class NamesModuleImpl implements NamesModule {
                 Component showEntityName = sender.showEntityName();
                 if (showEntityName == null) {
                     return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                            .module(this.name())
                             .sender(sender)
                             .receiver(fReceiver)
                             .message(StringUtils.replaceEach(
@@ -125,6 +126,7 @@ public class NamesModuleImpl implements NamesModule {
 
                 return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(sender)
                                 .receiver(fReceiver)
                                 .message(sender.type().equals(FEntity.UNKNOWN_TYPE)
@@ -169,6 +171,7 @@ public class NamesModuleImpl implements NamesModule {
                             if (StringUtils.isEmpty(constant)) return MessagePipeline.ReplacementTag.emptyTag();
 
                             return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fReceiver)
                                     .message(constant)
@@ -198,6 +201,7 @@ public class NamesModuleImpl implements NamesModule {
                             }
 
                             return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(sender)
                                     .receiver(fReceiver)
                                     .message(displayName)
@@ -233,6 +237,7 @@ public class NamesModuleImpl implements NamesModule {
                 (_, _) -> {
                     String formatInvisible = localization(receiver).invisible();
                     return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                            .module(this.name())
                             .sender(sender)
                             .receiver(receiver)
                             .message(formatInvisible)
@@ -271,6 +276,7 @@ public class NamesModuleImpl implements NamesModule {
         if (StringUtils.isEmpty(vaultTag)) return MessagePipeline.ReplacementTag.emptyTag();
 
         MessageContext tagContext = MessageContext.builder()
+                .module(this.name())
                 .sender(fPlayer)
                 .receiver(fReceiver)
                 .message(vaultTag)
@@ -302,6 +308,7 @@ public class NamesModuleImpl implements NamesModule {
             String setting = SettingText.CONSTANT.name() + "_" + index;
 
             String newConstant = messagePipeline.parse(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .message(constants.get(index))
                     .build()

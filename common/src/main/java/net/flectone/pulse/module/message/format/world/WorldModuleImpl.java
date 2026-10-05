@@ -75,6 +75,7 @@ public class WorldModuleImpl implements WorldModule {
             if (!worldPrefix.contains("%")) return Tag.preProcessParsed(worldPrefix);
 
             MessageContext worldContext = MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .receiver(messageContext.receiver())
                     .message(worldPrefix)

@@ -54,12 +54,13 @@ public class UnmuteProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(unmute.moderator());
             if (moduleController.isDisabledFor(unmuteModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(unmuteModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(unmuteModule.config().destination())
                     .range(Range.get(Range.Type.SERVER))
                     .sound(unmuteModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(unmuteModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

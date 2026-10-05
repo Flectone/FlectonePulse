@@ -3,6 +3,7 @@ package net.flectone.pulse.model.event.message.context;
 import lombok.Builder;
 import lombok.With;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.tag.LazyTagResolver;
@@ -28,6 +29,7 @@ import java.util.UUID;
 record MessageContextImpl(
         @NonNull Map<MessageFlag, Boolean> flags,
         @NonNull TagResolver tagResolver,
+        @NonNull ModuleName module,
         @NonNull FEntity sender,
         @NonNull FPlayer receiver,
         @NonNull UUID uuid,
@@ -125,9 +127,10 @@ record MessageContextImpl(
     }
 
     /**
-     * Fills in the defaults, an unknown sender, the sender as receiver, a fresh id and empty flags.
+     * Fills in the defaults, an unknown module, an unknown sender, the sender as receiver, a fresh id and empty flags.
      */
     public MessageContextImpl {
+        if (module == null) module = ModuleName.UNKNOWN;
         if (sender == null) sender = FPlayer.UNKNOWN;
         if (receiver == null) receiver = sender instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
         if (uuid == null) uuid = UUID.randomUUID();

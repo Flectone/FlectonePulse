@@ -169,6 +169,7 @@ public class MinecraftStatusModule extends StatusModuleImpl {
                 onlineFPlayers.forEach(player -> {
                     JsonObject playerObject = new JsonObject();
                     playerObject.addProperty("name", sample.name().equals("<players>") ? player.name() : messagePipeline.buildLegacy(MessageContext.builder()
+                            .module(this.name())
                             .sender(fPlayer)
                             .message(Strings.CS.replace(sample.name(), "<players>", player.name()))
                             .build()
@@ -183,6 +184,7 @@ public class MinecraftStatusModule extends StatusModuleImpl {
             JsonObject playerObject = new JsonObject();
 
             playerObject.addProperty("name", messagePipeline.buildLegacy(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .message(sample.name())
                     .build()

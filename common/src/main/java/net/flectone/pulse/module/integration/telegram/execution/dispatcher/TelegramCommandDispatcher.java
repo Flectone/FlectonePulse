@@ -87,6 +87,7 @@ public class TelegramCommandDispatcher {
     private String buildMessage(@NonNull FPlayer fPlayer,
                                 @NonNull String localization) {
         return messagePipeline.buildPlain(MessageContext.builder()
+                .module(telegramModule.name())
                 .sender(fPlayer)
                 .message(localization)
                 .flags(

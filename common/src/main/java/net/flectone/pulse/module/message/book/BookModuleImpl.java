@@ -53,6 +53,7 @@ public class BookModuleImpl implements BookModule {
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
         return Optional.of(messagePipeline.buildJson(MessageContext.builder()
+                .module(this.name())
                 .sender(fPlayer)
                 .message(string)
                 .flags(

@@ -52,12 +52,13 @@ public class KickProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(kick.moderator());
             if (moduleController.isDisabledFor(kickModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(kickModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(kickModule.config().destination())
                     .sound(kickModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(kickModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

@@ -39,12 +39,13 @@ public class BroadcastProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(broadcastModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(broadcastModule.config().destination())
                     .sound(broadcastModule.soundOrThrow())
                     .messageContext(fResolver -> StringMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(broadcastModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

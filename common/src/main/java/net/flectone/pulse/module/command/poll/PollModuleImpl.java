@@ -108,10 +108,11 @@ public class PollModuleImpl implements PollModule {
                 FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
                 Range range = config().range();
 
-                messageDispatcher.dispatch(this, EventMetadata.builder()
+                messageDispatcher.dispatch(EventMetadata.builder()
                         .range(range)
                         .messageContext(fResolver -> PollMessageContext.builder()
                                 .base(MessageContext.builder()
+                                        .module(this.name())
                                         .sender(fPlayer)
                                         .receiver(fResolver)
                                         .message(resolvePollFormat(fResolver, poll, status))
@@ -252,11 +253,12 @@ public class PollModuleImpl implements PollModule {
 
         saveAndUpdateLast(poll);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(config().range())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> PollMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(resolvePollFormat(fResolver, poll, Status.START))
@@ -301,8 +303,9 @@ public class PollModuleImpl implements PollModule {
 
         Poll poll = pollMap.get(id);
         if (poll == null) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPoll())
@@ -315,8 +318,9 @@ public class PollModuleImpl implements PollModule {
         }
 
         if (poll.isEnded()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).expired())
@@ -331,8 +335,9 @@ public class PollModuleImpl implements PollModule {
         int voteType = poll.vote(fPlayer, numberVote);
 
         if (voteType == -1) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).already())
@@ -347,9 +352,10 @@ public class PollModuleImpl implements PollModule {
         int count = poll.getCountAnswers()[numberVote];
         int pollID = poll.getId();
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> PollMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)

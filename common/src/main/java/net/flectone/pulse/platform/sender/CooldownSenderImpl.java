@@ -55,8 +55,9 @@ public class CooldownSenderImpl implements CooldownSender {
         long timeLeft = cooldownRepository.getTimeLeft(fPlayer.uuid(), cooldown, cooldownOwner);
         String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).cooldown());
 
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.ERROR)
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(cooldownMessage)

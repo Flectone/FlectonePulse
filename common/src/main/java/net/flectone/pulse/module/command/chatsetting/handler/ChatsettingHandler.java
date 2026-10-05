@@ -54,8 +54,9 @@ public class ChatsettingHandler {
                                MenuBuilder menuBuilder,
                                @Nullable String id) {
         if (!permissionChecker.check(fPlayer, chatsettingModule.permission().settings().get(SettingText.CHAT_NAME.name()))) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(chatsettingModule.localization(fResolver).noPermission())
@@ -81,6 +82,7 @@ public class ChatsettingHandler {
         };
 
         Component header = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fPlayer)
                 .receiver(fTarget)
                 .message(localization.menu().chat().inventory())
@@ -100,8 +102,9 @@ public class ChatsettingHandler {
                                  MenuBuilder menuBuilder,
                                  @Nullable String id) {
         if (!permissionChecker.check(fPlayer, chatsettingModule.permission().settings().get("FCOLOR_" + type.name()))) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(chatsettingModule.localization(fResolver).noPermission())
@@ -154,6 +157,7 @@ public class ChatsettingHandler {
         };
 
         Component header = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fPlayer)
                 .receiver(fTarget)
                 .message(subMenu.inventory())
@@ -167,8 +171,9 @@ public class ChatsettingHandler {
 
     public void handleSubMenu(FPlayer fPlayer, SubMenuItem item, Runnable successRunnable) {
         if (item.perm() != null && !permissionChecker.check(fPlayer, item.perm())) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(chatsettingModule.localization(fResolver).noPermission())
@@ -184,8 +189,9 @@ public class ChatsettingHandler {
 
     public Status handleCheckbox(FPlayer fPlayer, FPlayer fTarget, String messageType) {
         if (!permissionChecker.check(fPlayer, chatsettingModule.permission().settings().get(messageType))) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(chatsettingModule.localization(fResolver).noPermission())

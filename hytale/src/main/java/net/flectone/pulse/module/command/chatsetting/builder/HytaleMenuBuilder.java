@@ -70,6 +70,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
         Component header = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fPlayer)
                 .receiver(fTarget)
                 .message(localization.inventory().trim())
@@ -100,6 +101,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
         boolean enabled = socialService.isSetting(fTarget, messageType);
 
         Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fPlayer)
                 .receiver(fTarget)
                 .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled))
@@ -107,6 +109,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
         );
 
         Component componentLore = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fPlayer)
                 .receiver(fTarget)
                 .message(chatsettingModule.getCheckboxLore(fPlayer, enabled))
@@ -122,6 +125,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
             boolean currentEnabled = status.toBoolean();
 
             Component componentInvertTitle = messagePipeline.build(MessageContext.builder()
+                    .module(chatsettingModule.name())
                     .sender(fPlayer)
                     .receiver(fTarget)
                     .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled))
@@ -129,6 +133,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
             );
 
             Component componentInvertLore = messagePipeline.build(MessageContext.builder()
+                    .module(chatsettingModule.name())
                     .sender(fPlayer)
                     .receiver(fTarget)
                     .message(chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled))
@@ -161,12 +166,14 @@ public class HytaleMenuBuilder implements MenuBuilder {
         ).split("<br>");
 
         Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fTarget)
                 .message(messages.length > 0 ? messages[0] : "")
                 .build()
         );
 
         Component componentLore = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fTarget)
                 .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
                 .build()
@@ -191,12 +198,14 @@ public class HytaleMenuBuilder implements MenuBuilder {
         String[] messages = subMenu.item().split("<br>");
 
         Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fTarget)
                 .message(messages.length > 0 ? messages[0] : "")
                 .build()
         );
 
         Component componentLore = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fTarget)
                 .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
                 .build()
@@ -243,12 +252,14 @@ public class HytaleMenuBuilder implements MenuBuilder {
             String[] messages = message.split("<br>");
 
             Component componentTitle = messagePipeline.build(MessageContext.builder()
+                    .module(chatsettingModule.name())
                     .sender(fTarget)
                     .message(messages.length > 0 ? messages[0] : "")
                     .build()
             );
 
             Component componentLore = messagePipeline.build(MessageContext.builder()
+                    .module(chatsettingModule.name())
                     .sender(fTarget)
                     .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
                     .build()

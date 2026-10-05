@@ -21,6 +21,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -200,6 +201,7 @@ public class HytaleBubbleRender implements BubbleRender {
         Localization.Message.Bubble localization = fileFacade.localization(socialService.getSetting(viewer, SettingText.LOCALE)).message().bubble();
 
         MessageContext messageContext = MessageContext.builder()
+                .module(ModuleName.MESSAGE_BUBBLE)
                 .sender(bubble.getSender())
                 .receiver(viewer)
                 .message(bubble.getRawMessage())
@@ -213,6 +215,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
         return messagePipeline.buildPlain(StringMessageContext.builder()
                 .base(messageContext.toBuilder()
+                        .module(ModuleName.MESSAGE_BUBBLE)
                         .message(localization.format())
                         .flag(MessageFlag.PLAYER_MESSAGE, false)
                         .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(message)))

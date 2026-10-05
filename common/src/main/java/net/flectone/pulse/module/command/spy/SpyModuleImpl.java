@@ -70,11 +70,12 @@ public class SpyModuleImpl implements SpyModule {
 
         socialService.saveSetting(fPlayer, SettingText.SPY_STATUS, turnedBefore ? null : "1");
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> SpyMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(!turnedBefore ? localization(fResolver).formatTrue() : localization(fResolver).formatFalse())
@@ -210,12 +211,13 @@ public class SpyModuleImpl implements SpyModule {
     public void spy(@NonNull FPlayer fPlayer, @NonNull String action, @NonNull String message, @NonNull Set<FPlayer> receivers) {
         if (!moduleController.isEnable(this)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(config().range())
                 .filter(createFilter(fPlayer, receivers))
                 .destination(config().destination())
                 .messageContext(fResolver -> SpyMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).formatLog())

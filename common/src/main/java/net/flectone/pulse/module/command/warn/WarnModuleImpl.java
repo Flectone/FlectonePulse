@@ -99,8 +99,9 @@ public class WarnModuleImpl implements WarnModule {
                 : timeReasonPair.getLeft();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullTime())
@@ -114,8 +115,9 @@ public class WarnModuleImpl implements WarnModule {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -128,8 +130,9 @@ public class WarnModuleImpl implements WarnModule {
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).lowerWeightGroup())
@@ -156,6 +159,7 @@ public class WarnModuleImpl implements WarnModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, moderation))
@@ -175,7 +179,7 @@ public class WarnModuleImpl implements WarnModule {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
+        messageDispatcher.dispatch(baseMetadataBuilder.build());
 
         sendForTarget(moderation);
     }
@@ -206,9 +210,10 @@ public class WarnModuleImpl implements WarnModule {
         if (moduleController.isDisabledFor(this, fModerator)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(warn.player());
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).person(), fTarget, warn))

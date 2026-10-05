@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.listener.PulseListener;
@@ -187,6 +188,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                     if (fTarget.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
                     String json = messagePipeline.buildJson(MessageContext.builder()
+                            .module(ModuleName.INTEGRATION_MINIPLACEHOLDERS)
                             .sender(fTarget.get())
                             .receiver(fPlayer)
                             .message("<display_name>")
@@ -272,6 +274,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     String json = messagePipeline.buildJson(MessageContext.builder()
+                            .module(ModuleName.INTEGRATION_MINIPLACEHOLDERS)
                             .sender(fPlayerService.getFPlayer(player))
                             .message(queue.pop().value())
                             .build()

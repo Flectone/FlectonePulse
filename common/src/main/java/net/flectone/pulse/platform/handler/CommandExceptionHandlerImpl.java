@@ -61,8 +61,9 @@ public class CommandExceptionHandlerImpl implements CommandExceptionHandler {
             );
         };
 
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.ERROR)
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(message)
@@ -78,8 +79,9 @@ public class CommandExceptionHandlerImpl implements CommandExceptionHandler {
 
         String correctSyntax = context.exception().correctSyntax();
 
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.ERROR)
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(StringUtils.replaceEach(
@@ -101,8 +103,9 @@ public class CommandExceptionHandlerImpl implements CommandExceptionHandler {
     public void handleNoPermissionException(ExceptionContext<FPlayer, NoPermissionException> context) {
         FPlayer fPlayer = context.context().sender();
 
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.ERROR)
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().exception().permission())
@@ -119,8 +122,9 @@ public class CommandExceptionHandlerImpl implements CommandExceptionHandler {
 
         FPlayer fPlayer = context.context().sender();
 
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.ERROR)
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(Strings.CS.replace(

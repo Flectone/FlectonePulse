@@ -70,12 +70,13 @@ public class BallModuleImpl implements BallModule {
         int answer = randomUtil.nextInt(0, localization(FPlayer.UNKNOWN).answers().size());
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .range(config().range())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> BallMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replaceAnswer(fResolver, answer))

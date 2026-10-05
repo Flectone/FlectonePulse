@@ -105,8 +105,9 @@ public class MuteModuleImpl implements MuteModule {
                 ? durationReasonParser.parseTime(config().reasonTimes().getTime(timeReasonPair.getRight()))
                 : timeReasonPair.getLeft();
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullTime())
@@ -120,8 +121,9 @@ public class MuteModuleImpl implements MuteModule {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -133,8 +135,9 @@ public class MuteModuleImpl implements MuteModule {
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).lowerWeightGroup())
@@ -147,9 +150,10 @@ public class MuteModuleImpl implements MuteModule {
 
         if (config().checkDuplicate()) {
             Optional<Moderation> moderation = moderationService.getValid(fTarget, Moderation.Type.MUTE);
-            moderation.ifPresent(value -> messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            moderation.ifPresent(value -> messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(ModuleName.ERROR)
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(Strings.CS.replace(localization(fResolver).alreadyMuted(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " " + fTarget.name()))
@@ -179,6 +183,7 @@ public class MuteModuleImpl implements MuteModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, mute))
@@ -198,7 +203,7 @@ public class MuteModuleImpl implements MuteModule {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
+        messageDispatcher.dispatch(baseMetadataBuilder.build());
 
         sendForTarget(fPlayer, fTarget, mute);
     }
@@ -234,6 +239,7 @@ public class MuteModuleImpl implements MuteModule {
             if (!suffix.contains("%")) return Tag.preProcessParsed(suffix);
 
             return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .receiver(messageContext.receiver())
                     .message(suffix)
@@ -255,9 +261,10 @@ public class MuteModuleImpl implements MuteModule {
     public void sendForTarget(FEntity fModerator, FPlayer fReceiver, Moderation mute) {
         if (moduleController.isDisabledFor(this, fModerator)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fReceiver)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).person(), fReceiver, mute))

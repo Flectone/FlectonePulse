@@ -1,6 +1,7 @@
 package net.flectone.pulse.model.event;
 
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.value.Destination;
@@ -115,6 +116,16 @@ public interface EventMetadata {
         if (integrationMessageFormatSupplier == null) return null;
 
         return integrationMessageFormatSupplier.get();
+    }
+
+    /**
+     * Returns a copy with a different module.
+     *
+     * @param moduleName the new module
+     * @return the copy
+     */
+    default @NonNull EventMetadata withModule(ModuleName moduleName) {
+        return base().withModule(moduleName);
     }
 
     /**
@@ -282,4 +293,3 @@ public interface EventMetadata {
         }
     }
 }
-

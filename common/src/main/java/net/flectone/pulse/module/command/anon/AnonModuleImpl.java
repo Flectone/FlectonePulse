@@ -62,12 +62,13 @@ public class AnonModuleImpl implements AnonModule {
 
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .range(config().range())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> StringMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).format())

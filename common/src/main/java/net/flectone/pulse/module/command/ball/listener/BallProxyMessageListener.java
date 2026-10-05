@@ -40,12 +40,13 @@ public class BallProxyMessageListener implements PulseListener {
             int answer = proxyPayload.readInt();
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(ballModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(ballModule.config().destination())
                     .range(Range.get(Range.Type.SERVER))
                     .sound(ballModule.soundOrThrow())
                     .messageContext(fResolver -> BallMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(ballModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

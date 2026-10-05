@@ -37,12 +37,13 @@ public class CoinProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             int percent = proxyPayload.readInt();
 
-            messageDispatcher.dispatch(coinModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(coinModule.config().destination())
                     .sound(coinModule.soundOrThrow())
                     .messageContext(fResolver -> CoinMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(coinModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

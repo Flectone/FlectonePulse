@@ -81,8 +81,9 @@ public class ToponlineModuleImpl implements ToponlineModule {
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPage())
@@ -133,9 +134,10 @@ public class ToponlineModuleImpl implements ToponlineModule {
         String message = stringBuilder.toString();
         TagResolver finalTagResolvers = tagResolvers;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(message)
@@ -182,6 +184,7 @@ public class ToponlineModuleImpl implements ToponlineModule {
             if (fTarget.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
             return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fTarget.get())
                     .receiver(messageContext.receiver())
                     .message("<display_name>")

@@ -19,6 +19,7 @@ import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.PotionUtil;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
@@ -221,6 +222,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         Localization.Message.Bubble localization = fileFacade.localization(socialService.getSetting(viewer, SettingText.LOCALE)).message().bubble();
 
         MessageContext messageContext = MessageContext.builder()
+                .module(ModuleName.MESSAGE_BUBBLE)
                 .sender(bubble.getSender())
                 .receiver(viewer)
                 .message(bubble.getRawMessage())
@@ -232,6 +234,7 @@ public class MinecraftBubbleRender implements BubbleRender {
 
         return messagePipeline.build(StringMessageContext.builder()
                 .base(messageContext.toBuilder()
+                        .module(ModuleName.MESSAGE_BUBBLE)
                         .message(localization.format())
                         .flag(MessageFlag.PLAYER_MESSAGE, false)
                         .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(messagePipeline.build(messageContext))))

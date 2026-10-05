@@ -118,6 +118,7 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
 
             String objectiveName = getObjectiveName(fPlayer);
             Component title = messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .message(lines[0])
                     .build()
@@ -172,6 +173,7 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
             String lineId = getLineId(lineIndex, fPlayer);
 
             Component line = messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .message(lines[i])
                     .build()
@@ -199,6 +201,7 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
             int lineIndex = i - 1;
 
             String line = messagePipeline.buildLegacy(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .message(lines[i])
                     .build()

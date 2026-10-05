@@ -164,6 +164,7 @@ public class PaddingModuleImpl implements PaddingModule {
         String rightSymbols = symbol.repeat(paddingCount.getRight());
 
         return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message(start + leftSymbols + paddingText + rightSymbols + end)

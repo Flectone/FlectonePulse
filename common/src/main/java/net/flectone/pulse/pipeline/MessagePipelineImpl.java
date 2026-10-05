@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
@@ -72,6 +73,7 @@ public class MessagePipelineImpl implements MessagePipeline {
             Component deserialized = componentSerializer.fromLegacy(message);
 
             MessageContext messageContext = MessageContext.builder()
+                    .module(ModuleName.MESSAGE_FORMAT)
                     .sender(fPlayer)
                     .message(Strings.CS.replace(message, "§", "&"))
                     .flags(
@@ -166,6 +168,7 @@ public class MessagePipelineImpl implements MessagePipeline {
     @Override
     public Component messageComponent(FEntity sender, FPlayer receiver, String message) {
         return build(MessageContext.builder()
+                .module(ModuleName.MESSAGE_FORMAT)
                 .sender(sender)
                 .receiver(receiver)
                 .message(message)
@@ -185,6 +188,7 @@ public class MessagePipelineImpl implements MessagePipeline {
             }
 
             MessageContext messageContext = MessageContext.builder()
+                    .module(ModuleName.MESSAGE_FORMAT_NAMES)
                     .sender(target)
                     .receiver(receiver)
                     .message(Strings.CS.replace(formatTarget, "<index>", String.valueOf(targetIndex)))

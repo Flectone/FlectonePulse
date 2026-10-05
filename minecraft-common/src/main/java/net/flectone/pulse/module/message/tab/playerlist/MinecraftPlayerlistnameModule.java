@@ -172,7 +172,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                 return null;
             }
 
-            Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fSender, config().range());
+            Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fSender, config().range(), name());
 
             GameMode gameMode = GameMode.valueOf(platformPlayerAdapter.getGamemode(fSender));
 
@@ -343,6 +343,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
 
     private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver) {
         return messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(fPlayer)
                 .receiver(fReceiver)
                 .message(localization(fReceiver).format())

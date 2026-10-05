@@ -39,9 +39,10 @@ public class IgnoreSenderImpl implements IgnoreSender {
     }
 
     private void sendMessage(FPlayer fPlayer, FPlayer fTarget, String ignoreMessage) {
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .filter(fPlayer)
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.ERROR)
                         .sender(fTarget)
                         .receiver(fResolver)
                         .message(ignoreMessage)

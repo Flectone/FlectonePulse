@@ -99,8 +99,9 @@ public class StreamModuleImpl implements StreamModule {
         boolean isStream = localization(FPlayer.UNKNOWN).prefixTrue().equals(socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX));
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).already())
@@ -113,8 +114,9 @@ public class StreamModuleImpl implements StreamModule {
         }
 
         if (!isStream && !needStart) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).not())
@@ -141,12 +143,13 @@ public class StreamModuleImpl implements StreamModule {
                     .map(url -> StringUtils.substringBefore(url, "?"))
                     .collect(Collectors.joining(" "));
 
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(config().range())
                     .destination(config().destination())
                     .sound(soundOrThrow())
                     .messageContext(fResolver -> StreamMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(localization(fResolver).formatStart())
@@ -166,10 +169,11 @@ public class StreamModuleImpl implements StreamModule {
                     .build()
             );
         } else {
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .messageContext(fResolver -> StreamMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(localization(fResolver).formatEnd())
@@ -226,6 +230,7 @@ public class StreamModuleImpl implements StreamModule {
             if (!streamPrefix.contains("%")) return Tag.preProcessParsed(streamPrefix);
 
             return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .receiver(messageContext.receiver())
                     .message(streamPrefix)
@@ -242,6 +247,7 @@ public class StreamModuleImpl implements StreamModule {
             String template = localization(receiver).urlTemplate();
 
             return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(sender)
                     .receiver(receiver)
                     .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)

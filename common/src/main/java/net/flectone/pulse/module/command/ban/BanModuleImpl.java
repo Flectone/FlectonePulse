@@ -104,8 +104,9 @@ public class BanModuleImpl implements BanModule {
                 : timeReasonPair.getLeft();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullTime())
@@ -146,8 +147,9 @@ public class BanModuleImpl implements BanModule {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -160,8 +162,9 @@ public class BanModuleImpl implements BanModule {
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).lowerWeightGroup())
@@ -174,9 +177,10 @@ public class BanModuleImpl implements BanModule {
 
         if (config().checkDuplicate()) {
             Optional<Moderation> moderation = moderationService.getValid(fTarget, Moderation.Type.BAN);
-            moderation.ifPresent(value -> messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            moderation.ifPresent(value -> messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(ModuleName.ERROR)
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(Strings.CS.replace(localization(fResolver).alreadyBanned(), "<command>", "/" + commandModuleController.getCommandName(unbanModule) + " " + fTarget.name()))
@@ -205,6 +209,7 @@ public class BanModuleImpl implements BanModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, moderation))
@@ -226,7 +231,7 @@ public class BanModuleImpl implements BanModule {
             eventMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, eventMetadataBuilder.build());
+        messageDispatcher.dispatch(eventMetadataBuilder.build());
 
         kick(moderation);
     }
@@ -244,6 +249,7 @@ public class BanModuleImpl implements BanModule {
 
         platformPlayerAdapter.kick(fTarget, messagePipeline.build(ModerationMessageContext.builder()
                 .base(MessageContext.builder()
+                        .module(this.name())
                         .sender(fModerator)
                         .receiver(fTarget)
                         .message(formatPlayer)

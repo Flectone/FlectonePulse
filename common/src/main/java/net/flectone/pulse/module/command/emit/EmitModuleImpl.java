@@ -90,12 +90,13 @@ public class EmitModuleImpl implements EmitModule {
                 ? Range.get(Range.Type.PROXY)
                 : Range.fromString(targetName).orElse(null);
         if (range != null) {
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(range)
                     .destination(destination)
                     .sound(soundOrThrow())
                     .messageContext(fResolver -> StringMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
@@ -120,8 +121,9 @@ public class EmitModuleImpl implements EmitModule {
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (!fTarget.isOnline()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -142,12 +144,13 @@ public class EmitModuleImpl implements EmitModule {
             return;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .filter(fTarget)
                 .destination(destination)
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> StringMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).format())

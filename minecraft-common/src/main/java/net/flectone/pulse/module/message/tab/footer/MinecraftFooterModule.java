@@ -113,9 +113,10 @@ public class MinecraftFooterModule implements ModuleListLocalization {
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.MESSAGE_TAB_FOOTER)
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(format)

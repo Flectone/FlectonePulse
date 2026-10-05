@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -130,6 +131,7 @@ public class HytaleScoreboardModule extends ScoreboardModuleImpl {
         Component prefix = Component.empty();
         if (!localization(FPlayer.UNKNOWN).prefix().isEmpty()) {
             prefix = messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .message(localization(FPlayer.UNKNOWN).prefix())
                     .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
@@ -140,6 +142,7 @@ public class HytaleScoreboardModule extends ScoreboardModuleImpl {
         Component suffix = Component.empty();
         if (!localization(FPlayer.UNKNOWN).suffix().isEmpty()) {
             suffix = messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .message(localization(FPlayer.UNKNOWN).suffix())
                     .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)

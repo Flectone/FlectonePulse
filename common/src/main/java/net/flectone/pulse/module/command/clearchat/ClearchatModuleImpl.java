@@ -94,15 +94,16 @@ public class ClearchatModuleImpl implements ClearchatModule {
                     : Range.fromString(player).orElse(null);
             if (range != null) {
                 fPlayerService.getOnlineFPlayers().stream()
-                        .filter(rangeFilter.createFilter(fPlayer, range))
+                        .filter(rangeFilter.createFilter(fPlayer, range, name()))
                         .forEach(this::clearChat);
                 return;
             }
 
             fTarget = fPlayerService.getFPlayer(player);
             if (fTarget.isUnknown()) {
-                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                messageDispatcher.dispatch(EventMetadata.builder()
                         .messageContext(fResolver -> MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).nullPlayer())
@@ -151,8 +152,9 @@ public class ClearchatModuleImpl implements ClearchatModule {
             return;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message("<br> ".repeat(config().length()))
@@ -161,10 +163,11 @@ public class ClearchatModuleImpl implements ClearchatModule {
                 .build()
         );
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(localization(fResolver).format())

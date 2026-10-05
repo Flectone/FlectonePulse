@@ -97,8 +97,9 @@ public class SpriteModuleImpl implements SpriteModule {
 
         String atlas = commandModuleController.getArgument(this, commandContext, 0);
         if (!config().categories().contains(atlas)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullAtlas())
@@ -115,8 +116,9 @@ public class SpriteModuleImpl implements SpriteModule {
             return;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(Strings.CS.replace(localization(fResolver).atlasDownloading(), "<atlas>", atlas))
@@ -128,8 +130,9 @@ public class SpriteModuleImpl implements SpriteModule {
         taskScheduler.runAsync(name(), () -> {
             int responseCode = downloadAtlasFile(atlas);
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                messageDispatcher.dispatch(EventMetadata.builder()
                         .messageContext(fResolver -> MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(responseCode != HttpURLConnection.HTTP_NOT_FOUND ? localization(fResolver).downloadError() : localization(fResolver).nullAtlas())
@@ -168,8 +171,9 @@ public class SpriteModuleImpl implements SpriteModule {
     private void sendSprites(FPlayer fPlayer, String atlas, CommandContext<FPlayer> commandContext) {
         List<String> sprites = atlasSpritesMap.get(atlas);
         if (sprites == null || sprites.isEmpty()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullAtlas())
@@ -191,8 +195,9 @@ public class SpriteModuleImpl implements SpriteModule {
 
         int countPage = (int) Math.ceil((double) size / perPage);
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPage())
@@ -249,9 +254,10 @@ public class SpriteModuleImpl implements SpriteModule {
 
         String message = stringBuilder.toString();
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(message)

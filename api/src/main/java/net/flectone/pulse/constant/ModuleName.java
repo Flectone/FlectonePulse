@@ -146,6 +146,7 @@ public enum ModuleName {
     MESSAGE_UPDATE,
     MESSAGE_VANILLA,
 
+    UNKNOWN,
     ERROR,
 
     SERVER_ENABLE,

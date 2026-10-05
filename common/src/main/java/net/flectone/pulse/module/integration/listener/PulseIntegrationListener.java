@@ -30,6 +30,7 @@ public class PulseIntegrationListener implements PulseListener {
 
         eventDispatcher.dispatch(new MessagePrepareEvent(ModuleName.SERVER_ENABLE, EventMetadata.builder()
                 .messageContext(_ -> MessageContext.builder()
+                        .module(ModuleName.SERVER_ENABLE)
                         .sender(FPlayer.UNKNOWN)
                         .message(ModuleName.SERVER_ENABLE.name())
                         .build()
@@ -43,6 +44,7 @@ public class PulseIntegrationListener implements PulseListener {
     public void onDisableEvent(DisableEvent event) {
         eventDispatcher.dispatch(new MessagePrepareEvent(ModuleName.SERVER_DISABLE, EventMetadata.builder()
                 .messageContext(_ -> MessageContext.builder()
+                        .module(ModuleName.SERVER_DISABLE)
                         .sender(FPlayer.UNKNOWN)
                         .message(ModuleName.SERVER_DISABLE.name())
                         .build()

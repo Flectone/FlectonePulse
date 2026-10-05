@@ -37,12 +37,13 @@ public class StreamProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(streamModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(streamModule.config().destination())
                     .sound(streamModule.soundOrThrow())
                     .messageContext(fResolver -> StreamMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(streamModule.name())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(streamModule.localization(fResolver).formatStart())

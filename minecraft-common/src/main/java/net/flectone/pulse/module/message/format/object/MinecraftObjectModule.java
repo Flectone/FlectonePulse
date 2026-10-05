@@ -363,6 +363,7 @@ public class MinecraftObjectModule extends ObjectModuleImpl {
 
     private Component buildArgument(MessageContext messageContext, String argument) {
         return messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message(argument)

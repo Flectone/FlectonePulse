@@ -43,11 +43,12 @@ public class PulseMailListener implements PulseListener {
         for (Mail mail : mails) {
             FPlayer fPlayer = fPlayerService.getFPlayer(mail.sender());
 
-            messageDispatcher.dispatch(mailModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .filter(fReceiver)
                     .destination(mailModule.config().destination())
                     .messageContext(fResolver -> MailMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(mailModule.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(mailModule.localization(fResolver).receiver())

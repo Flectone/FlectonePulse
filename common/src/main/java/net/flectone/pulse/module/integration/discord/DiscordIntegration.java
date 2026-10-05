@@ -116,6 +116,7 @@ public class DiscordIntegration implements FIntegration {
                 Snowflake snowflake = Snowflake.of(id);
                 discordClient.gateway().getChannelById(snowflake)
                         .flatMap(channel -> channel.getRestChannel().modify(ChannelModifyRequest.builder().name(messagePipeline.buildPlain(MessageContext.builder()
+                                .module(discordModule.name())
                                 .sender(discordClient.sender())
                                 .message(entry.getValue())
                                 .build()

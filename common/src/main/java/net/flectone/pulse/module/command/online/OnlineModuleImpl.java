@@ -90,8 +90,9 @@ public class OnlineModuleImpl implements OnlineModule {
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         PlayTime playTime = playtimeService.getPlayTime(targetFPlayer);
         if (playTime == null) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fPlayer).nullPlayer())
@@ -103,7 +104,7 @@ public class OnlineModuleImpl implements OnlineModule {
             return;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> {
@@ -111,6 +112,7 @@ public class OnlineModuleImpl implements OnlineModule {
 
                     return OnlineMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(switch (type.toUpperCase()) {

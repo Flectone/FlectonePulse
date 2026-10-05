@@ -152,8 +152,9 @@ public class MaintenanceModuleImpl implements MaintenanceModule {
                 .orElseGet(() -> !isAlreadyTurned);
 
         if (turned && isAlreadyTurned || !turned && !isAlreadyTurned) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(turned ? localization(fResolver).alreadyTrue() : localization(fResolver).alreadyFalse())
@@ -241,6 +242,7 @@ public class MaintenanceModuleImpl implements MaintenanceModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MaintenanceMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(moderationMessageFormatter.replacePlaceholders(turned ? localization(fResolver).formatTrue() : localization(fResolver).formatFalse(), fResolver, moderation))
@@ -264,7 +266,7 @@ public class MaintenanceModuleImpl implements MaintenanceModule {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
+        messageDispatcher.dispatch(baseMetadataBuilder.build());
 
         if (moderation.type() == Moderation.Type.MAINTENANCE) {
             kickOnlinePlayers(moderation);
@@ -286,6 +288,7 @@ public class MaintenanceModuleImpl implements MaintenanceModule {
 
                     platformPlayerAdapter.kick(fReceiver, messagePipeline.build(ModerationMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fModerator)
                                     .receiver(fReceiver)
                                     .message(formatPlayer)

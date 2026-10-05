@@ -100,6 +100,7 @@ public class AnimationModuleImpl implements AnimationModule {
                 if (Boolean.TRUE.equals(animationConfig.raw())) return Tag.preProcessParsed(text);
 
                 return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                        .module(this.name())
                         .sender(finalMessageContext.sender())
                         .receiver(finalMessageContext.receiver())
                         .message(text)

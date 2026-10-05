@@ -115,6 +115,7 @@ public class AfkModuleImpl implements AfkModule {
             if (!afkSuffix.contains("%")) return Tag.preProcessParsed(afkSuffix);
 
             return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .receiver(messageContext.receiver())
                     .message(afkSuffix)
@@ -264,11 +265,12 @@ public class AfkModuleImpl implements AfkModule {
 
         Range range = config().range();
         if (range.is(Range.Type.PLAYER)) {
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .sound(soundOrThrow())
                     .messageContext(fResolver -> AFKMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(localizationFormat(fPlayer, fResolver, isAfk))
@@ -284,13 +286,14 @@ public class AfkModuleImpl implements AfkModule {
         }
 
         boolean vanished = socialService.isVanished(fPlayer);
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(range)
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .filter(fReceiver -> socialService.canSeeVanished(fPlayer, fReceiver))
                 .messageContext(fResolver -> AFKMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localizationFormat(fPlayer, fResolver, isAfk))

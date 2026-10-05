@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -62,6 +63,7 @@ public class BubbleService {
         List<Bubble> bubbles = splitMessageToBubbles(
                 sender,
                 messagePipeline.buildPlain(MessageContext.builder()
+                        .module(ModuleName.MESSAGE_BUBBLE)
                         .sender(sender)
                         .message(message)
                         .flags(

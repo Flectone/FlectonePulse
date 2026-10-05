@@ -99,6 +99,7 @@ public class MinecraftPlayersModule implements ModuleLocalization {
         }
 
         online = messagePipeline.buildPlain(MessageContext.builder()
+                .module(this.name())
                 .sender(fPlayer)
                 .message(config().online())
                 .build()

@@ -175,10 +175,11 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
 
             String formattedTime = timeFormatter.format(fPlayer, Duration.between(start, end).toMillis());
 
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .sound(soundOrThrow())
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(this.name())
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(Strings.CS.replace(localization(fResolver).formatTrue(), "<time>", formattedTime))
@@ -190,10 +191,11 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
         } catch (Exception e) {
             fLogger.warning(e.getMessage());
 
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .messageContext(fResolver -> ComponentMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(localization(fResolver).formatFalse())
@@ -256,10 +258,11 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
             String pasteKey = jsonResponse.get("key").getAsString();
             String pasteUrl = PASTES_DEV_URL + pasteKey;
 
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .sound(soundOrThrow())
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(this.name())
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(Strings.CS.replace(localization(fResolver).formatDump(), "<url>", pasteUrl))
@@ -268,8 +271,9 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
                     .build()
             );
         } else {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(Strings.CS.replace(localization(fResolver).dumpError(), "<error>", response.body()))
@@ -286,8 +290,9 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
 
     private boolean commandEditor(FPlayer fPlayer, Operation operation) {
         if (config().editor().host().isEmpty()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullHostEditor())
@@ -318,10 +323,11 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
             return false;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(Strings.CS.replace(localization(fResolver).formatEditor(), "<url>", url))
@@ -334,8 +340,9 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     }
 
     private void sendNullPortMessage(FPlayer fPlayer, int port) {
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.ERROR)
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(Strings.CS.replace(localization(fResolver).nullPortEditor(), "<port>", String.valueOf(port)))
@@ -360,8 +367,9 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
 
         Path zipFile = projectPath.resolve(getFilenameExported(commandContext));
         if (zipFile.toFile().exists()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(Strings.CS.replace(localization(fResolver).fileExist(), "<file>", zipFile.getFileName().toString()))
@@ -414,10 +422,11 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
                         }
                     });
 
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .sound(soundOrThrow())
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(this.name())
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(Strings.CS.replace(localization(fResolver).formatExport(), "<file>", zipFile.getFileName().toString()))
@@ -438,8 +447,9 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
         Path zipFile = projectPath.resolve(getFilenameExported(commandContext));
 
         if (!Files.exists(zipFile)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(Strings.CS.replace(localization(fResolver).nullFile(), "<file>", zipFile.getFileName().toString()))
@@ -477,10 +487,11 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
                         }
                     });
 
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .sound(soundOrThrow())
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(this.name())
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(Strings.CS.replace(localization(fResolver).formatImport(), "<file>", zipFile.getFileName().toString()))
@@ -546,8 +557,9 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     }
 
     private void sendMessageFile(FPlayer fPlayer, String message, Path file) {
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(ModuleName.ERROR)
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(Strings.CS.replace(message, "<file>", file.getFileName().toString()))
@@ -558,10 +570,11 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     }
 
     private void sendMessageDatabase(FPlayer fPlayer, String message, Path file) {
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(Strings.CS.replace(message, "<file>", file.getFileName().toString()))
@@ -582,9 +595,10 @@ public class FlectonepulseModuleImpl implements FlectonepulseModule {
     }
 
     private void sendMessageStarting(FPlayer fPlayer, Operation operation) {
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(Strings.CS.replace(localization(fPlayer).formatStarting(), "<type>", operation.name().toLowerCase()))

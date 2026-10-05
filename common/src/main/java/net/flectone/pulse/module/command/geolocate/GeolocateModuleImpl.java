@@ -99,8 +99,9 @@ public class GeolocateModuleImpl implements GeolocateModule {
         IpResponse response = getGeolocation(ip);
         if (response == null || !response.isSuccess()) {
             if (fTarget.isUnknown()) {
-                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                messageDispatcher.dispatch(EventMetadata.builder()
                         .messageContext(fResolver -> MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).nullPlayer())
@@ -111,8 +112,9 @@ public class GeolocateModuleImpl implements GeolocateModule {
                 return;
             }
 
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullOrError())
@@ -125,11 +127,12 @@ public class GeolocateModuleImpl implements GeolocateModule {
 
         long userCurrentTime = getUserCurrentTime(response);
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> GeolocateMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(localization(fResolver).format(),

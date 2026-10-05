@@ -15,6 +15,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.NeoForgeFlectonePulse;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.converter.AdventureHoverConverter;
 import net.flectone.pulse.converter.IconConverter;
@@ -282,6 +283,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
         if (customName == null) return Component.empty();
 
         String clearedDisplayName = messagePipeline.get().buildPlain(MessageContext.builder()
+                .module(ModuleName.MESSAGE_FORMAT_REPLACEMENT)
                 .message(customName.getString())
                 .build()
         );
@@ -322,6 +324,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
                 : Arrays.stream(lore)
                 .map(message -> messagePipeline.get()
                         .build(MessageContext.builder()
+                                .module(ModuleName.MESSAGE_FORMAT_REPLACEMENT)
                                 .sender(fPlayer)
                                 .message(message)
                                 .build()
@@ -341,6 +344,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
         if (title.isEmpty()) return Component.empty();
 
         return messagePipeline.get().build(MessageContext.builder()
+                .module(ModuleName.MESSAGE_FORMAT_REPLACEMENT)
                 .sender(fPlayer)
                 .message(title)
                 .build()

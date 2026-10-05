@@ -54,12 +54,13 @@ public class UnbanProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(unban.moderator());
             if (moduleController.isDisabledFor(unbanModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(unbanModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(unbanModule.config().destination())
                     .range(Range.get(Range.Type.SERVER))
                     .sound(unbanModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(unbanModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

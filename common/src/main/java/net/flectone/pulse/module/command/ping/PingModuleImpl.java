@@ -60,8 +60,9 @@ public class PingModuleImpl implements PingModule {
         FPlayer fTarget = optionalTarget.isPresent() ? fPlayerService.getFPlayer(optionalTarget.get()) : fPlayer;
         if (!platformPlayerAdapter.isOnline(fTarget)
                 || (!socialService.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(this.name())
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -73,11 +74,12 @@ public class PingModuleImpl implements PingModule {
             return;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .filter(fPlayer)
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fTarget)
                         .receiver(fResolver)
                         .message(localization(fResolver).format())

@@ -83,12 +83,13 @@ public class DiceModuleImpl implements DiceModule {
                 .mapToObj(_ -> randomUtil.nextInt(min, max + 1))
                 .toList();
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> DiceMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replaceResult(fResolver, cubes))

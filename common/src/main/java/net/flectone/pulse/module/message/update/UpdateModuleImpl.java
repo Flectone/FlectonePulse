@@ -84,11 +84,12 @@ public class UpdateModuleImpl implements UpdateModule {
             String currentVersion = fileFacade.config().version();
             if (!versionComparator.isOlderThan(currentVersion, latestVersion)) return;
 
-            messageDispatcher.dispatch(this, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .destination(config().destination())
                     .sound(soundOrThrow())
                     .messageContext(fResolver -> UpdateMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(StringUtils.replaceEach(

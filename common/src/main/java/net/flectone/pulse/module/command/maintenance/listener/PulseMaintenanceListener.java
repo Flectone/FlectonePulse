@@ -45,6 +45,7 @@ public class PulseMaintenanceListener implements PulseListener {
                 .withAllowed(false)
                 .withKickReason(messagePipeline.build(ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(maintenanceModule.name())
                                 .sender(fModerator)
                                 .receiver(fPlayer)
                                 .message(moderationMessageFormatter.replacePlaceholders(maintenanceModule.localization(fPlayer).person(), fPlayer, maintenance))

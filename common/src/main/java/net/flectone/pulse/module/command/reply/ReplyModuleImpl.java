@@ -54,8 +54,9 @@ public class ReplyModuleImpl implements ReplyModule {
 
         String receiverName = tellModule.getReceiverFor(fPlayer);
         if (receiverName == null) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullReceiver())

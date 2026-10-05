@@ -3,7 +3,6 @@ package net.flectone.pulse.dispatcher;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
@@ -11,7 +10,6 @@ import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.value.Destination;
-import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.pipeline.MessagePipelineImpl;
 import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -37,20 +35,10 @@ public class MessageDispatcherImpl implements MessageDispatcher {
     private final TaskScheduler taskScheduler;
 
     @Override
-    public Set<FPlayer> dispatch(@NonNull ModuleLocalization module, @NonNull EventMetadata eventMetadata) {
-        return dispatch(module.name(), eventMetadata);
-    }
-
-    @Override
-    public Set<FPlayer> dispatch(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata) {
-        return dispatch(moduleName, eventMetadata, createReceivers(moduleName, eventMetadata));
-    }
-
-    @Override
-    public Set<FPlayer> dispatch(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata, @NonNull Set<FPlayer> receivers) {
+    public Set<FPlayer> dispatch(@NonNull EventMetadata eventMetadata, @NonNull Set<FPlayer> receivers) {
         if (!receivers.isEmpty()) {
             taskScheduler.runAsync(() -> receivers.forEach(fReceiver ->
-                    dispatch(createMessageEvent(fReceiver, moduleName, eventMetadata)))
+                    dispatch(createMessageEvent(fReceiver, eventMetadata)))
             );
         }
 
@@ -63,18 +51,18 @@ public class MessageDispatcherImpl implements MessageDispatcher {
     }
 
     @Override
-    public Set<FPlayer> createReceivers(ModuleName moduleName, EventMetadata eventMetadata) {
+    public Set<FPlayer> createReceivers(EventMetadata eventMetadata) {
         MessageContext rawMessageContext = eventMetadata.resolveMessageContext(FPlayer.UNKNOWN);
         IntegrationMessageFormat integrationMessageFormat = eventMetadata.resolveIntegrationMessageFormat();
 
-        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(moduleName, eventMetadata, rawMessageContext, integrationMessageFormat));
+        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(rawMessageContext.module(), eventMetadata, rawMessageContext, integrationMessageFormat));
 
         // if cancelled, it means that message was sent to Proxy
         if (eventMetadata.proxy() != null && messagePrepareEvent.cancelled()) return Set.of();
 
         Set<FPlayer> receivers = fPlayerService.getFPlayersWithConsole().stream()
                 .filter(rangeFilter.createFilter(eventMetadata, rawMessageContext))
-                .filter(fReceiver -> socialService.isSetting(fReceiver, moduleName))
+                .filter(fReceiver -> socialService.isSetting(fReceiver, rawMessageContext.module()))
                 .collect(Collectors.toSet());
 
         if (messagePrepareEvent.receivers().isEmpty()) return receivers;
@@ -86,7 +74,7 @@ public class MessageDispatcherImpl implements MessageDispatcher {
     }
 
     @Override
-    public MessageSendEvent createMessageEvent(FPlayer fReceiver, ModuleName moduleName, EventMetadata eventMetadata) {
+    public MessageSendEvent createMessageEvent(FPlayer fReceiver, EventMetadata eventMetadata) {
         MessageContext messageContext = eventMetadata.resolveMessageContext(fReceiver);
 
         Component messageComponent = messagePipeline.build(messageContext);
@@ -99,7 +87,7 @@ public class MessageDispatcherImpl implements MessageDispatcher {
                 : messagePipeline.build(messageContext.withMessage(destination.subtext()));
 
         return new MessageSendEvent(
-                moduleName,
+                messageContext.module(),
                 messageComponent,
                 messageSubComponent,
                 eventMetadata,

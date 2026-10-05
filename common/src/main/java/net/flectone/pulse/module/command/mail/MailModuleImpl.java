@@ -73,8 +73,9 @@ public class MailModuleImpl implements MailModule {
         String playerName = commandModuleController.getArgument(this, commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown()) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).nullPlayer())
@@ -88,8 +89,9 @@ public class MailModuleImpl implements MailModule {
 
         if (fReceiver.isOnline() && socialService.canSeeVanished(fReceiver, fPlayer)) {
             if (!moduleController.isEnable(tellModule)) {
-                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                messageDispatcher.dispatch(EventMetadata.builder()
                         .messageContext(fResolver -> MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).onlinePlayer())
@@ -115,11 +117,12 @@ public class MailModuleImpl implements MailModule {
 
         int mailId = mail.get().id();
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MailMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(Strings.CS.replaceOnce(localization(fResolver).sender(), "<id>", String.valueOf(mailId)))

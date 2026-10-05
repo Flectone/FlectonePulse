@@ -162,6 +162,7 @@ public class MentionModuleImpl implements MentionModule {
 
     private Tag mentionTag(MessageContext messageContext, String mention) {
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
                 .message(StringUtils.replaceEach(localization(messageContext.receiver()).format(),
@@ -220,10 +221,11 @@ public class MentionModuleImpl implements MentionModule {
     public void sendMention(FPlayer fPlayer) {
         if (permissionChecker.check(fPlayer, permission().bypass())) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
+                        .module(this.name())
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(localization(fResolver).person())

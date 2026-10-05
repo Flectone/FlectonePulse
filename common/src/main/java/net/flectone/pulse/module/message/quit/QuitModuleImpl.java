@@ -116,6 +116,7 @@ public class QuitModuleImpl implements QuitModule {
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> VanishMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).format())
@@ -134,7 +135,7 @@ public class QuitModuleImpl implements QuitModule {
             eventMetadataBuilder.integration();
         }
 
-        messageDispatcher.dispatch(this, eventMetadataBuilder.build());
+        messageDispatcher.dispatch(eventMetadataBuilder.build());
     }
 
 }

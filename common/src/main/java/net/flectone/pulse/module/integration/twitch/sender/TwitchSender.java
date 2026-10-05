@@ -42,12 +42,13 @@ public class TwitchSender {
         TwitchClient twitchClient = twitchClientProvider.get();
         if (twitchClient == null) return;
 
-        messageDispatcher.dispatch(twitchModule, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .range(Range.get(Range.Type.PROXY))
                 .destination(twitchModule.config().destination())
                 .sound(twitchModule.soundOrThrow())
                 .messageContext(fResolver -> TwitchMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(twitchModule.name())
                                 .sender(twitchClient.sender())
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(
@@ -59,10 +60,12 @@ public class TwitchSender {
                                     if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
                                     return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                            .module(twitchModule.name())
                                             .message(twitchModule.localization(fResolver).formatReply())
                                             .tagResolvers(
                                                     messagePipeline.resolver("reply_user", Tag.inserting(Component.text(StringUtils.defaultString(reply.getLeft())))),
                                                     messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                                            .module(twitchModule.name())
                                                             .sender(twitchClient.sender())
                                                             .receiver(fResolver)
                                                             .message(reply.getRight())

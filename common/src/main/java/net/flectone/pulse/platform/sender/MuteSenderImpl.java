@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.checker.MuteChecker;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -33,7 +32,7 @@ public class MuteSenderImpl implements MuteSender {
         Optional<MessageContext> muteContext = moderationMessageFormatter.createMuteContext(fPlayer, status);
         if (muteContext.isEmpty()) return false;
 
-        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .messageContext(_ -> muteContext.get())
                 .build()
         );

@@ -86,8 +86,9 @@ public class MinesweeperModuleImpl implements MinesweeperModule {
 
         Minesweeper minesweeper = playerGames.get(fPlayer.uuid());
         if (minesweeper == null || minesweeper.getState() != Minesweeper.GameState.IN_PROGRESS) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).wrongGame())
@@ -114,8 +115,9 @@ public class MinesweeperModuleImpl implements MinesweeperModule {
         int column = optionalColumn == -1 ? config().maxColumn() : optionalColumn;
 
         if (!minesweeper.checkBounds(row, column)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).wrongMove())
@@ -140,8 +142,9 @@ public class MinesweeperModuleImpl implements MinesweeperModule {
 
     private void create(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (config().checkDuplicate() && playerGames.containsKey(fPlayer.uuid())) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).alreadyInGame())
@@ -164,8 +167,9 @@ public class MinesweeperModuleImpl implements MinesweeperModule {
                 || columnCount <= 0
                 || mineCount < 0
                 || mineCount > rowCount * columnCount - Math.min(9, rowCount * columnCount)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
+                            .module(ModuleName.ERROR)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(localization(fResolver).wrongParameters())
@@ -220,7 +224,7 @@ public class MinesweeperModuleImpl implements MinesweeperModule {
                              int row,
                              int column,
                              Function<Localization.Command.Minesweeper, String> localizationFunction) {
-        messageDispatcher.dispatch(this, EventMetadata.builder()
+        messageDispatcher.dispatch(EventMetadata.builder()
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> {
                     Localization.Command.Minesweeper localization = localization(fResolver);
@@ -239,6 +243,7 @@ public class MinesweeperModuleImpl implements MinesweeperModule {
 
                     return MinesweeperMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(this.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(StringUtils.replaceEach(

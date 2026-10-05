@@ -41,12 +41,13 @@ public class DiceProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             List<Integer> cubes = gson.fromJson(proxyPayload.readString(), new TypeToken<List<Integer>>() {}.getType());
 
-            messageDispatcher.dispatch(diceModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(diceModule.config().destination())
                     .sound(diceModule.soundOrThrow())
                     .messageContext(fResolver -> DiceMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(diceModule.name())
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)

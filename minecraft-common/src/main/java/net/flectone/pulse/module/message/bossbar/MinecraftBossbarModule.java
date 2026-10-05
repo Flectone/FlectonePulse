@@ -92,6 +92,7 @@ public class MinecraftBossbarModule extends BossbarModuleImpl {
 
             Component title = messagePipeline.build(ComponentMessageContext.builder()
                     .base(MessageContext.builder()
+                            .module(this.name())
                             .sender(fPlayer)
                             .message(message)
                             .tagResolver(raidersTag(fPlayer, raiders))
@@ -109,10 +110,11 @@ public class MinecraftBossbarModule extends BossbarModuleImpl {
 
             Message.Bossbar.Announce messageAnnounce = config().announce().get(translationKey);
             if (announce && messageAnnounce != null) {
-                messageDispatcher.dispatch(this, EventMetadata.builder()
+                messageDispatcher.dispatch(EventMetadata.builder()
                         .destination(messageAnnounce.destination())
                         .sound(Pair.of(messageAnnounce.sound(), permission().types().get(translationKey)))
                         .messageContext(fResolver -> MessageContext.builder()
+                                .module(this.name())
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(Strings.CS.replace(
@@ -137,6 +139,7 @@ public class MinecraftBossbarModule extends BossbarModuleImpl {
             if (StringUtils.isEmpty(raidersRemaining)) return MessagePipeline.ReplacementTag.emptyTag();
 
             return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(fPlayer)
                     .message(Strings.CS.replace(raidersRemaining, RAIDERS_PLACEHOLDER, raiders))
                     .build()

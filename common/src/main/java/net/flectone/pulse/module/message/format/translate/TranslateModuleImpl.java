@@ -110,6 +110,7 @@ public class TranslateModuleImpl implements TranslateModule {
             action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.string()).toString());
 
             return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .module(this.name())
                     .sender(sender)
                     .receiver(receiver)
                     .message(action)

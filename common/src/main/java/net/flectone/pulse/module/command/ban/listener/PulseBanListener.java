@@ -53,11 +53,12 @@ public class PulseBanListener implements PulseListener {
 
         // show player connection for moderators
         if (banModule.config().showConnectionAttempts()) {
-            messageDispatcher.dispatch(banModule, EventMetadata.builder()
+            messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .filter(filter -> permissionChecker.check(filter, banModule.permission()))
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
+                                    .module(banModule.name())
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(moderationMessageFormatter.replacePlaceholders(banModule.localization(fResolver).connectionAttempt(), fResolver, ban))
@@ -76,6 +77,7 @@ public class PulseBanListener implements PulseListener {
                 .withAllowed(false)
                 .withKickReason(messagePipeline.build(ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(banModule.name())
                                 .sender(fModerator)
                                 .receiver(fPlayer)
                                 .message(moderationMessageFormatter.replacePlaceholders(banModule.localization(fPlayer).person(), fPlayer, ban))

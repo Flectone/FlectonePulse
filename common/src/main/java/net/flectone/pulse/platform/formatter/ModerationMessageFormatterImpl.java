@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -57,6 +58,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
 
                 MessageContext muteContext = ModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .message(replacePlaceholders(format, fPlayer, mute))
                                 .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderator())))
@@ -77,6 +79,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
 
                 MessageContext muteContext = ExternalModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .message(replacePlaceholders(format, fPlayer, mute))
                                 .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())))
@@ -106,6 +109,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
 
                 MessageContext muteContext = ExternalModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .message(replacePlaceholders(format, fPlayer, mute))
                                 .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
@@ -135,6 +139,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
 
                 MessageContext muteContext = ExternalModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .message(replacePlaceholders(format, fPlayer, mute))
                                 .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
@@ -155,6 +160,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
 
                 MessageContext muteContext = ExternalModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .message(replacePlaceholders(format, fPlayer, mute))
                                 .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
@@ -184,6 +190,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
 
                 MessageContext muteContext = ExternalModerationMessageContext.builder()
                         .base(MessageContext.builder()
+                                .module(ModuleName.ERROR)
                                 .sender(fPlayer)
                                 .message(replacePlaceholders(format, fPlayer, mute))
                                 .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))

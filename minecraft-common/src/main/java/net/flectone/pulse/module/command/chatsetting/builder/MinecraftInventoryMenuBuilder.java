@@ -48,6 +48,7 @@ public class MinecraftInventoryMenuBuilder implements MenuBuilder {
 
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
         Component header = messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
                 .sender(fPlayer)
                 .receiver(fTarget)
                 .message(localization.inventory())
