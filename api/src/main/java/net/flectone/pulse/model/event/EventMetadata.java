@@ -139,7 +139,7 @@ public interface EventMetadata {
          * @param messageContext builds the context for a given receiver
          * @return this builder
          */
-        public Builder messageContext(Function<FPlayer, MessageContext> messageContext) {
+        public Builder messageContext(@NonNull Function<FPlayer, MessageContext> messageContext) {
             this.messageContext = messageContext;
             return this;
         }
@@ -150,7 +150,7 @@ public interface EventMetadata {
          * @param fReceiver the only receiver
          * @return this builder
          */
-        public Builder filter(FPlayer fReceiver) {
+        public Builder filter(@NonNull FPlayer fReceiver) {
             return filter(fReceiver::equals);
         }
 
@@ -160,7 +160,7 @@ public interface EventMetadata {
          * @param fReceivers the receivers
          * @return this builder
          */
-        public Builder filter(Collection<FPlayer> fReceivers) {
+        public Builder filter(@NonNull Collection<FPlayer> fReceivers) {
             return filter(fReceivers::contains);
         }
 
@@ -170,7 +170,7 @@ public interface EventMetadata {
          * @param filter the extra condition a receiver must satisfy
          * @return this builder
          */
-        public Builder filter(Predicate<FPlayer> filter) {
+        public Builder filter(@NonNull Predicate<FPlayer> filter) {
             this.filter = this.filter.and(filter);
             return this;
         }
@@ -181,7 +181,7 @@ public interface EventMetadata {
          * @param destination the destination
          * @return this builder
          */
-        public Builder destination(Destination destination) {
+        public Builder destination(@NonNull Destination destination) {
             this.destination = destination;
             return this;
         }
@@ -214,7 +214,7 @@ public interface EventMetadata {
          * @param sound the sound and its permission
          * @return this builder
          */
-        public Builder sound(Pair<Sound, PermissionSetting> sound) {
+        public Builder sound(@Nullable Pair<Sound, PermissionSetting> sound) {
             this.sound = sound;
             return this;
         }
