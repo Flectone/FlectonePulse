@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
 import net.flectone.pulse.constant.CacheName;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.model.file.FilePack;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.Strings;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
@@ -137,6 +139,54 @@ public class FileMigratorImpl implements FileMigrator {
                                 )
                         )
                 );
+    }
+
+    @Override
+    public FilePack migration_1_14_1(FilePack files) {
+        if (platformServerAdapter.get().getPlatformType() == PlatformType.HYTALE) return files;
+
+        List<Message.Vanilla.VanillaMessage> newVanillaTypes = new LinkedList<>();
+
+        for (Message.Vanilla.VanillaMessage vanillaMessage : files.message().vanilla().types()) {
+            if ("DEATH".equalsIgnoreCase(vanillaMessage.name()) && !vanillaMessage.translationKeys().contains("death.attack.sulfurCubeHot.item")) {
+                List<String> newTranslationKeys = new LinkedList<>(vanillaMessage.translationKeys());
+                newTranslationKeys.add("death.attack.sulfurCubeHot.item");
+
+                vanillaMessage = vanillaMessage.withTranslationKeys(newTranslationKeys);
+            }
+
+            newVanillaTypes.add(vanillaMessage);
+        }
+
+        Map<String, Localization> newLocalizations = new LinkedHashMap<>();
+
+        for (Localization localization : files.localizations().values()) {
+            Map<String, String> newVanillaTypesLocalization = new LinkedHashMap<>(localization.message().vanilla().types());
+
+            if (localization.language().contains("ru")) {
+                newVanillaTypesLocalization.put("death.attack.sulfurCubeHot.item", "<fcolor:1>☠ <argument:1> показал <argument:0>, что лавой может быть не только пол, используя <fcolor:2><argument:2><fcolor:1>");
+                newVanillaTypesLocalization.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:1> показал <argument:0>, что лавой может быть не только пол");
+            } else {
+                newVanillaTypesLocalization.put("death.attack.sulfurCubeHot.item", "<fcolor:1>☠ <argument:1> showed <argument:0> that not just the floor is lava using <fcolor:2><argument:2><fcolor:1>");
+                newVanillaTypesLocalization.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:1> showed <argument:0> that not just the floor is lava");
+            }
+
+            newLocalizations.put(localization.language(), localization
+                    .withMessage(localization.message()
+                            .withVanilla(localization.message().vanilla()
+                                    .withTypes(newVanillaTypesLocalization)
+                            )
+                    )
+            );
+        }
+
+        return files
+                .withMessage(files.message()
+                        .withVanilla(files.message().vanilla()
+                                .withTypes(newVanillaTypes)
+                        )
+                )
+                .withLocalizations(newLocalizations);
     }
 
 }

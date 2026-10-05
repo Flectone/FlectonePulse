@@ -33,4 +33,12 @@ public interface FileMigrator {
      */
     FilePack migration_1_13_2(FilePack files);
 
+    /**
+     * Applies the changes introduced in 1.14.1.
+     *
+     * @param files the current files
+     * @return the migrated files
+     */
+    FilePack migration_1_14_1(FilePack files);
+
 }

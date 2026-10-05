@@ -589,6 +589,7 @@ vanilla:
     - "death.attack.sting.item"
     - "death.attack.sting.player"
     - "death.attack.sulfurCubeHot"
+    - "death.attack.sulfurCubeHot.item"
     - "death.attack.sulfurCubeHot.player"
     - "death.attack.sweetBerryBush"
     - "death.attack.sweetBerryBush.player"
