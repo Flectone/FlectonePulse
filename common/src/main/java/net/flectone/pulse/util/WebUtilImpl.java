@@ -34,8 +34,8 @@ public class WebUtilImpl implements WebUtil {
                     outputPath.toFile().setLastModified(FileWriter.LAST_MODIFIED_TIME);
                 }
 
-            } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND && warn404) {
-                fLogger.warning("Failed to download %s. HTTP response: %s - %s", outputPath.getFileName(), connection.getResponseCode(), fileUrl);
+            } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND && warn404 || responseCode == HttpURLConnection.HTTP_FORBIDDEN) {
+                fLogger.warning("Failed to download %s. HTTP response: %s - %s", outputPath.getFileName(), responseCode, fileUrl);
             }
 
             return responseCode;
