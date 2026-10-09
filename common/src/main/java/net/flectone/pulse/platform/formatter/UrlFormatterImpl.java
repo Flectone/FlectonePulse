@@ -11,7 +11,6 @@ import org.jspecify.annotations.Nullable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -38,8 +37,13 @@ public class UrlFormatterImpl implements UrlFormatter {
         if (StringUtils.isEmpty(url)) return "";
 
         try {
-            return new URL(url).toURI().toASCIIString();
-        } catch (MalformedURLException | URISyntaxException _) {
+            URI uri = new URI(url);
+
+            // check syntax
+            uri.toURL();
+
+            return uri.toASCIIString();
+        } catch (URISyntaxException | IllegalArgumentException | MalformedURLException _) {
             return "";
         }
     }
