@@ -146,21 +146,23 @@ record MessageContextImpl(
 
     @Override
     public CacheKeyImpl createCacheKey() {
-        return new CacheKeyImpl(flags, sender.uuid(), receiver.uuid(), message);
+        return new CacheKeyImpl(flags, sender.uuid(), receiver.uuid(), receiver.id(), message);
     }
 
     /**
      * Cache key covering the fields that change how a plain message renders.
      *
      * @param flags the formatting switches
-     * @param sender the sender id
-     * @param receiver the receiver id
+     * @param sender the sender uuid
+     * @param receiver the receiver uuid
+     * @param receiverDatabaseId the receiver id from database
      * @param message the raw text
      */
     public record CacheKeyImpl(
             @NonNull Map<MessageFlag, Boolean> flags,
             @NonNull UUID sender,
             @NonNull UUID receiver,
+            int receiverDatabaseId,
             @NonNull String message
     ) implements CacheKey {
 
