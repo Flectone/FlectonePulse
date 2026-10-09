@@ -447,14 +447,16 @@ public class ReplacementModuleImpl implements ReplacementModule {
         if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
         if (messageContext.receiver().isUnknown() || messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
 
+        String domain = urlFormatter.getDomainName(url);
+
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                 .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
-                .message(Strings.CS.replace(
+                .message(StringUtils.replaceEach(
                         localization(messageContext.receiver()).values().getOrDefault("url", ""),
-                        "<message_1>",
-                        url
+                        new String[]{"<domain>", "<message_1>"},
+                        new String[]{domain, url}
                 ))
                 .flags(messageContext.flags())
                 .flags(
@@ -468,19 +470,21 @@ public class ReplacementModuleImpl implements ReplacementModule {
     private Tag imageTag(MessageContext messageContext, String url) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
         if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
-        if (messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
+        if (messageContext.receiver().isUnknown() || messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
 
         Component componentPixels = createImageComponent(url);
+
+        String domain = urlFormatter.getDomainName(url);
 
         return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
                 .base(MessageContext.builder()
                         .module(this.name())
                         .sender(messageContext.sender())
                         .receiver(messageContext.receiver())
-                        .message(Strings.CS.replace(
+                        .message(StringUtils.replaceEach(
                                 localization(messageContext.receiver()).values().getOrDefault("image", ""),
-                                "<message_1>",
-                                url
+                                new String[]{"<domain>", "<message_1>"},
+                                new String[]{domain, url}
                         ))
                         .flags(messageContext.flags())
                         .flags(
