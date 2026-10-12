@@ -149,6 +149,8 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     }
 
     public void update(FPlayer fSender) {
+        if (!moduleController.isEnable(this)) return;
+
         BiConsumer<FPlayer, List<FPlayer>> receiversConsumer = isNewerThanOrEqualsV_1_19_4 ? this::sendPlayerInfos : this::sendPlayerData;
 
         fPlayerService.getPlatformFPlayers()
@@ -159,7 +161,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                 );
     }
 
-    public void sendPlayerInfos(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
+    private void sendPlayerInfos(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
         List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfoList = onlinePlayers.stream().map(fSender -> {
             if (!socialService.canSeeVanished(fSender, fReceiver)) {
                 forgetEntry(fReceiver.uuid(), fSender.uuid());
@@ -201,7 +203,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         }
     }
 
-    public void sendPlayerData(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
+    private void sendPlayerData(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
         List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList = onlinePlayers.stream().map(fSender -> {
             if (!socialService.canSeeVanished(fSender, fReceiver)) {
                 forgetEntry(fReceiver.uuid(), fSender.uuid());
@@ -260,6 +262,8 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     }
 
     public void remove(UUID uuid) {
+        if (!moduleController.isEnable(this)) return;
+
         if (isProxyMode()) {
             proxyPlayers.values().forEach(uuids -> uuids.removeIf(uuid::equals));
             scoreboardModule.remove(fPlayerService.getFPlayer(uuid));
@@ -273,6 +277,8 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     }
 
     public void clearPlayer(UUID uuid) {
+        if (!moduleController.isEnable(this)) return;
+
         sentEntries.remove(uuid);
         sentEntries.values().forEach(entries -> entries.remove(uuid));
 
