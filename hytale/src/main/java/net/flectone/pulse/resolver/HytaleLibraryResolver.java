@@ -56,14 +56,15 @@ public class HytaleLibraryResolver extends LibraryResolverImpl {
                 .build()
         );
 
-        loadLibrary(Library.builder()
-                .groupId("curse{}maven")
-                .artifactId("hyui-1431415")
-                .version(BuildConfig.HYUI_VERSION)
-                .repository("https://www.cursemaven.com")
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
+        // TODO: uncomment after HyUI 0.9.8 is released
+//        loadLibrary(Library.builder()
+//                .groupId("curse{}maven")
+//                .artifactId("hyui-1431415")
+//                .version(BuildConfig.HYUI_VERSION)
+//                .repository("https://www.cursemaven.com")
+//                .resolveTransitiveDependencies(true)
+//                .build()
+//        );
 
         loadLibrary(Library.builder()
                 .groupId("org{}incendo")

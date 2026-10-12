@@ -1,6 +1,9 @@
 dependencies {
     implementation project(":common")
 
+    // TODO: delete after HyUI 0.9.8 is released
+    implementation files("libraries/HyUI-0.9.8.jar")
+
     compileOnly project(":hytale:loader")
     compileOnly project(":api")
 
