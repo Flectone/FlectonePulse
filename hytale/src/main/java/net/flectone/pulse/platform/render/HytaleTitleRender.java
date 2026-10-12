@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.render;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.hypixel.hytale.protocol.packets.interface_.EventTitleStyle;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class HytaleTitleRender implements TitleRender {
         EventTitleUtil.showEventTitleToPlayer(playerRef,
                 componentSerializer.toHytale(title),
                 componentSerializer.toHytale(subTitle),
-                true,
+                EventTitleStyle.Major,
                 null,
                 (float) times.stayTicks() / 20,
                 (float) times.fadeInTicks() / 20,

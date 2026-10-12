@@ -294,7 +294,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         PlayerRef player = getPlayer(uuid);
         if (player == null) return false;
 
-        return PermissionsModule.get().getGroupsForUser(uuid).contains(HytalePermissionsProvider.OP_GROUP);
+        return PermissionsModule.get().getGroupsForUser(uuid).contains(HytalePermissionsProvider.GROUP_ADMIN);
     }
 
     @Override
@@ -435,7 +435,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         dz /= distance;
 
         Vector3i targetBlock = TargetUtil.getTargetBlock(
-                world,
+                world.getChunkStore(),
                 (blockId, _) -> blockId != 0,
                 fromPos.x(), fromPos.y(), fromPos.z(),
                 dx, dy, dz,
