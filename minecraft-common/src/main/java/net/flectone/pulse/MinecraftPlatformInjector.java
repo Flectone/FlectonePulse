@@ -23,8 +23,6 @@ import net.flectone.pulse.module.message.bossbar.BossbarModuleImpl;
 import net.flectone.pulse.module.message.bossbar.MinecraftBossbarModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.MinecraftBubbleModule;
-import net.flectone.pulse.module.message.bubble.render.BubbleRender;
-import net.flectone.pulse.module.message.bubble.render.MinecraftBubbleRender;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.MinecraftChatModule;
 import net.flectone.pulse.module.message.format.object.MinecraftObjectModule;
@@ -63,10 +61,7 @@ import net.flectone.pulse.resolver.ProfileResolver;
 import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.serializer.ComponentSerializer;
 import net.flectone.pulse.serializer.MinecraftComponentSerializer;
-import net.flectone.pulse.service.MinecraftSkinService;
-import net.flectone.pulse.service.MinecraftTranslationService;
-import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.service.TranslationService;
+import net.flectone.pulse.service.*;
 
 import java.nio.file.Path;
 
@@ -135,7 +130,6 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(TextScreenRender.class).to(MinecraftTextScreenRender.class);
         bind(TitleRender.class).to(MinecraftTitleRender.class);
         bind(ToastRender.class).to(MinecraftToastRender.class);
-        bind(BubbleRender.class).to(MinecraftBubbleRender.class);
 
         // senders
         bind(MessageSender.class).to(MinecraftMessageSender.class);
@@ -145,6 +139,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(ComponentSerializer.class).to(MinecraftComponentSerializer.class);
         bind(ComponentExtractor.class).to(MinecraftComponentExtractor.class);
         bind(new TypeLiteral<ComponentExtractor<?>>() {}).to(MinecraftComponentExtractor.class);
+        bind(HeadTextService.class).to(MinecraftHeadTextService.class);
         bind(SkinService.class).to(MinecraftSkinService.class);
         bind(ProfileResolver.class).to(MinecraftProfileResolver.class);
         bind(TranslationService.class).to(MinecraftTranslationService.class);

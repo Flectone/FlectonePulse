@@ -94,6 +94,8 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
             instance.get(MetricsService.class).start();
         }
 
+        instance.get(HeadTextService.class).reload();
+
         // call enable ready event
         EnableEvent enableReadyEvent = eventDispatcher.dispatch(new EnableEvent(EnableEvent.Type.READY, instance));
         if (enableReadyEvent.cancelled()) return;
@@ -308,6 +310,8 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
         if (fileFacade.config().metrics().enable()) {
             instance.get(MetricsService.class).start();
         }
+
+        instance.get(HeadTextService.class).reload();
 
         // end reload event
         ReloadEvent endReloadEvent = eventDispatcher.dispatch(reloadListeners, new ReloadEvent(instance, ReloadEvent.Type.END, reloadException));

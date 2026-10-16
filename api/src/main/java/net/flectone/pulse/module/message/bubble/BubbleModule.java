@@ -1,9 +1,10 @@
 package net.flectone.pulse.module.message.bubble;
 
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.ModuleLocalization;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Set;
@@ -12,13 +13,16 @@ import java.util.Set;
  * Shows chat messages as floating text above the speaker's head.
  * @author TheFaser
  */
-public interface BubbleModule extends ModuleSimple {
+public interface BubbleModule extends ModuleLocalization {
 
     @Override
     Message.Bubble config();
 
     @Override
     Permission.Message.Bubble permission();
+
+    @Override
+    Localization.Message.Bubble localization(FPlayer fPlayer);
 
     /**
      * Shows a bubble above a player's head.

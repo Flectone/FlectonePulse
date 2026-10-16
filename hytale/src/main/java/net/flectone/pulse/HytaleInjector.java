@@ -12,8 +12,6 @@ import net.flectone.pulse.module.integration.HytaleIntegrationModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.HytaleBubbleModule;
-import net.flectone.pulse.module.message.bubble.render.BubbleRender;
-import net.flectone.pulse.module.message.bubble.render.HytaleBubbleRender;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.HytaleChatModule;
 import net.flectone.pulse.module.message.scoreboard.HytaleScoreboardModule;
@@ -42,10 +40,7 @@ import net.flectone.pulse.resolver.ProfileResolver;
 import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.serializer.ComponentSerializer;
 import net.flectone.pulse.serializer.HytaleComponentSerializer;
-import net.flectone.pulse.service.HytaleSkinService;
-import net.flectone.pulse.service.HytaleTranslationService;
-import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.service.TranslationService;
+import net.flectone.pulse.service.*;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 import java.nio.file.Path;
@@ -104,7 +99,6 @@ public class HytaleInjector extends PlatformInjector {
         bind(TextScreenRender.class).to(HytaleTextScreenRender.class);
         bind(TitleRender.class).to(HytaleTitleRender.class);
         bind(ToastRender.class).to(HytaleToastRender.class);
-        bind(BubbleRender.class).to(HytaleBubbleRender.class);
 
         // senders
         bind(MessageSender.class).to(HytaleMessageSender.class);
@@ -114,6 +108,7 @@ public class HytaleInjector extends PlatformInjector {
         bind(ComponentSerializer.class).to(HytaleComponentSerializer.class);
         bind(ComponentExtractor.class).to(HytaleComponentExtractor.class);
         bind(new TypeLiteral<ComponentExtractor<?>>() {}).to(HytaleComponentExtractor.class);
+        bind(HeadTextService.class).to(HytaleHeadTextService.class);
         bind(SkinService.class).to(HytaleSkinService.class);
         bind(ProfileResolver.class).to(HytaleProfileResolver.class);
         bind(TranslationService.class).to(HytaleTranslationService.class);

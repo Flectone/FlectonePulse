@@ -7,9 +7,9 @@ import lombok.Builder;
 import lombok.With;
 import net.flectone.pulse.config.setting.*;
 import net.flectone.pulse.constant.AdventureTag;
+import net.flectone.pulse.model.entity.HeadText;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.value.*;
-import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 
 import java.util.LinkedHashMap;
@@ -178,24 +178,15 @@ public record Message(
             String disallowedInput,
             Integer maxCount,
             Integer maxLength,
-            Float elevation,
+            Float offset,
             Double distance,
             Double readSpeed,
             Double handicapChars,
             Integer hintBufferLength,
             String wordBreakHint,
-            Interaction interaction,
             Modern modern,
             Ticker ticker
     ) implements EnableSetting {
-
-        @With
-        @Builder(toBuilder = true)
-        public record Interaction(
-                Boolean enable,
-                Float height
-        ) {
-        }
 
         @With
         @Builder(toBuilder = true)
@@ -205,8 +196,9 @@ public record Message(
                 Boolean seeThrough,
                 Integer animationTime,
                 Float scale,
+                Float space,
                 String background,
-                BubbleModule.Billboard billboard
+                HeadText.Billboard billboard
         ) {
         }
     }

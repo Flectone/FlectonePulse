@@ -26,11 +26,13 @@ import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.HeadTextService;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -52,6 +54,8 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
     private final TextScreenRender textScreenRender;
     private final TaskScheduler taskScheduler;
+    private final HeadTextService headTextService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FLogger fLogger;
 
     @Override
@@ -82,8 +86,19 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
 
         PacketTypeCommon packetType = event.getPacketType();
         switch (packetType) {
+            case PacketType.Play.Server.DEATH_COMBAT_EVENT -> {
+                UUID playerUUID = event.getUser().getUUID();
+                headTextService.remove(playerUUID);
+            }
+            case PacketType.Play.Server.SET_PASSENGERS -> {
+                WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
+                UUID playerUUID = platformPlayerAdapter.getPlayerByEntityId(wrapper.getEntityId());
+                if (playerUUID == null) return;
+
+                headTextService.remove(playerUUID);
+                textScreenRender.updateAndRide(wrapper.getEntityId());
+            }
             case PacketType.Login.Server.LOGIN_SUCCESS -> handleLoginSuccess(event);
-            case PacketType.Play.Server.SET_PASSENGERS -> handleSetPassengers(event);
             default -> {
                 Optional<Pair<Component, Boolean>> optionalPair = toMessageReceiveEvent(event);
                 if (optionalPair.isEmpty()) return;
@@ -154,13 +169,6 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
 
             packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()));
         });
-    }
-
-    private void handleSetPassengers(PacketSendEvent event) {
-        if (event.getPacketType() != PacketType.Play.Server.SET_PASSENGERS) return;
-
-        WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
-        textScreenRender.updateAndRide(wrapper.getEntityId());
     }
 
     private Optional<Pair<Component, Boolean>> toMessageReceiveEvent(PacketSendEvent event) {

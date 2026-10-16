@@ -53,11 +53,8 @@ public interface MessageMerger {
 
     Message.Brand mergeBrand(@MappingTarget Message.Brand.BrandBuilder target, Message.Brand source);
 
-    @Mapping(target = "interaction", expression = "java(mergeBubbleInteraction(target.build().interaction().toBuilder(), source.interaction()))")
     @Mapping(target = "modern", expression = "java(mergeBubbleModern(target.build().modern().toBuilder(), source.modern()))")
     Message.Bubble mergeBubble(@MappingTarget Message.Bubble.BubbleBuilder target, Message.Bubble source);
-
-    Message.Bubble.Interaction mergeBubbleInteraction(@MappingTarget Message.Bubble.Interaction.InteractionBuilder target, Message.Bubble.Interaction source);
 
     Message.Bubble.Modern mergeBubbleModern(@MappingTarget Message.Bubble.Modern.ModernBuilder target, Message.Bubble.Modern source);
 

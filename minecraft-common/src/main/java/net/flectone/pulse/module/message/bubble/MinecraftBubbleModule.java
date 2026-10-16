@@ -2,13 +2,16 @@ package net.flectone.pulse.module.message.bubble;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.message.bubble.listener.MinecraftPacketBubbleListener;
-import net.flectone.pulse.module.message.bubble.service.BubbleService;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.HeadTextService;
+import net.flectone.pulse.service.SocialService;
 
 @Singleton
 public class MinecraftBubbleModule extends BubbleModuleImpl {
@@ -18,14 +21,18 @@ public class MinecraftBubbleModule extends BubbleModuleImpl {
     @Inject
     public MinecraftBubbleModule(FileFacade fileFacade,
                                  TaskScheduler taskScheduler,
-                                 BubbleService bubbleService,
-                                 ListenerRegistry listenerRegistry,
                                  ModuleController moduleController,
-                                 FLogger fLogger) {
-        super(fileFacade, taskScheduler, bubbleService, listenerRegistry, moduleController, fLogger);
+                                 HeadTextService headTextService,
+                                 SocialService socialService,
+                                 ColorConverter colorConverter,
+                                 MessagePipeline messagePipeline,
+                                 FLogger fLogger,
+                                 ListenerRegistry listenerRegistry) {
+        super(fileFacade, taskScheduler, moduleController, headTextService, socialService, colorConverter, messagePipeline, fLogger);
 
         this.listenerRegistry = listenerRegistry;
     }
+
 
     @Override
     public void onEnable() {

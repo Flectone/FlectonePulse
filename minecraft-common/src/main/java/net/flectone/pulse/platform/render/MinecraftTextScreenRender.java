@@ -19,7 +19,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.Destination;
 import net.flectone.pulse.model.value.TextScreen;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
-import net.flectone.pulse.module.message.bubble.render.MinecraftBubbleRender;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
@@ -45,7 +44,6 @@ public class MinecraftTextScreenRender implements TextScreenRender {
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
     private final MinecraftEntityUtil entityUtil;
-    private final LazyInstance<MinecraftBubbleRender> bubbleRenderer;
     private final LazyInstance<TitleRender> titleRender;
     private final @Named("isNewerThanOrEqualsV_1_19_4") boolean isNewerThanOrEqualsV_1_19_4;
 
@@ -70,7 +68,7 @@ public class MinecraftTextScreenRender implements TextScreenRender {
         int playerId = platformPlayerAdapter.getEntityId(fPlayer.uuid());
 
         addAndRide(fPlayer.uuid(), playerId, entityId);
-        bubbleRenderer.get().removeBubbleIf(bubble -> bubble.getSender().equals(fPlayer));
+//        bubbleRenderer.get().removeBubbleIf(bubble -> bubble.getSender().equals(fPlayer));
 
         if (textScreen.hasAnimation()) {
             animationSpawn(fPlayer, textScreen, entityId);
