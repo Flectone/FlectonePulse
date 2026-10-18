@@ -61,6 +61,7 @@ public class MinecraftHeadTextService implements HeadTextService {
             HeadText text,
             int id,
             EntityType type,
+            String world,
             int row
     ) {
 
@@ -166,7 +167,7 @@ public class MinecraftHeadTextService implements HeadTextService {
                     List<HolderViewerEntity> alive = new ArrayList<>(current.size());
 
                     for (HolderViewerEntity entity : current) {
-                        if (distance > entity.text().distance() || entity.text().isEnd(now)) {
+                        if (distance > entity.text().distance() || entity.text().isEnd(now) || !holderWorld.equals(entity.world)) {
                             expired.add(entity);
                         } else {
                             alive.add(entity.withRow(alive.size()));
@@ -267,7 +268,7 @@ public class MinecraftHeadTextService implements HeadTextService {
                 entityId, UUID.randomUUID(), entityType, spawnLocation, 0, 0, null
         ));
 
-        HolderViewerEntity entity = new HolderViewerEntity(clientVersion, text, entityId, entityType, row);
+        HolderViewerEntity entity = new HolderViewerEntity(clientVersion, text, entityId, entityType, platformPlayerAdapter.getWorldName(fReceiver), row);
 
         List<HolderViewerEntity> all = new ArrayList<>(existingEntities);
         all.add(entity);
@@ -306,7 +307,11 @@ public class MinecraftHeadTextService implements HeadTextService {
         List<HolderViewerEntity> instant = new ArrayList<>();
         List<HolderViewerEntity> animated = new ArrayList<>();
 
+        String viewerWorld = platformPlayerAdapter.getWorldName(viewer);
         for (HolderViewerEntity entity : entitiesToDelete) {
+            // if player is in another world, they will delete entity themselves
+            if (!viewerWorld.equals(entity.world())) continue;
+
             if (entity.isTextDisplay() && entity.text().animationTime() > 0) {
                 animated.add(entity);
             } else {
