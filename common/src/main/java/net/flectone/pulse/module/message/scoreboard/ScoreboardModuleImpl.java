@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.message.scoreboard;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -19,22 +21,13 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ScoreboardModuleImpl implements ScoreboardModule {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final SocialService socialService;
-
-    protected ScoreboardModuleImpl(FileFacade fileFacade,
-                               ListenerRegistry listenerRegistry,
-                               PlatformPlayerAdapter platformPlayerAdapter,
-                               SocialService socialService) {
-        this.fileFacade = fileFacade;
-        this.listenerRegistry = listenerRegistry;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.socialService = socialService;
-    }
 
     @Override
     public Set<@NonNull Class<? extends ModuleSimple>> children() {

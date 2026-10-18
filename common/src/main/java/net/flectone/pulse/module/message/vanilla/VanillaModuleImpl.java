@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.message.vanilla;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -12,22 +14,13 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.SocialService;
 
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class VanillaModuleImpl implements VanillaModule {
 
     private final FileFacade fileFacade;
     private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
     private final SocialService socialService;
-
-    protected VanillaModuleImpl(FileFacade fileFacade,
-                            ProxyRegistry proxyRegistry,
-                            ListenerRegistry listenerRegistry,
-                            SocialService socialService) {
-        this.fileFacade = fileFacade;
-        this.proxyRegistry = proxyRegistry;
-        this.listenerRegistry = listenerRegistry;
-        this.socialService = socialService;
-    }
 
     @Override
     public void onEnable() {

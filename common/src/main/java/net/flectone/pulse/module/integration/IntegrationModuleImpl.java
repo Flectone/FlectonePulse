@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.integration;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.constant.ModuleName;
@@ -24,6 +26,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class IntegrationModuleImpl implements IntegrationModule {
 
     private final FileFacade fileFacade;
@@ -33,22 +36,6 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
     private final LazyInstance<LuckPermsModule> luckPermsModule;
     private final LazyInstance<DeeplModule> deeplModule;
     private final LazyInstance<YandexModule> yandexModule;
-
-    protected IntegrationModuleImpl(FileFacade fileFacade,
-                                    LazyInstance<PlatformServerAdapter> platformServerAdapter,
-                                    ListenerRegistry listenerRegistry,
-                                    ModuleController moduleController,
-                                    LazyInstance<LuckPermsModule> luckPermsModule,
-                                    LazyInstance<DeeplModule> deeplModule,
-                                    LazyInstance<YandexModule> yandexModule) {
-        this.fileFacade = fileFacade;
-        this.platformServerAdapter = platformServerAdapter;
-        this.listenerRegistry = listenerRegistry;
-        this.moduleController = moduleController;
-        this.luckPermsModule = luckPermsModule;
-        this.deeplModule = deeplModule;
-        this.yandexModule = yandexModule;
-    }
 
     @Override
     public void onEnable() {

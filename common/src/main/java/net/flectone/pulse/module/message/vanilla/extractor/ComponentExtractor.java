@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.message.vanilla.extractor;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
@@ -10,15 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ComponentExtractor<T> {
 
     private final Map<String, Message.Vanilla.VanillaMessage> translationVanillaMessages = new HashMap<>();
 
     private final FileFacade fileFacade;
-
-    protected ComponentExtractor(FileFacade fileFacade) {
-        this.fileFacade = fileFacade;
-    }
 
     public void reload() {
         translationVanillaMessages.clear();

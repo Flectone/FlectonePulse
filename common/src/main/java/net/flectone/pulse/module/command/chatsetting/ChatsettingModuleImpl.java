@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.command.chatsetting;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -29,6 +31,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ChatsettingModuleImpl implements ChatsettingModule {
 
     private final FileFacade fileFacade;
@@ -43,32 +46,6 @@ public abstract class ChatsettingModuleImpl implements ChatsettingModule {
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
-
-    protected ChatsettingModuleImpl(FileFacade fileFacade,
-                                FPlayerService fPlayerService,
-                                SocialService socialService,
-                                PermissionChecker permissionChecker,
-                                CommandParserProvider commandParserProvider,
-                                ProxySender proxySender,
-                                ProxyRegistry proxyRegistry,
-                                SoundPlayer soundPlayer,
-                                TaskScheduler taskScheduler,
-                                ModuleController moduleController,
-                                ModuleCommandController commandModuleController,
-                                ListenerRegistry listenerRegistry) {
-        this.fileFacade = fileFacade;
-        this.fPlayerService = fPlayerService;
-        this.socialService = socialService;
-        this.permissionChecker = permissionChecker;
-        this.commandParserProvider = commandParserProvider;
-        this.proxySender = proxySender;
-        this.proxyRegistry = proxyRegistry;
-        this.soundPlayer = soundPlayer;
-        this.taskScheduler = taskScheduler;
-        this.moduleController = moduleController;
-        this.commandModuleController = commandModuleController;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

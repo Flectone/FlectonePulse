@@ -9,6 +9,8 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.flectone.pulse.checker.*;
 import net.flectone.pulse.constant.CacheName;
@@ -276,17 +278,12 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PlatformInjector extends AbstractModule {
 
     private final Path projectPath;
     private final LibraryResolver libraryResolver;
     private final FLogger fLogger;
-
-    protected PlatformInjector(Path projectPath, LibraryResolver libraryResolver, FLogger fLogger) {
-        this.projectPath = projectPath;
-        this.libraryResolver = libraryResolver;
-        this.fLogger = fLogger;
-    }
 
     @SneakyThrows
     @Override

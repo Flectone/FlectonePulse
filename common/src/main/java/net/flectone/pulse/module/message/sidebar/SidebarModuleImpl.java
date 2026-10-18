@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.message.sidebar;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -22,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class SidebarModuleImpl implements SidebarModule {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
@@ -33,22 +36,6 @@ public abstract class SidebarModuleImpl implements SidebarModule {
     private final RandomGenerator randomUtil;
     private final SocialService socialService;
     private final ConditionModule conditionModule;
-
-    protected SidebarModuleImpl(FileFacade fileFacade,
-                            TaskScheduler taskScheduler,
-                            ListenerRegistry listenerRegistry,
-                            FPlayerService fPlayerService,
-                            RandomGenerator randomUtil,
-                            SocialService socialService,
-                            ConditionModule conditionModule) {
-        this.fileFacade = fileFacade;
-        this.taskScheduler = taskScheduler;
-        this.listenerRegistry = listenerRegistry;
-        this.fPlayerService = fPlayerService;
-        this.randomUtil = randomUtil;
-        this.socialService = socialService;
-        this.conditionModule = conditionModule;
-    }
 
     @Override
     public void onEnable() {

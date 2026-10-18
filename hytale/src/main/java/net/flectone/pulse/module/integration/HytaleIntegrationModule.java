@@ -35,8 +35,7 @@ public class HytaleIntegrationModule extends IntegrationModuleImpl {
                                    LazyInstance<LuckPermsModule> luckPermsModule,
                                    LazyInstance<DeeplModule> deeplModule,
                                    LazyInstance<YandexModule> yandexModule) {
-        super(fileFacade, platformServerAdapter, listenerRegistry, moduleController,
-                luckPermsModule, deeplModule, yandexModule);
+        super(fileFacade, platformServerAdapter, moduleController, listenerRegistry, luckPermsModule, deeplModule, yandexModule);
 
         this.platformServerAdapter = platformServerAdapter;
     }

@@ -50,8 +50,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModuleImpl {
                                          LazyInstance<MinecraftFloodgateModule> floodgateModule,
                                          LazyInstance<MinecraftGeyserModule> geyserModule,
                                          LazyInstance<MinecraftSkinsRestorerModule> skinsRestorerModule) {
-        super(fileFacade, platformServerAdapter, listenerRegistry, moduleController,
-                luckPermsModule, deeplModule, yandexModule);
+        super(fileFacade, platformServerAdapter, moduleController, listenerRegistry, luckPermsModule, deeplModule, yandexModule);
 
         this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;
