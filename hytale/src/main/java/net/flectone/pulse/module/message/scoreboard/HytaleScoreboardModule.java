@@ -7,7 +7,6 @@ import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import net.flectone.pulse.constant.MessageFlag;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -83,14 +82,14 @@ public class HytaleScoreboardModule extends ScoreboardModuleImpl {
 
     @Override
     public void createOrUpdate(@NonNull FPlayer fPlayer) {
-        taskScheduler.runAsync(() -> {
+        taskScheduler.runAsyncLater(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             CustomName customName = createNameplate(fPlayer);
             sendPacket(fPlayer.uuid(), customName.value());
 
             teamMap.put(fPlayer.uuid(), customName);
-        });
+        }, 20L);
     }
 
     @Override
