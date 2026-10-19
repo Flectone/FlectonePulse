@@ -1072,6 +1072,9 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
             Join join,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/nameplate")
+            Nameplate nameplate,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
             Quit quit,
 
@@ -1443,6 +1446,15 @@ public record Permission(
         @With
         @Builder(toBuilder = true)
         public record Join(
+                String name,
+                Permission.Type type,
+                PermissionEntry sound
+        ) implements SoundPermissionSetting, PermissionSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        public record Nameplate(
                 String name,
                 Permission.Type type,
                 PermissionEntry sound

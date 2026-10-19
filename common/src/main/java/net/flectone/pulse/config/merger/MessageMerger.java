@@ -29,6 +29,7 @@ public interface MessageMerger {
     @Mapping(target = "format", expression = "java(mergeFormat(target.build().format().toBuilder(), source.format()))")
     @Mapping(target = "greeting", expression = "java(mergeGreeting(target.build().greeting().toBuilder(), source.greeting()))")
     @Mapping(target = "join", expression = "java(mergeJoin(target.build().join().toBuilder(), source.join()))")
+    @Mapping(target = "nameplate", expression = "java(mergeNameplate(target.build().nameplate().toBuilder(), source.nameplate()))")
     @Mapping(target = "quit", expression = "java(mergeQuit(target.build().quit().toBuilder(), source.quit()))")
     @Mapping(target = "rightclick", expression = "java(mergeRightclick(target.build().rightclick().toBuilder(), source.rightclick()))")
     @Mapping(target = "scoreboard", expression = "java(mergeScoreboard(target.build().scoreboard().toBuilder(), source.scoreboard()))")
@@ -53,10 +54,7 @@ public interface MessageMerger {
 
     Message.Brand mergeBrand(@MappingTarget Message.Brand.BrandBuilder target, Message.Brand source);
 
-    @Mapping(target = "modern", expression = "java(mergeBubbleModern(target.build().modern().toBuilder(), source.modern()))")
     Message.Bubble mergeBubble(@MappingTarget Message.Bubble.BubbleBuilder target, Message.Bubble source);
-
-    Message.Bubble.Modern mergeBubbleModern(@MappingTarget Message.Bubble.Modern.ModernBuilder target, Message.Bubble.Modern source);
 
     Message.Chat mergeChat(@MappingTarget Message.Chat.ChatBuilder target, Message.Chat source);
 
@@ -122,6 +120,8 @@ public interface MessageMerger {
     Message.Greeting mergeGreeting(@MappingTarget Message.Greeting.GreetingBuilder target, Message.Greeting source);
 
     Message.Join mergeJoin(@MappingTarget Message.Join.JoinBuilder target, Message.Join source);
+
+    Message.Nameplate mergeNameplate(@MappingTarget Message.Nameplate.NameplateBuilder target, Message.Nameplate source);
 
     Message.Quit mergeQuit(@MappingTarget Message.Quit.QuitBuilder target, Message.Quit source);
 

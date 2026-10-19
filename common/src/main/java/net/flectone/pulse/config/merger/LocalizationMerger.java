@@ -226,6 +226,7 @@ public interface LocalizationMerger {
     @Mapping(target = "format", expression = "java(mergeMessageFormat(target.build().format().toBuilder(), source.format()))")
     @Mapping(target = "greeting", expression = "java(mergeMessageGreeting(target.build().greeting().toBuilder(), source.greeting()))")
     @Mapping(target = "join", expression = "java(mergeMessageJoin(target.build().join().toBuilder(), source.join()))")
+    @Mapping(target = "nameplate", expression = "java(mergeMessageNameplate(target.build().nameplate().toBuilder(), source.nameplate()))")
     @Mapping(target = "quit", expression = "java(mergeMessageQuit(target.build().quit().toBuilder(), source.quit()))")
     @Mapping(target = "rightclick", expression = "java(mergeMessageRightclick(target.build().rightclick().toBuilder(), source.rightclick()))")
     @Mapping(target = "scoreboard", expression = "java(mergeMessageScoreboard(target.build().scoreboard().toBuilder(), source.scoreboard()))")
@@ -302,6 +303,8 @@ public interface LocalizationMerger {
     Localization.Message.Greeting mergeMessageGreeting(@MappingTarget Localization.Message.Greeting.GreetingBuilder target, Localization.Message.Greeting source);
 
     Localization.Message.Join mergeMessageJoin(@MappingTarget Localization.Message.Join.JoinBuilder target, Localization.Message.Join source);
+
+    Localization.Message.Nameplate mergeMessageNameplate(@MappingTarget Localization.Message.Nameplate.NameplateBuilder target, Localization.Message.Nameplate source);
 
     Localization.Message.Quit mergeMessageQuit(@MappingTarget Localization.Message.Quit.QuitBuilder target, Localization.Message.Quit source);
 

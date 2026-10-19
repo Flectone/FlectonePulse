@@ -1016,6 +1016,9 @@ public record Localization(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
             Join join,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/nameplate")
+            Nameplate nameplate,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
             Quit quit,
 
@@ -1279,6 +1282,13 @@ public record Localization(
         public record Join(
                 String format,
                 String formatFirstTime
+        ) implements LocalizationSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        public record Nameplate(
+                MultilineString values
         ) implements LocalizationSetting {
         }
 

@@ -203,6 +203,8 @@ import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.greeting.GreetingModuleImpl;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.join.JoinModuleImpl;
+import net.flectone.pulse.module.message.nameplate.NameplateModule;
+import net.flectone.pulse.module.message.nameplate.NameplateModuleImpl;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.quit.QuitModuleImpl;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
@@ -408,6 +410,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(FormatModule.class).to(FormatModuleImpl.class);
         bind(GreetingModule.class).to(GreetingModuleImpl.class);
         bind(JoinModule.class).to(JoinModuleImpl.class);
+        bind(NameplateModule.class).to(NameplateModuleImpl.class);
         bind(MentionModule.class).to(MentionModuleImpl.class);
         bind(MessageModule.class).to(MessageModuleImpl.class);
         bind(ModerationModule.class).to(ModerationModuleImpl.class);

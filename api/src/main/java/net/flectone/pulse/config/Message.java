@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.With;
 import net.flectone.pulse.config.setting.*;
 import net.flectone.pulse.constant.AdventureTag;
-import net.flectone.pulse.model.entity.HeadText;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.value.*;
 import net.flectone.pulse.module.message.format.world.WorldModule;
@@ -62,6 +61,9 @@ public record Message(
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
         Join join,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/nameplate")
+        Nameplate nameplate,
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
         Quit quit,
@@ -174,33 +176,14 @@ public record Message(
     @Builder(toBuilder = true)
     public record Bubble(
             Boolean enable,
-            Boolean visibleToSelf,
+            Destination destination,
             String disallowedInput,
-            Integer maxCount,
             Integer maxLength,
-            Float offset,
-            Double distance,
             Double readSpeed,
             Double handicapChars,
             Integer hintBufferLength,
-            String wordBreakHint,
-            Modern modern,
-            Ticker ticker
+            String wordBreakHint
     ) implements EnableSetting {
-
-        @With
-        @Builder(toBuilder = true)
-        public record Modern(
-                Boolean enable,
-                Boolean hasShadow,
-                Boolean seeThrough,
-                Integer animationTime,
-                Float scale,
-                Float space,
-                String background,
-                HeadText.Billboard billboard
-        ) {
-        }
     }
 
     @With
@@ -586,6 +569,15 @@ public record Message(
             Destination destination,
             Sound sound
     ) implements EnableSetting, SoundConfigSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    public record Nameplate(
+            Boolean enable,
+            Destination destination,
+            Ticker ticker
+    ) implements EnableSetting {
     }
 
     @With

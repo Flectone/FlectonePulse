@@ -272,6 +272,7 @@ public interface PermissionMerger {
     @Mapping(target = "format", expression = "java(mergeMessageFormat(target.build().format().toBuilder(), source.format()))")
     @Mapping(target = "greeting", expression = "java(mergeMessageGreeting(target.build().greeting().toBuilder(), source.greeting()))")
     @Mapping(target = "join", expression = "java(mergeMessageJoin(target.build().join().toBuilder(), source.join()))")
+    @Mapping(target = "nameplate", expression = "java(mergeMessageNameplate(target.build().nameplate().toBuilder(), source.nameplate()))")
     @Mapping(target = "quit", expression = "java(mergeMessageQuit(target.build().quit().toBuilder(), source.quit()))")
     @Mapping(target = "rightclick", expression = "java(mergeMessageRightclick(target.build().rightclick().toBuilder(), source.rightclick()))")
     @Mapping(target = "scoreboard", expression = "java(mergeMessageScoreboard(target.build().scoreboard().toBuilder(), source.scoreboard()))")
@@ -303,6 +304,8 @@ public interface PermissionMerger {
     Permission.Message.Greeting mergeMessageGreeting(@MappingTarget Permission.Message.Greeting.GreetingBuilder target, Permission.Message.Greeting source);
 
     Permission.Message.Join mergeMessageJoin(@MappingTarget Permission.Message.Join.JoinBuilder target, Permission.Message.Join source);
+
+    Permission.Message.Nameplate mergeMessageNameplate(@MappingTarget Permission.Message.Nameplate.NameplateBuilder target, Permission.Message.Nameplate source);
 
     Permission.Message.Quit mergeMessageQuit(@MappingTarget Permission.Message.Quit.QuitBuilder target, Permission.Message.Quit source);
 

@@ -723,6 +723,10 @@ message:
   join:
     format: "<color:#4eff52>→ <display_name>"
     format_first_time: "<color:#4eff52>→ <display_name> <fcolor:1>welcome!"
+  nameplate:
+    values:
+      - "<display_name>"
+      - "<fcolor:2><replacement:ping> <fcolor:1>ms"
   quit:
     format: "<color:#ff4e4e>← <display_name>"
   rightclick:

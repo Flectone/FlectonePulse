@@ -19,6 +19,7 @@ import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.format.FormatModule;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.join.JoinModule;
+import net.flectone.pulse.module.message.nameplate.NameplateModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
 import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
@@ -54,6 +55,7 @@ public class MessageModuleImpl implements MessageModule {
         children.add(FormatModule.class);
         children.add(GreetingModule.class);
         children.add(JoinModule.class);
+        children.add(NameplateModule.class);
         children.add(QuitModule.class);
         children.add(RightclickModule.class);
         children.add(ScoreboardModule.class);

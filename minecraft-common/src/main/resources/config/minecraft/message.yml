@@ -354,6 +354,34 @@ join:
     type: "CHAT"
   sound:
     enable: false
+nameplate:
+  enable: true
+  destination:
+    type: "HEAD_TEXT"
+    visible_to_self: true
+    hide_when_sneaking: false
+    filter_ignores: false
+    movable: false
+    row: 0
+    max_count: 2
+    distance: 50.0
+    life_time: -1
+    modern:
+      enable: true
+      has_shadow: true
+      see_through: false
+      disable_see_through_when_sneaking: true
+      background: "#00000000"
+      animation_time: 5
+      offset_x: 0.0
+      offset_y: 0.2
+      offset_z: 0.0
+      scale: 1.0
+      space: 0.3
+      billboard: "CENTER"
+  ticker:
+    enable: true
+    period: 20
 quit:
   enable: true
   range: "PROXY"
