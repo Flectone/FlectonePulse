@@ -42,9 +42,9 @@ public class PulseMessageSendListener implements PulseListener {
     private final BossBarRender bossBarRender;
     private final BrandRender brandRender;
     private final ListFooterRender listFooterRender;
-    private final TextScreenRender textScreenRender;
     private final TitleRender titleRender;
     private final ToastRender toastRender;
+    private final HeadTextRender headTextRender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Pulse(priority = Event.Priority.MONITOR)
@@ -75,8 +75,12 @@ public class PulseMessageSendListener implements PulseListener {
             case TAB_HEADER -> listFooterRender.render(fReceiver, message, platformPlayerAdapter.getPlayerListFooter(fReceiver));
             case TAB_FOOTER -> listFooterRender.render(fReceiver, platformPlayerAdapter.getPlayerListHeader(fReceiver), message);
             case TOAST -> toastRender.render(fReceiver, message, event.submessage(), destination.toast());
+            case HEAD_TEXT -> {
+                if (!(event.messageContext().sender() instanceof FPlayer fPlayer)) return;
+
+                headTextRender.render(event.moduleName(), fPlayer, fReceiver,viewer -> message, destination.headText());
+            }
             case BRAND -> brandRender.render(fReceiver, message);
-            case TEXT_SCREEN -> textScreenRender.render(fReceiver, message, destination.textScreen());
             default -> messageSender.sendMessage(fReceiver, message, false);
         }
     }

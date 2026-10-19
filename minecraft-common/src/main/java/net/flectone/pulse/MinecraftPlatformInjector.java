@@ -127,7 +127,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(BossBarRender.class).to(MinecraftBossBarRender.class);
         bind(BrandRender.class).to(MinecraftBrandRender.class);
         bind(ListFooterRender.class).to(MinecraftListFooterRender.class);
-        bind(TextScreenRender.class).to(MinecraftTextScreenRender.class);
+        bind(HeadTextRender.class).to(MinecraftHeadTextRender.class);
         bind(TitleRender.class).to(MinecraftTitleRender.class);
         bind(ToastRender.class).to(MinecraftToastRender.class);
 
@@ -139,7 +139,6 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(ComponentSerializer.class).to(MinecraftComponentSerializer.class);
         bind(ComponentExtractor.class).to(MinecraftComponentExtractor.class);
         bind(new TypeLiteral<ComponentExtractor<?>>() {}).to(MinecraftComponentExtractor.class);
-        bind(HeadTextService.class).to(MinecraftHeadTextService.class);
         bind(SkinService.class).to(MinecraftSkinService.class);
         bind(ProfileResolver.class).to(MinecraftProfileResolver.class);
         bind(TranslationService.class).to(MinecraftTranslationService.class);

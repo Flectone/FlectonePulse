@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
+import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.service.*;
 
 @Singleton
@@ -19,11 +20,11 @@ public class PulsePlayerPersistAndDisposeListener implements PulseListener {
     private final PlaytimeService playtimeService;
     private final SocialService socialService;
     private final ModerationService moderationService;
-    private final HeadTextService headTextService;
+    private final HeadTextRender headTextRender;
 
     @Pulse(priority = Event.Priority.LOW)
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        headTextService.remove(event.player().uuid());
+        headTextRender.remove(event.player().uuid());
     }
 
     @Pulse(priority = Event.Priority.LOW)

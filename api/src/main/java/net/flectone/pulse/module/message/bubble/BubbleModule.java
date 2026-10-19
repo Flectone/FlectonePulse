@@ -44,16 +44,4 @@ public interface BubbleModule extends ModuleLocalization {
      */
     void add(@NonNull FPlayer fPlayer, @NonNull String rawString, @NonNull String inputString, Set<FPlayer> receivers);
 
-    /**
-     * How a bubble turns to face the viewer.
-     */
-    enum Billboard {
-
-        FIXED,
-        VERTICAL,
-        HORIZONTAL,
-        CENTER
-
-    }
-
 }

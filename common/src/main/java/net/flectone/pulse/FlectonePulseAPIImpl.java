@@ -19,7 +19,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.*;
-import net.flectone.pulse.platform.render.TextScreenRender;
+import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.*;
 
@@ -177,9 +177,6 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
 
         // close all UIs
         instance.hook(HookType.CLOSE_UIS);
-
-        // clear text screens
-        instance.get(TextScreenRender.class).clear();
 
         // get listener registry
         ListenerRegistry listenerRegistry = instance.get(ListenerRegistry.class);

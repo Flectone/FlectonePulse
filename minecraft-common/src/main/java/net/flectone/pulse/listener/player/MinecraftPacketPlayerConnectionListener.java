@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -12,9 +13,7 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +27,10 @@ import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.service.HeadTextService;
+import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -52,9 +50,8 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
     private final MinecraftPacketProvider packetProvider;
     private final MinecraftPacketSender packetSender;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
-    private final TextScreenRender textScreenRender;
     private final TaskScheduler taskScheduler;
-    private final HeadTextService headTextService;
+    private final HeadTextRender headTextRender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FLogger fLogger;
 
@@ -62,11 +59,16 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
     public void onPacketReceive(PacketReceiveEvent event) {
         PacketTypeCommon packetType = event.getPacketType();
 
-        if (packetType != PacketType.Play.Client.CLIENT_SETTINGS
-                && packetType != PacketType.Configuration.Client.CLIENT_SETTINGS) return;
-
         UUID uuid = event.getUser().getUUID();
         if (uuid == null) return;
+
+        if (packetType == PacketType.Play.Client.TELEPORT_CONFIRM) {
+            headTextRender.remove(uuid, uuid);
+            return;
+        }
+
+        if (packetType != PacketType.Play.Client.CLIENT_SETTINGS
+                && packetType != PacketType.Configuration.Client.CLIENT_SETTINGS) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
@@ -86,17 +88,28 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
 
         PacketTypeCommon packetType = event.getPacketType();
         switch (packetType) {
+            case PacketType.Play.Server.SPAWN_PLAYER -> {
+                WrapperPlayServerSpawnPlayer wrapperPlayServerSpawnPlayer = new WrapperPlayServerSpawnPlayer(event);
+                headTextRender.remove(wrapperPlayServerSpawnPlayer.getUUID(), event.getUser().getUUID());
+            }
+            case PacketType.Play.Server.SPAWN_ENTITY -> {
+                WrapperPlayServerSpawnEntity wrapperPlayServerSpawnEntity = new WrapperPlayServerSpawnEntity(event);
+                if (wrapperPlayServerSpawnEntity.getEntityType() == EntityTypes.PLAYER) {
+                    wrapperPlayServerSpawnEntity.getUUID().ifPresent(uuid ->
+                            headTextRender.remove(uuid, event.getUser().getUUID())
+                    );
+                }
+            }
             case PacketType.Play.Server.DEATH_COMBAT_EVENT -> {
                 UUID playerUUID = event.getUser().getUUID();
-                headTextService.remove(playerUUID);
+                headTextRender.remove(playerUUID);
             }
             case PacketType.Play.Server.SET_PASSENGERS -> {
                 WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
                 UUID playerUUID = platformPlayerAdapter.getPlayerByEntityId(wrapper.getEntityId());
                 if (playerUUID == null) return;
 
-                headTextService.remove(playerUUID);
-                textScreenRender.updateAndRide(wrapper.getEntityId());
+                headTextRender.setPassengers(playerUUID, wrapper.getPassengers());
             }
             case PacketType.Login.Server.LOGIN_SUCCESS -> handleLoginSuccess(event);
             default -> {

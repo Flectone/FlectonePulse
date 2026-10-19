@@ -16,7 +16,6 @@ import java.util.function.Function;
  * @param bossBar the boss bar settings, used by {@link Type#BOSS_BAR}
  * @param times the fade and stay timings, used by titles and the action bar
  * @param toast the toast settings, used by {@link Type#TOAST}
- * @param textScreen the floating text settings, used by {@link Type#TEXT_SCREEN}
  * @author TheFaser
  */
 public record Destination(
@@ -25,7 +24,7 @@ public record Destination(
         BossBar bossBar,
         Times times,
         Toast toast,
-        TextScreen textScreen
+        HeadText headText
 ) {
 
     /**
@@ -49,9 +48,33 @@ public record Destination(
      */
     public static final Toast DEFAULT_TOAST = new Toast("minecraft:diamond", Toast.Type.TASK);
     /**
-     * The text screen settings used when the config leaves them out.
+     * The head text settings used when the config leaves them out.
      */
-    public static final TextScreen DEFAULT_TEXT_SCREEN = new TextScreen("#00000040", true, false, 2, 10, 100000, 0.5f, 0f, -0.3f, -0.8f);
+    public static final HeadText DEFAULT_HEAD_TEXT = HeadText.builder()
+            .visibleToSelf(true)
+            .hideWhenSneaking(false)
+            .filterIgnores(false)
+            .movable(true)
+            .distance(30.0)
+            .row(0)
+            .maxCount(1)
+            .lifeTime(HeadText.AUTO)
+            .modern(HeadText.Modern.builder()
+                    .enable(true)
+                    .hasShadow(true)
+                    .seeThrough(false)
+                    .disableSeeThroughWhenSneaking(true)
+                    .background("#00000040")
+                    .animationTime(5)
+                    .offsetX(0)
+                    .offsetY(0.2f)
+                    .offsetZ(0)
+                    .scale(1.0f)
+                    .space(0.3f)
+                    .billboard(HeadText.Modern.Billboard.CENTER)
+                    .build()
+            )
+            .build();
     /**
      * The shared all-default destination for the action bar, so equal destinations share one instance.
      */
@@ -85,10 +108,6 @@ public record Destination(
      */
     public static final Destination EMPTY_TAB_FOOTER = new Destination(Type.TAB_FOOTER);
     /**
-     * The shared all-default destination for a floating text screen, so equal destinations share one instance.
-     */
-    public static final Destination EMPTY_TEXT_SCREEN = new Destination(Type.TEXT_SCREEN, DEFAULT_TEXT_SCREEN);
-    /**
      * The shared all-default destination for a toast, so equal destinations share one instance.
      */
     public static final Destination EMPTY_TOAST = new Destination(Type.TOAST, DEFAULT_TOAST, DEFAULT_SUBTEXT);
@@ -102,7 +121,7 @@ public record Destination(
         bossBar = (bossBar == null && type == Type.BOSS_BAR) ? DEFAULT_BOSS_BAR : bossBar;
         times = (times == null && (type == Type.TITLE || type == Type.SUBTITLE || type == Type.ACTION_BAR)) ? DEFAULT_TIMES : times;
         toast = (toast == null && type == Type.TOAST) ? DEFAULT_TOAST : toast;
-        textScreen = (textScreen == null && type == Type.TEXT_SCREEN) ? DEFAULT_TEXT_SCREEN : textScreen;
+        headText = (headText == null && type == Type.HEAD_TEXT) ? DEFAULT_HEAD_TEXT : headText;
     }
 
     /**
@@ -157,13 +176,13 @@ public record Destination(
     }
 
     /**
-     * Creates a floating text screen destination.
+     * Creates a head text destination.
      *
      * @param type the delivery target
-     * @param textScreen the text screen settings
+     * @param headText the head text settings
      */
-    public Destination(Type type, TextScreen textScreen) {
-        this(type, null, null, null, null, textScreen);
+    public Destination(Type type, HeadText headText) {
+        this(type, null, null, null, null, headText);
     }
 
     /**
@@ -178,6 +197,81 @@ public record Destination(
         Type type = Type.valueOf(String.valueOf(map.get("type")));
 
         return switch (type) {
+            case HEAD_TEXT -> {
+                boolean visibleToSelf = parseOrDefault(map.get("visible_to_self"), DEFAULT_HEAD_TEXT.visibleToSelf(), Boolean::parseBoolean);
+                boolean hideWhenSneaking = parseOrDefault(map.get("hide_when_sneaking"), DEFAULT_HEAD_TEXT.hideWhenSneaking(), Boolean::parseBoolean);
+                boolean filterIgnores = parseOrDefault(map.get("filter_ignores"), DEFAULT_HEAD_TEXT.filterIgnores(), Boolean::parseBoolean);
+                boolean movable = parseOrDefault(map.get("movable"), DEFAULT_HEAD_TEXT.movable(), Boolean::parseBoolean);
+                int row = parseOrDefault(map.get("row"), DEFAULT_HEAD_TEXT.row(), Integer::parseInt);
+                int maxCount = parseOrDefault(map.get("max_count"), DEFAULT_HEAD_TEXT.maxCount(), Integer::parseInt);
+                double distance = parseOrDefault(map.get("distance"), DEFAULT_HEAD_TEXT.distance(), Double::parseDouble);
+                long lifeTime = parseOrDefault(map.get("life_time"), DEFAULT_HEAD_TEXT.lifeTime(), Long::parseLong);
+
+                Object mapModern = map.get("modern");
+                if (!(mapModern instanceof Map<?, ?>)) {
+                    yield new Destination(type, HeadText.builder()
+                            .visibleToSelf(visibleToSelf)
+                            .hideWhenSneaking(hideWhenSneaking)
+                            .filterIgnores(filterIgnores)
+                            .movable(movable)
+                            .row(row)
+                            .maxCount(maxCount)
+                            .distance(distance)
+                            .lifeTime(lifeTime)
+                            .modern(DEFAULT_HEAD_TEXT.modern())
+                            .build()
+                    );
+                }
+
+                @SuppressWarnings("unchecked")
+                Map<String, Object> modernMap = (Map<String, Object>) mapModern;
+
+                boolean enable = parseOrDefault(modernMap.get("enable"), DEFAULT_HEAD_TEXT.modern().enable(), Boolean::parseBoolean);
+                boolean hasShadow = parseOrDefault(modernMap.get("has_shadow"), DEFAULT_HEAD_TEXT.modern().hasShadow(), Boolean::parseBoolean);
+                boolean seeThrough = parseOrDefault(modernMap.get("see_through"), DEFAULT_HEAD_TEXT.modern().seeThrough(), Boolean::parseBoolean);
+                boolean disableSeeThroughWhenSneaking = parseOrDefault(modernMap.get("disable_see_through_when_sneaking"), DEFAULT_HEAD_TEXT.modern().enable(), Boolean::parseBoolean);
+                String background = parseOrDefault(modernMap.get("background"), DEFAULT_HEAD_TEXT.modern().background(), String::valueOf);
+                int animationTime = parseOrDefault(modernMap.get("animation_time"), DEFAULT_HEAD_TEXT.modern().animationTime(), Integer::parseInt);
+                float offsetX = parseOrDefault(modernMap.get("offset_x"), DEFAULT_HEAD_TEXT.modern().offsetX(), Float::parseFloat);
+                float offsetY = parseOrDefault(modernMap.get("offset_y"), DEFAULT_HEAD_TEXT.modern().offsetY(), Float::parseFloat);
+                float offsetZ = parseOrDefault(modernMap.get("offset_z"), DEFAULT_HEAD_TEXT.modern().offsetZ(), Float::parseFloat);
+                float scale = parseOrDefault(modernMap.get("scale"), DEFAULT_HEAD_TEXT.modern().scale(), Float::parseFloat);
+                float space = parseOrDefault(modernMap.get("space"), DEFAULT_HEAD_TEXT.modern().space(), Float::parseFloat);
+
+                HeadText.Modern.Billboard billboard;
+                try {
+                    billboard = HeadText.Modern.Billboard.valueOf(String.valueOf(modernMap.get("billboard")));
+                } catch (IllegalArgumentException _) {
+                    billboard = DEFAULT_HEAD_TEXT.modern().billboard();
+                }
+
+                yield new Destination(type, HeadText.builder()
+                        .visibleToSelf(visibleToSelf)
+                        .hideWhenSneaking(hideWhenSneaking)
+                        .filterIgnores(filterIgnores)
+                        .movable(movable)
+                        .row(row)
+                        .maxCount(maxCount)
+                        .distance(distance)
+                        .lifeTime(lifeTime)
+                        .modern(HeadText.Modern.builder()
+                                .enable(enable)
+                                .hasShadow(hasShadow)
+                                .seeThrough(seeThrough)
+                                .disableSeeThroughWhenSneaking(disableSeeThroughWhenSneaking)
+                                .background(background)
+                                .animationTime(animationTime)
+                                .offsetX(offsetX)
+                                .offsetY(offsetY)
+                                .offsetZ(offsetZ)
+                                .scale(scale)
+                                .space(space)
+                                .billboard(billboard)
+                                .build()
+                        )
+                        .build()
+                );
+            }
             case TOAST -> {
                 String icon = parseOrDefault(map.get("icon"), DEFAULT_TOAST.icon(), string -> string);
                 String subtext = parseOrDefault(map.get("subtext"), DEFAULT_SUBTEXT, string -> string);
@@ -234,21 +328,6 @@ public record Destination(
 
                 yield bossBar.equals(DEFAULT_BOSS_BAR) ? EMPTY_BOSS_BAR : new Destination(type, bossBar);
             }
-            case TEXT_SCREEN -> {
-                String background = parseOrDefault(map.get("background"), DEFAULT_TEXT_SCREEN.background(), string -> string);
-                boolean hasShadow = parseOrDefault(map.get("has_shadow"), DEFAULT_TEXT_SCREEN.hasShadow(), Boolean::parseBoolean);
-                boolean seeThrough = parseOrDefault(map.get("see_through"), DEFAULT_TEXT_SCREEN.seeThrough(), Boolean::parseBoolean);
-                int animationTime = parseOrDefault(map.get("animation_time"), DEFAULT_TEXT_SCREEN.animationTime(), Integer::parseInt);
-                int liveTime = parseOrDefault(map.get("live_time"), DEFAULT_TEXT_SCREEN.liveTime(), Integer::parseInt);
-                int width = parseOrDefault(map.get("width"), DEFAULT_TEXT_SCREEN.width(), Integer::parseInt);
-                float scale = parseOrDefault(map.get("scale"), DEFAULT_TEXT_SCREEN.scale(), Float::parseFloat);
-                float offsetX = parseOrDefault(map.get("offset_x"), DEFAULT_TEXT_SCREEN.offsetX(), Float::parseFloat);
-                float offsetY = parseOrDefault(map.get("offset_y"), DEFAULT_TEXT_SCREEN.offsetY(), Float::parseFloat);
-                float offsetZ = parseOrDefault(map.get("offset_z"), DEFAULT_TEXT_SCREEN.offsetZ(), Float::parseFloat);
-
-                TextScreen textScreen = new TextScreen(background, hasShadow, seeThrough, animationTime, liveTime, width, scale, offsetX, offsetY, offsetZ);
-                yield textScreen.equals(DEFAULT_TEXT_SCREEN) ? EMPTY_TEXT_SCREEN : new Destination(type, textScreen);
-            }
             case BRAND -> EMPTY_BRAND;
             case CHAT -> EMPTY_CHAT;
             case TAB_HEADER -> EMPTY_TAB_HEADER;
@@ -271,6 +350,34 @@ public record Destination(
         map.put("type", this.type);
 
         switch (this.type) {
+            case HEAD_TEXT -> {
+                HeadText headText = this.headText != null ? this.headText : DEFAULT_HEAD_TEXT;
+                map.put("visible_to_self", headText.visibleToSelf());
+                map.put("hide_when_sneaking", headText.hideWhenSneaking());
+                map.put("filter_ignores", headText.filterIgnores());
+                map.put("movable", headText.movable());
+                map.put("row", headText.row());
+                map.put("max_count", headText.maxCount());
+                map.put("distance", headText.distance());
+                map.put("life_time", headText.lifeTime());
+
+                HeadText.Modern modern = headText.modern() != null ? headText.modern() : DEFAULT_HEAD_TEXT.modern();
+                Map<String, Object> modernMap = new LinkedHashMap<>();
+                modernMap.put("enable", modern.enable());
+                modernMap.put("has_shadow", modern.hasShadow());
+                modernMap.put("see_through", modern.seeThrough());
+                modernMap.put("disable_see_through_when_sneaking", modern.disableSeeThroughWhenSneaking());
+                modernMap.put("background", modern.background());
+                modernMap.put("animation_time", modern.animationTime());
+                modernMap.put("offset_x", modern.offsetX());
+                modernMap.put("offset_y", modern.offsetY());
+                modernMap.put("offset_z", modern.offsetZ());
+                modernMap.put("scale", modern.scale());
+                modernMap.put("space", modern.space());
+                modernMap.put("billboard", modern.billboard());
+
+                map.put("modern", modernMap);
+            }
             case TOAST -> {
                 Toast toast = this.toast != null ? this.toast : DEFAULT_TOAST;
                 map.put("icon", toast.icon());
@@ -300,19 +407,6 @@ public record Destination(
                 map.put("create_world_fog", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG));
                 map.put("darken_screen", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN));
             }
-            case TEXT_SCREEN -> {
-                TextScreen textScreen = this.textScreen != null ? this.textScreen : DEFAULT_TEXT_SCREEN;
-                map.put("background", textScreen.background());
-                map.put("has_shadow", textScreen.hasShadow());
-                map.put("see_through", textScreen.seeThrough());
-                map.put("animation_time", textScreen.animationTime());
-                map.put("live_time", textScreen.liveTime());
-                map.put("width", textScreen.width());
-                map.put("scale", textScreen.scale());
-                map.put("offset_x", textScreen.offsetX());
-                map.put("offset_y", textScreen.offsetY());
-                map.put("offset_z", textScreen.offsetZ());
-            }
         }
 
         return map;
@@ -330,7 +424,7 @@ public record Destination(
         SUBTITLE,
         TAB_HEADER,
         TAB_FOOTER,
-        TEXT_SCREEN,
-        TOAST
+        TOAST,
+        HEAD_TEXT
     }
 }

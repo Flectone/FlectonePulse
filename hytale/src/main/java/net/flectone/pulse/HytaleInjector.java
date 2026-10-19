@@ -96,7 +96,7 @@ public class HytaleInjector extends PlatformInjector {
         bind(BossBarRender.class).to(HytaleBossBarRender.class);
         bind(BrandRender.class).to(HytaleBrandRender.class);
         bind(ListFooterRender.class).to(HytaleListFooterRender.class);
-        bind(TextScreenRender.class).to(HytaleTextScreenRender.class);
+        bind(HeadTextRender.class).to(HytaleHeadTextRender.class);
         bind(TitleRender.class).to(HytaleTitleRender.class);
         bind(ToastRender.class).to(HytaleToastRender.class);
 
@@ -108,7 +108,6 @@ public class HytaleInjector extends PlatformInjector {
         bind(ComponentSerializer.class).to(HytaleComponentSerializer.class);
         bind(ComponentExtractor.class).to(HytaleComponentExtractor.class);
         bind(new TypeLiteral<ComponentExtractor<?>>() {}).to(HytaleComponentExtractor.class);
-        bind(HeadTextService.class).to(HytaleHeadTextService.class);
         bind(SkinService.class).to(HytaleSkinService.class);
         bind(ProfileResolver.class).to(HytaleProfileResolver.class);
         bind(TranslationService.class).to(HytaleTranslationService.class);

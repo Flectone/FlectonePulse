@@ -9,17 +9,16 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
-import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.entity.HeadText;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.message.context.StringMessageContext;
+import net.flectone.pulse.model.value.Destination;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.service.HeadTextService;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -37,9 +36,8 @@ public class BubbleModuleImpl implements BubbleModule {
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
-    private final HeadTextService headTextService;
+    private final HeadTextRender headTextRender;
     private final SocialService socialService;
-    private final ColorConverter colorConverter;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
@@ -86,6 +84,7 @@ public class BubbleModuleImpl implements BubbleModule {
     @Override
     public void add(@NonNull FPlayer fPlayer, @NonNull String rawString, @NonNull String inputString, Set<FPlayer> receivers) {
         if (disallowedPredicate != null && disallowedPredicate.test(rawString)) return;
+        if (config().destination().type() != Destination.Type.HEAD_TEXT) return;
 
         taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
@@ -95,7 +94,7 @@ public class BubbleModuleImpl implements BubbleModule {
     }
 
     private void addMessage(@NonNull FPlayer sender, @NonNull String message, Set<FPlayer> receivers) {
-        if (!headTextService.isCorrectHolder(sender.uuid())) return;
+        if (!headTextRender.isCorrectHolder(sender.uuid())) return;
 
         message = messagePipeline.buildPlain(MessageContext.builder()
                 .module(ModuleName.MESSAGE_BUBBLE)
@@ -111,7 +110,7 @@ public class BubbleModuleImpl implements BubbleModule {
         String wordBreakHint = config().wordBreakHint();
         int hintBufferLength = config().hintBufferLength();
         int maxLength = config().maxLength();
-        int maxCount = config().maxCount();
+        int maxCount = config().destination().headText().maxCount();
 
         if (message.length() <= maxLength) {
             show(sender, message, receivers);
@@ -160,33 +159,19 @@ public class BubbleModuleImpl implements BubbleModule {
     }
 
     private void show(@NonNull FPlayer sender, @NonNull String message, Set<FPlayer> receivers) {
-        headTextService.show(HeadText.builder()
-                .module(this.name())
-                .holder(sender)
-                .receivers(receivers)
-                .component(viewer -> createFormattedMessage(sender, viewer, message))
-                .distance(config().distance())
-                .modern(config().modern().enable())
-                .movable(true)
-                .visibleToSelf(config().visibleToSelf())
-                .filterIgnores(true)
-                .hasShadow(config().modern().hasShadow())
-                .seeThrough(config().modern().seeThrough())
-                .background(colorConverter.parseHexToArgb(config().modern().background()))
-                .scale(config().modern().scale())
-                .space(config().modern().space())
-                .offset(config().offset())
-                .maxCount(config().maxCount())
-                .animationTime(config().modern().animationTime())
-                .endTime(System.currentTimeMillis() + calculateDuration(message))
-                .billboard(config().modern().billboard())
-                .build()
+        long lifeTime = calculateDuration(message);
+        headTextRender.render(
+                this.name(),
+                sender,
+                receivers,
+                viewer -> createFormattedMessage(sender, viewer, message),
+                config().destination().headText().withLifeTime(lifeTime)
         );
     }
 
     private Component createFormattedMessage(FPlayer sender, FPlayer receiver, String message) {
         MessageContext messageContext = MessageContext.builder()
-                .module(ModuleName.MESSAGE_BUBBLE)
+                .module(this.name())
                 .sender(sender)
                 .receiver(receiver)
                 .message(message)
@@ -198,7 +183,7 @@ public class BubbleModuleImpl implements BubbleModule {
 
         return messagePipeline.build(StringMessageContext.builder()
                 .base(messageContext.toBuilder()
-                        .module(ModuleName.MESSAGE_BUBBLE)
+                        .module(this.name())
                         .message(localization(receiver).format())
                         .flag(MessageFlag.PLAYER_MESSAGE, false)
                         .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(messagePipeline.build(messageContext))))
@@ -213,7 +198,7 @@ public class BubbleModuleImpl implements BubbleModule {
         Message.Bubble config = fileFacade.message().bubble();
 
         int countWords = message.split(" ").length;
-        return (long) (((countWords + config.handicapChars()) / config.readSpeed()) * 60) * 1000L;
+        return (long) (((countWords + config.handicapChars()) / config.readSpeed()) * 60) * 20;
     }
 
     private boolean isNotLetter(char symbol) {

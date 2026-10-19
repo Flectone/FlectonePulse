@@ -10,7 +10,7 @@ import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.service.HeadTextService;
+import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.service.SocialService;
 
 @Singleton
@@ -22,13 +22,12 @@ public class MinecraftBubbleModule extends BubbleModuleImpl {
     public MinecraftBubbleModule(FileFacade fileFacade,
                                  TaskScheduler taskScheduler,
                                  ModuleController moduleController,
-                                 HeadTextService headTextService,
+                                 HeadTextRender headTextRender,
                                  SocialService socialService,
-                                 ColorConverter colorConverter,
                                  MessagePipeline messagePipeline,
                                  FLogger fLogger,
                                  ListenerRegistry listenerRegistry) {
-        super(fileFacade, taskScheduler, moduleController, headTextService, socialService, colorConverter, messagePipeline, fLogger);
+        super(fileFacade, taskScheduler, moduleController, headTextRender, socialService, messagePipeline, fLogger);
 
         this.listenerRegistry = listenerRegistry;
     }
