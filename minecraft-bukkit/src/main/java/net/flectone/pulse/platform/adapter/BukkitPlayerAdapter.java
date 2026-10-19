@@ -26,6 +26,7 @@ import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.serializer.ComponentSerializer;
+import net.flectone.pulse.service.NearbyService;
 import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -39,7 +40,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -56,6 +56,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     private final FLogger fLogger;
     private final LazyInstance<MinecraftHeaderModule> headerModule;
     private final LazyInstance<MinecraftFooterModule> footerModule;
+    private final LazyInstance<NearbyService> nearbyService;
 
     private MethodHandle handleMethod;
     private MethodHandle gameProfileMethod;
@@ -406,19 +407,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull UUID uuid, double x, double y, double z) {
-        Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return Set.of();
-
-        World world = player.getWorld();
-        Location location = player.getLocation();
-
-        return world.getNearbyEntities(location, x, y, z)
-                .stream()
-                .filter(Player.class::isInstance)
-                .map(Player.class::cast)
-                .filter(target -> target.canSee(player))
-                .map(Entity::getUniqueId)
-                .collect(Collectors.toSet());
+        return nearbyService.get().getNearbyPlayers(uuid, Math.max(x, z));
     }
 
     @Override

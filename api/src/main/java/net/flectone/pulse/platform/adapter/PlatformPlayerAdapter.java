@@ -386,7 +386,10 @@ public interface PlatformPlayerAdapter {
     @NonNull List<UUID> getOnlinePlayers();
 
     /**
-     * Finds players who can see a location.
+     * Finds players who can see the given location.
+     * <p>
+     * Use {@link net.flectone.pulse.service.NearbyService} instead.
+     * </p>
      *
      * @param uuid the source player UUID
      * @param x the X coordinate
@@ -394,8 +397,15 @@ public interface PlatformPlayerAdapter {
      * @param z the Z coordinate
      * @return set of player UUIDs who can see the location
      */
+    @Deprecated(since = "1.15.0")
     @NonNull Set<UUID> findPlayersWhoCanSee(UUID uuid, double x, double y, double z);
 
+    /**
+     * <p>
+     * Use {@link net.flectone.pulse.service.NearbyService} instead.
+     * </p>
+     */
+    @Deprecated(since = "1.15.0")
     default @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull FEntity entity, double x, double y, double z) {
         return findPlayersWhoCanSee(entity.uuid(), x, y, z);
     }
@@ -444,7 +454,20 @@ public interface PlatformPlayerAdapter {
          * @return the distance
          */
         public double distance(Coordinates other) {
-            return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2) + Math.pow(z - other.z, 2));
+            return Math.sqrt(distanceSquared(other));
+        }
+
+        /**
+         * The squared straight-line distance to another point, ignoring the facing angles.
+         *
+         * @param other the other point
+         * @return the squared distance
+         */
+        public double distanceSquared(Coordinates other) {
+            double dx = x - other.x;
+            double dy = y - other.y;
+            double dz = z - other.z;
+            return dx * dx + dy * dy + dz * dz;
         }
 
     }

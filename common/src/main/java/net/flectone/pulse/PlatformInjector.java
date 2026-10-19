@@ -473,6 +473,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(FPlayerService.class).to(FPlayerServiceImpl.class);
         bind(MetricsService.class).to(MetricsServiceImpl.class);
         bind(ModerationService.class).to(ModerationServiceImpl.class);
+        bind(NearbyService.class).to(NearbyServiceImpl.class);
         bind(PlaytimeService.class).to(PlaytimeServiceImpl.class);
         bind(SocialService.class).to(SocialServiceImpl.class);
 

@@ -23,6 +23,7 @@ import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.service.NearbyService;
 import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -36,17 +37,11 @@ import net.minecraft.server.players.NameAndId;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -60,6 +55,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     private final FLogger fLogger;
     private final LazyInstance<MinecraftHeaderModule> headerModule;
     private final LazyInstance<MinecraftFooterModule> footerModule;
+    private final LazyInstance<NearbyService> nearbyService;
 
     @Override
     public int getEntityId(@NonNull UUID uuid) {
@@ -369,35 +365,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull UUID uuid, double x, double y, double z) {
-        ServerPlayer player = getPlayer(uuid);
-        if (player == null) return Set.of();
-
-        Vec3 position = player.position();
-        AABB searchBox = new AABB(
-                position.x - x, position.y - y, position.z - z,
-                position.x + x, position.y + y, position.z + z
-        );
-
-        return player.level().getEntitiesOfClass(ServerPlayer.class, searchBox, _ -> true)
-                .stream()
-                .filter(target -> {
-                    Vec3 startPos = target.getEyePosition(1.0F);
-                    Vec3 endPos = player.getEyePosition(1.0F);
-
-                    BlockHitResult hitResult = target.level().clip(
-                            new ClipContext(
-                                    startPos,
-                                    endPos,
-                                    ClipContext.Block.VISUAL,
-                                    ClipContext.Fluid.SOURCE_ONLY,
-                                    target
-                            )
-                    );
-
-                    return hitResult.getType() == HitResult.Type.MISS;
-                })
-                .map(Entity::getUUID)
-                .collect(Collectors.toSet());
+        return nearbyService.get().getNearbyPlayers(uuid, Math.max(x, z));
     }
 
     @Override

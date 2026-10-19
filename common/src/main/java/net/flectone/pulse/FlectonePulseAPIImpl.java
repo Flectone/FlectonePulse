@@ -94,7 +94,11 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
             instance.get(MetricsService.class).start();
         }
 
-        instance.get(HeadTextService.class).reload();
+        // reload nearby service
+        instance.get(NearbyService.class).reload();
+
+        // reload head text render
+        instance.get(HeadTextRender.class).reload();
 
         // call enable ready event
         EnableEvent enableReadyEvent = eventDispatcher.dispatch(new EnableEvent(EnableEvent.Type.READY, instance));
@@ -308,7 +312,11 @@ public class FlectonePulseAPIImpl extends FlectonePulseAPI {
             instance.get(MetricsService.class).start();
         }
 
-        instance.get(HeadTextService.class).reload();
+        // reload nearby service
+        instance.get(NearbyService.class).reload();
+
+        // reload head text render
+        instance.get(HeadTextRender.class).reload();
 
         // end reload event
         ReloadEvent endReloadEvent = eventDispatcher.dispatch(reloadListeners, new ReloadEvent(instance, ReloadEvent.Type.END, reloadException));

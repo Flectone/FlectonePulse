@@ -31,6 +31,8 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.PlayTime;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.serializer.HytaleComponentSerializer;
+import net.flectone.pulse.service.NearbyService;
+import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.apache.commons.lang3.Strings;
@@ -43,7 +45,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -52,6 +53,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     private final FileFacade fileFacade;
     private final HytaleComponentSerializer componentSerializer;
     private final TaskScheduler taskScheduler;
+    private final LazyInstance<NearbyService> nearbyService;
 
     @Override
     public int getEntityId(@NonNull UUID uuid) {
@@ -392,31 +394,8 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NonNull Set<UUID> findPlayersWhoCanSee(UUID senderUuid, double viewDistanceX, double viewDistanceY, double viewDistanceZ) {
-        PlayerRef senderRef = getPlayer(senderUuid);
-        if (senderRef == null) return Set.of();
-
-        Universe universe = Universe.get();
-        if (universe == null) return Set.of();
-
-        UUID worldUUID = senderRef.getWorldUuid();
-        if (worldUUID == null) return Set.of();
-
-        World world = universe.getWorld(worldUUID);
-        if (world == null) return Set.of();
-
-        Vector3d senderPos = senderRef.getTransform().getPosition();
-
-        return world.getPlayerRefs().stream().filter(targetRef -> {
-            Vector3d targetPos = targetRef.getTransform().getPosition();
-
-            double dx = Math.abs(senderPos.x() - targetPos.x());
-            double dy = Math.abs(senderPos.y() - targetPos.y());
-            double dz = Math.abs(senderPos.z() - targetPos.z());
-
-            return dx <= viewDistanceX && dy <= viewDistanceY && dz <= viewDistanceZ
-                    && hasLineOfSight(senderRef, targetRef, world);
-        }).map(PlayerRef::getUuid).collect(Collectors.toSet());
+    public @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull UUID uuid, double x, double y, double z) {
+        return nearbyService.get().getNearbyPlayers(uuid, Math.max(x, z));
     }
 
     private boolean hasLineOfSight(PlayerRef from, PlayerRef to, World world) {
