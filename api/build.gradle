@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+
 dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson_annotations_version"
     implementation "org.incendo:cloud-core:$cloud_core_version"
@@ -25,6 +27,14 @@ tasks.named("sourcesJar", Jar) {
         it.file.path.startsWith(file("src/main/java").path)
     }
     from(tasks.delombok)
+    filesMatching("**/*.java") {
+        filter { line ->
+            line.replaceAll(/[A-Za-z_]\w*(\.[A-Za-z_]\w*)+/) { match ->
+                def relocator = tasks.shadowJar.relocators.get().find { it.canRelocateClass(match[0]) }
+                relocator ? relocator.relocateClass(new RelocateClassContext(match[0])) : match[0]
+            }
+        }
+    }
 }
 
 components.java {
