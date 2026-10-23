@@ -19,6 +19,14 @@ jar {
     archiveClassifier = "plain"
 }
 
+tasks.named("sourcesJar", Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude {
+        it.file.path.startsWith(file("src/main/java").path)
+    }
+    from(tasks.delombok)
+}
+
 components.java {
     withVariantsFromConfiguration(configurations.runtimeElements) {
         skip()
