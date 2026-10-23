@@ -12,7 +12,23 @@ dependencies {
 }
 
 shadowJar {
-    minimize()
+    archiveClassifier = ""
+}
+
+jar {
+    archiveClassifier = "plain"
+}
+
+components.java {
+    withVariantsFromConfiguration(configurations.runtimeElements) {
+        skip()
+    }
+    withVariantsFromConfiguration(configurations.apiElements) {
+        skip()
+    }
+    addVariantsFromConfiguration(configurations.shadowRuntimeElements) {
+        mapToMavenScope("runtime")
+    }
 }
 
 tasks.named("buildFinalJar", Jar) {
