@@ -137,7 +137,7 @@ public class GeolocateModuleImpl implements GeolocateModule {
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(localization(fResolver).format(),
                                         new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>", "<current_time>"},
-                                        new String[]{response.country(), response.region(), response.city(), response.timezone(), String.valueOf(response.mobile()), String.valueOf(response.proxy()), String.valueOf(response.hosting()), response.query(), timeFormatter.format(fResolver, userCurrentTime)}
+                                        new String[]{response.country(), response.region(), response.city(), response.timezone(), String.valueOf(response.mobile()), String.valueOf(response.proxy()), String.valueOf(response.hosting()), response.query(), timeFormatter.formatDate(fResolver, userCurrentTime)}
                                 ))
                                 .tagResolver(messagePipeline.targetTag(fResolver, fTarget))
                                 .build()
