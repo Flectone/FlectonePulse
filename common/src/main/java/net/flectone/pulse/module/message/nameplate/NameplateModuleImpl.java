@@ -17,6 +17,7 @@ import net.flectone.pulse.model.value.HeadText;
 import net.flectone.pulse.model.value.Ticker;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
@@ -37,6 +38,7 @@ public class NameplateModuleImpl implements NameplateModule {
     private final MessagePipeline messagePipeline;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final NearbyService nearbyService;
+    private final ModuleController moduleController;
     private final FPlayerService fPlayerService;
 
     @Override
@@ -69,6 +71,7 @@ public class NameplateModuleImpl implements NameplateModule {
 
     @Override
     public void show(FPlayer fPlayer) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
         if (config().destination().type() != Destination.Type.HEAD_TEXT) return;
 
         HeadText headText = config().destination().headText();
