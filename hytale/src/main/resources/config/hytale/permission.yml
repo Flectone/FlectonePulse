@@ -1042,9 +1042,6 @@ message:
   nameplate:
     name: "flectonepulse.module.message.nameplate"
     type: "TRUE"
-    sound:
-      name: "flectonepulse.module.message.nameplate.sound"
-      type: "TRUE"
   quit:
     name: "flectonepulse.module.message.quit"
     type: "TRUE"
