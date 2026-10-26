@@ -700,6 +700,8 @@ message:
         format_restrict: "<color:#ff7171>🔒 Ты не можешь общаться, потому что часто флудил (<time_left> осталось)"
       newbie:
         format_restrict: "<color:#ff7171>🔒 Ты не можешь общаться, потому что мало играл на сервере (<time_left> осталось)"
+      spam:
+        format_restrict: "<color:#ff7171>🔒 Ты не можешь общаться, потому что часто спамил (<time_left> осталось)"
       swear:
         symbol: "❤"
         format_see: "<hover:show_text:\"<swear>\"><symbols></hover>"

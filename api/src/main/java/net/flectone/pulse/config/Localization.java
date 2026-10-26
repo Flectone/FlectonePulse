@@ -1214,6 +1214,9 @@ public record Localization(
                     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/newbie")
                     Newbie newbie,
 
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/spam")
+                    Spam spam,
+
                     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/swear")
                     Swear swear
             ) implements LocalizationSetting {
@@ -1239,6 +1242,11 @@ public record Localization(
                 @With
                 @Builder(toBuilder = true)
                 public record Newbie(String formatRestrict) implements LocalizationSetting {
+                }
+
+                @With
+                @Builder(toBuilder = true)
+                public record Spam(String formatRestrict) implements LocalizationSetting {
                 }
 
                 @With

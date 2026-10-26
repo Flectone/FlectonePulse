@@ -17,6 +17,7 @@ import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
+import net.flectone.pulse.module.message.format.moderation.spam.SpamModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.service.ExternalModerationService;
@@ -41,6 +42,7 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
     private final LazyInstance<CapsModule> capsModule;
     private final LazyInstance<FloodModule> floodModule;
     private final LazyInstance<NewbieModule> newbieModule;
+    private final LazyInstance<SpamModule> spamModule;
     private final LazyInstance<SwearModule> swearModule;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
@@ -157,6 +159,36 @@ public class ModerationMessageFormatterImpl implements ModerationMessageFormatte
                 if (mute == null) yield Optional.empty();
 
                 String format = newbieModuleInstance.localization(fPlayer).formatRestrict();
+
+                MessageContext muteContext = ExternalModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .module(ModuleName.ERROR)
+                                .sender(fPlayer)
+                                .message(replacePlaceholders(format, fPlayer, mute))
+                                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                                .build()
+                        )
+                        .externalModeration(mute)
+                        .build();
+
+                yield Optional.of(muteContext);
+            }
+            case SPAM -> {
+                SpamModule spamModuleInstance = spamModule.get();
+                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), spamModuleInstance);
+                if (timestamp == null) yield Optional.empty();
+
+                String format = spamModuleInstance.localization(fPlayer).formatRestrict();
+
+                ExternalModeration mute = new ExternalModeration(
+                        fPlayer.name(),
+                        fileFacade.config().logger().console(),
+                        spamModuleInstance.localization(FPlayer.UNKNOWN).formatRestrict(),
+                        -1,
+                        System.currentTimeMillis(),
+                        timestamp,
+                        false
+                );
 
                 MessageContext muteContext = ExternalModerationMessageContext.builder()
                         .base(MessageContext.builder()

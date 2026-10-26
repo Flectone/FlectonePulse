@@ -183,6 +183,8 @@ import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModuleImpl;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModuleImpl;
+import net.flectone.pulse.module.message.format.moderation.spam.SpamModule;
+import net.flectone.pulse.module.message.format.moderation.spam.SpamModuleImpl;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModuleImpl;
 import net.flectone.pulse.module.message.format.names.NamesModule;
@@ -424,6 +426,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(ReplacementModule.class).to(ReplacementModuleImpl.class);
         bind(RightclickModule.class).to(RightclickModuleImpl.class);
         bind(SignModule.class).to(SignModuleImpl.class);
+        bind(SpamModule.class).to(SpamModuleImpl.class);
         bind(StatusModule.class).to(StatusModuleImpl.class);
         bind(SwearModule.class).to(SwearModuleImpl.class);
         bind(TabModule.class).to(TabModuleImpl.class);

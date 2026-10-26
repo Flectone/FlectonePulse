@@ -77,8 +77,8 @@ public class MessagePipelineImpl implements MessagePipeline {
                     .sender(fPlayer)
                     .message(Strings.CS.replace(message, "§", "&"))
                     .flags(
-                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.OBJECT_DEFAULT_VALUE},
-                            new boolean[]{true, true}
+                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.OBJECT_DEFAULT_VALUE, MessageFlag.SPAM_MODULE},
+                            new boolean[]{true, true, false}
                     )
                     .build();
 

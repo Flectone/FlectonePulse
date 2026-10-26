@@ -364,6 +364,7 @@ public interface PermissionMerger {
     @Mapping(target = "delete", expression = "java(mergeMessageFormatModerationDelete(target.build().delete().toBuilder(), source.delete()))")
     @Mapping(target = "newbie", expression = "java(mergeMessageFormatModerationNewbie(target.build().newbie().toBuilder(), source.newbie()))")
     @Mapping(target = "flood", expression = "java(mergeMessageFormatModerationFlood(target.build().flood().toBuilder(), source.flood()))")
+    @Mapping(target = "spam", expression = "java(mergeMessageFormatModerationSpam(target.build().spam().toBuilder(), source.spam()))")
     @Mapping(target = "swear", expression = "java(mergeMessageFormatModerationSwear(target.build().swear().toBuilder(), source.swear()))")
     Permission.Message.Format.Moderation mergeMessageFormatModeration(@MappingTarget Permission.Message.Format.Moderation.ModerationBuilder target, Permission.Message.Format.Moderation source);
 
@@ -374,6 +375,8 @@ public interface PermissionMerger {
     Permission.Message.Format.Moderation.Newbie mergeMessageFormatModerationNewbie(@MappingTarget Permission.Message.Format.Moderation.Newbie.NewbieBuilder target, Permission.Message.Format.Moderation.Newbie source);
 
     Permission.Message.Format.Moderation.Flood mergeMessageFormatModerationFlood(@MappingTarget Permission.Message.Format.Moderation.Flood.FloodBuilder target, Permission.Message.Format.Moderation.Flood source);
+
+    Permission.Message.Format.Moderation.Spam mergeMessageFormatModerationSpam(@MappingTarget Permission.Message.Format.Moderation.Spam.SpamBuilder target, Permission.Message.Format.Moderation.Spam source);
 
     Permission.Message.Format.Moderation.Swear mergeMessageFormatModerationSwear(@MappingTarget Permission.Message.Format.Moderation.Swear.SwearBuilder target, Permission.Message.Format.Moderation.Swear source);
 

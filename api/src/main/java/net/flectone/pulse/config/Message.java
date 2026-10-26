@@ -374,6 +374,9 @@ public record Message(
                 @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/flood")
                 Flood flood,
 
+                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/spam")
+                Spam spam,
+
                 @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/swear")
                 Swear swear
 
@@ -420,6 +423,17 @@ public record Message(
                     PLAYED_TIME,
                     SINCE_JOIN
                 }
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            public record Spam(
+                    Boolean enable,
+                    Boolean sameMessage,
+                    Integer violationLimit,
+                    Long violationResetTime,
+                    Long interval
+            ) implements EnableSetting, ViolationSetting {
             }
 
             @With

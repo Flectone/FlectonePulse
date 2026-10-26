@@ -25,6 +25,7 @@ public interface MuteChecker {
         CAPS,
         FLOOD,
         NEWBIE,
+        SPAM,
         SWEAR,
         NONE
     }

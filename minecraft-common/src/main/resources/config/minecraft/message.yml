@@ -226,6 +226,12 @@ format:
       enable: false
       mode: "PLAYED_TIME"
       timeout: 72000
+    spam:
+      enable: false
+      same_message: true
+      violation_limit: 5
+      violation_reset_time: 200
+      interval: 60
     swear:
       enable: false
       violation_limit: 5

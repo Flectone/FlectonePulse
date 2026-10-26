@@ -90,6 +90,7 @@ public interface MessageMerger {
     @Mapping(target = "delete", expression = "java(mergeFormatModerationDelete(target.build().delete().toBuilder(), source.delete()))")
     @Mapping(target = "newbie", expression = "java(mergeFormatModerationNewbie(target.build().newbie().toBuilder(), source.newbie()))")
     @Mapping(target = "flood", expression = "java(mergeFormatModerationFlood(target.build().flood().toBuilder(), source.flood()))")
+    @Mapping(target = "spam", expression = "java(mergeFormatModerationSpam(target.build().spam().toBuilder(), source.spam()))")
     @Mapping(target = "swear", expression = "java(mergeFormatModerationSwear(target.build().swear().toBuilder(), source.swear()))")
     Message.Format.Moderation mergeFormatModeration(@MappingTarget Message.Format.Moderation.ModerationBuilder target, Message.Format.Moderation source);
 
@@ -100,6 +101,8 @@ public interface MessageMerger {
     Message.Format.Moderation.Newbie mergeFormatModerationNewbie(@MappingTarget Message.Format.Moderation.Newbie.NewbieBuilder target, Message.Format.Moderation.Newbie source);
 
     Message.Format.Moderation.Flood mergeFormatModerationFlood(@MappingTarget Message.Format.Moderation.Flood.FloodBuilder target, Message.Format.Moderation.Flood source);
+
+    Message.Format.Moderation.Spam mergeFormatModerationSpam(@MappingTarget Message.Format.Moderation.Spam.SpamBuilder target, Message.Format.Moderation.Spam source);
 
     Message.Format.Moderation.Swear mergeFormatModerationSwear(@MappingTarget Message.Format.Moderation.Swear.SwearBuilder target, Message.Format.Moderation.Swear source);
 

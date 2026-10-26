@@ -12,6 +12,7 @@ import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
+import net.flectone.pulse.module.message.format.moderation.spam.SpamModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import org.jspecify.annotations.NonNull;
 
@@ -32,6 +33,7 @@ public class ModerationModuleImpl implements ModerationModule {
         children.add(DeleteModule.class);
         children.add(NewbieModule.class);
         children.add(FloodModule.class);
+        children.add(SpamModule.class);
         children.add(SwearModule.class);
         return Collections.unmodifiableSet(children);
     }

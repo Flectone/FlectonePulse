@@ -140,6 +140,11 @@ public enum MessageFlag {
     REPLACEMENT_MODULE(true),
 
     /**
+     * Enables Spam module processing.
+     */
+    SPAM_MODULE(true),
+
+    /**
      * Enables Swear module processing.
      */
     SWEAR_MODULE(true),

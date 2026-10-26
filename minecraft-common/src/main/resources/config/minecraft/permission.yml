@@ -862,6 +862,12 @@ message:
         bypass:
           name: "flectonepulse.module.message.format.moderation.flood.bypass"
           type: "OP"
+      spam:
+        name: "flectonepulse.module.message.format.moderation.spam"
+        type: "TRUE"
+        bypass:
+          name: "flectonepulse.module.message.format.moderation.spam.bypass"
+          type: "OP"
       swear:
         name: "flectonepulse.module.message.format.moderation.swear"
         type: "TRUE"

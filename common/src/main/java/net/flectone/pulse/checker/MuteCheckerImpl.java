@@ -8,6 +8,7 @@ import net.flectone.pulse.model.value.Moderation;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
+import net.flectone.pulse.module.message.format.moderation.spam.SpamModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.service.ExternalModerationService;
 import net.flectone.pulse.service.ModerationService;
@@ -22,6 +23,7 @@ public class MuteCheckerImpl implements MuteChecker {
     private final LazyInstance<CapsModule> capsModule;
     private final LazyInstance<FloodModule> floodModule;
     private final LazyInstance<NewbieModule> newbieModule;
+    private final LazyInstance<SpamModule> spamModule;
     private final LazyInstance<SwearModule> swearModule;
 
     @Override
@@ -40,6 +42,10 @@ public class MuteCheckerImpl implements MuteChecker {
 
         if (floodModule.get().isRestricted(fPlayer.uuid())) {
             return Status.FLOOD;
+        }
+
+        if (spamModule.get().isRestricted(fPlayer.uuid())) {
+            return Status.SPAM;
         }
 
         if (swearModule.get().isRestricted(fPlayer.uuid())) {

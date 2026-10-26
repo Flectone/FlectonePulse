@@ -176,8 +176,8 @@ public class BubbleModuleImpl implements BubbleModule {
                 .receiver(receiver)
                 .message(message)
                 .flags(
-                        new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.PLAYER_MESSAGE},
-                        new boolean[]{false, false, false, true}
+                        new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.PLAYER_MESSAGE, MessageFlag.VIOLATION_PROCESSING},
+                        new boolean[]{false, false, false, true, false}
                 )
                 .build();
 

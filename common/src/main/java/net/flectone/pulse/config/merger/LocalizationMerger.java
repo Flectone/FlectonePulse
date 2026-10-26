@@ -281,6 +281,7 @@ public interface LocalizationMerger {
     @Mapping(target = "delete", expression = "java(mergeMessageFormatModerationDelete(target.build().delete().toBuilder(), source.delete()))")
     @Mapping(target = "flood", expression = "java(mergeMessageFormatModerationFlood(target.build().flood().toBuilder(), source.flood()))")
     @Mapping(target = "newbie", expression = "java(mergeMessageFormatModerationNewbie(target.build().newbie().toBuilder(), source.newbie()))")
+    @Mapping(target = "spam", expression = "java(mergeMessageFormatModerationSpam(target.build().spam().toBuilder(), source.spam()))")
     @Mapping(target = "swear", expression = "java(mergeMessageFormatModerationSwear(target.build().swear().toBuilder(), source.swear()))")
     Localization.Message.Format.Moderation mergeMessageFormatModeration(@MappingTarget Localization.Message.Format.Moderation.ModerationBuilder target, Localization.Message.Format.Moderation source);
 
@@ -291,6 +292,8 @@ public interface LocalizationMerger {
     Localization.Message.Format.Moderation.Flood mergeMessageFormatModerationFlood(@MappingTarget Localization.Message.Format.Moderation.Flood.FloodBuilder target, Localization.Message.Format.Moderation.Flood source);
 
     Localization.Message.Format.Moderation.Newbie mergeMessageFormatModerationNewbie(@MappingTarget Localization.Message.Format.Moderation.Newbie.NewbieBuilder target, Localization.Message.Format.Moderation.Newbie source);
+
+    Localization.Message.Format.Moderation.Spam mergeMessageFormatModerationSpam(@MappingTarget Localization.Message.Format.Moderation.Spam.SpamBuilder target, Localization.Message.Format.Moderation.Spam source);
 
     Localization.Message.Format.Moderation.Swear mergeMessageFormatModerationSwear(@MappingTarget Localization.Message.Format.Moderation.Swear.SwearBuilder target, Localization.Message.Format.Moderation.Swear source);
 

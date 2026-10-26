@@ -1310,6 +1310,9 @@ public record Permission(
                     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/flood")
                     Flood flood,
 
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/spam")
+                    Spam spam,
+
                     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/swear")
                     Swear swear
             ) implements PermissionSetting {
@@ -1343,6 +1346,15 @@ public record Permission(
                 @With
                 @Builder(toBuilder = true)
                 public record Flood(
+                        String name,
+                        Permission.Type type,
+                        PermissionEntry bypass
+                ) implements PermissionSetting {
+                }
+
+                @With
+                @Builder(toBuilder = true)
+                public record Spam(
                         String name,
                         Permission.Type type,
                         PermissionEntry bypass
