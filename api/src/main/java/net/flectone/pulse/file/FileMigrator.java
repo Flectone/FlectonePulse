@@ -10,7 +10,7 @@ import net.flectone.pulse.model.file.FilePack;
 public interface FileMigrator {
 
     /**
-     * Applies the changes introduced in 1.11.1.
+     * Applies the changes introduced in 1.11.1 (1.12.0).
      *
      * @param files the current files
      * @return the migrated files
@@ -18,7 +18,7 @@ public interface FileMigrator {
     FilePack migration_1_11_1(FilePack files);
 
     /**
-     * Applies the changes introduced in 1.12.3.
+     * Applies the changes introduced in 1.12.3 (1.13.0).
      *
      * @param files the current files
      * @return the migrated files
@@ -26,7 +26,7 @@ public interface FileMigrator {
     FilePack migration_1_12_3(FilePack files);
 
     /**
-     * Applies the changes introduced in 1.13.2.
+     * Applies the changes introduced in 1.13.2 (1.14.0).
      *
      * @param files the current files
      * @return the migrated files
@@ -42,7 +42,7 @@ public interface FileMigrator {
     FilePack migration_1_14_1(FilePack files);
 
     /**
-     * Applies the changes introduced in 1.14.2.
+     * Applies the changes introduced in 1.14.2 (1.15.0).
      *
      * @param files the current files
      * @return the migrated files
