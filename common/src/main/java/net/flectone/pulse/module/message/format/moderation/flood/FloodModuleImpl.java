@@ -84,6 +84,9 @@ public class FloodModuleImpl implements FloodModule {
         if (messageContext.isFlag(MessageFlag.VIOLATION_PROCESSING) && config().violationLimit() > 0
                 && messageContext.receiver().equals(messageContext.sender()) && !messageContext.message().trim().equals(message.trim())) {
             moderationService.addViolation(sender.uuid(), this, config());
+
+            // same message must be processed again to count violation
+            messageContext = messageContext.addFlag(MessageFlag.USE_CACHE, false);
         }
 
         return messageContext.withMessage(message);

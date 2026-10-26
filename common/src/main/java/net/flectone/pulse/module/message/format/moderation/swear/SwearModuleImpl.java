@@ -113,6 +113,9 @@ public class SwearModuleImpl implements SwearModule {
         if (messageContext.isFlag(MessageFlag.VIOLATION_PROCESSING) && config().violationLimit() > 0
                 && messageContext.receiver().equals(messageContext.sender()) && !formattedMessage.trim().equals(message)) {
             moderationService.addViolation(sender.uuid(), this, config());
+
+            // same message must be processed again to count violation
+            messageContext = messageContext.addFlag(MessageFlag.USE_CACHE, false);
         }
 
         return messageContext.withMessage(formattedMessage);
