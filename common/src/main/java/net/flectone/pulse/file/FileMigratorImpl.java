@@ -189,4 +189,15 @@ public class FileMigratorImpl implements FileMigrator {
                 .withLocalizations(newLocalizations);
     }
 
+    @Override
+    public FilePack migration_1_14_2(FilePack files) {
+        // disable nameplate module by default for old versions
+        return files
+                .withMessage(files.message()
+                        .withNameplate(files.message().nameplate()
+                                .withEnable(false)
+                        )
+                );
+    }
+
 }

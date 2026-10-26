@@ -179,6 +179,10 @@ public class FileFacadeImpl implements FileFacade {
             files = fileMigrator.migration_1_14_1(files);
         }
 
+        if (versionComparator.isOlderThan(preInitVersion, "1.14.2")) { // 1.14.2 == 1.15.0
+            files = fileMigrator.migration_1_14_2(files);
+        }
+
         files = files.withConfig(files.config().withVersion(BuildConfig.PROJECT_VERSION));
     }
 }
