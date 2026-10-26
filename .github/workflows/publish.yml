@@ -42,7 +42,7 @@ jobs:
         run: ./gradlew :minecraft-neoforge:buildFinalJar
 
       - name: Build hytale
-        run: ./gradlew :hytale:buildFinalJar -PadventureVersion=5.2.0
+        run: ./gradlew :hytale:buildFinalJar
 
       - name: Upload artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7

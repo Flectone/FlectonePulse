@@ -22,7 +22,7 @@ public class HytaleLibraryResolver extends LibraryResolverImpl {
         getAdventureArtifactIds().forEach(artifactId -> loadLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId(artifactId)
-                .version(BuildConfig.NEW_ADVENTURE_API)
+                .version(BuildConfig.ADVANCEDBAN_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
