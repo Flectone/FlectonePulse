@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.nickname;
 
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.module.command.nickname.listener.NicknameProxyMessageListener;
 import net.flectone.pulse.module.command.nickname.listener.PulseNicknameListener;
 import net.flectone.pulse.module.command.nickname.model.NicknameMessageContext;
@@ -35,10 +37,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -60,6 +59,7 @@ public class NicknameModuleImpl implements NicknameModule {
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ProfileResolver profileResolver;
+    private final Gson gson;
     private final FLogger fLogger;
 
     private Predicate<String> allowedPredicate;
@@ -192,21 +192,31 @@ public class NicknameModuleImpl implements NicknameModule {
             socialService.saveSetting(fTarget, SettingText.NICKNAME, nickname);
         }
 
-        if (proxySender.send(fTarget, ModuleName.COMMAND_NICKNAME, dataOutputStream -> dataOutputStream.writeUTF(nickname))) return;
+        boolean proxy = proxySender.send(fTarget, ModuleName.COMMAND_NICKNAME, dataOutputStream -> {
+            dataOutputStream.writeUTF(gson.toJson(fPlayer));
+            dataOutputStream.writeUTF(nickname);
+        });
+        if (proxy) return;
 
-        sendMessageWithUpdatedNickname(fPlayer, nickname, UUID.randomUUID());
+        sendMessageWithUpdatedNickname(fPlayer, fTarget, nickname, UUID.randomUUID());
     }
 
     @Override
-    public void sendMessageWithUpdatedNickname(FEntity fPlayer, String nickname, UUID metadataUUID) {
+    public void sendMessageWithUpdatedNickname(FPlayer fPlayer, FEntity fTarget, String nickname, UUID metadataUUID) {
+        Set<FPlayer> receivers = !fPlayer.equals(fTarget) && fTarget instanceof FPlayer fTargetPlayer
+                ? Set.of(fPlayer, fTargetPlayer)
+                : Set.of(fPlayer);
+        
         messageDispatcher.dispatch(EventMetadata.builder()
                 .destination(config().destination())
+                .range(Range.Type.SERVER)
+                .filter(receivers)
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> NicknameMessageContext.builder()
                         .base(MessageContext.builder()
                                 .module(this.name())
                                 .uuid(metadataUUID)
-                                .sender(fPlayer)
+                                .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).format())
                                 .build()

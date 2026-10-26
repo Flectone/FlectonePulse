@@ -46,11 +46,12 @@ public interface NicknameModule extends ModuleCommand {
     /**
      * Announces a nickname change.
      *
-     * @param fPlayer whose nickname changed
+     * @param fPlayer who made the change
+     * @param fTarget whose nickname changed
      * @param nickname the new nickname
      * @param metadataUUID the shared message id
      */
-    void sendMessageWithUpdatedNickname(FEntity fPlayer, String nickname, UUID metadataUUID);
+    void sendMessageWithUpdatedNickname(FPlayer fPlayer, FEntity fTarget, String nickname, UUID metadataUUID);
 
     /**
      * Registers the tag that renders a player's nickname.
