@@ -29,10 +29,11 @@ public class MinecraftPacketBubbleListener implements PacketListener {
         if (event.getPacketType() != PacketType.Play.Client.CHAT_MESSAGE) return;
         if (moduleController.isEnable(chatModule)) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
-
         WrapperPlayClientChatMessage wrapper = new WrapperPlayClientChatMessage(event);
         String message = wrapper.getMessage();
+        if (message.startsWith("/")) return;
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
 
         bubbleModule.add(fPlayer, message, Set.of());
     }

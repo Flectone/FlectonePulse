@@ -73,7 +73,13 @@ public class MinecraftPacketSpyListener implements PacketListener {
             }
             case PacketType.Play.Client.CHAT_MESSAGE -> {
                 WrapperPlayClientChatMessage wrapperPlayClientChatMessage = new WrapperPlayClientChatMessage(event);
-                spyModule.checkChat(event.getUser().getUUID(), wrapperPlayClientChatMessage.getMessage(), List.of());
+
+                String message = wrapperPlayClientChatMessage.getMessage();
+                if (message.startsWith("/")) {
+                    spyModule.checkCommand(event.getUser().getUUID(), message);
+                } else {
+                    spyModule.checkChat(event.getUser().getUUID(), message, List.of());
+                }
             }
             case PacketType.Play.Client.EDIT_BOOK -> {
                 WrapperPlayClientEditBook wrapperPlayClientEditBook = new WrapperPlayClientEditBook(event);

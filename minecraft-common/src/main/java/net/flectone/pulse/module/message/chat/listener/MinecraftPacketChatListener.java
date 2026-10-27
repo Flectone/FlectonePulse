@@ -27,11 +27,12 @@ public class MinecraftPacketChatListener implements PacketListener {
         if (event.getPacketType() != PacketType.Play.Client.CHAT_MESSAGE) return;
         if (!moduleController.isEnable(chatModule)) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
-        if (moduleController.isDisabledFor(chatModule, fPlayer)) return;
-
         WrapperPlayClientChatMessage wrapper = new WrapperPlayClientChatMessage(event);
         String message = wrapper.getMessage();
+        if (message.startsWith("/")) return;
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
+        if (moduleController.isDisabledFor(chatModule, fPlayer)) return;
 
         event.setCancelled(true);
 
