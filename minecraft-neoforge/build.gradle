@@ -45,7 +45,7 @@ dependencies {
     compileOnly libraries.platform
     compileOnly libraries.adventure
 
-    compileOnly "org.incendo:cloud-neoforge:${cloud_neoforge_version}"
+    compileOnly "org.incendo:cloud-brigadier:${cloud_paper_version}"
 
     compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
     compileOnly "net.flectone:packeteventsmodern-netty-common:$packeteventsmodern_version"

@@ -2,90 +2,34 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.mapper.HytaleFPlayerMapper;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
-import net.flectone.pulse.platform.registry.cloud.HytaleCommandManager;
 import net.flectone.pulse.platform.registry.cloud.HytaleRegistrationHandler;
+import net.flectone.pulse.platform.registry.cloud.PlatformRegistrationHandler;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import org.incendo.cloud.Command;
-import org.incendo.cloud.CommandManager;
-import org.incendo.cloud.exception.ArgumentParseException;
-import org.incendo.cloud.exception.CommandExecutionException;
-import org.incendo.cloud.exception.InvalidSyntaxException;
-import org.incendo.cloud.exception.NoPermissionException;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.permission.Permission;
-import org.incendo.cloud.permission.PermissionResult;
-import org.incendo.cloud.setting.ManagerSetting;
-
-import java.util.function.Function;
 
 @Singleton
-public class HytaleCommandRegistry implements CommandRegistry {
+public class HytaleCommandRegistry extends CommandRegistryImpl<CommandSender> {
 
-    private final PermissionChecker permissionChecker;
-    private final HytaleFPlayerMapper fPlayerMapper;
     private final JavaPlugin javaPlugin;
-    private final CommandExceptionHandler commandExceptionHandler;
-    private final TaskScheduler taskScheduler;
-
-    private CommandManager<FPlayer> manager;
 
     @Inject
     public HytaleCommandRegistry(PermissionChecker permissionChecker,
-                                 HytaleFPlayerMapper fPlayerMapper,
-                                 JavaPlugin javaPlugin,
                                  CommandExceptionHandler commandExceptionHandler,
-                                 TaskScheduler taskScheduler) {
-        this.permissionChecker = permissionChecker;
-        this.fPlayerMapper = fPlayerMapper;
+                                 TaskScheduler taskScheduler,
+                                 HytaleFPlayerMapper fPlayerMapper,
+                                 JavaPlugin javaPlugin) {
+        super(permissionChecker, commandExceptionHandler, taskScheduler, fPlayerMapper);
+
         this.javaPlugin = javaPlugin;
-        this.commandExceptionHandler = commandExceptionHandler;
-        this.taskScheduler = taskScheduler;
     }
 
     @Override
-    public void init() {
-        this.manager = new HytaleCommandManager(ExecutionCoordinator.<FPlayer>builder().executor(taskScheduler.getExecutorService()).build(), new HytaleRegistrationHandler(), fPlayerMapper, javaPlugin);
-
-        manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
-        manager.settings().set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true);
-
-        manager.exceptionController().registerHandler(ArgumentParseException.class, commandExceptionHandler::handleArgumentParseException);
-        manager.exceptionController().registerHandler(InvalidSyntaxException.class, commandExceptionHandler::handleInvalidSyntaxException);
-        manager.exceptionController().registerHandler(NoPermissionException.class, commandExceptionHandler::handleNoPermissionException);
-        manager.exceptionController().registerHandler(CommandExecutionException.class, commandExceptionHandler::handleCommandExecutionException);
-    }
-
-    @Override
-    public void registerCommand(Function<CommandManager<FPlayer>, Command.Builder<FPlayer>> builder) {
-        Command.Builder<FPlayer> commandBuilder = builder.apply(manager);
-
-        Permission permission = commandBuilder.commandPermission();
-        String permissionString = permission.permissionString();
-
-        Command<FPlayer> command = commandBuilder.permission(fPlayer -> {
-            boolean value = permissionChecker.check(fPlayer, permissionString);
-
-            return PermissionResult.of(value, permission);
-        }).build();
-
-        String commandName = command.rootComponent().name();
-
-        boolean isCloudCommand = manager.commands().stream()
-                .anyMatch(fPlayerCommand -> fPlayerCommand.rootComponent().name().equals(commandName));
-        if (isCloudCommand) return;
-
-        unregisterCommand(commandName);
-        manager.command(command);
-    }
-
-    @Override
-    public void unregisterCommand(String name) {
-        // not supported
+    protected PlatformRegistrationHandler<CommandSender> createRegistrationHandler() {
+        return new HytaleRegistrationHandler(javaPlugin);
     }
 
 }
