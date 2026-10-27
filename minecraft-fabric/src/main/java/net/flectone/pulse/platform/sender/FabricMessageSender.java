@@ -7,6 +7,7 @@ import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
+import net.flectone.pulse.platform.adapter.FabricVersionAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.serializer.FabricComponentSerializer;
 import net.kyori.adventure.text.Component;
@@ -16,6 +17,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class FabricMessageSender extends MinecraftMessageSender {
 
     private final FabricPlayerAdapter fabricPlayerAdapter;
+    private final FabricVersionAdapter fabricVersionAdapter;
     private final FabricComponentSerializer componentSerializer;
     private final FileFacade fileFacade;
     private final FLogger fLogger;
@@ -26,11 +28,13 @@ public class FabricMessageSender extends MinecraftMessageSender {
                                IntegrationModule integrationModule,
                                FLogger fLogger,
                                FabricPlayerAdapter fabricPlayerAdapter,
+                               FabricVersionAdapter fabricVersionAdapter,
                                FabricComponentSerializer componentSerializer,
                                FileFacade fileFacade) {
         super(packetSender, packetProvider, integrationModule, fLogger);
 
         this.fabricPlayerAdapter = fabricPlayerAdapter;
+        this.fabricVersionAdapter = fabricVersionAdapter;
         this.componentSerializer = componentSerializer;
         this.fileFacade = fileFacade;
         this.fLogger = fLogger;
@@ -50,7 +54,7 @@ public class FabricMessageSender extends MinecraftMessageSender {
         if (serverPlayer == null) return false;
 
         try {
-            serverPlayer.sendSystemMessage(componentSerializer.toFabric(component));
+            fabricVersionAdapter.sendSystemMessage(serverPlayer, componentSerializer.toFabric(component));
         } catch (Throwable e) {
             fLogger.warning("Failed to deserialize message %s", e, component);
             return false;

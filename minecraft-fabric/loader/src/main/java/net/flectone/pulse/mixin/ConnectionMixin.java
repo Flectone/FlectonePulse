@@ -18,31 +18,48 @@
 
 package net.flectone.pulse.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import net.flectone.pulse.FabricFlectonePulseLoader;
 import net.flectone.pulse.constant.HookType;
-import net.minecraft.network.BandwidthDebugMonitor;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
 import org.jspecify.annotations.NullMarked;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @NullMarked
-@Mixin(Connection.class)
+@Mixin(value = Connection.class, priority = 1500)
 public class ConnectionMixin {
 
+    @Shadow
+    private Channel channel;
+
     @Inject(
-            method = "configureSerialization",
-            at = @At("TAIL")
+            method = "configureSerialization*",
+            at = @At("TAIL"),
+            require = 0
     )
     private static void configureSerialization(
-            ChannelPipeline pipeline, PacketFlow flow, boolean memoryOnly,
-            BandwidthDebugMonitor bandwithDebugMonitor, CallbackInfo ci
+            CallbackInfo ci,
+            @Local(argsOnly = true) ChannelPipeline pipeline,
+            @Local(argsOnly = true) PacketFlow flow
     ) {
         FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.CONFIGURE_SERIALIZATION, pipeline, flow);
+    }
+
+    @Inject(
+            method = "setupCompression*",
+            at = @At("TAIL")
+    )
+    private void setupCompression(CallbackInfo ci) {
+        if (channel == null || !channel.isActive()) return;
+
+        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.SETUP_COMPRESSION, channel.pipeline());
     }
 
 }

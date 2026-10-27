@@ -1,0 +1,128 @@
+plugins {
+	id "net.fabricmc.fabric-loom-remap"
+}
+
+def layers = ["1.21.11", "1.21.9", "1.21.5", "1.21.4", "1.21.2", "1.20.5", "1.20.2", "1.19.4", "1.19.3", "1.19", "1.17", "1.16"]
+
+sourceSets {
+	main {
+		java.srcDirs = ["../src/main/java", "../src/intermediary/java"]
+	}
+}
+
+loom {
+	accessWidenerPath = file("../loader/src/intermediary/resources/flectonepulse.accesswidener")
+}
+
+configurations.configureEach {
+	exclude group: "com.github.retrooper", module: "adventure-text-serializer-gson"
+	exclude group: "com.github.retrooper", module: "adventure-text-serializer-legacy"
+}
+
+dependencies {
+	minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
+	mappings(loom.officialMojangMappings())
+
+	compileOnly project(":common")
+	compileOnly project(":minecraft-common")
+
+	compileOnly project(":api")
+	compileOnly project(":minecraft-fabric:loader")
+
+	compileOnly libraries.platform
+	compileOnly libraries.adventure
+
+	modCompileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
+
+	modCompileOnly fabricApi.module("fabric-api-base", fabric_api_version)
+	modCompileOnly fabricApi.module("fabric-command-api-v2", fabric_api_version)
+	modCompileOnly fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
+	modCompileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
+
+	compileOnly "org.incendo:cloud-brigadier:${cloud_paper_version}"
+
+	compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
+	compileOnly "net.flectone:packeteventsmodern-netty-common:$packeteventsmodern_version"
+	compileOnly "net.flectone:packeteventsmodern-fabric-common:$packeteventsmodern_version"
+
+	// integrations
+	modCompileOnly "eu.pb4:placeholder-api:$text_placeholder_api_version"
+	modCompileOnly "maven.modrinth:vanish:$vanish_version"
+	compileOnly "io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version"
+}
+
+shadowJar {
+	configurations = []
+}
+
+remapJar {
+	inputFile = shadowJar.archiveFile
+	dependsOn(shadowJar)
+}
+
+downgradeJar {
+	inputFile = remapJar.archiveFile
+}
+
+tasks.register("jarInJarContent", Jar) {
+	archiveFileName = "flectonepulse-fabric-platform.jarinjar"
+
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	from { zipTree(project(":minecraft-fabric:intermediary").tasks.named("shadeDowngradedApi").get().archiveFile) }
+	dependsOn(":minecraft-fabric:intermediary:shadeDowngradedApi")
+
+	layers.each { layer ->
+		from { zipTree(project(":minecraft-fabric:intermediary:${layer}").tasks.named("shadeDowngradedApi").get().archiveFile) }
+		dependsOn(":minecraft-fabric:intermediary:${layer}:shadeDowngradedApi")
+	}
+}
+
+subprojects {
+	apply plugin: "net.fabricmc.fabric-loom-remap"
+
+	configurations.configureEach {
+		exclude group: "com.github.retrooper", module: "adventure-text-serializer-gson"
+		exclude group: "com.github.retrooper", module: "adventure-text-serializer-legacy"
+	}
+
+	if (file("flectonepulse.accesswidener").exists()) {
+		loom {
+			accessWidenerPath = file("flectonepulse.accesswidener")
+		}
+	}
+
+	dependencies {
+		minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
+		mappings(loom.officialMojangMappings())
+
+		modCompileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
+
+		compileOnly project(path: ":minecraft-fabric:intermediary", configuration: "namedElements")
+		layers.subList(0, layers.indexOf(project.name)).each { layer ->
+			compileOnly project(path: ":minecraft-fabric:intermediary:${layer}", configuration: "namedElements")
+		}
+
+		compileOnly project(":api")
+		compileOnly project(":common")
+		compileOnly project(":minecraft-common")
+
+		compileOnly libraries.platform
+		compileOnly libraries.adventure
+
+		compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
+	}
+
+	shadowJar {
+		configurations = []
+	}
+
+	remapJar {
+		inputFile = shadowJar.archiveFile
+		dependsOn(shadowJar)
+	}
+
+	downgradeJar {
+		inputFile = remapJar.archiveFile
+	}
+}

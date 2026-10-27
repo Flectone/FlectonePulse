@@ -38,8 +38,6 @@ import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -56,6 +54,7 @@ import java.util.*;
 public class FabricServerAdapter implements PlatformServerAdapter {
 
     private final FabricFlectonePulse fabricFlectonePulse;
+    private final FabricVersionAdapter fabricVersionAdapter;
     private final LazyInstance<FPlayerService> fPlayerService;
     private final LazyInstance<MessagePipeline> messagePipeline;
     private final LazyInstance<SocialService> socialService;
@@ -164,7 +163,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         if (minecraftServer == null) return null;
 
         if (serverIcon == null) {
-            File iconFile = minecraftServer.getFile("server-icon.png").toFile();
+            File iconFile = FabricLoader.getInstance().getGameDir().resolve("server-icon.png").toFile();
 
             if (iconFile.exists()) {
                 serverIcon = iconConverter.convert(iconFile);
@@ -219,7 +218,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
     @Override
     public @NonNull String getItemName(@NonNull Object item) {
-        return item instanceof net.minecraft.world.item.ItemStack itemStack ? itemStack.getItemName().getString() : "";
+        return item instanceof net.minecraft.world.item.ItemStack itemStack ? itemStack.getItem().getName(itemStack).getString() : "";
     }
 
     @Override
@@ -227,15 +226,16 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         if (!(item instanceof net.minecraft.world.item.ItemStack itemStack)) return Component.empty();
         if (getItemName(item).equalsIgnoreCase("air")) return Component.translatable("block.minecraft.air");
 
-        Component component = itemStack.getCustomName() == null
-                || itemStack.getCustomName().getString().isBlank()
+        net.minecraft.network.chat.Component itemCustomName = fabricVersionAdapter.getCustomName(itemStack);
+        Component component = itemCustomName == null
+                || itemCustomName.getString().isBlank()
                 ? createTranslatableItemName(itemStack, translatable)
                 : createItemMetaName(itemStack);
 
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer != null) {
             // convert fabric itemStack to packetevents
-            ItemStack packetItemStack = fromMinecraftStack(itemStack, minecraftServer.registryAccess());
+            ItemStack packetItemStack = fromMinecraftStack(itemStack, minecraftServer);
 
             // translation for checking component
             String translationKey = getTranslationKey(itemStack);
@@ -260,7 +260,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
             return componentDecorator.hoverIfAbsent(component, adventureHoverConverter.convert(packetItemStack));
         }
 
-        Key key = Key.key(itemStack.getItem().builtInRegistryHolder().key().identifier().getPath());
+        Key key = Key.key(fabricVersionAdapter.getItemPath(itemStack));
         return componentDecorator.hoverIfAbsent(component, HoverEvent.showItem(key, itemStack.getCount()));
     }
 
@@ -269,11 +269,10 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     // https://github.com/retrooper/packetevents/pull/1147/changes#diff-9647df572bdd365fa3ce0333c7491ea491ee6b602bfadcb0f46d8660b580f419R142
-    private ItemStack fromMinecraftStack(net.minecraft.world.item.ItemStack stack, RegistryAccess registries) {
+    private ItemStack fromMinecraftStack(net.minecraft.world.item.ItemStack stack, MinecraftServer minecraftServer) {
         ByteBuf buf = PooledByteBufAllocator.DEFAULT.buffer();
         try {
-            net.minecraft.world.item.ItemStack.OPTIONAL_STREAM_CODEC.encode(
-                    new RegistryFriendlyByteBuf(buf, registries), stack);
+            fabricVersionAdapter.writeItemStack(buf, stack, minecraftServer);
             return PacketWrapper.createUniversalPacketWrapper(buf).readItemStack();
         } finally {
             buf.release();
@@ -281,7 +280,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     private Component createItemMetaName(net.minecraft.world.item.ItemStack itemStack) {
-        net.minecraft.network.chat.Component customName = itemStack.getCustomName();
+        net.minecraft.network.chat.Component customName = fabricVersionAdapter.getCustomName(itemStack);
         if (customName == null) return Component.empty();
 
         MessagePipeline messagePipelineInstance = messagePipeline.get();

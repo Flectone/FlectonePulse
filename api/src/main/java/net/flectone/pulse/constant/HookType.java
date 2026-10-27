@@ -3,6 +3,7 @@ package net.flectone.pulse.constant;
 public enum HookType {
 
     CONFIGURE_SERIALIZATION,
+    SETUP_COMPRESSION,
     PRE_NEW_PLAYER_PLACE,
     ON_PLAYER_PRE_LOGIN,
     ON_PLAYER_LOGIN,

@@ -4,12 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
-import eu.pb4.placeholders.api.Placeholders;
-import eu.pb4.placeholders.api.ServerPlaceholderContext;
-import eu.pb4.placeholders.api.parsers.NodeParser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.constant.MessageFlag;
@@ -38,7 +34,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.LazyInstance;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -57,6 +52,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final FabricPlaceholderAPIModule fabricPlaceholderAPIModule;
+    private final FabricPlaceholderAPIAdapter fabricPlaceholderAPIAdapter;
     private final LazyInstance<MuteModule> muteModule;
     private final LazyInstance<ConditionModule> conditionModule;
     private final LazyInstance<AfkModule> afkModule;
@@ -106,19 +102,13 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
         String message = messageContext.message();
 
-        String text = NodeParser.builder()
-                .serverPlaceholders()
-                .commonPlaceholders()
-                .simplifiedTextFormat()
-                .build()
-                .parseComponent(message, ServerPlaceholderContext.of(playerEntity).asParserContext())
-                .getString();
+        String text = fabricPlaceholderAPIAdapter.parse(message, playerEntity);
 
         return event.withContext(messageContext.withMessage(text));
     }
 
     private void register() {
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":mute_suffix"), (context, _) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("mute_suffix", (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
@@ -126,7 +116,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
             return PlaceholderResult.value(muteModule.get().getMuteSuffix(fPlayer, fPlayer));
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration"), (context, _) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("afk_duration", (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
@@ -134,7 +124,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
             return PlaceholderResult.value(String.valueOf(afkModule.get().getAfkDuration(fPlayer)));
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration_formatted"), (context, _) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("afk_duration_formatted", (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
@@ -142,7 +132,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
             return PlaceholderResult.value(afkModule.get().getAfkDurationFormatted(fPlayer, fPlayer));
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":toponline"), (context, argument) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("toponline", (context, argument) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             ToponlineModule toponlineModuleInstance = toponlineModule.get();
@@ -151,7 +141,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
             return PlaceholderResult.value(fTarget.isPresent() ? fTarget.get().name() : "");
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":online"), (context, argument) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("online", (context, argument) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
@@ -163,29 +153,29 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
             return PlaceholderResult.value(timeValue);
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":maintenance"), (_, argument) ->
+        fabricPlaceholderAPIAdapter.registerCommon("maintenance", (_, argument) ->
                 PlaceholderResult.value(moderationService.get().getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE, argument, 1, 0).isEmpty() ? "no" : "yes")
         );
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":condition"), (context, argument) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("condition", (context, argument) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             return PlaceholderResult.value(conditionModule.get().getConditionValue(argument, fPlayerService.getFPlayer(context.player().getUUID())));
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor"), (context, argument) ->
+        fabricPlaceholderAPIAdapter.registerCommon("fcolor", (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.SEE, FColor.Type.OUT)
         );
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor_out"), (context, argument) ->
+        fabricPlaceholderAPIAdapter.registerCommon("fcolor_out", (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.OUT)
         );
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor_see"), (context, argument) ->
+        fabricPlaceholderAPIAdapter.registerCommon("fcolor_see", (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.SEE)
         );
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":setting"), (context, argument) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("setting", (context, argument) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
             if (argument == null) return PlaceholderResult.value("");
 
@@ -202,32 +192,32 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
             return PlaceholderResult.value(socialService.isSetting(fPlayer, argument.toUpperCase()) ? "yes" : "no");
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":player"), (context, _) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("player", (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
             return PlaceholderResult.value(fPlayer.name());
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ip"), (context, _) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("ip", (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
             return PlaceholderResult.value(fPlayer.ip());
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ping"), (context, _) -> {
+        fabricPlaceholderAPIAdapter.registerCommon("ping", (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
             return PlaceholderResult.value(String.valueOf(platformPlayerAdapter.getPing(fPlayer)));
         });
 
-        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":online"), (_, _) ->
+        fabricPlaceholderAPIAdapter.registerServer("online", (_, _) ->
                 PlaceholderResult.value(String.valueOf(platformServerAdapter.getOnlinePlayerCount()))
         );
 
-        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"), (context, _) -> {
+        fabricPlaceholderAPIAdapter.registerServer("tps", (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());

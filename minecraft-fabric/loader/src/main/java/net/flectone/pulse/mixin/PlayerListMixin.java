@@ -18,11 +18,11 @@
 
 package net.flectone.pulse.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.flectone.pulse.FabricFlectonePulseLoader;
 import net.flectone.pulse.constant.HookType;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.players.PlayerList;
 import org.jspecify.annotations.NullMarked;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,18 +36,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PlayerListMixin {
 
     @Inject(
-            method = "placeNewPlayer",
+            method = "placeNewPlayer*",
             at = @At("HEAD")
     )
     private void preNewPlayerPlace(
-            Connection connection, ServerPlayer player,
-            CommonListenerCookie cookie, CallbackInfo ci
+            CallbackInfo ci,
+            @Local(argsOnly = true) Connection connection,
+            @Local(argsOnly = true) ServerPlayer player
     ) {
-        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.PRE_NEW_PLAYER_PLACE, connection, connection.channel, player);
+        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.PRE_NEW_PLAYER_PLACE, connection.channel, player);
     }
 
     @Inject(
-            method = "placeNewPlayer",
+            method = "placeNewPlayer*",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V",
@@ -55,20 +56,18 @@ public class PlayerListMixin {
             )
     )
     private void onPlayerLogin(
-            Connection connection, ServerPlayer player,
-            CommonListenerCookie cookie, CallbackInfo ci
+            CallbackInfo ci,
+            @Local(argsOnly = true) ServerPlayer player
     ) {
-        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.ON_PLAYER_LOGIN, connection, player);
+        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.ON_PLAYER_LOGIN, player);
     }
 
     @Inject(
-            method = "respawn",
+            method = "respawn*",
             at = @At("RETURN")
     )
     private void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
-        ServerPlayer player = cir.getReturnValue();
-        Connection connection = player.connection.connection;
-        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.POST_RESPAWN, connection, connection.channel);
+        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.POST_RESPAWN, cir.getReturnValue());
     }
 
 }

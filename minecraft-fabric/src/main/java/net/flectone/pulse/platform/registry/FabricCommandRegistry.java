@@ -8,6 +8,7 @@ import net.flectone.pulse.mapper.FabricFPlayerMapper;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.minecraft.commands.CommandSourceStack;
 import org.incendo.cloud.CloudCapability;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
@@ -16,7 +17,7 @@ import org.incendo.cloud.exception.CommandExecutionException;
 import org.incendo.cloud.exception.InvalidSyntaxException;
 import org.incendo.cloud.exception.NoPermissionException;
 import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.fabric.FabricServerCommandManager;
+import org.incendo.cloud.brigadier.BrigadierManagerHolder;
 import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.permission.PermissionResult;
 import org.incendo.cloud.setting.ManagerSetting;
@@ -29,6 +30,7 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
     private final FabricFlectonePulse fabricFlectonePulse;
     private final PermissionChecker permissionChecker;
     private final FabricFPlayerMapper fPlayerMapper;
+    private final FabricCommandManagerFactory fabricCommandManagerFactory;
     private final CommandExceptionHandler commandExceptionHandler;
     private final TaskScheduler taskScheduler;
 
@@ -39,10 +41,12 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
                                  PermissionChecker permissionChecker,
                                  CommandExceptionHandler commandExceptionHandler,
                                  FabricFPlayerMapper fPlayerMapper,
+                                 FabricCommandManagerFactory fabricCommandManagerFactory,
                                  TaskScheduler taskScheduler) {
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.permissionChecker = permissionChecker;
         this.fPlayerMapper = fPlayerMapper;
+        this.fabricCommandManagerFactory = fabricCommandManagerFactory;
         this.commandExceptionHandler = commandExceptionHandler;
         this.taskScheduler = taskScheduler;
     }
@@ -51,7 +55,7 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
     public void init() {
         if (this.manager != null) return;
 
-        this.manager = new FabricServerCommandManager<>(ExecutionCoordinator.<FPlayer>builder().executor(taskScheduler.getExecutorService()).build(), fPlayerMapper);
+        this.manager = fabricCommandManagerFactory.create(ExecutionCoordinator.<FPlayer>builder().executor(taskScheduler.getExecutorService()).build(), fPlayerMapper);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
         manager.settings().set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true);
@@ -61,7 +65,7 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
         manager.exceptionController().registerHandler(NoPermissionException.class, commandExceptionHandler::handleNoPermissionException);
         manager.exceptionController().registerHandler(CommandExecutionException.class, commandExceptionHandler::handleCommandExecutionException);
 
-        setupBrigadierManager(((FabricServerCommandManager<FPlayer>) manager).brigadierManager());
+        setupBrigadierManager(((BrigadierManagerHolder<FPlayer, CommandSourceStack>) manager).brigadierManager());
     }
 
     @Override

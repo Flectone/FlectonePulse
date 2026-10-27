@@ -2,6 +2,12 @@ plugins {
     id "net.neoforged.moddev" version "${neoforge_moddev_version}"
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(java_version)
+    }
+}
+
 neoForge {
     version = "${neoforge_version}"
 }
@@ -28,8 +34,8 @@ shadowJar {
 
     exclude("org/jspecify/**")
 
-    from { project(":minecraft-neoforge").tasks.shadowJar.archiveFile }
-    dependsOn(":minecraft-neoforge:shadowJar")
+    from { project(":minecraft-neoforge").tasks.named("jarInJarContent").get().archiveFile }
+    dependsOn(":minecraft-neoforge:jarInJarContent")
 }
 
 processResources {

@@ -2,21 +2,23 @@ plugins {
     id "net.fabricmc.fabric-loom" version "${fabric_loom_version}"
 }
 
-loom {
-    accessWidenerPath = file("src/main/resources/flectonepulse.accesswidener")
+sourceSets {
+    main {
+        resources.srcDirs = ["src/main/resources", "src/official/resources"]
+    }
 }
 
-configurations {
-    shade
+loom {
+    accessWidenerPath = file("src/official/resources/flectonepulse.accesswidener")
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
 
-    shade project(":api")
     implementation project(":api")
 
     compileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    compileOnly "io.github.llamalad7:mixinextras-fabric:${mixinextras_version}"
 
     compileOnly fabricApi.module("fabric-api-base", fabric_api_version)
     compileOnly fabricApi.module("fabric-command-api-v2", fabric_api_version)
@@ -27,10 +29,10 @@ dependencies {
 }
 
 shadowJar {
-    configurations = [project.configurations.shade]
+    configurations = []
 
-    from { project(":minecraft-fabric").tasks.shadowJar.archiveFile }
-    dependsOn(":minecraft-fabric:shadowJar")
+    from { project(":minecraft-fabric").tasks.named("jarInJarContent").get().archiveFile }
+    dependsOn(":minecraft-fabric:jarInJarContent")
 }
 
 processResources {

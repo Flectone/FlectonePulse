@@ -1,17 +1,17 @@
 package net.flectone.pulse;
 
 import com.alessiodp.libby.logging.LogLevel;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
-import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.tree.CommandNode;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
 import lombok.Setter;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.flectone.pulse.constant.HookType;
 import net.flectone.pulse.exception.InjectorNotInitializedException;
@@ -22,21 +22,22 @@ import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceModule;
 import net.flectone.pulse.platform.adapter.FabricLogAdapter;
 import net.flectone.pulse.platform.adapter.FabricPacketEventsAdapter;
+import net.flectone.pulse.platform.adapter.FabricVersionAdapter;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.resolver.FabricLibraryResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @Getter
@@ -64,7 +65,7 @@ public class FabricFlectonePulse implements FlectonePulse {
     @Override
     public void onLoad() {
         // initialize custom logger
-        Logger logger = LoggerFactory.getLogger(BuildConfig.PROJECT_MOD_ID);
+        Logger logger = LogManager.getLogger(BuildConfig.PROJECT_MOD_ID);
 
         fLogger = new FLogger(new FabricLogAdapter(logger), () -> fileFacade);
         fLogger.logEnabling();
@@ -84,12 +85,25 @@ public class FabricFlectonePulse implements FlectonePulse {
         }
 
         // load PacketEvents
-        packetEventsAdapter = new FabricPacketEventsAdapter();
+        packetEventsAdapter = new FabricPacketEventsAdapter(this);
         packetEventsAdapter.load();
 
         try {
             // create guice injector for dependency injection
-            injector = Guice.createInjector(Stage.PRODUCTION, new FabricInjector(this, packetEventsAdapter, libraryResolver, fLogger));
+            injector = Guice.createInjector(Stage.PRODUCTION, new FabricInjector(this, packetEventsAdapter, libraryResolver, fLogger).withLayers(List.of(
+                    new MinecraftPlatformLayer(ServerVersion.V_1_21_11, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_21_11"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_21_9, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_21_9"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_21_5, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_21_5"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_21_4, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_21_4"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_21_2, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_21_2"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_20_5, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_20_5"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_20_2, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_20_2"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_19_4, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_19_4"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_19_3, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_19_3"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_19, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_19"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_17, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_17"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_16, VersionComparison.OLDER_THAN, "net.flectone.pulse.FabricInjectorV_1_16")
+            )));
             fileFacade = injector.getInstance(FileFacade.class);
         } catch (Exception e) {
             throwInitException(e);
@@ -155,10 +169,11 @@ public class FabricFlectonePulse implements FlectonePulse {
         try {
             switch (type) {
                 case CONFIGURE_SERIALIZATION -> packetEventsAdapter.configureSerialization((ChannelPipeline) args[0], (PacketFlow) args[1]);
-                case PRE_NEW_PLAYER_PLACE -> packetEventsAdapter.preNewPlayerPlace((Connection) args[0], (Channel) args[1], (ServerPlayer) args[2]);
-                case ON_PLAYER_PRE_LOGIN -> getPlayerLoginListener().onPreLogin((ServerLoginPacketListenerImpl) args[0], (GameProfile) args[1]);
-                case ON_PLAYER_LOGIN -> packetEventsAdapter.onPlayerLogin((Connection) args[0], (ServerPlayer) args[1]);
-                case POST_RESPAWN -> packetEventsAdapter.postRespawn((Connection) args[0], (Channel) args[1], (ServerPlayer) args[2]);
+                case SETUP_COMPRESSION -> packetEventsAdapter.setupCompression((ChannelPipeline) args[0]);
+                case PRE_NEW_PLAYER_PLACE -> packetEventsAdapter.preNewPlayerPlace((Channel) args[0], (ServerPlayer) args[1]);
+                case ON_PLAYER_PRE_LOGIN -> getPlayerLoginListener().onPreLogin((ServerLoginPacketListenerImpl) args[0]);
+                case ON_PLAYER_LOGIN -> packetEventsAdapter.onPlayerLogin((ServerPlayer) args[0]);
+                case POST_RESPAWN -> packetEventsAdapter.postRespawn((ServerPlayer) args[0]);
                 case INIT_PACKET_ADAPTER -> packetEventsAdapter.init();
                 case TERMINATE_FAILED_PACKET_ADAPTER -> packetEventsAdapter.terminateFailed();
                 case TERMINATE_PACKET_ADAPTER -> packetEventsAdapter.terminate();
@@ -191,7 +206,7 @@ public class FabricFlectonePulse implements FlectonePulse {
     }
 
     private void removeDefaultFabricCommands() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
+        injector.getInstance(FabricVersionAdapter.class).registerCommands(dispatcher -> {
             CommandNode<CommandSourceStack> root = dispatcher.getRoot();
 
             for (String command : injector.getInstance(FileFacade.class).config().internal().vanillaCommandsToRemove()) {

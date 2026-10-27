@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "flectonepulse",
+	"id": "flectonepulse-intermediary",
 	"version": "${version}",
-	"name": "FlectonePulse",
+	"name": "FlectonePulse (Intermediary Mappings)",
 	"description": "${description}",
 	"authors": [
 		"TheFaser"
@@ -27,9 +27,9 @@
 	],
 	"accessWidener": "flectonepulse.accesswidener",
 	"depends": {
-      "fabricloader": "*",
+      "fabricloader": ">=0.16",
       "fabric-api-base": "*",
-      "minecraft": ">=26.3",
-      "java": ">=25"
+      "minecraft": ">=1.14 <26",
+      "java": ">=21"
 	}
 }

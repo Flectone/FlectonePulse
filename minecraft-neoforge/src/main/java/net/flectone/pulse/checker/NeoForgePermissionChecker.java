@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.NeoForgePlayerAdapter;
+import net.flectone.pulse.platform.adapter.NeoForgeVersionAdapter;
 import net.flectone.pulse.platform.registry.NeoForgePermissionRegistry;
 import net.flectone.pulse.util.LazyInstance;
 import net.minecraft.server.MinecraftServer;
@@ -18,10 +19,9 @@ import net.minecraft.server.level.ServerPlayer;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NeoForgePermissionChecker implements PermissionChecker {
 
-    private static final net.minecraft.server.permissions.Permission TRUE_PERMISSION = new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.ALL);
-
     private final NeoForgeFlectonePulse neoForgeFlectonePulse;
     private final NeoForgePlayerAdapter neoForgePlayerAdapter;
+    private final NeoForgeVersionAdapter neoForgeVersionAdapter;
     private final NeoForgePermissionRegistry neoForgePermissionRegistry;
     private final LazyInstance<IntegrationModule> integrationModule;
 
@@ -50,7 +50,7 @@ public class NeoForgePermissionChecker implements PermissionChecker {
 
         ServerPlayer player = neoForgePlayerAdapter.getPlayer(entity.uuid());
         if (player != null) {
-            value = value && player.permissions().hasPermission(TRUE_PERMISSION);
+            value = value && neoForgeVersionAdapter.hasPermission(player);
         }
 
         return value;

@@ -1,11 +1,11 @@
 package net.flectone.pulse;
 
 import lombok.Getter;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
 
 import java.util.function.Supplier;
 
@@ -26,11 +26,11 @@ public class NeoForgeFlectonePulseLoader implements Supplier<NeoForgeFlectonePul
 
     private JarInJarClassLoader loader;
 
-    public NeoForgeFlectonePulseLoader(IEventBus eventBus, ModContainer modContainer) {
+    public NeoForgeFlectonePulseLoader(IEventBus eventBus, ModContainer modContainer, Dist dist) {
         this.container = modContainer;
         this.eventBus = eventBus;
 
-        if (FMLEnvironment.getDist().isClient()) return;
+        if (dist.isClient()) return;
 
         this.loader = new JarInJarClassLoader(getClass().getClassLoader(), JAR_NAME);
 

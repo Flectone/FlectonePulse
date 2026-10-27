@@ -28,12 +28,10 @@ import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.NameAndId;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -55,6 +53,7 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
 
     private final FileFacade fileFacade;
     private final NeoForgeFlectonePulse neoForgeFlectonePulse;
+    private final NeoForgeVersionAdapter neoForgeVersionAdapter;
     private final MinecraftPacketSender packetSender;
     private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
@@ -148,7 +147,7 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
         ServerPlayer player = getPlayer(uuid);
         if (player == null) return "";
 
-        return player.level().dimension().identifier().getPath();
+        return neoForgeVersionAdapter.getPath(player.level().dimension());
     }
 
     @Override
@@ -189,7 +188,7 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
         if (player == null) return null;
 
         GameProfile profile = player.getGameProfile();
-        PropertyMap properties = profile.properties();
+        PropertyMap properties = neoForgeVersionAdapter.getProperties(profile);
 
         Collection<Property> textures = properties.get("textures");
         if (textures.isEmpty()) return null;
@@ -207,7 +206,7 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
         ServerPlayer player = getPlayer(uuid);
         if (player == null) return GameMode.SURVIVAL.name();
 
-        GameType gameType = player.gameMode();
+        GameType gameType = player.gameMode.getGameModeForPlayer();
         if (gameType == null) return GameMode.SURVIVAL.name();
 
         return GameMode.getById(gameType.getId()).name();
@@ -297,7 +296,7 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
         MinecraftServer minecraftServer = neoForgeFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        return minecraftServer.getPlayerList().isOp(new NameAndId(uuid, getName(uuid)));
+        return neoForgeVersionAdapter.isOperator(minecraftServer, uuid, getName(uuid));
     }
 
     @Override
@@ -330,10 +329,10 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
         if (potion == null) return false;
 
         ClientVersion clientVersion = packetProvider.getServerVersion().toClientVersion();
-        Optional<Holder.Reference<@NonNull MobEffect>> effect = BuiltInRegistries.MOB_EFFECT.get(potion.getId(clientVersion));
-        if (effect.isEmpty()) return false;
+        MobEffect effect = BuiltInRegistries.MOB_EFFECT.byId(potion.getId(clientVersion));
+        if (effect == null) return false;
 
-        MobEffectInstance effectInstance = player.getEffect(effect.get());
+        MobEffectInstance effectInstance = player.getEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect));
         return effectInstance != null && effectInstance.getDuration() > 0;
     }
 

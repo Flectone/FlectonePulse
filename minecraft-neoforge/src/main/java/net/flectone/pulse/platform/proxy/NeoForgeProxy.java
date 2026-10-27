@@ -8,10 +8,10 @@ import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.listener.proxy.ProxyMessageProcessor;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.platform.adapter.NeoForgeVersionAdapter;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -27,6 +27,7 @@ public class NeoForgeProxy implements Proxy {
 
     private final FileFacade fileFacade;
     private final NeoForgeFlectonePulse neoForgeFlectonePulse;
+    private final NeoForgeVersionAdapter neoForgeVersionAdapter;
     private final ProxyMessageProcessor proxyMessageProcessor;
 
     private CustomPacketPayload.Type<@NonNull ProxyPayload> payloadType;
@@ -39,7 +40,7 @@ public class NeoForgeProxy implements Proxy {
 
     @Override
     public void onEnable() {
-        payloadType = new CustomPacketPayload.Type<>(Identifier.parse(Proxy.CHANNEL));
+        payloadType = neoForgeVersionAdapter.createPayloadType(Proxy.CHANNEL);
 
         if (streamCodec == null) {
             streamCodec = StreamCodec.of(

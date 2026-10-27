@@ -30,7 +30,7 @@ public class FabricComponentSerializer extends MinecraftComponentSerializer {
     @SuppressWarnings("unchecked")
     public net.minecraft.network.chat.Component toFabric(String json) throws Throwable {
         Object jsonElement = jsonParseStringHandle.invoke(json);
-        DynamicOps<Object> ops = (DynamicOps<Object>) (DynamicOps<?>) com.mojang.serialization.JsonOps.INSTANCE;
+        DynamicOps<Object> ops = (DynamicOps<Object>) (Object) com.mojang.serialization.JsonOps.INSTANCE;
 
         return ComponentSerialization.CODEC.parse(ops, jsonElement).getOrThrow();
     }

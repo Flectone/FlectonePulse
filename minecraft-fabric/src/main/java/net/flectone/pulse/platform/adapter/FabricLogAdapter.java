@@ -1,9 +1,9 @@
 package net.flectone.pulse.platform.adapter;
 
 import com.alessiodp.libby.logging.LogLevel;
+import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
 
 public class FabricLogAdapter implements LogAdapter {
 

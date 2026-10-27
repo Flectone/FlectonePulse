@@ -26,7 +26,7 @@ public class FabricPlayerConnectionListener {
     private final TaskScheduler taskScheduler;
 
     public void asyncProcessJoinEvent(ServerGamePacketListenerImpl handler, PacketSender packetSender, MinecraftServer minecraftServer) {
-        UUID uuid = handler.getPlayer().getUUID();
+        UUID uuid = handler.player.getUUID();
 
         taskScheduler.runAsyncLater(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
@@ -42,7 +42,7 @@ public class FabricPlayerConnectionListener {
     }
 
     public void asyncProcessQuitEvent(ServerGamePacketListenerImpl handler, MinecraftServer minecraftServer) {
-        UUID uuid = handler.getPlayer().getUUID();
+        UUID uuid = handler.player.getUUID();
 
         taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);

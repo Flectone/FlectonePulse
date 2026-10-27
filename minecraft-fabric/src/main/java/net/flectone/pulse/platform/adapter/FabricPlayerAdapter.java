@@ -28,13 +28,9 @@ import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.NameAndId;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
@@ -49,6 +45,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     private final FileFacade fileFacade;
     private final FabricFlectonePulse fabricFlectonePulse;
+    private final FabricVersionAdapter fabricVersionAdapter;
     private final MinecraftPacketSender packetSender;
     private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
@@ -63,7 +60,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (minecraftServer == null) return 0;
 
         for (ServerLevel world : minecraftServer.getAllLevels()) {
-            Entity entity = world.getEntity(uuid);
+            Entity entity = fabricVersionAdapter.getEntity(world, uuid);
             if (entity != null) {
                 return entity.getId();
             }
@@ -90,7 +87,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         return switch (platformPlayer) {
             case ServerPlayer player -> player.getUUID();
             case CommandSourceStack commandSource -> {
-                ServerPlayer player = commandSource.getPlayer();
+                ServerPlayer player = fabricVersionAdapter.getPlayer(commandSource);
                 yield player == null ? null : player.getUUID();
             }
             default -> null;
@@ -142,7 +139,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         ServerPlayer player = getPlayer(uuid);
         if (player == null) return "";
 
-        return player.level().dimension().identifier().getPath();
+        return fabricVersionAdapter.getWorldName(player);
     }
 
     @Override
@@ -155,7 +152,10 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         ServerPlayer player = getPlayer(uuid);
         if (player == null) return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
 
-        return player.clientInformation().language();
+        String language = fabricVersionAdapter.getLanguage(player);
+        if (language == null) return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+
+        return language;
     }
 
     @Override
@@ -183,7 +183,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (player == null) return null;
 
         GameProfile profile = player.getGameProfile();
-        PropertyMap properties = profile.properties();
+        PropertyMap properties = fabricVersionAdapter.getProperties(profile);
 
         Collection<Property> textures = properties.get("textures");
         if (textures.isEmpty()) return null;
@@ -192,7 +192,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
         return PlayerHeadObjectContents.property(
                 "textures",
-                textureProperty.value()
+                fabricVersionAdapter.getValue(textureProperty)
         );
     }
 
@@ -201,7 +201,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         ServerPlayer player = getPlayer(uuid);
         if (player == null) return GameMode.SURVIVAL.name();
 
-        GameType gameType = player.gameMode();
+        GameType gameType = player.gameMode.getGameModeForPlayer();
         if (gameType == null) return GameMode.SURVIVAL.name();
 
         return GameMode.getById(gameType.getId()).name();
@@ -264,7 +264,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         ServerPlayer player = getPlayer(uuid);
         if (player == null) return null;
 
-        return new Coordinates(player.getBlockX(), player.getBlockY(), player.getBlockZ(), player.getYRot(), player.getXRot());
+        return fabricVersionAdapter.getCoordinates(player);
     }
 
     @Override
@@ -276,14 +276,14 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
         ServerPlayer secondPlayer = getPlayer(second);
         if (secondPlayer == null) return -1.0;
-        if (!firstPlayer.level().equals(secondPlayer.level())) return -1.0;
+        if (!fabricVersionAdapter.getLevel(firstPlayer).equals(fabricVersionAdapter.getLevel(secondPlayer))) return -1.0;
 
         return firstPlayer.distanceTo(secondPlayer);
     }
 
     @Override
     public boolean isConsole(@NonNull Object platformPlayer) {
-        return platformPlayer instanceof CommandSourceStack source && source.getPlayer() == null;
+        return platformPlayer instanceof CommandSourceStack source && fabricVersionAdapter.getPlayer(source) == null;
     }
 
     @Override
@@ -291,7 +291,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        return minecraftServer.getPlayerList().isOp(new NameAndId(uuid, getName(uuid)));
+        return fabricVersionAdapter.isOperator(minecraftServer, uuid, getName(uuid));
     }
 
     @Override
@@ -299,7 +299,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         ServerPlayer player = getPlayer(uuid);
         if (player == null) return false;
 
-        return player.isCrouching();
+        return fabricVersionAdapter.isSneaking(player);
     }
 
     @Override
@@ -324,10 +324,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (potion == null) return false;
 
         ClientVersion clientVersion = packetProvider.getServerVersion().toClientVersion();
-        Optional<Holder.Reference<@NonNull MobEffect>> effect = BuiltInRegistries.MOB_EFFECT.get(potion.getId(clientVersion));
-        if (effect.isEmpty()) return false;
-
-        MobEffectInstance effectInstance = player.getEffect(effect.get());
+        MobEffectInstance effectInstance = fabricVersionAdapter.getEffect(player, potion.getId(clientVersion));
         return effectInstance != null && effectInstance.getDuration() > 0;
     }
 

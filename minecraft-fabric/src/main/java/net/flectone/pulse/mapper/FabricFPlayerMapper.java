@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.platform.adapter.FabricVersionAdapter;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.minecraft.commands.CommandSourceStack;
@@ -20,10 +21,11 @@ public class FabricFPlayerMapper implements SenderMapper<CommandSourceStack, FPl
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final FabricVersionAdapter fabricVersionAdapter;
 
     @Override
     public @NonNull FPlayer map(@NonNull CommandSourceStack sender) {
-        ServerPlayer player = sender.getPlayer();
+        ServerPlayer player = fabricVersionAdapter.getPlayer(sender);
         if (player != null) {
             return fPlayerService.getFPlayer(player.getUUID());
         }
@@ -37,7 +39,7 @@ public class FabricFPlayerMapper implements SenderMapper<CommandSourceStack, FPl
 
         Object obj = platformPlayerAdapter.convertToPlatformPlayer(mapped);
         return obj instanceof ServerPlayer player
-                ? player.createCommandSourceStack()
+                ? fabricVersionAdapter.createCommandSourceStack(player)
                 : minecraftServer.createCommandSourceStack();
     }
 }

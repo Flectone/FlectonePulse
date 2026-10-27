@@ -2,6 +2,12 @@ plugins {
     id "net.neoforged.moddev" version "${neoforge_moddev_version}"
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(java_version)
+    }
+}
+
 neoForge {
     version = "${neoforge_version}"
 }
@@ -20,6 +26,16 @@ configurations {
 }
 
 dependencies {
+    components {
+        withModule("org.apache.commons:commons-text") {
+            allVariants {
+                withDependencies {
+                    removeAll { it.name == "commons-lang3" }
+                }
+            }
+        }
+    }
+
     shadow project(":common")
     shadow project(":minecraft-common")
 
@@ -37,8 +53,23 @@ dependencies {
 }
 
 shadowJar {
-    archiveFileName = "flectonepulse-neoforge.jarinjar"
     configurations = [project.configurations.shadow]
+}
+
+tasks.register("jarInJarContent", Jar) {
+    archiveFileName = "flectonepulse-neoforge.jarinjar"
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from { zipTree(project(":minecraft-neoforge").tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project(":minecraft-neoforge:1.21.4").tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project(":minecraft-neoforge:1.21.9").tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project(":minecraft-neoforge:1.21.11").tasks.named("shadeDowngradedApi").get().archiveFile) }
+
+    dependsOn(":minecraft-neoforge:shadeDowngradedApi")
+    dependsOn(":minecraft-neoforge:1.21.4:shadeDowngradedApi")
+    dependsOn(":minecraft-neoforge:1.21.9:shadeDowngradedApi")
+    dependsOn(":minecraft-neoforge:1.21.11:shadeDowngradedApi")
 }
 
 tasks.named("buildFinalJar", Jar) {
@@ -46,7 +77,7 @@ tasks.named("buildFinalJar", Jar) {
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    from { zipTree(project(":minecraft-neoforge:loader").tasks.shadowJar.archiveFile) }
+    from { zipTree(project(":minecraft-neoforge:loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
 
-    dependsOn(":minecraft-neoforge:loader:shadowJar")
+    dependsOn(":minecraft-neoforge:loader:shadeDowngradedApi")
 }

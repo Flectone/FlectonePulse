@@ -19,9 +19,7 @@ public class FabricLibraryResolver extends LibraryResolverImpl {
     @Override
     public List<String> getPacketEventsArtifactIds() {
         return List.of(
-                "packeteventsmodern-fabric",
                 "packeteventsmodern-fabric-common",
-                "packeteventsmodern-fabric-official",
                 "packeteventsmodern-api",
                 "packeteventsmodern-netty-common"
         );
@@ -29,6 +27,16 @@ public class FabricLibraryResolver extends LibraryResolverImpl {
 
     @Override
     public void loadLibraries() {
+        if (!isSlf4jLoaded()) {
+            loadLibrary(Library.builder()
+                    .groupId("org{}slf4j")
+                    .artifactId("slf4j-api")
+                    .version(BuildConfig.SLF4J_VERSION)
+                    .repository(BuildConfig.MAVEN_REPOSITORY)
+                    .build()
+            );
+        }
+
         super.loadLibraries();
 
         getAdventureArtifactIds().forEach(artifactId -> loadLibrary(Library.builder()
@@ -54,7 +62,7 @@ public class FabricLibraryResolver extends LibraryResolverImpl {
                 .groupId("net{}flectone")
                 .artifactId(artifactId)
                 .version(BuildConfig.PACKETEVENTSMODERN_VERSION)
-                .repository(BuildConfig.CODEMC_REPOSITORY)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .fallbackRepository(BuildConfig.CODEMC_REPOSITORY)
                 .relocate(Relocation.builder()
                         .pattern("com{}github{}retrooper")
@@ -116,43 +124,15 @@ public class FabricLibraryResolver extends LibraryResolverImpl {
                 )
                 .build()
         );
+    }
 
-        loadLibrary(Library.builder()
-                .groupId("org{}incendo")
-                .artifactId("cloud-minecraft-modded-common")
-                .version(BuildConfig.CLOUD_FABRIC_VERSION)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("org{}incendo")
-                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".cloud")
-                        .build()
-                )
-                .relocate(Relocation.builder()
-                        .pattern("io{}leangen{}geantyref")
-                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".geantyref")
-                        .build()
-                )
-                .build()
-        );
-
-        loadLibrary(Library.builder()
-                .groupId("org{}incendo")
-                .artifactId("cloud-fabric")
-                .version(BuildConfig.CLOUD_FABRIC_VERSION)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .relocate(Relocation.builder()
-                        .pattern("org{}incendo")
-                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".cloud")
-                        .build()
-                )
-                .relocate(Relocation.builder()
-                        .pattern("io{}leangen{}geantyref")
-                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".geantyref")
-                        .build()
-                )
-                .build()
-        );
+    private boolean isSlf4jLoaded() {
+        try {
+            Class.forName("org.slf4j.LoggerFactory", false, getClass().getClassLoader());
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
 }

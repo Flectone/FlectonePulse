@@ -1,0 +1,31 @@
+plugins {
+    id "net.neoforged.moddev" version "${neoforge_moddev_version}"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(java_version)
+    }
+}
+
+neoForge {
+    version = "${neoforge_version}"
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        force "org.jspecify:jspecify:1.0.1"
+    }
+}
+
+dependencies {
+    compileOnly project(":minecraft-neoforge")
+    compileOnly project(":minecraft-neoforge:1.21.4")
+    compileOnly project(":minecraft-neoforge:1.21.9")
+
+    compileOnly "com.google.inject:guice:$guice_version"
+}
+
+shadowJar {
+    configurations = []
+}

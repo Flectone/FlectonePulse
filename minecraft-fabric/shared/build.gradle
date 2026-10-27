@@ -1,0 +1,12 @@
+configurations {
+    shadow
+}
+
+dependencies {
+    shadow project(":common")
+    shadow project(":minecraft-common")
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+}

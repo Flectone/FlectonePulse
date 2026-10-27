@@ -31,7 +31,8 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.ModList;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -46,11 +47,12 @@ public class NeoForgePacketEventsAdapter implements MinecraftPacketEventsAdapter
     @Override
     public void load() {
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
-        PacketEvents.setAPI(new NeoForgePacketEventsAPI(BuildConfig.PROJECT_MOD_ID, FMLLoader.getCurrent().getDist()) {
+        PacketEvents.setAPI(new NeoForgePacketEventsAPI(BuildConfig.PROJECT_MOD_ID, Dist.DEDICATED_SERVER) {
             @Override
             protected ServerManager constructServerManager() {
-                SharedConstants.tryDetectVersion();
-                String version = SharedConstants.getCurrentVersion().id();
+                String version = ModList.get().getModContainerById("minecraft")
+                        .map(container -> container.getModInfo().getVersion().toString())
+                        .orElseThrow();
                 return new NeoForgeServerManager(version);
             }
 

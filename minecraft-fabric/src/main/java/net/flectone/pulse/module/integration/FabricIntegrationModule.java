@@ -37,6 +37,7 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
     private final LazyInstance<PermissionChecker> permissionChecker;
     private final LazyInstance<PlatformServerAdapter> platformServerAdapter;
     private final LazyInstance<FabricVanishModule> vanishModule;
+    private final ReflectionResolver reflectionResolver;
 
     @Inject
     public FabricIntegrationModule(FileFacade fileManager,
@@ -59,6 +60,7 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
         this.permissionChecker = permissionChecker;
         this.platformServerAdapter = platformServerAdapter;
         this.vanishModule = vanishModule;
+        this.reflectionResolver = reflectionResolver;
     }
 
     @Override
@@ -74,7 +76,7 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
             builder.add(FabricMiniPlaceholdersModule.class);
         }
 
-        if (platformServerAdapterInstance.hasProject("placeholder-api")) {
+        if (platformServerAdapterInstance.hasProject("placeholder-api") && reflectionResolver.hasClass("eu.pb4.placeholders.api.PlaceholderContext")) {
             builder.add(FabricPlaceholderAPIModule.class);
         }
 

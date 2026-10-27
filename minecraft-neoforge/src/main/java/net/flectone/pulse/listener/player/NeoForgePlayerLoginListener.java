@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.platform.adapter.NeoForgeVersionAdapter;
 import net.flectone.pulse.serializer.NeoForgeComponentSerializer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
@@ -17,6 +18,7 @@ public class NeoForgePlayerLoginListener {
 
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
     private final NeoForgeComponentSerializer componentSerializer;
+    private final NeoForgeVersionAdapter neoForgeVersionAdapter;
 
     public void onPreLogin(RegisterConfigurationTasksEvent event) {
         if (!(event.getListener() instanceof ServerConfigurationPacketListenerImpl packetListener)) {
@@ -26,8 +28,8 @@ public class NeoForgePlayerLoginListener {
         GameProfile profile = packetListener.getOwner();
         if (profile == null) return;
 
-        UUID uuid = profile.id();
-        String name = profile.name();
+        UUID uuid = neoForgeVersionAdapter.getId(profile);
+        String name = neoForgeVersionAdapter.getName(profile);
 
         playerPreLoginProcessor.processLogin(uuid, name, loginEvent -> {
             try {

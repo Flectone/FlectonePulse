@@ -56,6 +56,7 @@ import java.util.*;
 public class NeoForgeServerAdapter implements PlatformServerAdapter {
 
     private final NeoForgeFlectonePulse neoForgeFlectonePulse;
+    private final NeoForgeVersionAdapter neoForgeVersionAdapter;
     private final LazyInstance<FPlayerService> fPlayerService;
     private final LazyInstance<MessagePipeline> messagePipeline;
     private final LazyInstance<SocialService> socialService;
@@ -217,7 +218,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
 
     @Override
     public @NonNull String getItemName(@NonNull Object item) {
-        return item instanceof net.minecraft.world.item.ItemStack itemStack ? itemStack.getItemName().getString() : "";
+        return item instanceof net.minecraft.world.item.ItemStack itemStack ? itemStack.getItem().getName(itemStack).getString() : "";
     }
 
     @Override
@@ -225,8 +226,9 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
         if (!(item instanceof net.minecraft.world.item.ItemStack itemStack)) return Component.empty();
         if (getItemName(item).equalsIgnoreCase("air")) return Component.translatable("block.minecraft.air");
 
-        Component component = itemStack.getCustomName() == null
-                || itemStack.getCustomName().getString().isBlank()
+        net.minecraft.network.chat.Component itemCustomName = neoForgeVersionAdapter.getCustomName(itemStack);
+        Component component = itemCustomName == null
+                || itemCustomName.getString().isBlank()
                 ? createTranslatableItemName(itemStack, translatable)
                 : createItemMetaName(itemStack);
 
@@ -258,7 +260,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
             return componentDecorator.hoverIfAbsent(component, adventureHoverConverter.convert(packetItemStack));
         }
 
-        Key key = Key.key(itemStack.getItem().builtInRegistryHolder().key().identifier().getPath());
+        Key key = Key.key(neoForgeVersionAdapter.getPath(itemStack.getItem().builtInRegistryHolder().key()));
         return componentDecorator.hoverIfAbsent(component, HoverEvent.showItem(key, itemStack.getCount()));
     }
 
@@ -279,7 +281,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
     }
 
     private Component createItemMetaName(net.minecraft.world.item.ItemStack itemStack) {
-        net.minecraft.network.chat.Component customName = itemStack.getCustomName();
+        net.minecraft.network.chat.Component customName = neoForgeVersionAdapter.getCustomName(itemStack);
         if (customName == null) return Component.empty();
 
         String clearedDisplayName = messagePipeline.get().buildPlain(MessageContext.builder()

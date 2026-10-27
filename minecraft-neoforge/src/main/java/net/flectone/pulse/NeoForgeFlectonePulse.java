@@ -1,6 +1,7 @@
 package net.flectone.pulse;
 
 import com.alessiodp.libby.logging.LogLevel;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -35,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @Getter
@@ -85,7 +87,11 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
 
         try {
             // create guice injector for dependency injection
-            injector = Guice.createInjector(Stage.PRODUCTION, new NeoForgeInjector(this, packetEventsAdapter, libraryResolver, fLogger));
+            injector = Guice.createInjector(Stage.PRODUCTION, new NeoForgeInjector(this, packetEventsAdapter, libraryResolver, fLogger).withLayers(List.of(
+                    new MinecraftPlatformLayer(ServerVersion.V_1_21_4, "net.flectone.pulse.NeoForgeInjectorV_1_21_4"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_21_9, "net.flectone.pulse.NeoForgeInjectorV_1_21_9"),
+                    new MinecraftPlatformLayer(ServerVersion.V_1_21_11, "net.flectone.pulse.NeoForgeInjectorV_1_21_11")
+            )));
             fileFacade = injector.getInstance(FileFacade.class);
         } catch (Exception e) {
             throwInitException(e);

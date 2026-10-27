@@ -3,6 +3,7 @@ package net.flectone.pulse;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.gson.Gson;
+import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
@@ -64,6 +65,7 @@ import net.flectone.pulse.serializer.MinecraftComponentSerializer;
 import net.flectone.pulse.service.*;
 
 import java.nio.file.Path;
+import java.util.List;
 
 public abstract class MinecraftPlatformInjector extends PlatformInjector {
 
@@ -76,6 +78,10 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         super(projectPath, libraryResolver, fLogger);
 
         this.minecraftPacketEventsAdapter = minecraftPacketEventsAdapter;
+    }
+
+    public Module withLayers(List<MinecraftPlatformLayer> layers) {
+        return MinecraftPlatformLayer.apply(this, PacketEvents.getAPI().getServerManager().getVersion(), layers);
     }
 
     @Override

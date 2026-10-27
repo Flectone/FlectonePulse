@@ -43,8 +43,8 @@ public class JarInJarClassLoader extends URLClassLoader {
         ClassLoader.registerAsParallelCapable();
     }
 
-    public JarInJarClassLoader(ClassLoader loaderClassLoader, String jarResourcePath) throws LoadingException {
-        super(new URL[]{extractJar(loaderClassLoader, jarResourcePath)}, loaderClassLoader);
+    public JarInJarClassLoader(ClassLoader loaderClassLoader, String... jarResourcePaths) throws LoadingException {
+        super(extractJars(loaderClassLoader, jarResourcePaths), loaderClassLoader);
     }
 
     public <T> LoaderBootstrap instantiatePlugin(String bootstrapClass, Class<T> loaderPluginType, T loaderPlugin) throws LoadingException {
@@ -67,6 +67,15 @@ public class JarInJarClassLoader extends URLClassLoader {
         } catch (ReflectiveOperationException e) {
             throw new LoadingException("Unable to create bootstrap plugin instance", e);
         }
+    }
+
+    private static URL[] extractJars(ClassLoader loaderClassLoader, String[] jarResourcePaths) throws LoadingException {
+        URL[] urls = new URL[jarResourcePaths.length];
+        for (int i = 0; i < jarResourcePaths.length; i++) {
+            urls[i] = extractJar(loaderClassLoader, jarResourcePaths[i]);
+        }
+
+        return urls;
     }
 
     private static URL extractJar(ClassLoader loaderClassLoader, String jarResourcePath) throws LoadingException {

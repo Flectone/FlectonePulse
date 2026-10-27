@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
+import net.flectone.pulse.platform.adapter.FabricVersionAdapter;
 import net.flectone.pulse.platform.registry.FabricPermissionRegistry;
 import net.flectone.pulse.util.LazyInstance;
 import net.minecraft.server.MinecraftServer;
@@ -18,10 +19,9 @@ import net.minecraft.server.level.ServerPlayer;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricPermissionChecker implements PermissionChecker {
 
-    private static final net.minecraft.server.permissions.Permission TRUE_PERMISSION = new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.ALL);
-
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FabricPlayerAdapter fabricPlayerAdapter;
+    private final FabricVersionAdapter fabricVersionAdapter;
     private final FabricPermissionRegistry fabricPermissionRegistry;
     private final LazyInstance<IntegrationModule> integrationModule;
 
@@ -50,7 +50,7 @@ public class FabricPermissionChecker implements PermissionChecker {
 
         ServerPlayer player = fabricPlayerAdapter.getPlayer(entity.uuid());
         if (player != null) {
-            value = value && player.permissions().hasPermission(TRUE_PERMISSION);
+            value = value && fabricVersionAdapter.hasPermission(player);
         }
 
         return value;
