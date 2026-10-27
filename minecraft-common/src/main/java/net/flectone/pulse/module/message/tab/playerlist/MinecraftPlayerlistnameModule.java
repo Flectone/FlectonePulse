@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
@@ -87,7 +88,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     private final MinecraftScoreboardModule scoreboardModule;
     private final IntegrationModule integrationModule;
     private final RangeFilter rangeFilter;
-    private final @Named("isNewerThanOrEqualsV_1_19_4") boolean isNewerThanOrEqualsV_1_19_4;
+    private final @Named("isNewerThanOrEqualsV_1_19_3") boolean isNewerThanOrEqualsV_1_19_3;
 
     @Override
     public void onEnable() {
@@ -138,7 +139,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         if (!moduleController.isEnable(this)) return;
 
         taskScheduler.runAsync(() -> {
-            BiConsumer<FPlayer, List<FPlayer>> receiversConsumer = isNewerThanOrEqualsV_1_19_4 ? this::sendPlayerInfos : this::sendPlayerData;
+            BiConsumer<FPlayer, List<FPlayer>> receiversConsumer = isNewerThanOrEqualsV_1_19_3 ? this::sendPlayerInfos : this::sendPlayerData;
 
             List<FPlayer> onlinePlayers = fPlayerService.getOnlineFPlayers();
 
@@ -151,7 +152,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     public void update(FPlayer fSender) {
         if (!moduleController.isEnable(this)) return;
 
-        BiConsumer<FPlayer, List<FPlayer>> receiversConsumer = isNewerThanOrEqualsV_1_19_4 ? this::sendPlayerInfos : this::sendPlayerData;
+        BiConsumer<FPlayer, List<FPlayer>> receiversConsumer = isNewerThanOrEqualsV_1_19_3 ? this::sendPlayerInfos : this::sendPlayerData;
 
         fPlayerService.getPlatformFPlayers()
                 .forEach(fReceiver -> receiversConsumer.accept(fReceiver, fReceiver.equals(fSender)
@@ -248,7 +249,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                     return !fPlayer.isOnline() || !socialService.canSeeVanished(fPlayer, fReceiver);
                 })
                 .forEach(uuid -> {
-                    packetSender.send(key, new WrapperPlayServerPlayerInfoRemove(uuid));
+                    packetSender.send(key, createRemovePacket(uuid));
 
                     forgetEntry(key, uuid);
 
@@ -272,8 +273,14 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         sentEntries.values().forEach(entries -> entries.remove(uuid));
 
         platformPlayerAdapter.getOnlinePlayers().forEach(onlineUUID ->
-                packetSender.send(onlineUUID, new WrapperPlayServerPlayerInfoRemove(uuid))
+                packetSender.send(onlineUUID, createRemovePacket(uuid))
         );
+    }
+
+    private PacketWrapper<?> createRemovePacket(UUID uuid) {
+        return isNewerThanOrEqualsV_1_19_3
+                ? new WrapperPlayServerPlayerInfoRemove(uuid)
+                : new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, new WrapperPlayServerPlayerInfo.PlayerData(null, new UserProfile(uuid, ""), null, 0));
     }
 
     public void clearPlayer(UUID uuid) {
