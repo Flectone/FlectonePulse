@@ -3,7 +3,9 @@ package net.flectone.pulse.module.message.vanilla.listener;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.Combat;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCombatEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -32,6 +34,12 @@ public class MinecraftPacketVanillaListener implements PacketListener {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Play.Server.DEATH_COMBAT_EVENT && vanillaModule.config().cancelDefaultDeathScreen()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (event.getPacketType() == PacketType.Play.Server.COMBAT_EVENT && vanillaModule.config().cancelDefaultDeathScreen()
+                && new WrapperPlayServerCombatEvent(event).getCombat() == Combat.ENTITY_DEAD) {
             event.setCancelled(true);
             return;
         }

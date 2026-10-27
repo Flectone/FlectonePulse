@@ -91,6 +91,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_14")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_16")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16));
+        bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_17")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_18")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_19_4")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_6")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_6));

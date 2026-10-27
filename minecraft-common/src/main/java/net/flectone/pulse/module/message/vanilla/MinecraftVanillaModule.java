@@ -1,9 +1,13 @@
 package net.flectone.pulse.module.message.vanilla;
 
+import com.github.retrooper.packetevents.protocol.player.Combat;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCombatEvent;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDeathCombatEvent;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
 import net.flectone.pulse.file.FileFacade;
@@ -54,6 +58,7 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
     private final ModuleController moduleController;
     private final SocialService socialService;
     private final Gson gson;
+    private final boolean isNewerThanOrEqualsV_1_17;
 
     @Inject
     public MinecraftVanillaModule(FileFacade fileFacade,
@@ -67,7 +72,8 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
                                   MinecraftPacketSender packetSender,
                                   ModuleController moduleController,
                                   SocialService socialService,
-                                  Gson gson) {
+                                  Gson gson,
+                                  @Named("isNewerThanOrEqualsV_1_17") boolean isNewerThanOrEqualsV_1_17) {
         super(fileFacade, proxyRegistry, listenerRegistry, socialService);
 
         this.extractor = extractor;
@@ -80,6 +86,7 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
         this.moduleController = moduleController;
         this.socialService = socialService;
         this.gson = gson;
+        this.isNewerThanOrEqualsV_1_17 = isNewerThanOrEqualsV_1_17;
     }
 
     @Override
@@ -330,6 +337,14 @@ public class MinecraftVanillaModule extends VanillaModuleImpl {
     }
 
     private void sendPersonalDeath(FPlayer fPlayer, Component component) {
-        taskScheduler.runSync(() -> packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(platformPlayerAdapter.getEntityId(fPlayer), null, component), config().cancelDefaultDeathScreen()));
+        taskScheduler.runSync(() -> {
+            int entityId = platformPlayerAdapter.getEntityId(fPlayer);
+
+            PacketWrapper<?> wrapper = isNewerThanOrEqualsV_1_17
+                    ? new WrapperPlayServerDeathCombatEvent(entityId, null, component)
+                    : new WrapperPlayServerCombatEvent(Combat.ENTITY_DEAD, entityId, -1, component);
+
+            packetSender.send(fPlayer, wrapper, config().cancelDefaultDeathScreen());
+        });
     }
 }
