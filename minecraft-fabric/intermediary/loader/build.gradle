@@ -51,7 +51,7 @@ processResources {
         exclude "flectonepulse.accesswidener"
     }
 
-    def props = [version: "$project_version", author: "$project_author", description: "$project_description", id: "flectonepulse-intermediary", name: "FlectonePulse (Intermediary Mappings)", minecraft: ">=1.14 <26"]
+    def props = [version: "$project_version", author: "$project_author", description: "$project_description", id: "flectonepulse-intermediary", name: "FlectonePulse (Intermediary Mappings)", minecraft: ">=1.14.4 <26"]
     inputs.properties props
     filteringCharset "UTF-8"
     filesMatching("fabric.mod.json") { expand props }

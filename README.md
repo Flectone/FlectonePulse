@@ -68,7 +68,7 @@ Java 21 or higher is **required** on every platform. Older Minecraft versions, s
 | Platform                                     | Supported Versions    |
 |----------------------------------------------|-----------------------|
 | **Bukkit / Spigot / Paper / Purpur / Folia** | 1.8.8 – Latest        |
-| **Fabric**                                   | 1.14 – Latest         |
+| **Fabric**                                   | 1.14.4 – Latest       |
 | **BungeeCord / Waterfall**                   | Latest                |
 | **Velocity**                                 | Latest                |
 | **Hytale**                                   | Latest Hytale version |
