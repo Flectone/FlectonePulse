@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -111,6 +112,16 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
                 if (playerUUID == null) return;
 
                 headTextRender.setPassengers(playerUUID, wrapper.getPassengers());
+            }
+            case PacketType.Play.Server.UPDATE_ATTRIBUTES -> {
+                WrapperPlayServerUpdateAttributes wrapper = new WrapperPlayServerUpdateAttributes(event);
+                UUID playerUUID = platformPlayerAdapter.getPlayerByEntityId(wrapper.getEntityId());
+                if (playerUUID == null) return;
+
+                wrapper.getProperties().stream()
+                        .filter(property -> property.getAttribute() == Attributes.SCALE)
+                        .findFirst()
+                        .ifPresent(property -> headTextRender.setScale(playerUUID, (float) property.calcValue()));
             }
             case PacketType.Login.Server.LOGIN_SUCCESS -> handleLoginSuccess(event);
             default -> {

@@ -70,6 +70,7 @@ public record Destination(
                     .offsetY(0.2f)
                     .offsetZ(0)
                     .scale(1.0f)
+                    .scaleWithPlayer(false)
                     .space(0.3f)
                     .billboard(HeadText.Modern.Billboard.CENTER)
                     .build()
@@ -236,6 +237,7 @@ public record Destination(
                 float offsetY = parseOrDefault(modernMap.get("offset_y"), DEFAULT_HEAD_TEXT.modern().offsetY(), Float::parseFloat);
                 float offsetZ = parseOrDefault(modernMap.get("offset_z"), DEFAULT_HEAD_TEXT.modern().offsetZ(), Float::parseFloat);
                 float scale = parseOrDefault(modernMap.get("scale"), DEFAULT_HEAD_TEXT.modern().scale(), Float::parseFloat);
+                boolean scaleWithPlayer = parseOrDefault(modernMap.get("scale_with_player"), DEFAULT_HEAD_TEXT.modern().scaleWithPlayer(), Boolean::parseBoolean);
                 float space = parseOrDefault(modernMap.get("space"), DEFAULT_HEAD_TEXT.modern().space(), Float::parseFloat);
 
                 HeadText.Modern.Billboard billboard;
@@ -265,6 +267,7 @@ public record Destination(
                                 .offsetY(offsetY)
                                 .offsetZ(offsetZ)
                                 .scale(scale)
+                                .scaleWithPlayer(scaleWithPlayer)
                                 .space(space)
                                 .billboard(billboard)
                                 .build()
@@ -373,6 +376,7 @@ public record Destination(
                 modernMap.put("offset_y", modern.offsetY());
                 modernMap.put("offset_z", modern.offsetZ());
                 modernMap.put("scale", modern.scale());
+                modernMap.put("scale_with_player", modern.scaleWithPlayer());
                 modernMap.put("space", modern.space());
                 modernMap.put("billboard", modern.billboard());
 

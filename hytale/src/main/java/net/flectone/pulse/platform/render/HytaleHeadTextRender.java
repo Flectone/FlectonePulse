@@ -282,6 +282,10 @@ public class HytaleHeadTextRender implements HeadTextRender {
     }
 
     @Override
+    public void setScale(@NonNull UUID holder, float scale) {
+    }
+
+    @Override
     public boolean isCorrectHolder(@NonNull UUID holder) {
         Object playerObj = platformPlayerAdapter.convertToPlatformPlayer(holder);
         if (!(playerObj instanceof PlayerRef)) return false;

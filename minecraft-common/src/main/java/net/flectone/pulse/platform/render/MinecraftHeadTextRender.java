@@ -50,6 +50,7 @@ public class MinecraftHeadTextRender implements HeadTextRender {
     private static final float LEGACY_1_19_4_OFFSET = 0.42f;
 
     private final Map<UUID, int[]> platformPlayerPassengers = new ConcurrentHashMap<>();
+    private final Map<UUID, Float> holderScales = new ConcurrentHashMap<>();
     private final Map<UUID, Map<UUID, List<HolderViewerEntity>>> holderViewerEntities = new ConcurrentHashMap<>();
 
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -75,7 +76,8 @@ public class MinecraftHeadTextRender implements HeadTextRender {
             int id,
             int componentHash,
             int row,
-            long endTime
+            long endTime,
+            float holderScale
     ) {
 
         private boolean isTextDisplay() {
@@ -356,6 +358,31 @@ public class MinecraftHeadTextRender implements HeadTextRender {
     }
 
     @Override
+    public void setScale(@NonNull UUID holder, float scale) {
+        Float previousScale = holderScales.put(holder, scale);
+        if (previousScale != null && previousScale == scale) return;
+
+        Map<UUID, List<HolderViewerEntity>> viewerEntities = holderViewerEntities.get(holder);
+        if (viewerEntities == null) return;
+
+        viewerEntities.replaceAll((viewer, entities) -> {
+            List<HolderViewerEntity> scaledEntities = entities.stream()
+                    .map(entity -> entity.withHolderScale(scale))
+                    .toList();
+
+            scaledEntities.stream()
+                    .filter(entity -> entity.isTextDisplay() && entity.headText().modern().scaleWithPlayer())
+                    .forEach(entity -> {
+                        float entityScale = scale(entity);
+                        changeScale(viewer, entity, new Vector3f(entityScale, entityScale, entityScale));
+                        changePosition(viewer, List.of(entity), entity.row());
+                    });
+
+            return scaledEntities;
+        });
+    }
+
+    @Override
     public boolean isCorrectHolder(@NonNull UUID holder) {
         if (platformPlayerAdapter.isDead(holder)) return false;
         if (GameMode.SPECTATOR.name().equals(platformPlayerAdapter.getGamemode(holder))) return false;
@@ -437,6 +464,7 @@ public class MinecraftHeadTextRender implements HeadTextRender {
                 .componentHash(message.hashCode())
                 .row(row)
                 .endTime(headText.calculateEndTime())
+                .holderScale(holderScales.getOrDefault(holderUUID, 1.0f))
                 .build();
 
         List<HolderViewerEntity> all = new ArrayList<>(existingEntities);
@@ -450,7 +478,7 @@ public class MinecraftHeadTextRender implements HeadTextRender {
         sendPassengers(holderUUID, viewerUUID, all);
 
         if (entity.isTextDisplay() && headText.modern().animationTime() > 0) {
-            float scale = headText.modern().scale();
+            float scale = scale(entity);
             taskScheduler.runAsyncLater(() -> {
                 changePosition(viewerUUID, existingEntities, row);
                 changeScale(viewerUUID, entity, new Vector3f(scale, scale, scale));
@@ -621,7 +649,7 @@ public class MinecraftHeadTextRender implements HeadTextRender {
             metadataList.add(new EntityData<>(displayIndex(2), EntityDataTypes.VECTOR3F, translation(entity)));
 
             // scale
-            float scale = text.modern().scale();
+            float scale = scale(entity);
             Vector3f scaleVector = text.modern().animationTime() > 0 ? Vector3f.zero() : new Vector3f(scale, scale, scale);
             metadataList.add(new EntityData<>(displayIndex(3), EntityDataTypes.VECTOR3F, scaleVector));
 
@@ -666,11 +694,19 @@ public class MinecraftHeadTextRender implements HeadTextRender {
     }
 
     private Vector3f translation(@NonNull HolderViewerEntity entity) {
-        float step = entity.headText().modern().space() * entity.headText().modern().scale();
-        float offsetX = entity.headText().modern().offsetX();
-        float offsetY = entity.headText().modern().offsetY() + step * entity.row() + (entity.clientVersion.isNewerThanOrEquals(ClientVersion.V_1_20_2) ? 0 : LEGACY_1_19_4_OFFSET);
-        float offsetZ = entity.headText().modern().offsetZ();
+        HeadText.Modern modern = entity.headText().modern();
+        float holderScale = modern.scaleWithPlayer() ? entity.holderScale() : 1.0f;
+
+        float step = modern.space() * scale(entity);
+        float offsetX = modern.offsetX() * holderScale;
+        float offsetY = modern.offsetY() * holderScale + step * entity.row() + (entity.clientVersion.isNewerThanOrEquals(ClientVersion.V_1_20_2) ? 0 : LEGACY_1_19_4_OFFSET);
+        float offsetZ = modern.offsetZ() * holderScale;
         return new Vector3f(offsetX, offsetY, offsetZ);
+    }
+
+    private float scale(@NonNull HolderViewerEntity entity) {
+        HeadText.Modern modern = entity.headText().modern();
+        return modern.scaleWithPlayer() ? modern.scale() * entity.holderScale() : modern.scale();
     }
 
     private int displayIndex(int field) {

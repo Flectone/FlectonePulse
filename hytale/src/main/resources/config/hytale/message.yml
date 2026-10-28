@@ -65,6 +65,7 @@ bubble:
       offset_y: 1.8
       offset_z: 0.0
       scale: 1.0
+      scale_with_player: true
       space: 0.25
       billboard: "CENTER"
   disallowed_input: ""
@@ -350,6 +351,7 @@ nameplate:
       offset_y: 1.8
       offset_z: 0.0
       scale: 1.0
+      scale_with_player: true
       space: 0.25
       billboard: "CENTER"
   ticker:

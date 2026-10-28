@@ -46,6 +46,7 @@ public record HeadText(
      * @param offsetY the Y offset
      * @param offsetZ the Z offset
      * @param scale the scale factor
+     * @param scaleWithPlayer whether the scale, offsets and space are multiplied by the holder's scale
      * @param space the spacing between rows
      * @param billboard how the text turns toward the viewer
      */
@@ -62,6 +63,7 @@ public record HeadText(
             float offsetY,
             float offsetZ,
             float scale,
+            boolean scaleWithPlayer,
             float space,
             Billboard billboard
     ) {

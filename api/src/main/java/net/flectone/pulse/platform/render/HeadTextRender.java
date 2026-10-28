@@ -91,6 +91,14 @@ public interface HeadTextRender {
     void setPassengers(@NonNull UUID holder, int[] entities);
 
     /**
+     * Sets the holder's scale, which head texts with scale_with_player follow.
+     *
+     * @param holder the UUID of the holder
+     * @param scale the holder's scale, 1.0 removes it
+     */
+    void setScale(@NonNull UUID holder, float scale);
+
+    /**
      * Checks if the specified UUID is a valid holder.
      * A holder is valid when alive, not in spectator mode, and not invisible.
      *
