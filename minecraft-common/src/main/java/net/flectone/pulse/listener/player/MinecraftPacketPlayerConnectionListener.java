@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
@@ -192,6 +193,7 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
             if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                 WrapperPlayServerChatMessage wrapper = new WrapperPlayServerChatMessage(event);
                 component = wrapper.getMessage().getChatContent();
+                overlay = wrapper.getMessage().getType() == ChatTypes.GAME_INFO;
             } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
                 WrapperPlayServerSystemChatMessage wrapper = new WrapperPlayServerSystemChatMessage(event);
                 component = wrapper.getMessage();
