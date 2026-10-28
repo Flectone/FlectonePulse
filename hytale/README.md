@@ -58,7 +58,7 @@ FlectonePulse was the subject of a **university thesis** and received top marks 
 
 ### Requirement
 
-Java 17 or higher is **REQUIRED**
+Java 21 or higher is **required**
 
 | Platform   | Supported Versions    |
 |------------|-----------------------|

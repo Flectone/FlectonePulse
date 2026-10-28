@@ -63,16 +63,24 @@ FlectonePulse was the subject of a **university thesis** and received top marks 
 
 ### Requirement
 
-Java 17 or higher is **REQUIRED**. Older Minecraft versions, such as 1.8.8, can also run on Java 17 (check [PandaSpigot](https://github.com/hpfxd/pandaspigot))
+Java 21 or higher is **required** on every platform. Older Minecraft versions, such as 1.8.8, can also run on Java 21 (see [PandaSpigot](https://github.com/hpfxd/pandaspigot))
 
-| Platform                                     | Supported Versions       |
-|----------------------------------------------|--------------------------|
-| **Bukkit / Spigot / Paper / Purpur / Folia** | 1.8.8 – Latest           |
-| **Fabric**                                   | Latest Minecraft version |
-| **BungeeCord / Waterfall**                   | Latest                   |
-| **Velocity**                                 | Latest                   |
-| **Hytale**                                   | Latest Hytale version    |
-| **NeoForge**                                 | Latest Minecraft version |
+| Platform                                     | Supported Versions    |
+|----------------------------------------------|-----------------------|
+| **Bukkit / Spigot / Paper / Purpur / Folia** | 1.8.8 – Latest        |
+| **Fabric**                                   | 1.14 – Latest         |
+| **BungeeCord / Waterfall**                   | Latest                |
+| **Velocity**                                 | Latest                |
+| **Hytale**                                   | Latest Hytale version |
+| **NeoForge**                                 | 1.21.1 – Latest       |
+
+Paper 1.16.5 and 1.17.x refuse to start on newer Java and print `Unsupported Java detected (...). Only up to Java 16 is supported`. To skip this check, add the `-DPaper.IgnoreJavaVersion=true` flag
+
+```bash
+java -DPaper.IgnoreJavaVersion=true -jar paper.jar nogui
+```
+
+Paper 1.18 and newer start on Java 21 without this flag
 
 ### Configuration Files
 

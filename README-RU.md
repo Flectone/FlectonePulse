@@ -63,16 +63,24 @@ FlectonePulse стал темой **университетской диплом�
 
 ### Требования
 
-**ТРЕБУЕТСЯ** Java 17 или выше. Старые версии Minecraft, например 1.8.8, также могут работать на Java 17 (смотри [PandaSpigot](https://github.com/hpfxd/pandaspigot))
+**Требуется** Java 21 или выше на любой платформе. Для старых версий Minecraft, например 1.8.8, также могут работать на Java 21 (смотри [PandaSpigot](https://github.com/hpfxd/pandaspigot))
 
-| Платформа                                    | Поддерживаемые версии      |
-|----------------------------------------------|----------------------------|
-| **Bukkit / Spigot / Paper / Purpur / Folia** | 1.8.8 – Последняя          |
-| **Fabric**                                   | Последняя версия Minecraft |
-| **BungeeCord / Waterfall**                   | Последняя                  |
-| **Velocity**                                 | Последняя                  |
-| **Hytale**                                   | Последняя версия Hytale    |
-| **NeoForge**                                 | Последняя версия Minecraft |
+| Платформа                                    | Поддерживаемые версии   |
+|----------------------------------------------|-------------------------|
+| **Bukkit / Spigot / Paper / Purpur / Folia** | 1.8.8 – Последняя       |
+| **Fabric**                                   | 1.14 – Последняя        |
+| **BungeeCord / Waterfall**                   | Последняя               |
+| **Velocity**                                 | Последняя               |
+| **Hytale**                                   | Последняя версия Hytale |
+| **NeoForge**                                 | 1.21.1 – Последняя      |
+
+Paper 1.16.5 и 1.17.x отказываются запускаться на новой Java и пишут `Unsupported Java detected (...). Only up to Java 16 is supported`. Чтобы пропустить эту проверку, добавь флаг `-DPaper.IgnoreJavaVersion=true`
+
+```bash
+java -DPaper.IgnoreJavaVersion=true -jar paper.jar nogui
+```
+
+Paper 1.18 и новее запускается на Java 21 без этого флага
 
 ### Файлы конфигурации
 
