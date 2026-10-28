@@ -9,11 +9,6 @@ loom {
 	accessWidenerPath = accessWidener
 }
 
-configurations.configureEach {
-	exclude group: "com.github.retrooper", module: "adventure-text-serializer-gson"
-	exclude group: "com.github.retrooper", module: "adventure-text-serializer-legacy"
-}
-
 dependencies {
 	minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
 
@@ -63,11 +58,6 @@ tasks.register("jarInJarContent", Jar) {
 
 configure(versions.collect { project(":minecraft-fabric:official:${it}") }) {
 	apply plugin: "net.fabricmc.fabric-loom"
-
-	configurations.configureEach {
-		exclude group: "com.github.retrooper", module: "adventure-text-serializer-gson"
-		exclude group: "com.github.retrooper", module: "adventure-text-serializer-legacy"
-	}
 
 	loom {
 		accessWidenerPath = accessWidener

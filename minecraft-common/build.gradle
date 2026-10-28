@@ -7,7 +7,7 @@ dependencies {
     compileOnly libraries.adventure
 
     compileOnly "org.incendo:cloud-brigadier:$cloud_paper_version"
-    compileOnly "com.github.retrooper:packetevents-api:$packetevents_spigot_version"
+    compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
 
     compileOnly "com.mojang:brigadier:$mojang_brigadier_version"
     compileOnly "net.skinsrestorer:skinsrestorer-api:$skinsrestorerapi_version"

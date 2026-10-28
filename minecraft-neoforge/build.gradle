@@ -13,8 +13,6 @@ neoForge {
 }
 
 configurations.configureEach {
-    exclude group: "com.github.retrooper", module: "adventure-text-serializer-gson"
-    exclude group: "com.github.retrooper", module: "adventure-text-serializer-legacy"
     resolutionStrategy {
         force "org.jspecify:jspecify:1.0.1"
     }
