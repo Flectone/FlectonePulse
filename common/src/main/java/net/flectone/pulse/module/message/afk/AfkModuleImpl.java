@@ -132,7 +132,7 @@ public class AfkModuleImpl implements AfkModule {
     }
 
     @Override
-    public void removeAfk(@NonNull String action, @NonNull FPlayer fPlayer) {
+    public synchronized void removeAfk(@NonNull String action, @NonNull FPlayer fPlayer) {
         // skip empty afk suffix
         if (StringUtils.isEmpty(socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX))) {
             playersCoordinates.remove(fPlayer.uuid());
@@ -159,7 +159,7 @@ public class AfkModuleImpl implements AfkModule {
     }
 
     @Override
-    public void addAfk(FPlayer fPlayer) {
+    public synchronized void addAfk(FPlayer fPlayer) {
         addAfkSetting(fPlayer);
         sendAfkMessage(fPlayer, true);
     }
