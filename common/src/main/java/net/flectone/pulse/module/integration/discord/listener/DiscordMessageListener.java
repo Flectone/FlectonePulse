@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.Embed;
+import discord4j.core.object.MessageReference;
 import discord4j.core.object.PartialMessage;
 import discord4j.core.object.entity.*;
 import discord4j.core.object.entity.poll.Poll;
@@ -102,9 +103,12 @@ public class DiscordMessageListener implements DiscordEventListener<MessageCreat
 
             String content = getMessageContent(partialMessage);
 
-            Optional<User> author = partialMessage.getAuthor();
-            return author.map(user -> Pair.of(user.getUsername(), content))
-                    .or(() -> Optional.of(Pair.of("Unknown", content)));
+            String author = partialMessage.getAuthor()
+                    .map(User::getUsername)
+                    .or(() -> retrieveForwardedMessage(message).map(this::retrieveAuthor))
+                    .orElse("Unknown");
+
+            return Optional.of(Pair.of(author, content));
         }
 
         Optional<Message> optionalReferencedMessage = message.getReferencedMessage();
@@ -114,18 +118,26 @@ public class DiscordMessageListener implements DiscordEventListener<MessageCreat
 
         String content = getMessageContent(referencedMessage);
 
-        Optional<User> author = referencedMessage.getAuthor();
-        if (author.isPresent()) return Optional.of(Pair.of(author.get().getUsername(), content));
+        return Optional.of(Pair.of(retrieveAuthor(referencedMessage), content));
+    }
 
-        Optional<Snowflake> webhookId = referencedMessage.getWebhookId();
-        if (webhookId.isPresent()) {
-            Webhook webhook = referencedMessage.getWebhook().block();
-            if (webhook != null) {
-                return Optional.of(Pair.of(webhook.getName().orElse("Unknown"), content));
-            }
-        }
+    private Optional<Message> retrieveForwardedMessage(@NonNull Message message) {
+        Optional<MessageReference> optionalMessageReference = message.getMessageReference();
+        if (optionalMessageReference.isEmpty()) return Optional.empty();
 
-        return Optional.of(Pair.of("Unknown", content));
+        MessageReference messageReference = optionalMessageReference.get();
+
+        Optional<Snowflake> messageId = messageReference.getMessageId();
+        if (messageId.isEmpty()) return Optional.empty();
+
+        return message.getClient().getMessageById(messageReference.getChannelId(), messageId.get())
+                .onErrorResume(_ -> Mono.empty())
+                .blockOptional();
+    }
+
+    @NonNull
+    private String retrieveAuthor(@NonNull Message message) {
+        return message.getData().author().username();
     }
 
     @NonNull
