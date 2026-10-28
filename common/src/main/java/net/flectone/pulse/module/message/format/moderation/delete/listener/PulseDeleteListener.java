@@ -47,20 +47,20 @@ public class PulseDeleteListener implements PulseListener {
         if (event.overlay()) return;
 
         Component component = event.component();
+        FPlayer fReceiver = event.player();
 
         // skip FlectonePulse messages
-        if (deleteModule.isCached(component)) {
-            deleteModule.removeCache(component);
+        if (deleteModule.isCached(fReceiver, component)) {
+            deleteModule.removeCache(fReceiver, component);
             return;
         }
 
-        FPlayer fReceiver = event.player();
         UUID messageUUID = UUID.randomUUID();
 
         deleteModule.save(fReceiver, messageUUID, component, false);
     }
 
-    @Pulse(priority = Event.Priority.MONITOR)
+    @Pulse(priority = Event.Priority.HIGHEST)
     public void onSenderToReceiverMessageEvent(MessageSendEvent event) {
         EventMetadata eventMetadata = event.eventMetadata();
         if (eventMetadata.destination().type() != Destination.Type.CHAT) return;

@@ -52,19 +52,21 @@ public interface DeleteModule extends ModuleLocalization {
     void save(FPlayer receiver, UUID messageUUID, Component component, boolean needToCache);
 
     /**
-     * Whether a rendered message is one this module is holding.
+     * Whether a rendered message is one this module is holding for a receiver.
      *
+     * @param receiver who received it
      * @param component the rendered message
      * @return true if it is held
      */
-    boolean isCached(Component component);
+    boolean isCached(FPlayer receiver, Component component);
 
     /**
-     * Forgets a held message.
+     * Forgets a held message of a receiver.
      *
+     * @param receiver who received it
      * @param component the rendered message
      */
-    void removeCache(Component component);
+    void removeCache(FPlayer receiver, Component component);
 
     /**
      * Withdraws a message from everyone who received it.
@@ -74,6 +76,15 @@ public interface DeleteModule extends ModuleLocalization {
      * @return true if anything was withdrawn
      */
     boolean remove(FEntity sender, UUID messageUUID);
+
+    /**
+     * Brings a rendered message to the form it will have after passing through a packet,
+     * so it can be matched with the copy read back from the outgoing packet.
+     *
+     * @param component the rendered message
+     * @return the message as the receiver's client will get it
+     */
+    Component normalize(Component component);
 
     /**
      * Redraws a reader's chat after something was withdrawn.

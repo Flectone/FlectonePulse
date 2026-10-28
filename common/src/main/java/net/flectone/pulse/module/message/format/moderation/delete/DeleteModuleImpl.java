@@ -39,7 +39,7 @@ public class DeleteModuleImpl implements DeleteModule {
     private final Map<UUID, List<HistoryMessage>> playersHistory = new ConcurrentHashMap<>();
 
     // only for skipping FlectonePulse messages
-    private final List<Component> cachedComponents = new CopyOnWriteArrayList<>();
+    private final Map<UUID, List<Component>> cachedComponents = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
@@ -83,6 +83,7 @@ public class DeleteModuleImpl implements DeleteModule {
     @Override
     public void clearHistory(FPlayer fPlayer) {
         playersHistory.remove(fPlayer.uuid());
+        cachedComponents.remove(fPlayer.uuid());
     }
 
     @Override
@@ -134,21 +135,23 @@ public class DeleteModuleImpl implements DeleteModule {
 
         history.add(historyMessage);
 
-        if (needToCache && !isCached(component)) {
-            cachedComponents.add(component);
+        if (needToCache) {
+            cachedComponents.computeIfAbsent(playerUUID, _ -> new CopyOnWriteArrayList<>()).add(normalize(component));
         }
     }
 
     @Override
-    public boolean isCached(Component component) {
-        // idk why, but this doesn't work
-        // return playersHistory.values().stream().anyMatch(historyMessages -> historyMessages.stream().anyMatch(historyMessage -> historyMessage.component().equals(component)));
-        return cachedComponents.contains(component);
+    public boolean isCached(FPlayer receiver, Component component) {
+        List<Component> components = cachedComponents.get(receiver.uuid());
+        return components != null && components.contains(component);
     }
 
     @Override
-    public void removeCache(Component component) {
-        cachedComponents.remove(component);
+    public void removeCache(FPlayer receiver, Component component) {
+        List<Component> components = cachedComponents.get(receiver.uuid());
+        if (components == null) return;
+
+        components.remove(component);
     }
 
     @Override
@@ -193,6 +196,11 @@ public class DeleteModuleImpl implements DeleteModule {
         });
 
         return true;
+    }
+
+    @Override
+    public Component normalize(Component component) {
+        return component;
     }
 
     @Override
