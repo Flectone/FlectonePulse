@@ -238,7 +238,7 @@ public class MinesweeperModuleImpl implements MinesweeperModule {
                     String flag = Strings.CS.replace(
                             minesweeper.isFlagMode() ? localization.flagDisabled() : localization.flagEnabled(),
                             "<command>",
-                            commandModuleController.getCommandName(this)
+                            "/" + commandModuleController.getCommandName(this)
                     );
 
                     return MinesweeperMessageContext.builder()
@@ -287,7 +287,7 @@ public class MinesweeperModuleImpl implements MinesweeperModule {
         return StringUtils.replaceEach(
                 string,
                 new String[]{"<command>", "<row>", "<column>"},
-                new String[]{commandModuleController.getCommandName(this), String.valueOf(cell.row()), String.valueOf(cell.column())}
+                new String[]{"/" + commandModuleController.getCommandName(this), String.valueOf(cell.row()), String.valueOf(cell.column())}
         );
     }
 

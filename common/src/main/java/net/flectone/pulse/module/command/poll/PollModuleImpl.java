@@ -402,7 +402,7 @@ public class PollModuleImpl implements PollModule {
         StringBuilder answersBuilder = new StringBuilder();
 
         int[] countAnswers = poll.getCountAnswers();
-        String voteCommand = commandModuleController.getCommandName(this) + config().subCommandVote();
+        String voteCommand = "/" + commandModuleController.getCommandName(this) + config().subCommandVote();
         String pollId = String.valueOf(poll.getId());
 
         for (int index = 0; index < poll.getAnswers().size(); index++) {

@@ -202,7 +202,7 @@ public class TictactoeModuleImpl implements TictactoeModule {
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
-                                .message(Strings.CS.replace(String.format(localization(fResolver).receiver(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove()))
+                                .message(Strings.CS.replace(String.format(localization(fResolver).receiver(), ticTacToe.getId()), "<command>", "/" + commandModuleController.getCommandName(this) + config().subCommandMove()))
                                 .build()
                         )
                         .ticTacToe(ticTacToe)
@@ -384,7 +384,7 @@ public class TictactoeModuleImpl implements TictactoeModule {
                 }
         );
 
-        String symbolEmpty = Strings.CS.replace(String.format(messageSymbol.blank(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove());
+        String symbolEmpty = Strings.CS.replace(String.format(messageSymbol.blank(), ticTacToe.getId()), "<command>", "/" + commandModuleController.getCommandName(this) + config().subCommandMove());
         String symbolFirstRemove = messageSymbol.firstRemove();
         String symbolFirstWin = messageSymbol.firstWin();
         String symbolSecondRemove = messageSymbol.secondRemove();

@@ -174,12 +174,12 @@ public class WhoisModuleImpl implements WhoisModule {
                             localization.line(),
                             new String[]{"<ip>", "<target_name>", "<online>", "<command_mutelist>", "<command_banlist>", "<command_warnlist>", "<command_whitelist>", "<command_geolocate>", "<command_online>", "<target"},
                             new String[]{ip, fTarget.name(), fTarget.isOnline() && socialService.canSeeVanished(fTarget, fPlayer) ? localization.online() : localization.offline(),
-                                    commandModuleController.getCommandName(mutelistModule),
-                                    commandModuleController.getCommandName(banlistModule),
-                                    commandModuleController.getCommandName(warnlistModule),
-                                    commandModuleController.getCommandName(whitelistModule) + whitelistModule.config().subCommandPlayer(),
-                                    commandModuleController.getCommandName(geolocateModule),
-                                    commandModuleController.getCommandName(onlineModule),
+                                    "/" + commandModuleController.getCommandName(mutelistModule),
+                                    "/" + commandModuleController.getCommandName(banlistModule),
+                                    "/" + commandModuleController.getCommandName(warnlistModule),
+                                    "/" + commandModuleController.getCommandName(whitelistModule) + whitelistModule.config().subCommandPlayer(),
+                                    "/" + commandModuleController.getCommandName(geolocateModule),
+                                    "/" + commandModuleController.getCommandName(onlineModule),
                                     "<target_" + i
                             }
                     ))
