@@ -1,64 +1,5 @@
 plugins {
-	id "net.fabricmc.fabric-loom" version "${fabric_loom_version}"
-}
-
-sourceSets {
-	main {
-		java.srcDirs = ["src/main/java", "src/official/java"]
-	}
-}
-
-loom {
-	accessWidenerPath = file("loader/src/official/resources/flectonepulse.accesswidener")
-}
-
-configurations.configureEach {
-	exclude group: "com.github.retrooper", module: "adventure-text-serializer-gson"
-	exclude group: "com.github.retrooper", module: "adventure-text-serializer-legacy"
-}
-
-dependencies {
-	minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
-
-	compileOnly project(":common")
-	compileOnly project(":minecraft-common")
-
-	compileOnly project(":api")
-	compileOnly project(":minecraft-fabric:loader")
-
-	compileOnly libraries.platform
-	compileOnly libraries.adventure
-
-	compileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
-
-	compileOnly fabricApi.module("fabric-api-base", fabric_api_version)
-	compileOnly fabricApi.module("fabric-command-api-v2", fabric_api_version)
-	compileOnly fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
-	compileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
-
-	compileOnly "org.incendo:cloud-brigadier:${cloud_paper_version}"
-	compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
-	compileOnly "net.flectone:packeteventsmodern-netty-common:$packeteventsmodern_version"
-	compileOnly "net.flectone:packeteventsmodern-fabric-common:$packeteventsmodern_version"
-
-	// integrations
-	compileOnly "eu.pb4:placeholder-api:$text_placeholder_api_version"
-	compileOnly "maven.modrinth:vanish:$vanish_version"
-	compileOnly "io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version"
-}
-
-shadowJar {
-	configurations = []
-}
-
-tasks.register("jarInJarContent", Jar) {
-	archiveFileName = "flectonepulse-fabric-platform.jarinjar"
-
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-	from { zipTree(project(":minecraft-fabric").tasks.named("shadeDowngradedApi").get().archiveFile) }
-
-	dependsOn(":minecraft-fabric:shadeDowngradedApi")
+	id "net.fabricmc.fabric-loom" version "${fabric_loom_version}" apply false
 }
 
 tasks.named("buildFinalJar", Jar) {
@@ -69,33 +10,33 @@ tasks.named("buildFinalJar", Jar) {
 	def props = [version: "$project_version", description: "$project_description"]
 	inputs.properties props
 
-	from("loader/src/aggregator/resources") {
+	from("fabric.mod.json") {
 		filteringCharset "UTF-8"
 		expand props
 	}
 
-	from("loader/src/main/resources") {
+	from("official/loader/src/main/resources") {
 		include "assets/**"
 	}
 
 	from { zipTree(project(":api").tasks.named("shadeDowngradedApi").get().archiveFile) }
 
-	from({ project(":minecraft-fabric:shared").tasks.named("shadeDowngradedApi").get().archiveFile }) {
+	from({ project(":minecraft-common").tasks.named("shadeDowngradedApi").get().archiveFile }) {
 		rename { "flectonepulse-fabric.jarinjar" }
 	}
 
 	into("META-INF/jars") {
-		from { project(":minecraft-fabric:loader:intermediary").tasks.named("shadeDowngradedApi").get().archiveFile }
+		from { project(":minecraft-fabric:intermediary:loader").tasks.named("shadeDowngradedApi").get().archiveFile }
 		rename { "flectonepulse-intermediary.jar" }
 	}
 
 	into("META-INF/jars") {
-		from { project(":minecraft-fabric:loader").tasks.named("shadeDowngradedApi").get().archiveFile }
+		from { project(":minecraft-fabric:official:loader").tasks.named("shadeDowngradedApi").get().archiveFile }
 		rename { "flectonepulse-official.jar" }
 	}
 
 	dependsOn(":api:shadeDowngradedApi")
-	dependsOn(":minecraft-fabric:shared:shadeDowngradedApi")
-	dependsOn(":minecraft-fabric:loader:intermediary:shadeDowngradedApi")
-	dependsOn(":minecraft-fabric:loader:shadeDowngradedApi")
+	dependsOn(":minecraft-common:shadeDowngradedApi")
+	dependsOn(":minecraft-fabric:intermediary:loader:shadeDowngradedApi")
+	dependsOn(":minecraft-fabric:official:loader:shadeDowngradedApi")
 }

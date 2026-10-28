@@ -1,0 +1,7 @@
+dependencies {
+	compileOnly fabricApi.module("fabric-api-base", fabric_api_version)
+	compileOnly fabricApi.module("fabric-command-api-v2", fabric_api_version)
+	compileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
+
+	compileOnly "eu.pb4:placeholder-api:$text_placeholder_api_version"
+}

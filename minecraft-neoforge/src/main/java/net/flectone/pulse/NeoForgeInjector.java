@@ -42,6 +42,8 @@ public class NeoForgeInjector extends MinecraftPlatformInjector {
         bind(PlatformPlayerAdapter.class).to(NeoForgePlayerAdapter.class);
         bind(PlatformServerAdapter.class).to(NeoForgeServerAdapter.class);
 
+        bindVersioned(NeoForgeVersionAdapter.class);
+
         // registries
         bind(PermissionRegistry.class).to(NeoForgePermissionRegistry.class);
         bind(ProxyRegistryImpl.class).to(NeoForgeProxyRegistry.class);

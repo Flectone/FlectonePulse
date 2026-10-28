@@ -20,6 +20,7 @@ configurations.configureEach {
 
 dependencies {
     compileOnly project(":minecraft-neoforge")
+    compileOnly project(":minecraft-neoforge:1.21.1")
 
     compileOnly "com.google.inject:guice:$guice_version"
 }

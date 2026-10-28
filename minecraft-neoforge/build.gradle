@@ -62,11 +62,13 @@ tasks.register("jarInJarContent", Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from { zipTree(project(":minecraft-neoforge").tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project(":minecraft-neoforge:1.21.1").tasks.named("shadeDowngradedApi").get().archiveFile) }
     from { zipTree(project(":minecraft-neoforge:1.21.4").tasks.named("shadeDowngradedApi").get().archiveFile) }
     from { zipTree(project(":minecraft-neoforge:1.21.9").tasks.named("shadeDowngradedApi").get().archiveFile) }
     from { zipTree(project(":minecraft-neoforge:1.21.11").tasks.named("shadeDowngradedApi").get().archiveFile) }
 
     dependsOn(":minecraft-neoforge:shadeDowngradedApi")
+    dependsOn(":minecraft-neoforge:1.21.1:shadeDowngradedApi")
     dependsOn(":minecraft-neoforge:1.21.4:shadeDowngradedApi")
     dependsOn(":minecraft-neoforge:1.21.9:shadeDowngradedApi")
     dependsOn(":minecraft-neoforge:1.21.11:shadeDowngradedApi")

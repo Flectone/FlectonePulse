@@ -1,34 +1,29 @@
 package net.flectone.pulse.platform.adapter;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import io.netty.channel.Channel;
-import lombok.SneakyThrows;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
+import net.minecraft.world.entity.Entity;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.UUID;
 
 @Singleton
-public class FabricVersionAdapterV_1_20_2 extends FabricVersionAdapterV_1_20_5 {
-
-    private Field profileField;
+public class FabricVersionAdapterV_1_20_2 extends FabricVersionAdapterV_1_19_4 {
 
     @Override
     public Channel getChannel(ServerPlayer player) {
-        return (Channel) PacketEvents.getAPI().getProtocolManager().getChannel(player.getUUID());
+        return player.connection.connection.channel;
     }
 
     @Override
     public int getPing(ServerPlayer player) {
-        return player.latency;
+        return player.connection.latency();
     }
 
     @Override
@@ -36,37 +31,54 @@ public class FabricVersionAdapterV_1_20_2 extends FabricVersionAdapterV_1_20_5 {
         player.connection.disconnect(literal(message));
     }
 
-    @SneakyThrows
     @Override
     public @Nullable GameProfile getProfile(ServerLoginPacketListenerImpl listener) {
-        if (profileField == null) {
-            profileField = Arrays.stream(ServerLoginPacketListenerImpl.class.getDeclaredFields())
-                    .filter(field -> field.getType() == GameProfile.class)
-                    .findFirst()
-                    .orElseThrow();
+        return listener.authenticatedProfile;
+    }
 
-            profileField.setAccessible(true);
-        }
+    @Override
+    public boolean isAcceptingMessages(ServerLoginPacketListenerImpl listener) {
+        return listener.isAcceptingMessages();
+    }
 
-        GameProfile profile = (GameProfile) profileField.get(listener);
-        if (profile == null || profile.getId() != null) return profile;
+    @Override
+    public UUID getId(GameProfile profile) {
+        return profile.getId();
+    }
 
-        return new GameProfile(UUID.nameUUIDFromBytes(("OfflinePlayer:" + profile.getName()).getBytes(StandardCharsets.UTF_8)), profile.getName());
+    @Override
+    public String getName(GameProfile profile) {
+        return profile.getName();
+    }
+
+    @Override
+    public PropertyMap getProperties(GameProfile profile) {
+        return profile.getProperties();
     }
 
     @Override
     public String getValue(Property property) {
-        return property.getValue();
+        return property.value();
     }
 
     @Override
     public @Nullable String getLanguage(ServerPlayer player) {
-        return null;
+        return player.clientInformation().language();
     }
 
     @Override
     public ServerLevel getLevel(ServerPlayer player) {
-        return (ServerLevel) player.getCommandSenderWorld();
+        return player.serverLevel();
+    }
+
+    @Override
+    public String getWorldName(ServerPlayer player) {
+        return getLevel(player).dimension().location().getPath();
+    }
+
+    @Override
+    public @Nullable Entity getEntity(ServerLevel serverLevel, UUID uuid) {
+        return serverLevel.getEntity(uuid);
     }
 
 }

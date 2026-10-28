@@ -1,0 +1,58 @@
+plugins {
+    id "net.fabricmc.fabric-loom-remap"
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/flectonepulse.accesswidener")
+
+    mixin {
+        useLegacyMixinAp = false
+    }
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
+    mappings(loom.officialMojangMappings())
+
+    implementation project(":api")
+
+    modCompileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    compileOnly "io.github.llamalad7:mixinextras-fabric:${mixinextras_version}"
+
+    modCompileOnly fabricApi.module("fabric-api-base", fabric_api_version)
+    modCompileOnly fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
+    modCompileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
+
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
+}
+
+compileJava {
+    source("../../official/loader/src/main/java")
+}
+
+shadowJar {
+    configurations = []
+
+    from { project(":minecraft-fabric:intermediary").tasks.named("jarInJarContent").get().archiveFile }
+    dependsOn(":minecraft-fabric:intermediary:jarInJarContent")
+}
+
+remapJar {
+    inputFile = shadowJar.archiveFile
+    dependsOn(shadowJar)
+}
+
+downgradeJar {
+    inputFile = remapJar.archiveFile
+}
+
+processResources {
+    from("../../official/loader/src/main/resources") {
+        exclude "flectonepulse.accesswidener"
+    }
+
+    def props = [version: "$project_version", author: "$project_author", description: "$project_description", id: "flectonepulse-intermediary", name: "FlectonePulse (Intermediary Mappings)", minecraft: ">=1.14 <26"]
+    inputs.properties props
+    filteringCharset "UTF-8"
+    filesMatching("fabric.mod.json") { expand props }
+}

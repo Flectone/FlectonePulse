@@ -2,16 +2,11 @@ plugins {
 	id "net.fabricmc.fabric-loom-remap"
 }
 
-def layers = ["1.21.11", "1.21.9", "1.21.5", "1.21.4", "1.21.2", "1.20.5", "1.20.2", "1.19.4", "1.19.3", "1.19", "1.17", "1.16"]
-
-sourceSets {
-	main {
-		java.srcDirs = ["../src/main/java", "../src/intermediary/java"]
-	}
-}
+def versions = ["1.14", "1.16", "1.17", "1.19", "1.19.3", "1.19.4", "1.20.2", "1.20.5", "1.21.2", "1.21.4", "1.21.5", "1.21.9", "1.21.11"]
+def accessWidener = file("loader/src/main/resources/flectonepulse.accesswidener")
 
 loom {
-	accessWidenerPath = file("../loader/src/intermediary/resources/flectonepulse.accesswidener")
+	accessWidenerPath = accessWidener
 }
 
 configurations.configureEach {
@@ -27,7 +22,7 @@ dependencies {
 	compileOnly project(":minecraft-common")
 
 	compileOnly project(":api")
-	compileOnly project(":minecraft-fabric:loader")
+	compileOnly project(path: ":minecraft-fabric:intermediary:loader", configuration: "namedElements")
 
 	compileOnly libraries.platform
 	compileOnly libraries.adventure
@@ -35,7 +30,6 @@ dependencies {
 	modCompileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
 
 	modCompileOnly fabricApi.module("fabric-api-base", fabric_api_version)
-	modCompileOnly fabricApi.module("fabric-command-api-v2", fabric_api_version)
 	modCompileOnly fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
 	modCompileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
 
@@ -49,6 +43,10 @@ dependencies {
 	modCompileOnly "eu.pb4:placeholder-api:$text_placeholder_api_version"
 	modCompileOnly "maven.modrinth:vanish:$vanish_version"
 	compileOnly "io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version"
+}
+
+compileJava {
+	source("../official/src/main/java")
 }
 
 shadowJar {
@@ -69,16 +67,16 @@ tasks.register("jarInJarContent", Jar) {
 
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-	from { zipTree(project(":minecraft-fabric:intermediary").tasks.named("shadeDowngradedApi").get().archiveFile) }
-	dependsOn(":minecraft-fabric:intermediary:shadeDowngradedApi")
+	from { zipTree(tasks.named("shadeDowngradedApi").get().archiveFile) }
+	dependsOn("shadeDowngradedApi")
 
-	layers.each { layer ->
-		from { zipTree(project(":minecraft-fabric:intermediary:${layer}").tasks.named("shadeDowngradedApi").get().archiveFile) }
-		dependsOn(":minecraft-fabric:intermediary:${layer}:shadeDowngradedApi")
+	versions.each { version ->
+		from { zipTree(project(":minecraft-fabric:intermediary:${version}").tasks.named("shadeDowngradedApi").get().archiveFile) }
+		dependsOn(":minecraft-fabric:intermediary:${version}:shadeDowngradedApi")
 	}
 }
 
-subprojects {
+configure(versions.collect { project(":minecraft-fabric:intermediary:${it}") }) {
 	apply plugin: "net.fabricmc.fabric-loom-remap"
 
 	configurations.configureEach {
@@ -86,30 +84,22 @@ subprojects {
 		exclude group: "com.github.retrooper", module: "adventure-text-serializer-legacy"
 	}
 
-	if (file("flectonepulse.accesswidener").exists()) {
-		loom {
-			accessWidenerPath = file("flectonepulse.accesswidener")
-		}
+	loom {
+		accessWidenerPath = accessWidener
 	}
 
 	dependencies {
 		minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
 		mappings(loom.officialMojangMappings())
 
-		modCompileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
-
 		compileOnly project(path: ":minecraft-fabric:intermediary", configuration: "namedElements")
-		layers.subList(0, layers.indexOf(project.name)).each { layer ->
-			compileOnly project(path: ":minecraft-fabric:intermediary:${layer}", configuration: "namedElements")
+		versions.subList(0, versions.indexOf(project.name)).each { version ->
+			compileOnly project(path: ":minecraft-fabric:intermediary:${version}", configuration: "namedElements")
 		}
 
 		compileOnly project(":api")
-		compileOnly project(":common")
-		compileOnly project(":minecraft-common")
 
-		compileOnly libraries.platform
-		compileOnly libraries.adventure
-
+		compileOnly "com.google.inject:guice:$guice_version"
 		compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
 	}
 

@@ -1,0 +1,36 @@
+plugins {
+    id "net.fabricmc.fabric-loom"
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/flectonepulse.accesswidener")
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
+
+    implementation project(":api")
+
+    compileOnly "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    compileOnly "io.github.llamalad7:mixinextras-fabric:${mixinextras_version}"
+
+    compileOnly fabricApi.module("fabric-api-base", fabric_api_version)
+    compileOnly fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
+    compileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
+
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
+}
+
+shadowJar {
+    configurations = []
+
+    from { project(":minecraft-fabric:official").tasks.named("jarInJarContent").get().archiveFile }
+    dependsOn(":minecraft-fabric:official:jarInJarContent")
+}
+
+processResources {
+    def props = [version: "$project_version", author: "$project_author", description: "$project_description", id: "flectonepulse-official", name: "FlectonePulse (Official Mappings)", minecraft: ">=26.1"]
+    inputs.properties props
+    filteringCharset "UTF-8"
+    filesMatching("fabric.mod.json") { expand props }
+}

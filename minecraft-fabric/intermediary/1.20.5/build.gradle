@@ -1,4 +1,3 @@
 dependencies {
-	modCompileOnly fabricApi.module("fabric-api-base", fabric_api_version)
 	modCompileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
 }

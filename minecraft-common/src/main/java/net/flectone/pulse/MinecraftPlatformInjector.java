@@ -3,7 +3,6 @@ package net.flectone.pulse;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.gson.Gson;
-import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
@@ -65,7 +64,6 @@ import net.flectone.pulse.serializer.MinecraftComponentSerializer;
 import net.flectone.pulse.service.*;
 
 import java.nio.file.Path;
-import java.util.List;
 
 public abstract class MinecraftPlatformInjector extends PlatformInjector {
 
@@ -78,10 +76,6 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         super(projectPath, libraryResolver, fLogger);
 
         this.minecraftPacketEventsAdapter = minecraftPacketEventsAdapter;
-    }
-
-    public Module withLayers(List<MinecraftPlatformLayer> layers) {
-        return MinecraftPlatformLayer.apply(this, PacketEvents.getAPI().getServerManager().getVersion(), layers);
     }
 
     @Override
@@ -149,6 +143,23 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(SkinService.class).to(MinecraftSkinService.class);
         bind(ProfileResolver.class).to(MinecraftProfileResolver.class);
         bind(TranslationService.class).to(MinecraftTranslationService.class);
+    }
+
+    protected <T> void bindVersioned(Class<T> type) {
+        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+
+        for (ServerVersion version : ServerVersion.reversedValues()) {
+            if (version == ServerVersion.ERROR || serverVersion.isOlderThan(version)) continue;
+
+            try {
+                Class<?> implementation = Class.forName(type.getName() + version.name(), false, type.getClassLoader());
+                bind(type).to(implementation.asSubclass(type));
+                return;
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+
+        throw new IllegalStateException("No implementation of " + type.getSimpleName() + " for " + serverVersion.getReleaseName());
     }
 
 }

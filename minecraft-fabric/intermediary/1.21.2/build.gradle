@@ -1,0 +1,4 @@
+dependencies {
+	modCompileOnly fabricApi.module("fabric-api-base", fabric_api_version)
+	modCompileOnly fabricApi.module("fabric-command-api-v2", fabric_api_version)
+}
