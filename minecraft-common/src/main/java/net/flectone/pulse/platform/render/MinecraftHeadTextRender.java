@@ -342,12 +342,11 @@ public class MinecraftHeadTextRender implements HeadTextRender {
 
     @Override
     public void setPassengers(@NonNull UUID holder, int[] entitiesIds) {
-        if (entitiesIds == null) {
+        if (ArrayUtils.isEmpty(entitiesIds)) {
             platformPlayerPassengers.remove(holder);
-            return;
+        } else {
+            platformPlayerPassengers.put(holder, entitiesIds);
         }
-
-        platformPlayerPassengers.put(holder, entitiesIds);
 
         Map<UUID, List<HolderViewerEntity>> viewerEntities = holderViewerEntities.get(holder);
         if (viewerEntities == null) return;

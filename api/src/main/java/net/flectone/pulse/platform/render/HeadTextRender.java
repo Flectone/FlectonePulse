@@ -83,10 +83,10 @@ public interface HeadTextRender {
 
     /**
      * Sets platform-specific passenger entity IDs to ride the holder alongside head text displays.
-     * Passing null clears the stored passengers.
+     * Passing null or an empty array clears the stored passengers.
      *
      * @param holder the UUID of the holder
-     * @param entities the passenger entity IDs, or null to clear them
+     * @param entities the passenger entity IDs, or null or an empty array to clear them
      */
     void setPassengers(@NonNull UUID holder, int[] entities);
 
