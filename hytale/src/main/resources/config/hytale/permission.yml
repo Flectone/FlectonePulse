@@ -160,7 +160,7 @@ command:
         name: "flectonepulse.module.command.chatsetting.message_join"
         type: "TRUE"
       MESSAGE_QUIT:
-        name: "flectonepulse.module.command.chatsetting.nessage_quit"
+        name: "flectonepulse.module.command.chatsetting.message_quit"
         type: "TRUE"
       SLEEP:
         name: "flectonepulse.module.command.chatsetting.sleep"
