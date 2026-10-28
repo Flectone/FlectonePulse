@@ -341,6 +341,13 @@ public class MinecraftHeadTextRender implements HeadTextRender {
     }
 
     @Override
+    public void dispose(@NonNull UUID holder) {
+        holderScales.remove(holder);
+        platformPlayerPassengers.remove(holder);
+        remove(holder);
+    }
+
+    @Override
     public void setPassengers(@NonNull UUID holder, int[] entitiesIds) {
         if (ArrayUtils.isEmpty(entitiesIds)) {
             platformPlayerPassengers.remove(holder);

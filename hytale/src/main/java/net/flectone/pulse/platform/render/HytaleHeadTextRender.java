@@ -277,6 +277,11 @@ public class HytaleHeadTextRender implements HeadTextRender {
     }
 
     @Override
+    public void dispose(@NonNull UUID holder) {
+        remove(holder);
+    }
+
+    @Override
     public void setPassengers(@NonNull UUID holder, int[] entitiesIds) {
         // Hytale uses MountedComponent, passengers are not synchronized manually
     }

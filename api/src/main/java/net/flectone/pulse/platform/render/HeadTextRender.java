@@ -82,6 +82,13 @@ public interface HeadTextRender {
     void remove(@NonNull UUID holder, @NonNull UUID viewer);
 
     /**
+     * Removes the head text and all stored data for the specified holder.
+     *
+     * @param holder the UUID of the holder
+     */
+    void dispose(@NonNull UUID holder);
+
+    /**
      * Sets platform-specific passenger entity IDs to ride the holder alongside head text displays.
      * Passing null or an empty array clears the stored passengers.
      *

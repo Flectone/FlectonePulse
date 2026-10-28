@@ -24,7 +24,7 @@ public class PulsePlayerPersistAndDisposeListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.LOW)
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        headTextRender.remove(event.player().uuid());
+        headTextRender.dispose(event.player().uuid());
     }
 
     @Pulse(priority = Event.Priority.LOW)
