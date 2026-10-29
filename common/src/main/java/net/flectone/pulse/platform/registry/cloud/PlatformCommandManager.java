@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.registry.cloud;
 
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.model.entity.FPlayer;
+import org.incendo.cloud.CloudCapability;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.SenderMapperHolder;
@@ -22,6 +23,7 @@ public class PlatformCommandManager<S> extends CommandManager<FPlayer> implement
         this.senderMapper = senderMapper;
         this.permissionChecker = permissionChecker;
 
+        registerCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
         registrationHandler.initialize(this);
     }
 

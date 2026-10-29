@@ -2,133 +2,90 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.file.FileFacade;
-import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.mapper.BukkitFPlayerMapper;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
+import net.flectone.pulse.platform.registry.cloud.BukkitRegistrationHandler;
+import net.flectone.pulse.platform.registry.cloud.PaperAsyncTabCompleteListener;
+import net.flectone.pulse.platform.registry.cloud.PlatformRegistrationHandler;
 import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.Plugin;
-import org.incendo.cloud.Command;
-import org.incendo.cloud.CommandManager;
-import org.incendo.cloud.exception.ArgumentParseException;
-import org.incendo.cloud.exception.CommandExecutionException;
-import org.incendo.cloud.exception.InvalidSyntaxException;
-import org.incendo.cloud.exception.NoPermissionException;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.paper.LegacyPaperCommandManager;
-import org.incendo.cloud.setting.ManagerSetting;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 @Singleton
-public class LegacyBukkitCommandRegistry implements CommandRegistry {
+public class LegacyBukkitCommandRegistry extends CommandRegistryImpl<CommandSender> {
+
+    protected final Plugin plugin;
+    protected final ReflectionResolver reflectionResolver;
+    protected final TaskScheduler taskScheduler;
 
     private final FileFacade fileFacade;
-    private final Plugin plugin;
-    private final ReflectionResolver reflectionResolver;
-    private final TaskScheduler taskScheduler;
-    private final BukkitFPlayerMapper fPlayerMapper;
-    private final CommandExceptionHandler commandExceptionHandler;
-    private final FLogger fLogger;
 
-    protected LegacyPaperCommandManager<FPlayer> manager;
+    private CommandMap commandMap;
+    private Map<String, org.bukkit.command.Command> knownCommands;
+    private BukkitRegistrationHandler bukkitRegistrationHandler;
 
     @Inject
     public LegacyBukkitCommandRegistry(FileFacade fileFacade,
+                                       PermissionChecker permissionChecker,
                                        CommandExceptionHandler commandExceptionHandler,
                                        Plugin plugin,
                                        ReflectionResolver reflectionResolver,
                                        TaskScheduler taskScheduler,
-                                       BukkitFPlayerMapper fPlayerMapper,
-                                       FLogger fLogger) {
+                                       BukkitFPlayerMapper fPlayerMapper) {
+        super(permissionChecker, commandExceptionHandler, taskScheduler, fPlayerMapper);
+
         this.fileFacade = fileFacade;
         this.plugin = plugin;
-        this.fPlayerMapper = fPlayerMapper;
-        this.taskScheduler = taskScheduler;
         this.reflectionResolver = reflectionResolver;
-        this.commandExceptionHandler = commandExceptionHandler;
-        this.fLogger = fLogger;
+        this.taskScheduler = taskScheduler;
+    }
+
+    @Override
+    protected PlatformRegistrationHandler<CommandSender> createRegistrationHandler() {
+        this.bukkitRegistrationHandler = new BukkitRegistrationHandler(plugin, commandMap, knownCommands, taskScheduler, reflectionResolver);
+        return bukkitRegistrationHandler;
     }
 
     @Override
     public void init() {
-        this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.<FPlayer>builder().executor(taskScheduler.getExecutorService()).build(), fPlayerMapper);
+        if (this.manager != null) return;
 
-        manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
+        loadCommandMap();
 
-        manager.exceptionController().registerHandler(ArgumentParseException.class, commandExceptionHandler::handleArgumentParseException);
-        manager.exceptionController().registerHandler(InvalidSyntaxException.class, commandExceptionHandler::handleInvalidSyntaxException);
-        manager.exceptionController().registerHandler(NoPermissionException.class, commandExceptionHandler::handleNoPermissionException);
-        manager.exceptionController().registerHandler(CommandExecutionException.class, commandExceptionHandler::handleCommandExecutionException);
+        super.init();
+
+        if (reflectionResolver.hasClass("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent")
+                && !reflectionResolver.hasClass("com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent")) {
+            PaperAsyncTabCompleteListener paperAsyncTabCompleteListener = new PaperAsyncTabCompleteListener(plugin, manager, bukkitRegistrationHandler::isRegisteredCommand);
+            Bukkit.getPluginManager().registerEvents(paperAsyncTabCompleteListener, plugin);
+        }
 
         unregisterVanillaCommands();
     }
 
     @Override
-    public void registerCommand(Function<CommandManager<FPlayer>, Command.Builder<FPlayer>> builder) {
-        Command<FPlayer> command = builder.apply(manager).build();
-
-        // root name
-        String commandName = command.rootComponent().name();
-
-        boolean isCloudCommand = manager.commands().stream()
-                .anyMatch(fPlayerCommand -> fPlayerCommand.rootComponent().name().equals(commandName));
-
-        boolean needUnregister = plugin.getServer().getPluginCommand(commandName) != null
-                || fileFacade.config().internal().unregisterCommandOnReload() && isCloudCommand;
-
-        if (needUnregister) {
-            unregisterCommand(commandName);
-        } else if (isCloudCommand) {
-            return;
-        }
-
-        // register new command
-        if (reflectionResolver.isPaper()) {
-            registerCommand(command);
-        } else {
-            taskScheduler.runSync(() -> registerCommand(command));
-        }
-    }
-
-    @Override
     public void unregisterCommand(String name) {
-        if (reflectionResolver.isPaper()) {
-            deleteRootCommand(name);
-        } else {
-            taskScheduler.runSync(() -> deleteRootCommand(name));
-        }
+        manager.deleteRootCommand(name);
     }
 
     @Override
     public void onDisable() {
         if (!fileFacade.config().internal().unregisterCommandOnReload()) return;
 
-        if (reflectionResolver.isPaper()) {
-            unregisterCommands();
-        } else {
-            taskScheduler.runSync(this::unregisterCommands);
-        }
-    }
-
-    public void deleteRootCommand(String name) {
-        manager.deleteRootCommand(name);
-    }
-
-    public void registerCommand(Command<FPlayer> command) {
-        manager.command(command);
-    }
-
-    public void unregisterCommands() {
         manager.commands().stream()
                 .map(command -> command.rootComponent().name())
+                .distinct()
                 .toList() // fix concurrent modification
                 .forEach(this::unregisterCommand);
     }
@@ -140,25 +97,26 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
             return;
         }
 
+        fileFacade.config().internal().vanillaCommandsToRemove().forEach(commandName -> {
+            org.bukkit.command.Command bukkitCommand = knownCommands.remove(commandName);
+            if (bukkitCommand != null) {
+                bukkitCommand.unregister(commandMap);
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadCommandMap() {
         try {
-            Field declaredField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            declaredField.setAccessible(true);
-            SimpleCommandMap commandMap = (SimpleCommandMap) declaredField.get(Bukkit.getServer());
+            Method getCommandMap = Bukkit.getServer().getClass().getDeclaredMethod("getCommandMap");
+            getCommandMap.setAccessible(true);
+            this.commandMap = (CommandMap) getCommandMap.invoke(Bukkit.getServer());
 
             Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
             knownCommandsField.setAccessible(true);
-            Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) knownCommandsField.get(commandMap);
-
-            fileFacade.config().internal().vanillaCommandsToRemove().forEach(commandName -> {
-                org.bukkit.command.Command bukkitCommand = knownCommands.remove(commandName);
-                if (bukkitCommand != null) {
-                    bukkitCommand.unregister(commandMap);
-                }
-
-                knownCommands.remove(commandName);
-            });
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fLogger.warning("Failed to remove vanilla commands: %s", e.getMessage());
+            this.knownCommands = (Map<String, org.bukkit.command.Command>) knownCommandsField.get(commandMap);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Failed to get bukkit command map", e);
         }
     }
 
