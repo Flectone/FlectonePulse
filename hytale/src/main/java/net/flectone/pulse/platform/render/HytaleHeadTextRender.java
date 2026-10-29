@@ -287,6 +287,10 @@ public class HytaleHeadTextRender implements HeadTextRender {
     }
 
     @Override
+    public void updatePassengers(@NonNull UUID holder) {
+    }
+
+    @Override
     public void setScale(@NonNull UUID holder, float scale) {
     }
 

@@ -5,13 +5,12 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FlectonePulse;
-import net.flectone.pulse.converter.ImagePixelConverter;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
@@ -37,9 +36,8 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final LazyInstance<MinecraftSkinService> skinService;
-    private final LazyInstance<ImagePixelConverter> imagePixelConverter;
+    private final LazyInstance<HeadTextRender> headTextRender;
     private final TaskScheduler taskScheduler;
-    private final ProxySender proxySender;
     @Getter private final FLogger fLogger;
 
     private SkinsRestorer skinsRestorer;
@@ -62,6 +60,9 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
 
                     // update skin cache
                     skinService.get().updateProfileProperty(fPlayer);
+
+                    // we need to update passengers with delay because SkinsRestorer changes player state
+                    taskScheduler.runAsyncLater(() -> headTextRender.get().updatePassengers(fPlayer.uuid()), 5L);
                 });
 
                 skinApplyEventSubscribed = true;

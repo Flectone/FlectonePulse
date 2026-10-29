@@ -355,6 +355,11 @@ public class MinecraftHeadTextRender implements HeadTextRender {
             platformPlayerPassengers.put(holder, entitiesIds);
         }
 
+        updatePassengers(holder);
+    }
+
+    @Override
+    public void updatePassengers(@NonNull UUID holder) {
         Map<UUID, List<HolderViewerEntity>> viewerEntities = holderViewerEntities.get(holder);
         if (viewerEntities == null) return;
 

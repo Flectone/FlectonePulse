@@ -98,6 +98,14 @@ public interface HeadTextRender {
     void setPassengers(@NonNull UUID holder, int[] entities);
 
     /**
+     * Resends the passengers of the specified holder to all viewers.
+     * The packet contains the stored platform passengers together with the head text displays.
+     *
+     * @param holder the UUID of the holder
+     */
+    void updatePassengers(@NonNull UUID holder);
+
+    /**
      * Sets the holder's scale, which head texts with scale_with_player follow.
      *
      * @param holder the UUID of the holder
