@@ -89,14 +89,16 @@ public class MinecraftSkinService implements SkinService {
 
         profileProperty = getProfileProperty(entity);
 
+        boolean isOnline = platformPlayerAdapter.isOnline(entity);
+
         // not save profileProperty for offline player without textures
-        if (entity instanceof FPlayer fPlayer && !platformPlayerAdapter.isOnline(fPlayer) && profileProperty.value().isEmpty()) {
+        if (entity instanceof FPlayer && !isOnline && profileProperty.value().isEmpty()) {
             return profileProperty;
         }
 
         profilePropertyCache.put(entity.uuid(), profileProperty);
 
-        if (entity instanceof FPlayer fPlayer && fPlayer.isOnline()) {
+        if (isOnline) {
             sendToProxy(entity, profileProperty);
         }
 
@@ -129,7 +131,7 @@ public class MinecraftSkinService implements SkinService {
         return PlayerHeadObjectContents.property(entity.name(), "");
     }
 
-    private void sendToProxy(@NonNull FEntity sender, PlayerHeadObjectContents.@NonNull ProfileProperty profileProperty) {
+    public void sendToProxy(@NonNull FEntity sender, PlayerHeadObjectContents.@NonNull ProfileProperty profileProperty) {
         proxySender.send(sender, ModuleName.UPDATE_CACHE_SKINPROFILE, dataOutputStream -> {
             dataOutputStream.writeUTF(profileProperty.name());
             dataOutputStream.writeUTF(profileProperty.value());

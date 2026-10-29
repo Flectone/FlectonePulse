@@ -55,11 +55,15 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
 
             if (!skinApplyEventSubscribed) {
                 skinsRestorer.getEventBus().subscribe(flectonePulse.getLoader(), SkinApplyEvent.class, event -> {
+                    if (event.isCancelled()) return;
+
                     FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer(platformPlayerAdapter.getPlayerClass()));
                     if (fPlayer.isUnknown()) return;
 
                     // update skin cache
-                    skinService.get().updateProfileProperty(fPlayer);
+                    PlayerHeadObjectContents.ProfileProperty profileProperty = convertToProfileProperty(event.getProperty());
+                    skinService.get().updateProfileProperty(fPlayer, profileProperty, true);
+                    skinService.get().sendToProxy(fPlayer, profileProperty);
 
                     // we need to update passengers with delay because SkinsRestorer changes player state
                     taskScheduler.runAsyncLater(() -> headTextRender.get().updatePassengers(fPlayer.uuid()), 5L);
