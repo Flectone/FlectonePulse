@@ -4,6 +4,10 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -273,6 +277,10 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
             return buildModernItemStack(itemMaterial, componentName, componentLore);
         }
 
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            return buildNbtItemStack(itemMaterial, componentName, componentLore);
+        }
+
         return buildLegacyItemStack(itemMaterial, componentName, componentLore);
     }
 
@@ -292,6 +300,22 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 .type(SpigotConversionUtil.fromBukkitItemMaterial(material))
                 .component(ComponentTypes.ITEM_NAME, name)
                 .component(ComponentTypes.LORE, new ItemLore(lore))
+                .build();
+    }
+
+    private @NonNull ItemStack buildNbtItemStack(@NonNull Material material, @NonNull Component name, @NonNull List<Component> lore) {
+        AdventureSerializer serializer = AdventureSerializer.serializer();
+
+        NBTList<NBTString> nbtLore = NBTList.createStringList();
+        lore.forEach(line -> nbtLore.addTag(new NBTString(serializer.asJson(line))));
+
+        NBTCompound display = new NBTCompound();
+        display.setTag("Name", new NBTString(serializer.asJson(name.decoration(TextDecoration.ITALIC, false))));
+        display.setTag("Lore", nbtLore);
+
+        return new ItemStack.Builder()
+                .type(SpigotConversionUtil.fromBukkitItemMaterial(material))
+                .nbt("display", display)
                 .build();
     }
 

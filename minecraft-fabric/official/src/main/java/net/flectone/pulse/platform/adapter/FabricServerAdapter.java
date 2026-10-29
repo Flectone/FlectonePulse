@@ -1,10 +1,15 @@
 package net.flectone.pulse.platform.adapter;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -336,10 +341,34 @@ public class FabricServerAdapter implements PlatformServerAdapter {
                 )
                 .toList();
 
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            return buildModernItemStack(itemMaterial, componentName, componentLore);
+        }
+
+        return buildLegacyItemStack(itemMaterial, componentName, componentLore);
+    }
+
+    private @NonNull ItemStack buildModernItemStack(@NonNull ItemType itemType, @NonNull Component name, @NonNull List<Component> lore) {
         return new ItemStack.Builder()
-                .type(itemMaterial)
-                .component(ComponentTypes.ITEM_NAME, componentName)
-                .component(ComponentTypes.LORE, new ItemLore(componentLore))
+                .type(itemType)
+                .component(ComponentTypes.ITEM_NAME, name)
+                .component(ComponentTypes.LORE, new ItemLore(lore))
+                .build();
+    }
+
+    private @NonNull ItemStack buildLegacyItemStack(@NonNull ItemType itemType, @NonNull Component name, @NonNull List<Component> lore) {
+        AdventureSerializer serializer = AdventureSerializer.serializer();
+
+        NBTList<NBTString> nbtLore = NBTList.createStringList();
+        lore.forEach(line -> nbtLore.addTag(new NBTString(serializer.asJson(line))));
+
+        NBTCompound display = new NBTCompound();
+        display.setTag("Name", new NBTString(serializer.asJson(name.decoration(TextDecoration.ITALIC, false))));
+        display.setTag("Lore", nbtLore);
+
+        return new ItemStack.Builder()
+                .type(itemType)
+                .nbt("display", display)
                 .build();
     }
 
