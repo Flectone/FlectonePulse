@@ -71,7 +71,7 @@ public class PulsePlayerLoadListener implements PulseListener {
         socialService.invalidate(currentPlayerUUID);
 
         // update player skin
-        skinService.updateProfileProperty(fPlayer, false, true);
+        skinService.invalidateProfileProperty(currentPlayerUUID);
 
         // minecraft locale will update via PacketEvents
         if (platformServerAdapter.getPlatformType() == PlatformType.HYTALE) {

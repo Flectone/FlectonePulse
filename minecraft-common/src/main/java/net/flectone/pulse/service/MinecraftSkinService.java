@@ -3,7 +3,6 @@ package net.flectone.pulse.service;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -39,14 +38,13 @@ public class MinecraftSkinService implements SkinService {
     private final TaskScheduler taskScheduler;
     private final LazyInstance<MinecraftPlayerlistnameModule> playerlistnameModule;
     private final ProxySender proxySender;
-    private final Gson gson;
 
     @Override
-    public void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname, boolean sendToProxy) {
-        updateProfileProperty(fPlayer, getProfileProperty(fPlayer), updatePlayerlistname, sendToProxy);
+    public void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname) {
+        updateProfileProperty(fPlayer, getProfileProperty(fPlayer), updatePlayerlistname);
     }
 
-    public void updateProfileProperty(@NonNull FPlayer fPlayer, PlayerHeadObjectContents.@NonNull ProfileProperty profileProperty, boolean updatePlayerlistname, boolean sendToProxy) {
+    public void updateProfileProperty(@NonNull FPlayer fPlayer, PlayerHeadObjectContents.@NonNull ProfileProperty profileProperty, boolean updatePlayerlistname) {
         if (profileProperty.value().isEmpty() && !platformPlayerAdapter.isOnline(fPlayer)) {
             profilePropertyCache.invalidate(fPlayer.uuid());
         } else {
@@ -61,14 +59,6 @@ public class MinecraftSkinService implements SkinService {
             } else {
                 minecraftPlayerlistnameModuleInstance.update();
             }
-        }
-
-        if (sendToProxy) {
-            proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE, dataOutputStream -> {
-                dataOutputStream.writeUTF(profileProperty.name());
-                dataOutputStream.writeUTF(profileProperty.value());
-                dataOutputStream.writeUTF(StringUtils.defaultString(profileProperty.signature()));
-            });
         }
     }
 
@@ -105,6 +95,11 @@ public class MinecraftSkinService implements SkinService {
         }
 
         profilePropertyCache.put(entity.uuid(), profileProperty);
+
+        if (entity instanceof FPlayer fPlayer && fPlayer.isOnline()) {
+            sendToProxy(entity, profileProperty);
+        }
+
         return profileProperty;
     }
 
@@ -132,6 +127,14 @@ public class MinecraftSkinService implements SkinService {
 
         // empty textures
         return PlayerHeadObjectContents.property(entity.name(), "");
+    }
+
+    private void sendToProxy(@NonNull FEntity sender, PlayerHeadObjectContents.@NonNull ProfileProperty profileProperty) {
+        proxySender.send(sender, ModuleName.UPDATE_CACHE_SKINPROFILE, dataOutputStream -> {
+            dataOutputStream.writeUTF(profileProperty.name());
+            dataOutputStream.writeUTF(profileProperty.value());
+            dataOutputStream.writeUTF(StringUtils.defaultString(profileProperty.signature()));
+        });
     }
 
 }

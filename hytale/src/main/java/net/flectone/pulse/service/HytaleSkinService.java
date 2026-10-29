@@ -28,7 +28,7 @@ public class HytaleSkinService implements SkinService {
     }
 
     @Override
-    public void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname, boolean sendToProxy) {
+    public void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname) {
     }
 
     @Override

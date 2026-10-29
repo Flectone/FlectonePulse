@@ -33,7 +33,7 @@ public class MinecraftSkinprofileCacheProxyMessageListener implements PulseListe
             String signature = proxyPayload.readString();
 
             PlayerHeadObjectContents.ProfileProperty profileProperty = PlayerHeadObjectContents.property(name, value, signature.isEmpty() ? null : signature);
-            minecraftSkinService.updateProfileProperty(fPlayer, profileProperty, true, false);
+            minecraftSkinService.updateProfileProperty(fPlayer, profileProperty, true);
         }
 
         return event.withProcessed(true);

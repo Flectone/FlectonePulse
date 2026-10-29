@@ -17,18 +17,17 @@ public interface SkinService {
      *
      * @param fPlayer the player
      * @param updatePlayerlistname whether to update the player's name in the tab list on this server
-     * @param sendToProxy whether to send the new skin to the other servers through the proxy
      */
-    void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname, boolean sendToProxy);
+    void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname);
 
     /**
      * Reads the current skin of a player and stores it, replacing the stored one,
-     * then updates the player's name in the tab list and sends the new skin through the proxy.
+     * then updates the player's name in the tab list.
      *
      * @param fPlayer the player
      */
     default void updateProfileProperty(@NonNull FPlayer fPlayer) {
-        updateProfileProperty(fPlayer, true, true);
+        updateProfileProperty(fPlayer, true);
     }
 
     /**
