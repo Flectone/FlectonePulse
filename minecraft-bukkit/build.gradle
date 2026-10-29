@@ -11,6 +11,7 @@ dependencies {
 
     compileOnly "org.incendo:cloud-brigadier:$cloud_paper_version"
     compileOnly "com.mojang:brigadier:$mojang_brigadier_version"
+    compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
     compileOnly "net.flectone:packeteventsmodern-spigot:$packeteventsmodern_version"
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
 
