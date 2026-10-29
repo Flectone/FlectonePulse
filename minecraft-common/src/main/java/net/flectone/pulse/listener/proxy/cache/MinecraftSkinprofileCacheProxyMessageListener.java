@@ -7,8 +7,11 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.util.payload.ProxyPayload;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 
 import java.io.IOException;
 
@@ -19,12 +22,21 @@ public class MinecraftSkinprofileCacheProxyMessageListener implements PulseListe
     private final MinecraftSkinService minecraftSkinService;
 
     @Pulse
-    public void onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
-        if (event.name() != ModuleName.UPDATE_CACHE_SKINPROFILE) return;
-        if (event.sentByThisServer()) return;
-        if (!(event.sender() instanceof FPlayer fPlayer)) return;
+    public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
+        if (event.name() != ModuleName.UPDATE_CACHE_SKINPROFILE) return event;
+        if (event.sentByThisServer()) return event.withProcessed(true);
+        if (!(event.sender() instanceof FPlayer fPlayer)) return event.withProcessed(true);
 
-        minecraftSkinService.updateProfileProperty(fPlayer, true, false);
+        try (ProxyPayload proxyPayload = new ProxyPayload(event.payload())) {
+            String name = proxyPayload.readString();
+            String value = proxyPayload.readString();
+            String signature = proxyPayload.readString();
+
+            PlayerHeadObjectContents.ProfileProperty profileProperty = PlayerHeadObjectContents.property(name, value, signature.isEmpty() ? null : signature);
+            minecraftSkinService.updateProfileProperty(fPlayer, profileProperty, true, false);
+        }
+
+        return event.withProcessed(true);
     }
 
 }

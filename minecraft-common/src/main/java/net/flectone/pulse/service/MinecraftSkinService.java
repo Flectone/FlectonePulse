@@ -3,6 +3,7 @@ package net.flectone.pulse.service;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -19,6 +20,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 
@@ -37,10 +39,19 @@ public class MinecraftSkinService implements SkinService {
     private final TaskScheduler taskScheduler;
     private final LazyInstance<MinecraftPlayerlistnameModule> playerlistnameModule;
     private final ProxySender proxySender;
+    private final Gson gson;
 
     @Override
     public void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname, boolean sendToProxy) {
-        profilePropertyCache.put(fPlayer.uuid(), getProfileProperty(fPlayer));
+        updateProfileProperty(fPlayer, getProfileProperty(fPlayer), updatePlayerlistname, sendToProxy);
+    }
+
+    public void updateProfileProperty(@NonNull FPlayer fPlayer, PlayerHeadObjectContents.@NonNull ProfileProperty profileProperty, boolean updatePlayerlistname, boolean sendToProxy) {
+        if (profileProperty.value().isEmpty() && !platformPlayerAdapter.isOnline(fPlayer)) {
+            profilePropertyCache.invalidate(fPlayer.uuid());
+        } else {
+            profilePropertyCache.put(fPlayer.uuid(), profileProperty);
+        }
 
         if (updatePlayerlistname) {
             MinecraftPlayerlistnameModule minecraftPlayerlistnameModuleInstance = playerlistnameModule.get();
@@ -53,7 +64,11 @@ public class MinecraftSkinService implements SkinService {
         }
 
         if (sendToProxy) {
-            proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE);
+            proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE, dataOutputStream -> {
+                dataOutputStream.writeUTF(profileProperty.name());
+                dataOutputStream.writeUTF(profileProperty.value());
+                dataOutputStream.writeUTF(StringUtils.defaultString(profileProperty.signature()));
+            });
         }
     }
 
