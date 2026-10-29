@@ -64,7 +64,7 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
                     // update image cache
                     if (!proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE)) {
                         MinecraftSkinService skinServiceInstance = skinService.get();
-                        skinServiceInstance.updateProfilePropertyCache(fPlayer);
+                        skinServiceInstance.updateProfileProperty(fPlayer);
 
                         ImagePixelConverter imagePixelConverterInstance = imagePixelConverter.get();
                         imagePixelConverterInstance.invalidate(skinServiceInstance.getSkin(fPlayer));

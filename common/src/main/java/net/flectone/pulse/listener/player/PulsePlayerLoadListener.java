@@ -18,10 +18,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.service.PlaytimeService;
-import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.service.*;
 
 import java.util.UUID;
 
@@ -36,6 +33,7 @@ public class PulsePlayerLoadListener implements PulseListener {
     private final ModerationService moderationService;
     private final PlaytimeService playtimeService;
     private final SocialService socialService;
+    private final SkinService skinService;
     private final ProxySender proxySender;
     private final ProxyRegistry proxyRegistry;
     private final TaskScheduler taskScheduler;
@@ -71,6 +69,9 @@ public class PulsePlayerLoadListener implements PulseListener {
 
         // update settings, colors, ignores cache
         socialService.invalidate(currentPlayerUUID);
+
+        // update player skin
+        skinService.updateProfileProperty(fPlayer, false);
 
         // minecraft locale will update via PacketEvents
         if (platformServerAdapter.getPlatformType() == PlatformType.HYTALE) {

@@ -24,7 +24,7 @@ public class MinecraftSkinprofileCacheProxyMessageListener implements PulseListe
         if (event.sentByThisServer()) return;
         if (!(event.sender() instanceof FPlayer fPlayer)) return;
 
-        minecraftSkinService.updateProfilePropertyCache(fPlayer);
+        minecraftSkinService.updateProfileProperty(fPlayer);
     }
 
 }

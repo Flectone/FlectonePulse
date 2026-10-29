@@ -1,6 +1,10 @@
 package net.flectone.pulse.service;
 
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import org.jspecify.annotations.NonNull;
+
+import java.util.UUID;
 
 /**
  * Resolves player skins and the avatar images used by the chat integrations.
@@ -9,12 +13,37 @@ import net.flectone.pulse.model.entity.FEntity;
 public interface SkinService {
 
     /**
-     * The encoded skin texture of an entity.
+     * Reads the current skin of a player and stores it, replacing the stored one.
+     *
+     * @param fPlayer the player
+     * @param updatePlayerlistname whether to update the player's name in the tab list with the new skin
+     */
+    void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname);
+
+    /**
+     * Reads the current skin of a player and stores it, replacing the stored one,
+     * then updates the player's name in the tab list.
+     *
+     * @param fPlayer the player
+     */
+    default void updateProfileProperty(@NonNull FPlayer fPlayer) {
+        updateProfileProperty(fPlayer, true);
+    }
+
+    /**
+     * Drops the stored skin of a player, so it is read again on the next use.
+     *
+     * @param player the UUID of the player
+     */
+    void invalidateProfileProperty(@NonNull UUID player);
+
+    /**
+     * The skin of a player, used to build the avatar and body urls.
      *
      * @param fPlayer the entity
      * @return the texture value, or an empty string if it could not be resolved
      */
-    String getSkin(FEntity fPlayer);
+    @NonNull String getSkin(@NonNull FEntity fPlayer);
 
     /**
      * A url rendering the entity's head, used as the avatar on Discord and Telegram.
@@ -22,7 +51,7 @@ public interface SkinService {
      * @param entity the entity
      * @return the avatar url
      */
-    String getAvatarUrl(FEntity entity);
+    @NonNull String getAvatarUrl(@NonNull FEntity entity);
 
     /**
      * A url rendering the entity's full body.
@@ -30,6 +59,6 @@ public interface SkinService {
      * @param entity the entity
      * @return the body url
      */
-    String getBodyUrl(FEntity entity);
+    @NonNull String getBodyUrl(@NonNull FEntity entity);
 
 }

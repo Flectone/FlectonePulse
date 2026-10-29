@@ -35,16 +35,40 @@ public class MinecraftSkinService implements SkinService {
     private final TaskScheduler taskScheduler;
     private final LazyInstance<MinecraftPlayerlistnameModule> playerlistnameModule;
 
-    public void updateProfilePropertyCache(FPlayer fPlayer) {
+    @Override
+    public void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname) {
         profilePropertyCache.put(fPlayer.uuid(), getProfileProperty(fPlayer));
 
-        MinecraftPlayerlistnameModule minecraftPlayerlistnameModuleInstance = playerlistnameModule.get();
+        if (updatePlayerlistname) {
+            MinecraftPlayerlistnameModule minecraftPlayerlistnameModuleInstance = playerlistnameModule.get();
 
-        if (platformPlayerAdapter.isOnline(fPlayer)) {
-            taskScheduler.runAsyncLater(() -> minecraftPlayerlistnameModuleInstance.update(fPlayer), 2L);
-        } else {
-            minecraftPlayerlistnameModuleInstance.update();
+            if (platformPlayerAdapter.isOnline(fPlayer)) {
+                taskScheduler.runAsyncLater(() -> minecraftPlayerlistnameModuleInstance.update(fPlayer), 2L);
+            } else {
+                minecraftPlayerlistnameModuleInstance.update();
+            }
         }
+    }
+
+    @Override
+    public void invalidateProfileProperty(@NonNull UUID player) {
+        profilePropertyCache.invalidate(player);
+    }
+
+    @Override
+    public @NonNull String getAvatarUrl(@NonNull FEntity entity) {
+        return Strings.CS.replace(fileFacade.integration().avatarApiUrl(), "<skin>", getSkin(entity));
+    }
+
+    @Override
+    public @NonNull String getBodyUrl(@NonNull FEntity entity) {
+        return Strings.CS.replace(fileFacade.integration().bodyApiUrl(), "<skin>", getSkin(entity));
+    }
+
+    @Override
+    public @NonNull String getSkin(@NonNull FEntity entity) {
+        String texture = integrationModule.getTextureUrl(entity);
+        return texture != null ? texture : entity.uuid().toString();
     }
 
     public PlayerHeadObjectContents.@NonNull ProfileProperty getProfilePropertyFromCache(FEntity entity) {
@@ -86,22 +110,6 @@ public class MinecraftSkinService implements SkinService {
 
         // empty textures
         return PlayerHeadObjectContents.property(entity.name(), "");
-    }
-
-    @Override
-    public String getAvatarUrl(FEntity entity) {
-        return Strings.CS.replace(fileFacade.integration().avatarApiUrl(), "<skin>", getSkin(entity));
-    }
-
-    @Override
-    public String getBodyUrl(FEntity entity) {
-        return Strings.CS.replace(fileFacade.integration().bodyApiUrl(), "<skin>", getSkin(entity));
-    }
-
-    @Override
-    public String getSkin(FEntity entity) {
-        String texture = integrationModule.getTextureUrl(entity);
-        return texture != null ? texture : entity.uuid().toString();
     }
 
 }
