@@ -142,9 +142,11 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
                     ? modernSidebarLines(fPlayer, objectiveName, lines)
                     : legacySidebarLines(fPlayer, objectiveName, lines);
 
-            if (oldContent != null && oldContent.size() > content.size()) {
-                for (int i = content.size(); i < oldContent.size(); i++) {
+            if (oldContent != null) {
+                for (int i = 0; i < oldContent.size(); i++) {
                     String oldLine = oldContent.get(i);
+                    if (content.contains(oldLine)) continue;
+
                     if (isNewerThanOrEqualsV_1_20_3) {
                         packetSender.send(fPlayer, new WrapperPlayServerResetScore(oldLine, objectiveName));
                     } else {
