@@ -19,7 +19,9 @@
   <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/assets/badges/paper.webp" alt="paper"></a>
   <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/assets/badges/purpur.webp" alt="purpur"></a>
   <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/assets/badges/folia.webp" alt="folia"></a>
-  <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/assets/badges/fabric.webp" height="40" alt="fabric"></a>
+  <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/assets/badges/fabric.webp" alt="fabric"></a>
+  <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/assets/badges/neoforge.webp" alt="neoforge"></a>
+  <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/assets/badges/sponge.webp" alt="sponge"></a>
   <a href="https://www.curseforge.com/hytale/mods/flectonepulse"><img src="https://flectone.net/assets/badges/hytale.webp" alt="hytale"></a>
   <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/assets/badges/bungeecord.webp" alt="bungeecord"></a>
   <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/assets/badges/velocity.webp" alt="velocity"></a>
@@ -73,7 +75,7 @@ FlectonePulse стал темой **университетской диплом�
 | **Velocity**                                 | Последняя               |
 | **Hytale**                                   | Последняя версия Hytale |
 | **NeoForge**                                 | 1.21.1 – Последняя      |
-| **Sponge**                                   | 1.21.10 – Последня      |
+| **Sponge**                                   | 1.21.10 – Последняя     |
 
 Paper 1.16.5 и 1.17.x отказываются запускаться на новой Java и пишут `Unsupported Java detected (...). Only up to Java 16 is supported`. Чтобы пропустить эту проверку, добавь флаг `-DPaper.IgnoreJavaVersion=true`
 
