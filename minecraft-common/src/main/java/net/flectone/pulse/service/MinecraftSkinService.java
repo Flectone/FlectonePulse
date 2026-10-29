@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -14,6 +15,7 @@ import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -34,9 +36,10 @@ public class MinecraftSkinService implements SkinService {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final LazyInstance<MinecraftPlayerlistnameModule> playerlistnameModule;
+    private final ProxySender proxySender;
 
     @Override
-    public void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname) {
+    public void updateProfileProperty(@NonNull FPlayer fPlayer, boolean updatePlayerlistname, boolean sendToProxy) {
         profilePropertyCache.put(fPlayer.uuid(), getProfileProperty(fPlayer));
 
         if (updatePlayerlistname) {
@@ -47,6 +50,10 @@ public class MinecraftSkinService implements SkinService {
             } else {
                 minecraftPlayerlistnameModuleInstance.update();
             }
+        }
+
+        if (sendToProxy) {
+            proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE);
         }
     }
 

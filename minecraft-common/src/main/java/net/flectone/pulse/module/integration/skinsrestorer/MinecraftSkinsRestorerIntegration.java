@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FlectonePulse;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.converter.ImagePixelConverter;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
@@ -61,16 +60,8 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
                     FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer(platformPlayerAdapter.getPlayerClass()));
                     if (fPlayer.isUnknown()) return;
 
-                    // update image cache
-                    if (!proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE)) {
-                        MinecraftSkinService skinServiceInstance = skinService.get();
-                        skinServiceInstance.updateProfileProperty(fPlayer);
-
-                        ImagePixelConverter imagePixelConverterInstance = imagePixelConverter.get();
-                        imagePixelConverterInstance.invalidate(skinServiceInstance.getSkin(fPlayer));
-                        imagePixelConverterInstance.invalidate(skinServiceInstance.getBodyUrl(fPlayer));
-                        imagePixelConverterInstance.invalidate(skinServiceInstance.getAvatarUrl(fPlayer));
-                    }
+                    // update skin cache
+                    skinService.get().updateProfileProperty(fPlayer);
                 });
 
                 skinApplyEventSubscribed = true;
