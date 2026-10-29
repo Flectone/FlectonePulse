@@ -1,8 +1,10 @@
 package net.flectone.pulse.platform.controller;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,6 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.inventory.MinecraftInventory;
 import net.flectone.pulse.model.inventory.MinecraftInventoryClickType;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 
@@ -28,6 +31,7 @@ public class MinecraftInventoryController {
 
     private final MinecraftPacketSender packetSender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final MinecraftPacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
 
     public MinecraftInventory get(UUID uuid) {
@@ -73,6 +77,10 @@ public class MinecraftInventoryController {
 
             if (isWindowClicked || clickType == MinecraftInventoryClickType.PICKUP) {
                 packetSender.send(uuid, new WrapperPlayServerWindowItems(wrapper.getWindowId(), 0, inventory.getWrapperItems().getItems(), null));
+
+                if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_17_1)) {
+                    packetSender.send(uuid, new WrapperPlayServerSetSlot(-1, 0, -1, ItemStack.EMPTY));
+                }
 
                 if (isWindowClicked) {
                     click(inventory, wrapper.getSlot());
