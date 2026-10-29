@@ -41,6 +41,9 @@ jobs:
       - name: Build minecraft-neoforge
         run: ./gradlew :minecraft-neoforge:buildFinalJar
 
+      - name: Build minecraft-sponge
+        run: ./gradlew :minecraft-sponge:buildFinalJar
+
       - name: Build hytale
         run: ./gradlew :hytale:buildFinalJar
 
