@@ -209,8 +209,14 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
                     .build()
             );
 
+            // in older versions strings cannot match, so we add a unique invisible hex value
+            String uniqueLine = line;
+            for (int code = 0; content.contains(uniqueLine); code++) {
+                uniqueLine = line + "§" + Integer.toHexString(code);
+            }
+
             packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
-                    line,
+                    uniqueLine,
                     WrapperPlayServerUpdateScore.Action.CREATE_OR_UPDATE_ITEM,
                     objectiveName,
                     lines.length - lineIndex,
@@ -218,7 +224,7 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
                     null
             ));
 
-            content.add(line);
+            content.add(uniqueLine);
         }
 
         return content;
