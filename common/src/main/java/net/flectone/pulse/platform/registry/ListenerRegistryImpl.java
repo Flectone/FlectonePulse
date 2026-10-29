@@ -143,7 +143,6 @@ public class ListenerRegistryImpl implements ListenerRegistry {
             register(PlayerConnectedProxyMessageListener.class);
             register(PlayerDisconnectedProxyMessageListener.class);
             register(SettingCacheProxyMessageListener.class);
-            register(SkinprofileCacheProxyMessageListener.class);
             register(ViolationCacheProxyMessageListener.class);
             register(WarnCacheProxyMessageListener.class);
             register(WhitelistCacheProxyMessageListener.class);
