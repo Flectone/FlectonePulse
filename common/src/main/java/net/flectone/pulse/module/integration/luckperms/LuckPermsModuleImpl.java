@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.LazyInstance;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -57,10 +58,10 @@ public class LuckPermsModuleImpl implements LuckPermsModule {
     }
 
     @Override
-    public boolean hasLuckPermission(FPlayer fPlayer, String permission) {
-        if (!moduleController.isEnable(this)) return false;
+    public @Nullable Boolean getLuckPermission(FPlayer fPlayer, String permission) {
+        if (!moduleController.isEnable(this)) return null;
 
-        return luckPermsIntegration.get().hasPermission(fPlayer, permission);
+        return luckPermsIntegration.get().getPermission(fPlayer, permission);
     }
 
     @Override

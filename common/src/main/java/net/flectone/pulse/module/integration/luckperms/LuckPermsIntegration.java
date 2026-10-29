@@ -12,6 +12,8 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
+import net.luckperms.api.util.Tristate;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,11 +46,12 @@ public class LuckPermsIntegration implements FIntegration {
         taskScheduler.runAsyncLater(this::hook);
     }
 
-    public boolean hasPermission(FPlayer fPlayer, String permission) {
+    public @Nullable Boolean getPermission(FPlayer fPlayer, String permission) {
         User user = getUser(fPlayer);
-        if (user == null) return false;
+        if (user == null) return null;
 
-        return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
+        Tristate tristate = user.getCachedData().getPermissionData().checkPermission(permission);
+        return tristate == Tristate.UNDEFINED ? null : tristate.asBoolean();
     }
 
     public int getGroupWeight(FPlayer fPlayer) {

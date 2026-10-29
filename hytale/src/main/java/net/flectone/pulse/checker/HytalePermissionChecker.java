@@ -3,44 +3,32 @@ package net.flectone.pulse.checker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.permissions.PermissionsModule;
-import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.platform.adapter.HytalePlayerAdapter;
-import net.flectone.pulse.platform.registry.HytalePermissionRegistry;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.registry.PermissionRegistry;
 import net.flectone.pulse.util.LazyInstance;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class HytalePermissionChecker implements PermissionChecker {
+public class HytalePermissionChecker extends PermissionCheckerImpl {
 
-    private final HytalePermissionRegistry hytalePermissionRegistry;
-    private final HytalePlayerAdapter hytalePlayerAdapter;
     private final LazyInstance<IntegrationModule> integrationModule;
 
+    @Inject
+    public HytalePermissionChecker(PlatformPlayerAdapter platformPlayerAdapter,
+                                   PermissionRegistry permissionRegistry,
+                                   LazyInstance<IntegrationModule> integrationModule) {
+        super(platformPlayerAdapter, integrationModule, permissionRegistry);
+
+        this.integrationModule = integrationModule;
+    }
+
     @Override
-    public boolean check(FEntity entity, String permission) {
-        if (permission == null) return true;
-        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isConsole()) return true;
+    public boolean checkPlatform(FPlayer fPlayer, String permission, boolean defaultValue) {
+        if (integrationModule.get().containsEnabledChild(ModuleName.INTEGRATION_LUCKPERMS)) return defaultValue;
 
-        IntegrationModule integrationModuleInstance = integrationModule.get();
-        if (integrationModuleInstance.hasFPlayerPermission(fPlayer, permission)) return true;
-
-        Permission.Type hytalePermission = hytalePermissionRegistry.getPermissions().get(permission);
-
-        boolean value;
-        if (hytalePermission != null) {
-            if (hytalePermission == Permission.Type.TRUE && integrationModuleInstance.isAlwaysHaveTruePermission()) return true;
-
-            value = hytalePermission != Permission.Type.FALSE &&
-                    (hytalePermission == Permission.Type.TRUE || hytalePlayerAdapter.isOperator(fPlayer) && hytalePermission != Permission.Type.NOT_OP);
-        } else {
-            value = hytalePlayerAdapter.isOperator(fPlayer);
-        }
-
-        return PermissionsModule.get().hasPermission(entity.uuid(), permission, value);
+        return PermissionsModule.get().hasPermission(fPlayer.uuid(), permission, defaultValue);
     }
 
 }

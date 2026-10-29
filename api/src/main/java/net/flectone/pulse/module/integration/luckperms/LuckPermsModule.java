@@ -4,6 +4,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
@@ -20,18 +21,18 @@ public interface LuckPermsModule extends ModuleSimple {
     Permission.Integration.Luckperms permission();
 
     /**
-     * Whether LuckPerms grants a node to a player.
+     * The value LuckPerms sets for a node of a player.
      *
      * @param fPlayer the player
      * @param permission the node
-     * @return true if it is granted
+     * @return true if it is granted, false if it is denied, or null if it is not set
      */
-    boolean hasLuckPermission(FPlayer fPlayer, String permission);
+    @Nullable Boolean getLuckPermission(FPlayer fPlayer, String permission);
 
     /**
-     * Whether LuckPerms grants every node, which means its answers carry no information.
+     * Whether nodes granted by default stay granted even when LuckPerms denies them, for example with {@code * false}.
      *
-     * @return true if every node is granted
+     * @return true if default nodes are always granted
      */
     boolean isAlwaysHaveTrue();
 

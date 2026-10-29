@@ -3,6 +3,7 @@ package net.flectone.pulse;
 import com.google.inject.Singleton;
 import net.flectone.pulse.checker.NeoForgePermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.checker.PermissionCheckerImpl;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.module.integration.NeoForgeIntegrationModule;
@@ -51,7 +52,7 @@ public class NeoForgeInjector extends MinecraftPlatformInjector {
         bind(CommandRegistry.class).to(NeoForgeCommandRegistry.class);
 
         // checkers and utilities
-        bind(PermissionChecker.class).to(NeoForgePermissionChecker.class);
+        bind(PermissionCheckerImpl.class).to(NeoForgePermissionChecker.class);
 
         bind(MinecraftIntegrationModule.class).to(NeoForgeIntegrationModule.class);
 

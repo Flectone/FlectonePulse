@@ -43,6 +43,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.permissions.Permissible;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -201,14 +202,15 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     }
 
     @Override
-    public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
-        boolean value = super.hasFPlayerPermission(fPlayer, permission);
+    public @Nullable Boolean getFPlayerPermission(FPlayer fPlayer, String permission) {
+        Boolean value = super.getFPlayerPermission(fPlayer, permission);
+        if (value != null) return value;
 
-        if (containsEnabledChild(ModuleName.INTEGRATION_VAULT)) {
-            return vaultModule.get().hasVaultPermission(fPlayer, permission);
+        if (containsEnabledChild(ModuleName.INTEGRATION_VAULT) && vaultModule.get().hasVaultPermission(fPlayer, permission)) {
+            return true;
         }
 
-        return value;
+        return null;
     }
 
     @Override

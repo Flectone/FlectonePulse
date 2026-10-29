@@ -494,6 +494,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(FileWriter.class).to(FileWriterImpl.class);
         bind(LogFilter.class).to(LogFilterImpl.class);
         bind(MuteChecker.class).to(MuteCheckerImpl.class);
+        bind(PermissionChecker.class).to(PermissionCheckerImpl.class);
         bind(RandomGenerator.class).to(RandomGeneratorImpl.class);
         bind(ValidNameChecker.class).to(ValidNameCheckerImpl.class);
         bind(VersionComparator.class).to(VersionComparatorImpl.class);

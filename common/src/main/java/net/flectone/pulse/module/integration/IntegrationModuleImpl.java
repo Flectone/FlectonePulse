@@ -21,6 +21,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.LazyInstance;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -83,14 +84,14 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
     }
 
     @Override
-    public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
-        if (!moduleController.isEnable(this)) return false;
+    public @Nullable Boolean getFPlayerPermission(FPlayer fPlayer, String permission) {
+        if (!moduleController.isEnable(this)) return null;
 
         if (containsEnabledChild(ModuleName.INTEGRATION_LUCKPERMS)) {
-            return luckPermsModule.get().hasLuckPermission(fPlayer, permission);
+            return luckPermsModule.get().getLuckPermission(fPlayer, permission);
         }
 
-        return false;
+        return null;
     }
 
     @Override

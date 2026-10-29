@@ -2,9 +2,10 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Permission;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,6 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NeoForgePermissionRegistry implements PermissionRegistry {
 
-    @Getter
     private final Map<String, Permission.Type> permissions = new HashMap<>();
 
     @Override
@@ -22,6 +22,11 @@ public class NeoForgePermissionRegistry implements PermissionRegistry {
         if (type == null) return;
 
         permissions.put(name, type);
+    }
+
+    @Override
+    public Permission.@Nullable Type getType(@NonNull String name) {
+        return permissions.get(name);
     }
 
     @Override

@@ -2,57 +2,42 @@ package net.flectone.pulse.checker;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.NeoForgeFlectonePulse;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.NeoForgePlayerAdapter;
 import net.flectone.pulse.platform.adapter.NeoForgeVersionAdapter;
 import net.flectone.pulse.platform.registry.NeoForgePermissionRegistry;
 import net.flectone.pulse.util.LazyInstance;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NeoForgePermissionChecker implements PermissionChecker {
+public class NeoForgePermissionChecker extends PermissionCheckerImpl {
 
     private final NeoForgeFlectonePulse neoForgeFlectonePulse;
     private final NeoForgePlayerAdapter neoForgePlayerAdapter;
     private final NeoForgeVersionAdapter neoForgeVersionAdapter;
-    private final NeoForgePermissionRegistry neoForgePermissionRegistry;
-    private final LazyInstance<IntegrationModule> integrationModule;
+
+    @Inject
+    public NeoForgePermissionChecker(NeoForgeFlectonePulse neoForgeFlectonePulse,
+                                     NeoForgePlayerAdapter neoForgePlayerAdapter,
+                                     NeoForgeVersionAdapter neoForgeVersionAdapter,
+                                     NeoForgePermissionRegistry permissionRegistry,
+                                     LazyInstance<IntegrationModule> integrationModule) {
+        super(neoForgePlayerAdapter, integrationModule, permissionRegistry);
+
+        this.neoForgeFlectonePulse = neoForgeFlectonePulse;
+        this.neoForgePlayerAdapter = neoForgePlayerAdapter;
+        this.neoForgeVersionAdapter = neoForgeVersionAdapter;
+    }
 
     @Override
-    public boolean check(FEntity entity, String permission) {
-        if (permission == null) return true;
-        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isConsole()) return true;
+    public boolean checkPlatform(FPlayer fPlayer, String permission, boolean defaultValue) {
+        if (neoForgeFlectonePulse.getMinecraftServer() == null) return true;
+        if (!defaultValue) return false;
 
-        MinecraftServer minecraftServer = neoForgeFlectonePulse.getMinecraftServer();
-        if (minecraftServer == null) return true;
-
-        IntegrationModule integrationModuleInstance = integrationModule.get();
-        if (integrationModuleInstance.hasFPlayerPermission(fPlayer, permission)) return true;
-
-        Permission.Type neoForgePermission = neoForgePermissionRegistry.getPermissions().get(permission);
-
-        boolean value;
-        if (neoForgePermission != null) {
-            if (neoForgePermission == Permission.Type.TRUE && integrationModuleInstance.isAlwaysHaveTruePermission()) return true;
-
-            value = neoForgePermission != Permission.Type.FALSE &&
-                    (neoForgePermission == Permission.Type.TRUE || neoForgePlayerAdapter.isOperator(fPlayer) && neoForgePermission != Permission.Type.NOT_OP);
-        } else {
-            value = neoForgePlayerAdapter.isOperator(fPlayer);
-        }
-
-        ServerPlayer player = neoForgePlayerAdapter.getPlayer(entity.uuid());
-        if (player != null) {
-            value = value && neoForgeVersionAdapter.hasPermission(player);
-        }
-
-        return value;
+        ServerPlayer player = neoForgePlayerAdapter.getPlayer(fPlayer.uuid());
+        return player == null || neoForgeVersionAdapter.hasPermission(player);
     }
+
 }

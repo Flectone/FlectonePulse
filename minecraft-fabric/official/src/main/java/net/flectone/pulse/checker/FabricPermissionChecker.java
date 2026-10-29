@@ -2,57 +2,42 @@ package net.flectone.pulse.checker;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
 import net.flectone.pulse.platform.adapter.FabricVersionAdapter;
-import net.flectone.pulse.platform.registry.FabricPermissionRegistry;
+import net.flectone.pulse.platform.registry.PermissionRegistry;
 import net.flectone.pulse.util.LazyInstance;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FabricPermissionChecker implements PermissionChecker {
+public class FabricPermissionChecker extends PermissionCheckerImpl {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FabricPlayerAdapter fabricPlayerAdapter;
     private final FabricVersionAdapter fabricVersionAdapter;
-    private final FabricPermissionRegistry fabricPermissionRegistry;
-    private final LazyInstance<IntegrationModule> integrationModule;
+
+    @Inject
+    public FabricPermissionChecker(FabricFlectonePulse fabricFlectonePulse,
+                                   FabricPlayerAdapter fabricPlayerAdapter,
+                                   FabricVersionAdapter fabricVersionAdapter,
+                                   PermissionRegistry permissionRegistry,
+                                   LazyInstance<IntegrationModule> integrationModule) {
+        super(fabricPlayerAdapter, integrationModule, permissionRegistry);
+
+        this.fabricFlectonePulse = fabricFlectonePulse;
+        this.fabricPlayerAdapter = fabricPlayerAdapter;
+        this.fabricVersionAdapter = fabricVersionAdapter;
+    }
 
     @Override
-    public boolean check(FEntity entity, String permission) {
-        if (permission == null) return true;
-        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isConsole()) return true;
+    public boolean checkPlatform(FPlayer fPlayer, String permission, boolean defaultValue) {
+        if (fabricFlectonePulse.getMinecraftServer() == null) return true;
+        if (!defaultValue) return false;
 
-        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
-        if (minecraftServer == null) return true;
-
-        IntegrationModule integrationModuleInstance = integrationModule.get();
-        if (integrationModuleInstance.hasFPlayerPermission(fPlayer, permission)) return true;
-
-        Permission.Type fabricPermission = fabricPermissionRegistry.getPermissions().get(permission);
-
-        boolean value;
-        if (fabricPermission != null) {
-            if (fabricPermission == Permission.Type.TRUE && integrationModuleInstance.isAlwaysHaveTruePermission()) return true;
-
-            value = fabricPermission != Permission.Type.FALSE &&
-                    (fabricPermission == Permission.Type.TRUE || fabricPlayerAdapter.isOperator(fPlayer) && fabricPermission != Permission.Type.NOT_OP);
-        } else {
-            value = fabricPlayerAdapter.isOperator(fPlayer);
-        }
-
-        ServerPlayer player = fabricPlayerAdapter.getPlayer(entity.uuid());
-        if (player != null) {
-            value = value && fabricVersionAdapter.hasPermission(player);
-        }
-
-        return value;
+        ServerPlayer player = fabricPlayerAdapter.getPlayer(fPlayer.uuid());
+        return player == null || fabricVersionAdapter.hasPermission(player);
     }
+
 }

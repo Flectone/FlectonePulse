@@ -5,6 +5,7 @@ import com.google.inject.TypeLiteral;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import net.flectone.pulse.checker.HytalePermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.checker.PermissionCheckerImpl;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.HytaleChatsettingModule;
@@ -75,7 +76,7 @@ public class HytaleInjector extends PlatformInjector {
         bind(CommandRegistry.class).to(HytaleCommandRegistry.class);
 
         // checkers and utilities
-        bind(PermissionChecker.class).to(HytalePermissionChecker.class);
+        bind(PermissionCheckerImpl.class).to(HytalePermissionChecker.class);
         bind(MessagePipelineImpl.class).to(HytaleMessagePipeline.class);
 
         // integrations

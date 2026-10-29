@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -33,6 +34,19 @@ public class BukkitPermissionRegistry implements PermissionRegistry {
         }
 
         Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault));
+    }
+
+    @Override
+    public net.flectone.pulse.config.Permission.Type getType(@NonNull String name) {
+        org.bukkit.permissions.Permission bukkitPermission = Bukkit.getPluginManager().getPermission(name);
+        if (bukkitPermission == null) return null;
+
+        return switch (bukkitPermission.getDefault()) {
+            case TRUE -> net.flectone.pulse.config.Permission.Type.TRUE;
+            case FALSE -> net.flectone.pulse.config.Permission.Type.FALSE;
+            case OP -> net.flectone.pulse.config.Permission.Type.OP;
+            case NOT_OP -> net.flectone.pulse.config.Permission.Type.NOT_OP;
+        };
     }
 
 }

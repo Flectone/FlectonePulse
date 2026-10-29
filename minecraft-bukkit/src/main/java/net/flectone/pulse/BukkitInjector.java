@@ -4,6 +4,7 @@ import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.google.inject.Singleton;
 import net.flectone.pulse.checker.BukkitPermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.checker.PermissionCheckerImpl;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.command.spy.MinecraftSpyModule;
@@ -91,7 +92,7 @@ public class BukkitInjector extends MinecraftPlatformInjector {
         }
 
         // Checkers and utilities
-        bind(PermissionChecker.class).to(BukkitPermissionChecker.class);
+        bind(PermissionCheckerImpl.class).to(BukkitPermissionChecker.class);
         bind(TaskSchedulerImpl.class).to(BukkitTaskScheduler.class);
 
         // Modules

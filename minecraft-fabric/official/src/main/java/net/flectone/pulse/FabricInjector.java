@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.checker.FabricPermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.checker.PermissionCheckerImpl;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
@@ -55,7 +56,7 @@ public class FabricInjector extends MinecraftPlatformInjector {
         bind(CommandRegistry.class).to(FabricCommandRegistry.class);
 
         // checkers and utilities
-        bind(PermissionChecker.class).to(FabricPermissionChecker.class);
+        bind(PermissionCheckerImpl.class).to(FabricPermissionChecker.class);
 
         bind(MinecraftIntegrationModule.class).to(FabricIntegrationModule.class);
 

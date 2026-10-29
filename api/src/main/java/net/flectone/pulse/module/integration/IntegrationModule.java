@@ -8,6 +8,7 @@ import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.constant.ModuleName;
 import net.kyori.adventure.text.Component;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
@@ -107,18 +108,18 @@ public interface IntegrationModule extends ModuleSimple {
     boolean containsEnabledChild(ModuleName moduleName);
 
     /**
-     * Whether a permission plugin grants this node, consulted when the platform cannot answer.
+     * The value a permission plugin sets for this node, consulted before the default of the node.
      *
      * @param fPlayer the player
      * @param permission the node
-     * @return true if it is granted
+     * @return true if it is granted, false if it is denied, or null if it is not set
      */
-    boolean hasFPlayerPermission(FPlayer fPlayer, String permission);
+    @Nullable Boolean getFPlayerPermission(FPlayer fPlayer, String permission);
 
     /**
-     * Whether the permission plugin answers yes to everything, which means its answers carry no information.
+     * Whether nodes granted by default stay granted even when the permission plugin denies them, for example with {@code * false}.
      *
-     * @return true if every node is granted
+     * @return true if default nodes are always granted
      */
     boolean isAlwaysHaveTruePermission();
 
