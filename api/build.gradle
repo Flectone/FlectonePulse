@@ -37,6 +37,20 @@ tasks.named("sourcesJar", Jar) {
     }
 }
 
+afterEvaluate {
+    configurations.shadowRuntimeElements {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.shadeDowngradedApi.archiveFile) {
+            classifier = ""
+            builtBy(tasks.shadeDowngradedApi)
+        }
+
+        attributes {
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+        }
+    }
+}
+
 components.java {
     withVariantsFromConfiguration(configurations.runtimeElements) {
         skip()
