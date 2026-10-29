@@ -103,7 +103,7 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
 
         PlayerStorage playerStorage = skinsRestorer.getPlayerStorage();
         try {
-            Optional<SkinProperty> skinProperty = playerStorage.getSkinForPlayer(fPlayer.uuid(), fPlayer.name());
+            Optional<SkinProperty> skinProperty = playerStorage.getSkinOfPlayer(fPlayer.uuid());
             if (skinProperty.isPresent()) return skinProperty.get();
             if (fileFacade.integration().skinsrestorer().loadMojangSkin()) {
                 SkinStorage skinStorage = skinsRestorer.getSkinStorage();
