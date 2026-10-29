@@ -63,6 +63,7 @@ public class MinecraftSkinsRestorerModule implements ModuleSimple {
 
     public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return null;
+        if (!config().loadProfileProperty()) return null;
 
         return skinsRestorerIntegration.getProfileProperty(fPlayer);
     }

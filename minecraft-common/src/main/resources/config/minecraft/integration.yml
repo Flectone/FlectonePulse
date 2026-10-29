@@ -117,6 +117,7 @@ simplevoice:
   enable: true
 skinsrestorer:
   enable: true
+  load_profile_property: true
   load_mojang_skin: false
 supervanish:
   enable: true

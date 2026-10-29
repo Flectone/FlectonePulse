@@ -336,7 +336,11 @@ public record Integration(
 
     @With
     @Builder(toBuilder = true)
-    public record Skinsrestorer(Boolean enable, Boolean loadMojangSkin) implements EnableSetting {
+    public record Skinsrestorer(
+            Boolean enable,
+            Boolean loadProfileProperty,
+            Boolean loadMojangSkin
+    ) implements EnableSetting {
     }
 
     @With
