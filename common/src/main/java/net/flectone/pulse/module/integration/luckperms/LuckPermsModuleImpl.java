@@ -29,7 +29,8 @@ public class LuckPermsModuleImpl implements LuckPermsModule {
     @Override
     public void onEnable() {
         if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
-                || platformServerAdapter.getPlatformType() == PlatformType.NEOFORGE) {
+                || platformServerAdapter.getPlatformType() == PlatformType.NEOFORGE
+                || platformServerAdapter.getPlatformType() == PlatformType.SPONGE) {
             // delay for init
             luckPermsIntegration.get().hookLater();
         } else {

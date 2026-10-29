@@ -1,0 +1,52 @@
+{
+  "loader": {
+    "name": "java_plain",
+    "version": "1.0"
+  },
+  "license": "GPL-3.0",
+  "plugins": [
+    {
+      "id": "flectonepulse",
+      "entrypoint": "net.flectone.pulse.SpongeFlectonePulseLoader",
+      "name": "FlectonePulse",
+      "description": "${description}",
+      "version": "${version}",
+      "links": {
+        "homepage": "https://flectone.net/pulse/",
+        "source": "https://github.com/Flectone/FlectonePulse",
+        "issues": "https://github.com/Flectone/FlectonePulse/issues"
+      },
+      "contributors": [
+        {
+          "name": "${author}"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "spongeapi",
+          "version": "17.0.0",
+          "load-order": "after",
+          "optional": false
+        },
+        {
+          "id": "luckperms",
+          "version": "*",
+          "load-order": "after",
+          "optional": true
+        },
+        {
+          "id": "skinsrestorer",
+          "version": "*",
+          "load-order": "after",
+          "optional": true
+        },
+        {
+          "id": "geyser",
+          "version": "*",
+          "load-order": "after",
+          "optional": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+plugins {
+    id "net.neoforged.moddev" version "${neoforge_moddev_version}"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(java_version)
+    }
+}
+
+neoForge {
+    neoFormVersion = "${neoform_version}"
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        force "org.jspecify:jspecify:1.0.1"
+    }
+}
+
+configurations {
+    shadow
+    implementation.extendsFrom shadow
+}
+
+dependencies {
+    components {
+        withModule("org.apache.commons:commons-text") {
+            allVariants {
+                withDependencies {
+                    removeAll { it.name == "commons-lang3" }
+                }
+            }
+        }
+        withModule("net.neoforged:minecraft-dependencies") {
+            allVariants {
+                withDependencies {
+                    removeAll { it.group == "com.fasterxml.jackson.core" }
+                }
+            }
+        }
+    }
+
+    shadow project(":common")
+    shadow project(":minecraft-common")
+
+    compileOnly project(":api")
+    compileOnly project(":minecraft-sponge:loader")
+
+    compileOnly libraries.platform
+    compileOnly libraries.adventure
+
+    compileOnly "org.incendo:cloud-brigadier:${cloud_paper_version}"
+
+    compileOnly "org.spongepowered:spongeapi:${spongeapi_version}"
+
+    compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
+    compileOnly "net.flectone:packeteventsmodern-netty-common:$packeteventsmodern_version"
+    compileOnly "net.flectone:packeteventsmodern-sponge:$packeteventsmodern_version"
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+}
+
+tasks.register("jarInJarContent", Jar) {
+    archiveFileName = "flectonepulse-sponge.jarinjar"
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from { zipTree(project(":minecraft-sponge").tasks.named("shadeDowngradedApi").get().archiveFile) }
+
+    dependsOn(":minecraft-sponge:shadeDowngradedApi")
+}
+
+tasks.named("buildFinalJar", Jar) {
+    archiveFileName = "FlectonePulse-Sponge-" + project_version + ".jar"
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from { zipTree(project(":minecraft-sponge:loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
+
+    dependsOn(":minecraft-sponge:loader:shadeDowngradedApi")
+}

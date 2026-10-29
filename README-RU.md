@@ -73,6 +73,7 @@ FlectonePulse стал темой **университетской диплом�
 | **Velocity**                                 | Последняя               |
 | **Hytale**                                   | Последняя версия Hytale |
 | **NeoForge**                                 | 1.21.1 – Последняя      |
+| **Sponge**                                   | 1.21.10 – Последня      |
 
 Paper 1.16.5 и 1.17.x отказываются запускаться на новой Java и пишут `Unsupported Java detected (...). Only up to Java 16 is supported`. Чтобы пропустить эту проверку, добавь флаг `-DPaper.IgnoreJavaVersion=true`
 

@@ -73,6 +73,7 @@ Java 21 or higher is **required** on every platform. Older Minecraft versions, s
 | **Velocity**                                 | Latest                |
 | **Hytale**                                   | Latest Hytale version |
 | **NeoForge**                                 | 1.21.1 – Latest       |
+| **Sponge**                                   | 1.21.10 – Latest      |
 
 Paper 1.16.5 and 1.17.x refuse to start on newer Java and print `Unsupported Java detected (...). Only up to Java 16 is supported`. To skip this check, add the `-DPaper.IgnoreJavaVersion=true` flag
 

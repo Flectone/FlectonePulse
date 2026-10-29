@@ -150,6 +150,12 @@ subprojects {
             }
         }
         maven {
+            url = "https://repo.spongepowered.org/repository/maven-public/"
+            content {
+                includeGroupAndSubgroups "org.spongepowered"
+            }
+        }
+        maven {
             url = "https://repo.inventivetalent.org/repository/public/"
             content {
                 includeGroup "org.mineskin"

@@ -25,7 +25,8 @@ public class MinecraftGeyserModule implements ModuleSimple {
     @Override
     public void onEnable() {
         if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
-                || platformServerAdapter.getPlatformType() == PlatformType.NEOFORGE) {
+                || platformServerAdapter.getPlatformType() == PlatformType.NEOFORGE
+                || platformServerAdapter.getPlatformType() == PlatformType.SPONGE) {
             // delay for init
             geyserIntegration.hookLater();
         } else {

@@ -1,0 +1,402 @@
+package net.flectone.pulse.platform.adapter;
+
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.potion.PotionType;
+import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.SpongeFlectonePulse;
+import net.flectone.pulse.constant.ModuleName;
+import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.value.PlayTime;
+import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
+import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.service.NearbyService;
+import net.flectone.pulse.util.LazyInstance;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.GameType;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class SpongePlayerAdapter implements PlatformPlayerAdapter {
+
+    private final FileFacade fileFacade;
+    private final SpongeFlectonePulse spongeFlectonePulse;
+    private final MinecraftPacketSender packetSender;
+    private final MinecraftPacketProvider packetProvider;
+    private final MessagePipeline messagePipeline;
+    private final FLogger fLogger;
+    private final LazyInstance<MinecraftHeaderModule> headerModule;
+    private final LazyInstance<MinecraftFooterModule> footerModule;
+    private final LazyInstance<NearbyService> nearbyService;
+
+    @Override
+    public int getEntityId(@NonNull UUID uuid) {
+        MinecraftServer minecraftServer = spongeFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return 0;
+
+        for (ServerLevel world : minecraftServer.getAllLevels()) {
+            Entity entity = world.getEntity(uuid);
+            if (entity != null) {
+                return entity.getId();
+            }
+        }
+
+        return 0;
+    }
+
+    @Override
+    public @Nullable UUID getPlayerByEntityId(int entityId) {
+        MinecraftServer minecraftServer = spongeFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return null;
+
+        return minecraftServer.getPlayerList().getPlayers()
+                .stream()
+                .filter(serverPlayerEntity -> serverPlayerEntity.getId() == entityId)
+                .findAny()
+                .map(Entity::getUUID)
+                .orElse(null);
+    }
+
+    @Override
+    public @Nullable UUID getUUID(@NonNull Object platformPlayer) {
+        return switch (platformPlayer) {
+            case ServerPlayer player -> player.getUUID();
+            case CommandSourceStack commandSource -> {
+                ServerPlayer player = commandSource.getPlayer();
+                yield player == null ? null : player.getUUID();
+            }
+            default -> null;
+        };
+    }
+
+    @Override
+    public @Nullable Class<?> getPlayerClass() {
+        return ServerPlayer.class;
+    }
+
+    @Override
+    public @Nullable Object convertToPlatformPlayer(@NonNull UUID uuid) {
+        return getPlayer(uuid);
+    }
+
+    @Override
+    public @NonNull String getName(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return "";
+
+        return player.getName().getString();
+    }
+
+    @Override
+    public @NonNull String getName(@NonNull Object platformPlayer) {
+        return switch (platformPlayer) {
+            case ServerPlayer player -> player.getName().getString();
+            case CommandSourceStack commandSource -> commandSource.getTextName();
+            default -> "";
+        };
+    }
+
+    @Override
+    public int getPing(FPlayer fPlayer) {
+        Object platformPlayer = convertToPlatformPlayer(fPlayer);
+        if (platformPlayer == null) return 0;
+
+        try {
+            return packetProvider.getPing(platformPlayer);
+        } catch (Exception e) {
+            fLogger.warning(e);
+            return 0;
+        }
+    }
+
+    @Override
+    public @NonNull String getWorldName(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return "";
+
+        return getSpongePlayer(player).world().key().value();
+    }
+
+    @Override
+    public @NonNull String getWorldEnvironment(@NonNull UUID uuid) {
+        return getWorldName(uuid);
+    }
+
+    @Override
+    public @NonNull String getLocale(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+
+        return player.clientInformation().language();
+    }
+
+    @Override
+    public @Nullable String getIp(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player != null) {
+            return player.getIpAddress();
+        }
+
+        return packetProvider.getHostAddress(uuid);
+    }
+
+    @Override
+    public @NonNull String getEntityTranslationKey(@Nullable Object platformPlayer) {
+        if (platformPlayer instanceof Entity entity) {
+            return entity.getType().getDescriptionId();
+        }
+
+        return "";
+    }
+
+    @Override
+    public PlayerHeadObjectContents.@Nullable ProfileProperty getTexture(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return null;
+
+        GameProfile profile = player.getGameProfile();
+        PropertyMap properties = profile.properties();
+
+        Collection<Property> textures = properties.get("textures");
+        if (textures.isEmpty()) return null;
+
+        Property textureProperty = textures.iterator().next();
+
+        return PlayerHeadObjectContents.property(
+                "textures",
+                textureProperty.value()
+        );
+    }
+
+    @Override
+    public @NonNull String getGamemode(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return GameMode.SURVIVAL.name();
+
+        GameType gameType = player.gameMode.getGameModeForPlayer();
+        if (gameType == null) return GameMode.SURVIVAL.name();
+
+        return GameMode.getById(gameType.getId()).name();
+    }
+
+    @Override
+    public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
+        MinecraftHeaderModule headerModuleInstance = headerModule.get();
+
+        if (!headerModuleInstance.isDisabledFor(fPlayer)) {
+            String header = headerModuleInstance.getCurrentMessage(fPlayer);
+            if (header != null) {
+                return messagePipeline.build(MessageContext.builder()
+                        .module(ModuleName.MESSAGE_TAB_HEADER)
+                        .sender(fPlayer)
+                        .message(header)
+                        .build()
+                );
+            }
+        }
+
+        return Component.empty();
+    }
+
+    @Override
+    public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
+        MinecraftFooterModule footerModuleInstance = footerModule.get();
+
+        if (!footerModuleInstance.isDisabledFor(fPlayer)) {
+            String footer = footerModuleInstance.getCurrentMessage(fPlayer);
+            if (footer != null) {
+                return messagePipeline.build(MessageContext.builder()
+                        .module(ModuleName.MESSAGE_TAB_FOOTER)
+                        .sender(fPlayer)
+                        .message(footer)
+                        .build()
+                );
+            }
+        }
+
+        return Component.empty();
+    }
+
+    @Override
+    public @Nullable Statistics getStatistics(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return null;
+
+        return new Statistics(
+                Math.round(player.getHealth() * 10.0),
+                player.getArmorValue(),
+                player.experienceLevel,
+                player.getFoodData().getFoodLevel(),
+                player.getMainHandItem().getDamageValue()
+        );
+    }
+
+    @Override
+    public @Nullable Coordinates getCoordinates(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return null;
+
+        return new Coordinates(player.getBlockX(), player.getBlockY(), player.getBlockZ(), player.getYRot(), player.getXRot());
+    }
+
+    @Override
+    public double distance(@NonNull UUID first, @NonNull UUID second) {
+        if (first.equals(second)) return 0.0;
+
+        ServerPlayer firstPlayer = getPlayer(first);
+        if (firstPlayer == null) return -1.0;
+
+        ServerPlayer secondPlayer = getPlayer(second);
+        if (secondPlayer == null) return -1.0;
+        if (!firstPlayer.level().equals(secondPlayer.level())) return -1.0;
+
+        return firstPlayer.distanceTo(secondPlayer);
+    }
+
+    @Override
+    public boolean isConsole(@NonNull Object platformPlayer) {
+        return platformPlayer instanceof CommandSourceStack source && source.getPlayer() == null;
+    }
+
+    @Override
+    public boolean isOperator(@NonNull UUID uuid) {
+        MinecraftServer minecraftServer = spongeFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return false;
+
+        return minecraftServer.getPlayerList().isOp(new NameAndId(uuid, getName(uuid)));
+    }
+
+    @Override
+    public boolean isSneaking(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return false;
+
+        return player.isCrouching();
+    }
+
+    @Override
+    public boolean isDead(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return false;
+
+        return !player.isAlive();
+    }
+
+    @Override
+    public boolean hasPlayedBefore(@NonNull UUID uuid) {
+        return true;
+    }
+
+    @Override
+    public boolean hasPotionEffect(@NonNull UUID uuid, @NonNull String potionType) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return false;
+
+        PotionType potion = PotionTypes.getByName(potionType);
+        if (potion == null) return false;
+
+        ClientVersion clientVersion = packetProvider.getServerVersion().toClientVersion();
+        MobEffect effect = BuiltInRegistries.MOB_EFFECT.byId(potion.getId(clientVersion));
+        if (effect == null) return false;
+
+        MobEffectInstance effectInstance = player.getEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect));
+        return effectInstance != null && effectInstance.getDuration() > 0;
+    }
+
+    @Override
+    public boolean isOnline(@NonNull UUID uuid) {
+        return getPlayer(uuid) != null;
+    }
+
+    @Override
+    public void updateInventory(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return;
+
+        player.inventoryMenu.broadcastChanges();
+    }
+
+    @Override
+    public @Nullable Object getItem(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return null;
+
+        return player.getMainHandItem();
+    }
+
+    @Override
+    public @NonNull List<UUID> getOnlinePlayers() {
+        MinecraftServer minecraftServer = spongeFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return List.of();
+
+        return minecraftServer.getPlayerList().getPlayers()
+                .stream()
+                .map(Entity::getUUID)
+                .toList();
+    }
+
+    @Override
+    public @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull UUID uuid, double x, double y, double z) {
+        return nearbyService.get().getNearbyPlayers(uuid, Math.max(x, z));
+    }
+
+    @Override
+    public @NonNull List<Integer> getPassengers(UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return List.of();
+
+        return player.getPassengers()
+                .stream()
+                .map(Entity::getId)
+                .toList();
+    }
+
+    @Override
+    public @Nullable PlayTime getPlayedTime(FPlayer fPlayer) {
+        return null;
+    }
+
+    @Override
+    public void kick(FPlayer fPlayer, Component reason) {
+        packetSender.send(fPlayer, new WrapperPlayServerDisconnect(reason));
+    }
+
+    @Nullable
+    public ServerPlayer getPlayer(UUID uuid) {
+        MinecraftServer minecraftServer = spongeFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return null;
+
+        return minecraftServer.getPlayerList().getPlayer(uuid);
+    }
+
+    public org.spongepowered.api.entity.living.player.server.@NonNull ServerPlayer getSpongePlayer(@NonNull ServerPlayer player) {
+        return (org.spongepowered.api.entity.living.player.server.ServerPlayer) (Object) player;
+    }
+}

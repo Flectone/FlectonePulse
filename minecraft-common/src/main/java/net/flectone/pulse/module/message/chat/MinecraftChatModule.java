@@ -58,7 +58,8 @@ public class MinecraftChatModule extends ChatModuleImpl {
 
         if (config().mode() == Message.Chat.Mode.PACKET
                 || platformServerAdapter.getPlatformType() == PlatformType.FABRIC
-                || platformServerAdapter.getPlatformType() == PlatformType.NEOFORGE) {
+                || platformServerAdapter.getPlatformType() == PlatformType.NEOFORGE
+                || platformServerAdapter.getPlatformType() == PlatformType.SPONGE) {
             listenerRegistry.register(MinecraftPacketChatListener.class);
         }
     }
