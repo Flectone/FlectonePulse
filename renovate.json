@@ -6,32 +6,40 @@
   "commitMessagePrefix": "chore(deps): ",
   "packageRules": [
     {
-      "matchDatasources": ["maven"],
-      "registryUrls": [
-        "https://jitpack.io",
-        "https://hub.spigotmc.org/nexus/content/repositories/snapshots/",
-        "https://oss.sonatype.org/content/groups/public/",
-        "https://repo.aikar.co/content/groups/aikar/",
-        "https://repo.codemc.io/repository/maven-releases/",
-        "https://repo.minebench.de",
-        "https://repo.alessiodp.com/snapshots",
-        "https://libraries.minecraft.net",
-        "https://maven.maxhenkel.de/repository/public",
-        "https://repo.extendedclip.com/content/repositories/placeholderapi/",
-        "https://repo.plasmoverse.com/releases",
-        "https://repo.plasmoverse.com/snapshots",
-        "https://repo.loohpjames.com/repository",
-        "https://repo.diogotc.com/releases",
-        "https://repo.codemc.io/repository/maven-snapshots/",
-        "https://maven.devs.beer/",
-        "https://maven.nucleoid.xyz/",
-        "https://api.modrinth.com/maven",
-        "https://maven.fabricmc.net/",
-        "https://repo1.maven.org/maven2/",
-        "https://maven.wagyourtail.xyz/releases",
-        "https://mvn-repo.arim.space/affero-gpl3/",
-        "https://mvn-repo.arim.space/lesser-gpl3/"
-      ]
+      "matchPackageNames": ["net.fabricmc:fabric-loader"],
+      "registryUrls": ["https://maven.fabricmc.net/"]
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "matchPackageNames": ["eu.pb4:placeholder-api", "maven.modrinth:vanish"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-(?<prerelease>[^+]+))?\\+(?<compatibility>.+)$"
+    },
+    {
+      "matchFileNames": [
+        "minecraft-fabric/intermediary/**",
+        "minecraft-fabric/official/*/gradle.properties",
+        "minecraft-neoforge/gradle.properties",
+        "minecraft-neoforge/*/gradle.properties"
+      ],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["io.papermc.paper:paper-api", "org.spigotmc:spigot-api", "io.github.llamalad7:mixinextras-fabric"],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": [
+        "com.loohp:InteractiveChat",
+        "dev.lone:api-itemsadder",
+        "com.mojang:authlib",
+        "com.gitlab.ruany:LiteBansAPI",
+        "curse.maven:hyui-1431415"
+      ],
+      "enabled": false
     }
   ]
 }
