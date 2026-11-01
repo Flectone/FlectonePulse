@@ -2,6 +2,7 @@ package net.flectone.pulse.model.value;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.With;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.function.Function;
  * @param toast the toast settings, used by {@link Type#TOAST}
  * @author TheFaser
  */
+@With
 public record Destination(
         Type type,
         String subtext,
