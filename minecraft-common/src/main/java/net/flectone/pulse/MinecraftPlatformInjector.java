@@ -63,7 +63,10 @@ import net.flectone.pulse.resolver.ProfileResolver;
 import net.flectone.pulse.resolver.ReflectionResolver;
 import net.flectone.pulse.serializer.ComponentSerializer;
 import net.flectone.pulse.serializer.MinecraftComponentSerializer;
-import net.flectone.pulse.service.*;
+import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.service.MinecraftTranslationService;
+import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.service.TranslationService;
 
 import java.nio.file.Path;
 

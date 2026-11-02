@@ -3,7 +3,10 @@ package net.flectone.pulse.module.command.poll.model;
 import lombok.Getter;
 import net.flectone.pulse.model.entity.FEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

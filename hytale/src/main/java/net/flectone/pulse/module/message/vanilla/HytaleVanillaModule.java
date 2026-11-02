@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.protocol.packets.interface_.ServerMessage;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.dispatcher.MessageDispatcher;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;

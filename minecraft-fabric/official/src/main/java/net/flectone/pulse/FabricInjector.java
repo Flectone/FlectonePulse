@@ -3,7 +3,6 @@ package net.flectone.pulse;
 import com.google.inject.Singleton;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.checker.FabricPermissionChecker;
-import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.checker.PermissionCheckerImpl;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;

@@ -2,15 +2,14 @@ package net.flectone.pulse.module.message.bubble;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.message.bubble.listener.MinecraftPacketBubbleListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.render.HeadTextRender;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SocialService;
 
 @Singleton

@@ -10,7 +10,10 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.platform.render.HeadTextRender;
-import net.flectone.pulse.service.*;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

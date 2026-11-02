@@ -29,12 +29,7 @@ import org.spongepowered.plugin.PluginContainer;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SpongeRegistrationHandler extends PlatformRegistrationHandler<CommandSourceStack> {

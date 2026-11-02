@@ -2,11 +2,11 @@ package net.flectone.pulse.module.integration;
 
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.constant.ModuleName;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.Nullable;
 

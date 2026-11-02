@@ -1,10 +1,10 @@
 package net.flectone.pulse.model.event.message;
 
 import lombok.With;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.constant.ModuleName;
 import net.kyori.adventure.text.Component;
 
 /**

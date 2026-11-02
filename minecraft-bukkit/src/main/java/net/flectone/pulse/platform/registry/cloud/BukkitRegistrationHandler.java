@@ -17,11 +17,7 @@ import org.incendo.cloud.suggestion.Suggestions;
 import org.incendo.cloud.util.StringUtils;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitRegistrationHandler extends PlatformRegistrationHandler<CommandSender> {
