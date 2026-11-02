@@ -1,105 +1,74 @@
 package net.flectone.pulse.module.message.sidebar;
 
-import au.ellie.hyui.builders.*;
-import au.ellie.hyui.elements.LayoutModeSupported;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.render.HytaleHudService;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.HytaleMessageUtil;
 import net.flectone.pulse.util.random.RandomGenerator;
 import net.kyori.adventure.text.Component;
+import org.jspecify.annotations.Nullable;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class HytaleSidebarModule extends SidebarModuleImpl {
 
-    private final Map<UUID, HyUIHud> playerSidebars = new ConcurrentHashMap<>();
-
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
-    private final HytaleMessageUtil hytaleMessageUtil;
     private final ModuleController moduleController;
-    private final ComponentSerializer componentSerializer;
+    private final HytaleHudService hudService;
 
     @Inject
     public HytaleSidebarModule(FileFacade fileFacade,
                                TaskScheduler taskScheduler,
                                ListenerRegistry listenerRegistry,
                                FPlayerService fPlayerService,
-                               PlatformPlayerAdapter platformPlayerAdapter,
                                PermissionChecker permissionChecker,
                                MessagePipeline messagePipeline,
-                               HytaleMessageUtil hytaleMessageUtil,
                                ModuleController moduleController,
                                RandomGenerator randomUtil,
-                               ComponentSerializer componentSerializer,
                                SocialService socialService,
-                               ConditionModule conditionModule) {
+                               ConditionModule conditionModule,
+                               HytaleHudService hudService) {
         super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil, socialService, conditionModule);
 
-        this.platformPlayerAdapter = platformPlayerAdapter;
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
-        this.hytaleMessageUtil = hytaleMessageUtil;
         this.moduleController = moduleController;
-        this.componentSerializer = componentSerializer;
+        this.hudService = hudService;
     }
 
     @Override
     public void remove(FPlayer fPlayer) {
-        HyUIHud hyUIHud = playerSidebars.get(fPlayer.uuid());
-        if (hyUIHud != null) {
-            hyUIHud.remove();
-
-            playerSidebars.remove(fPlayer.uuid());
-        }
+        hudService.removeSidebar(fPlayer);
     }
 
     @Override
     public void update(FPlayer fPlayer) {
-        if (!playerSidebars.containsKey(fPlayer.uuid())) {
-            create(fPlayer);
+        if (!permissionChecker.check(fPlayer, permission()) || moduleController.isDisabledFor(this, fPlayer)) {
+            remove(fPlayer);
+            return;
         }
 
-        HyUIHud hyUIHud = playerSidebars.get(fPlayer.uuid());
-        if (hyUIHud == null) return;
-        if (!(platformPlayerAdapter.convertToPlatformPlayer(fPlayer) instanceof PlayerRef playerRef)) return;
+        List<Component> lines = createLines(fPlayer);
+        if (lines == null) return;
 
-        Ref<EntityStore> refStore = playerRef.getReference();
-        if (refStore == null) return;
-
-        HudBuilder hudBuilder = createHudBuilder(fPlayer, playerRef);
-        if (hudBuilder == null) return;
-
-        refStore.getStore().getExternalData().getWorld().execute(() -> hyUIHud.update(hudBuilder));
+        hudService.updateSidebar(fPlayer, lines, config());
     }
 
     @Override
     public void create(FPlayer fPlayer) {
-        if (!(platformPlayerAdapter.convertToPlatformPlayer(fPlayer) instanceof PlayerRef playerRef)) return;
-
-        remove(fPlayer);
-
         if (!permissionChecker.check(fPlayer, permission())) {
             remove(fPlayer);
             return;
@@ -107,58 +76,34 @@ public class HytaleSidebarModule extends SidebarModuleImpl {
 
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        Ref<EntityStore> refStore = playerRef.getReference();
-        if (refStore == null) return;
+        List<Component> lines = createLines(fPlayer);
+        if (lines == null) {
+            remove(fPlayer);
+            return;
+        }
 
-        HudBuilder hudBuilder = createHudBuilder(fPlayer, playerRef);
-        if (hudBuilder == null) return;
-
-        refStore.getStore().getExternalData().getWorld().execute(() -> playerSidebars.put(fPlayer.uuid(), hudBuilder.show()));
+        hudService.updateSidebar(fPlayer, lines, config());
     }
 
-    private HudBuilder createHudBuilder(FPlayer fPlayer, PlayerRef playerRef) {
+    private @Nullable List<Component> createLines(FPlayer fPlayer) {
         String format = getNextFormat(fPlayer);
         if (format == null) return null;
 
         String[] lines = format.split("<br>");
         if (lines.length == 0) return null;
 
-        String objectiveName = getObjectiveName(fPlayer);
+        List<Component> components = new ArrayList<>(lines.length);
 
-        GroupBuilder lineBuilder = GroupBuilder.group()
-                .withId(objectiveName)
-                .withLayoutMode(LayoutModeSupported.LayoutMode.Top);
-
-        for (int i = 0; i < lines.length; i++) {
-            String lineId = getLineId(i, fPlayer);
-            Component line = messagePipeline.build(MessageContext.builder()
+        for (String line : lines) {
+            components.add(messagePipeline.build(MessageContext.builder()
                     .module(this.name())
                     .sender(fPlayer)
-                    .message(lines[i])
+                    .message(line)
                     .build()
-            );
-
-            lineBuilder.addChild(LabelBuilder.label()
-                    .withId(lineId)
-                    .withText(componentSerializer.toPlain(line))
-                    .withStyle(new HyUIStyle().setTextColor(hytaleMessageUtil.findFirstColor(line)))
-                    .withPadding(new HyUIPadding(config().labelLeft(), config().labelTop(), 0, 0))
-            );
+            ));
         }
 
-        return HudBuilder.hudForPlayer(playerRef)
-                .addElement(GroupBuilder.group()
-                        .withBackground(new HyUIPatchStyle()
-                                .setColor(config().background())
-                        )
-                        .withAnchor(new HyUIAnchor()
-                                .setWidth(config().width())
-                                .setHeight(config().height())
-                                .setTop(config().top())
-                                .setRight(config().right())
-                        )
-                        .addChild(lineBuilder)
-                );
+        return components;
     }
 
 }

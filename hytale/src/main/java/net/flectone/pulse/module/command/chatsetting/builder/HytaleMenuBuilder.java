@@ -1,15 +1,11 @@
 package net.flectone.pulse.module.command.chatsetting.builder;
 
-import au.ellie.hyui.builders.*;
-import au.ellie.hyui.elements.LayoutModeSupported;
-import au.ellie.hyui.events.UIContext;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
-import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +26,10 @@ import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -51,24 +47,18 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
     @Override
     public void open(FPlayer fPlayer, UUID fTargetUUID) {
-        Object platformPlayer = platformPlayerAdapter.convertToPlatformPlayer(fPlayer);
-        if (!(platformPlayer instanceof PlayerRef playerRef)) return;
+        PlayerRef playerRef = playerRef(fPlayer);
+        if (playerRef == null) return;
 
         Ref<EntityStore> refStore = playerRef.getReference();
         if (refStore == null) return;
 
-        UUID worldUUID = playerRef.getWorldUuid();
-        if (worldUUID == null) return;
-
-        Universe universe = Universe.get();
-        if (universe == null) return;
-
-        World world = universe.getWorld(worldUUID);
+        World world = refStore.getStore().getExternalData().getWorld();
         if (world == null) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
-
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
+
         Component header = messagePipeline.build(MessageContext.builder()
                 .module(chatsettingModule.name())
                 .sender(fPlayer)
@@ -77,145 +67,25 @@ public class HytaleMenuBuilder implements MenuBuilder {
                 .build()
         );
 
-        GridGroup gridGroup = new GridGroup(config().columns());
+        List<MenuButton> buttons = new ArrayList<>();
 
-        gridGroup = createDialogChatMenu(fPlayer, fTarget, gridGroup, localization);
-        gridGroup = createDialogFColorMenu(fPlayer, fTarget, FColor.Type.SEE, gridGroup, chatsettingModule.config().menu().see(), localization.menu().see());
-        gridGroup = createDialogFColorMenu(fPlayer, fTarget, FColor.Type.OUT, gridGroup, chatsettingModule.config().menu().out(), localization.menu().out());
+        MenuButton chatButton = createChatMenu(fPlayer, fTarget, localization);
+        if (chatButton != null) buttons.add(chatButton);
+
+        MenuButton seeButton = createFColorMenu(fPlayer, fTarget, FColor.Type.SEE, chatsettingModule.config().menu().see(), localization.menu().see());
+        if (seeButton != null) buttons.add(seeButton);
+
+        MenuButton outButton = createFColorMenu(fPlayer, fTarget, FColor.Type.OUT, chatsettingModule.config().menu().out(), localization.menu().out());
+        if (outButton != null) buttons.add(outButton);
 
         for (String setting : chatsettingModule.config().checkbox().types().keySet()) {
-            gridGroup = createDialogCheckbox(fPlayer, fTarget, gridGroup, setting);
+            MenuButton checkboxButton = createCheckbox(fPlayer, fTarget, setting);
+            if (checkboxButton == null) continue;
+
+            buttons.add(checkboxButton);
         }
 
-        PageBuilder pageBuilder = createPage(playerRef, header, gridGroup);
-
-        world.execute(() -> pageBuilder.open(refStore.getStore()));
-    }
-
-    private GridGroup createDialogCheckbox(FPlayer fPlayer, FPlayer fTarget, GridGroup gridGroup, String messageType) {
-        Command.Chatsetting.Checkbox checkbox = chatsettingModule.config().checkbox();
-
-        int slot = checkbox.types().get(messageType);
-        if (slot == -1) return gridGroup;
-
-        boolean enabled = socialService.isSetting(fTarget, messageType);
-
-        Component componentTitle = messagePipeline.build(MessageContext.builder()
-                .module(chatsettingModule.name())
-                .sender(fPlayer)
-                .receiver(fTarget)
-                .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled))
-                .build()
-        );
-
-        Component componentLore = messagePipeline.build(MessageContext.builder()
-                .module(chatsettingModule.name())
-                .sender(fPlayer)
-                .receiver(fTarget)
-                .message(chatsettingModule.getCheckboxLore(fPlayer, enabled))
-                .build()
-        );
-
-        String id = "fp_" + UUID.randomUUID();
-
-        return gridGroup.append(createButton(id, componentTitle, componentLore, (_, uiContext) -> {
-            ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
-            if (status == ChatsettingHandler.Status.DENIED) return;
-
-            boolean currentEnabled = status.toBoolean();
-
-            Component componentInvertTitle = messagePipeline.build(MessageContext.builder()
-                    .module(chatsettingModule.name())
-                    .sender(fPlayer)
-                    .receiver(fTarget)
-                    .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled))
-                    .build()
-            );
-
-            Component componentInvertLore = messagePipeline.build(MessageContext.builder()
-                    .module(chatsettingModule.name())
-                    .sender(fPlayer)
-                    .receiver(fTarget)
-                    .message(chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled))
-                    .build()
-            );
-
-            uiContext.getById(id, ButtonBuilder.class).ifPresent(buttonBuilder -> buttonBuilder
-                    .withText(componentSerializer.toPlain(componentInvertTitle))
-                    .withTooltipTextSpan(componentSerializer.toHytale(componentInvertLore))
-            );
-
-            uiContext.updatePage(true);
-        }));
-    }
-
-    private GridGroup createDialogChatMenu(FPlayer fPlayer,
-                                           FPlayer fTarget,
-                                           GridGroup gridGroup,
-                                           Localization.Command.Chatsetting localization) {
-        Command.Chatsetting.Menu.Chat chat = chatsettingModule.config().menu().chat();
-
-        int slot = chat.slot();
-        if (slot == -1) return gridGroup;
-
-        String currentChat = chatsettingModule.getPlayerChat(fTarget);
-
-        String[] messages = Strings.CS.replace(
-                localization.menu().chat().item(),
-                "<chat>", localization.menu().chat().types().getOrDefault(currentChat, currentChat)
-        ).split("<br>");
-
-        Component componentTitle = messagePipeline.build(MessageContext.builder()
-                .module(chatsettingModule.name())
-                .sender(fTarget)
-                .message(messages.length > 0 ? messages[0] : "")
-                .build()
-        );
-
-        Component componentLore = messagePipeline.build(MessageContext.builder()
-                .module(chatsettingModule.name())
-                .sender(fTarget)
-                .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
-                .build()
-        );
-
-        String id = "fp_chat";
-
-        return gridGroup.append(createButton(id, componentTitle, componentLore, (_, _) ->
-                chatsettingHandler.handleChatMenu(fPlayer, fTarget, chat, localization, this, id)
-        ));
-    }
-
-    private GridGroup createDialogFColorMenu(FPlayer fPlayer,
-                                             FPlayer fTarget,
-                                             FColor.Type type,
-                                             GridGroup gridGroup,
-                                             Command.Chatsetting.Menu.Color color,
-                                             Localization.Command.Chatsetting.Menu.SubMenu subMenu) {
-        int slot = color.slot();
-        if (slot == -1) return gridGroup;
-
-        String[] messages = subMenu.item().split("<br>");
-
-        Component componentTitle = messagePipeline.build(MessageContext.builder()
-                .module(chatsettingModule.name())
-                .sender(fTarget)
-                .message(messages.length > 0 ? messages[0] : "")
-                .build()
-        );
-
-        Component componentLore = messagePipeline.build(MessageContext.builder()
-                .module(chatsettingModule.name())
-                .sender(fTarget)
-                .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
-                .build()
-        );
-
-        String id = "fp_fcolor_" + type.ordinal();
-
-        return gridGroup.append(createButton(id, componentTitle, componentLore, (_, _) ->
-                chatsettingHandler.handleFColorMenu(fPlayer, fTarget, type, color, subMenu, this, id)
-        ));
+        world.execute(() -> openPage(playerRef, refStore, header, buttons));
     }
 
     @Override
@@ -227,125 +97,160 @@ public class HytaleMenuBuilder implements MenuBuilder {
                             Function<SubMenuItem, String> getItemMessage,
                             Consumer<SubMenuItem> onSelect,
                             String id) {
-        Object platformPlayer = platformPlayerAdapter.convertToPlatformPlayer(fPlayer);
-        if (!(platformPlayer instanceof PlayerRef playerRef)) return;
+        PlayerRef playerRef = playerRef(fPlayer);
+        if (playerRef == null) return;
 
         Ref<EntityStore> refStore = playerRef.getReference();
         if (refStore == null) return;
 
-        UUID worldUUID = playerRef.getWorldUuid();
-        if (worldUUID == null) return;
-
-        Universe universe = Universe.get();
-        if (universe == null) return;
-
-        World world = universe.getWorld(worldUUID);
+        World world = refStore.getStore().getExternalData().getWorld();
         if (world == null) return;
 
-        GridGroup gridGroup = new GridGroup(config().columns());
-
         FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
+        List<MenuButton> buttons = new ArrayList<>();
 
         for (int i = 0; i < items.size(); i++) {
             SubMenuItem item = items.get(i);
-            String message = getItemMessage.apply(item);
-            String[] messages = message.split("<br>");
+            String[] messages = getItemMessage.apply(item).split("<br>");
 
-            Component componentTitle = messagePipeline.build(MessageContext.builder()
-                    .module(chatsettingModule.name())
-                    .sender(fTarget)
-                    .message(messages.length > 0 ? messages[0] : "")
-                    .build()
-            );
-
-            Component componentLore = messagePipeline.build(MessageContext.builder()
-                    .module(chatsettingModule.name())
-                    .sender(fTarget)
-                    .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
-                    .build()
-            );
+            Component title = buildComponent(fTarget, messages.length > 0 ? messages[0] : "");
+            Component lore = buildComponent(fTarget, messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "");
 
             String subId = id + "_" + i;
 
-            gridGroup = gridGroup.append(createButton(subId, componentTitle, componentLore, (_, _) ->
+            buttons.add(new MenuButton(subId, title, lore, _ ->
                     chatsettingHandler.handleSubMenu(fPlayer, item, () -> {
                         onSelect.accept(item);
                         closeConsumer.run();
                         open(fPlayer, fTargetUUID);
-                    })));
+                    })
+            ));
         }
 
-        PageBuilder pageBuilder = createPage(playerRef, header, gridGroup);
-
-        world.execute(() -> pageBuilder.open(refStore.getStore()));
+        world.execute(() -> openPage(playerRef, refStore, header, buttons));
     }
 
-    private ButtonBuilder createButton(String id, Component componentTitle, Component componentLore, BiConsumer<Void, UIContext> callback) {
-        return ButtonBuilder.textButton()
-                .withId(id)
-                .withText(componentSerializer.toPlain(componentTitle))
-                .withTooltipTextSpan(componentSerializer.toHytale(componentLore))
-                .withAnchor(new HyUIAnchor()
-                        .setWidth(config().buttonWidth())
-                        .setHeight(config().buttonHeight())
-                )
-                .withPadding(new HyUIPadding().setFull(config().buttonPadding()))
-                .addEventListener(CustomUIEventBindingType.Activating, callback);
+    private @Nullable MenuButton createCheckbox(FPlayer fPlayer, FPlayer fTarget, String messageType) {
+        Command.Chatsetting.Checkbox checkbox = chatsettingModule.config().checkbox();
+
+        int slot = checkbox.types().get(messageType);
+        if (slot == -1) return null;
+
+        boolean enabled = socialService.isSetting(fTarget, messageType);
+
+        Component title = buildCheckboxTitle(fPlayer, fTarget, messageType, enabled);
+        Component lore = buildCheckboxLore(fPlayer, fTarget, enabled);
+
+        String id = "fp_checkbox_" + messageType;
+
+        return new MenuButton(id, title, lore, page -> {
+            ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
+            if (status == ChatsettingHandler.Status.DENIED) return;
+
+            boolean currentEnabled = status.toBoolean();
+
+            page.updateButton(
+                    id,
+                    buildCheckboxTitle(fPlayer, fTarget, messageType, !currentEnabled),
+                    buildCheckboxLore(fPlayer, fTarget, !currentEnabled)
+            );
+        });
     }
 
-    private PageBuilder createPage(PlayerRef playerRef, Component title, GridGroup gridGroup) {
-        return PageBuilder.pageForPlayer(playerRef)
-                .withLifetime(CustomPageLifetime.CanDismissOrCloseThroughInteraction)
-                .addElement(PageOverlayBuilder.pageOverlay()
-                        .addChild(ContainerBuilder.container()
-                                .withTitleText(componentSerializer.toPlain(title))
-                                .withAnchor(new HyUIAnchor()
-                                        .setWidth(config().panelWidth())
-                                        .setHeight(config().panelHeight())
-                                )
-                                .addChild(gridGroup.buildMainGroup())
-                        )
-                );
+    private Component buildCheckboxTitle(FPlayer fPlayer, FPlayer fTarget, String messageType, boolean enabled) {
+        return messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled))
+                .build()
+        );
+    }
+
+    private Component buildCheckboxLore(FPlayer fPlayer, FPlayer fTarget, boolean enabled) {
+        return messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(chatsettingModule.getCheckboxLore(fPlayer, enabled))
+                .build()
+        );
+    }
+
+    private @Nullable MenuButton createChatMenu(FPlayer fPlayer,
+                                                FPlayer fTarget,
+                                                Localization.Command.Chatsetting localization) {
+        Command.Chatsetting.Menu.Chat chat = chatsettingModule.config().menu().chat();
+
+        int slot = chat.slot();
+        if (slot == -1) return null;
+
+        String currentChat = chatsettingModule.getPlayerChat(fTarget);
+
+        String[] messages = Strings.CS.replace(
+                localization.menu().chat().item(),
+                "<chat>", localization.menu().chat().types().getOrDefault(currentChat, currentChat)
+        ).split("<br>");
+
+        Component title = buildComponent(fTarget, messages.length > 0 ? messages[0] : "");
+        Component lore = buildComponent(fTarget, messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "");
+
+        String id = "fp_chat";
+
+        return new MenuButton(id, title, lore, _ ->
+                chatsettingHandler.handleChatMenu(fPlayer, fTarget, chat, localization, this, id)
+        );
+    }
+
+    private @Nullable MenuButton createFColorMenu(FPlayer fPlayer,
+                                                  FPlayer fTarget,
+                                                  FColor.Type type,
+                                                  Command.Chatsetting.Menu.Color color,
+                                                  Localization.Command.Chatsetting.Menu.SubMenu subMenu) {
+        int slot = color.slot();
+        if (slot == -1) return null;
+
+        String[] messages = subMenu.item().split("<br>");
+
+        Component title = buildComponent(fTarget, messages.length > 0 ? messages[0] : "");
+        Component lore = buildComponent(fTarget, messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "");
+
+        String id = "fp_fcolor_" + type.ordinal();
+
+        return new MenuButton(id, title, lore, _ ->
+                chatsettingHandler.handleFColorMenu(fPlayer, fTarget, type, color, subMenu, this, id)
+        );
+    }
+
+    private Component buildComponent(FPlayer sender, String message) {
+        return messagePipeline.build(MessageContext.builder()
+                .module(chatsettingModule.name())
+                .sender(sender)
+                .message(message)
+                .build()
+        );
+    }
+
+    private void openPage(PlayerRef playerRef, Ref<EntityStore> refStore, Component title, List<MenuButton> buttons) {
+        Store<EntityStore> store = refStore.getStore();
+        Player player = store.getComponent(refStore, Player.getComponentType());
+        if (player == null) return;
+
+        player.getPageManager().openCustomPage(refStore, store, new HytaleChatsettingPage(
+                playerRef,
+                title,
+                buttons,
+                componentSerializer,
+                config()
+        ));
+    }
+
+    private @Nullable PlayerRef playerRef(FPlayer fPlayer) {
+        return platformPlayerAdapter.convertToPlatformPlayer(fPlayer) instanceof PlayerRef playerRef ? playerRef : null;
     }
 
     private Command.Chatsetting.Modern config() {
         return chatsettingModule.config().modern();
     }
 
-    private record GridGroup(
-            int maxPerLine,
-            int currentLine,
-            GroupBuilder mainGroup,
-            GroupBuilder rowGroup
-    ) {
-
-        public GridGroup(int columns) {
-            this(columns, 0, GroupBuilder.group().withLayoutMode(LayoutModeSupported.LayoutMode.Top), GroupBuilder.group().withLayoutMode(LayoutModeSupported.LayoutMode.Center));
-        }
-
-        public GroupBuilder buildMainGroup() {
-            return mainGroup.addChild(rowGroup);
-        }
-
-        public GridGroup append(@Nullable UIElementBuilder<?> uiElementBuilder) {
-            GridGroup gridGroup = this;
-            if (uiElementBuilder == null) return gridGroup;
-            if (gridGroup.currentLine == gridGroup.maxPerLine) {
-                gridGroup = new GridGroup(
-                        gridGroup.maxPerLine,
-                        0,
-                        gridGroup.buildMainGroup(),
-                        GroupBuilder.group().withLayoutMode(LayoutModeSupported.LayoutMode.Center)
-                );
-            }
-
-            return new GridGroup(
-                    gridGroup.maxPerLine,
-                    gridGroup.currentLine + 1,
-                    gridGroup.mainGroup,
-                    gridGroup.rowGroup.addChild(uiElementBuilder)
-            );
-        }
-
-    }
 }

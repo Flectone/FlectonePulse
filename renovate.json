@@ -36,8 +36,7 @@
         "com.loohp:InteractiveChat",
         "dev.lone:api-itemsadder",
         "com.mojang:authlib",
-        "com.gitlab.ruany:LiteBansAPI",
-        "curse.maven:hyui-1431415"
+        "com.gitlab.ruany:LiteBansAPI"
       ],
       "enabled": false
     }

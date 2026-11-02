@@ -162,7 +162,6 @@ FlectonePulse Hytale is built on these projects:
 - 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** – text component formatting
 - ⌨️ **[Cloud](https://github.com/Incendo/cloud)** – commands with tab completion
 - 🔣 **[Symbol Chat](https://github.com/replaceitem/symbol-chat)** – Unicode symbol picker
-- 🖥️ **[HyUI](https://github.com/Elliesaur/HyUI)** – GUI elements
 - 🌐 **[MiniTranslator](https://github.com/imDaniX/MiniTranslator)** – legacy to MiniMessage conversion
 - 🌱 **[FlectoneChat](https://github.com/Flectone/FlectoneChat)** – the predecessor
 

@@ -1,9 +1,6 @@
 dependencies {
     implementation project(":common")
 
-    // TODO: delete after HyUI 0.9.8 is released
-    implementation files("libraries/HyUI-0.9.8.jar")
-
     compileOnly project(":hytale:loader")
     compileOnly project(":api")
 
@@ -11,7 +8,6 @@ dependencies {
     compileOnly libraries.adventure
 
     compileOnly "eu.mikart.adventure:adventure-platform-hytale:$adventure_platform_hytale_version"
-    compileOnly "curse.maven:hyui-1431415:$hyui_version"
     compileOnly "com.hypixel.hytale:Server:$hytale_server_version"
     compileOnly "at.helpch:placeholderapi-hytale:$placeholderapi_hytale_version"
 }

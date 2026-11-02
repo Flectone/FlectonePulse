@@ -1,0 +1,21 @@
+Group #FlectonePulseHud {
+    LayoutMode: Full;
+
+    Group #Sidebar {
+        LayoutMode: Top;
+
+        Group #SidebarLines {
+            LayoutMode: Top;
+        }
+    }
+
+    Group #ActionBar {
+        LayoutMode: CenterMiddle;
+        Anchor: (Bottom: -700);
+
+        Label #ActionBarText {
+            Padding: (Full: 5);
+            Background: (Color: #1E1E1E60);
+        }
+    }
+}

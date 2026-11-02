@@ -1,4 +1,0 @@
-$C = "../../Common.ui";
-$C.@SmallSecondaryTextButton #HyUISmallSecondaryTextButton {
-    @Text = "Button";
-}

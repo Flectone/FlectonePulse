@@ -1,0 +1,26 @@
+$C = "../../Common.ui";
+
+$C.@PageOverlay {
+    LayoutMode: CenterMiddle;
+
+    $C.@Container #ChatsettingPanel {
+        #Title {
+            Group {
+                $C.@Title #ChatsettingTitle {
+                    @Text = "";
+                }
+            }
+        }
+
+        #Content {
+            Group #ChatsettingCenter {
+                Anchor: (Full: 0);
+                LayoutMode: CenterMiddle;
+
+                Group #ChatsettingGrid {
+                    LayoutMode: Top;
+                }
+            }
+        }
+    }
+}

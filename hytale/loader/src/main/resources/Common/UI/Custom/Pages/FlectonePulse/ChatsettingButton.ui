@@ -1,0 +1,10 @@
+$C = "../../Common.ui";
+
+Group #ChatsettingButtonWrapper {
+    LayoutMode: Full;
+
+    $C.@TextButton #ChatsettingButton {
+        @Text = "";
+        Anchor: (Full: 0);
+    }
+}
