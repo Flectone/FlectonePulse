@@ -199,7 +199,7 @@ subprojects {
     }
 
     tasks.register("buildFinalJar", Jar) {
-        archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
+        archiveFileName = "$project_name-$project.name-${project_version}.jar"
         destinationDirectory = file("$rootDir/build/libs")
     }
 
@@ -220,12 +220,12 @@ subprojects {
         relocate("io.leangen.geantyref", "${relocated_pattern}.geantyref")
         relocate("org.mineskin", "${relocated_pattern}.mineskin")
 
-        if (project.name != "minecraft-paper") {
+        if (project.name != module_minecraft_paper) {
             relocate("net.kyori", "${relocated_pattern}")
             relocate("com.google.gson", "${relocated_pattern}.gson")
         }
 
-        if (project.name != "minecraft-velocity" && project.parent.name != "minecraft-velocity") {
+        if (project.name != module_minecraft_velocity && project.parent.name != module_minecraft_velocity) {
             relocate("com.google.inject", "${relocated_pattern}.guice")
             relocate("com.google.common", "${relocated_pattern}.guava")
         }
@@ -260,9 +260,9 @@ configure(project(":api")) {
         coordinates(maven_group, project.name, project_version)
 
         pom {
-            name = "FlectonePulse API"
-            description = "Every Message Under Your Control!"
-            url = "https://github.com/Flectone/FlectonePulse"
+            name = "$project_name API"
+            description = project_description
+            url = "https://github.com/Flectone/$project_name"
 
             licenses {
                 license {
@@ -273,16 +273,16 @@ configure(project(":api")) {
 
             developers {
                 developer {
-                    id = "TheFaser"
-                    name = "TheFaser"
+                    id = project_author
+                    name = project_author
                     email = "artem.mochalin11@gmail.com"
                 }
             }
 
             scm {
-                connection = "scm:git:https://github.com/Flectone/FlectonePulse.git"
-                developerConnection = "scm:git:ssh://github.com/Flectone/FlectonePulse.git"
-                url = "https://github.com/Flectone/FlectonePulse"
+                connection = "scm:git:https://github.com/Flectone/${project_name}.git"
+                developerConnection = "scm:git:ssh://github.com/Flectone/${project_name}.git"
+                url = "https://github.com/Flectone/${project_name}"
             }
         }
 
