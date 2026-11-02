@@ -28,7 +28,7 @@ dependencies {
 	modCompileOnly fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
 	modCompileOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
 
-	compileOnly "org.incendo:cloud-brigadier:${cloud_paper_version}"
+	compileOnly "org.incendo:cloud-brigadier:${cloud_minecraft_version}"
 
 	compileOnly "net.flectone:packeteventsmodern-api:$packeteventsmodern_version"
 	compileOnly "net.flectone:packeteventsmodern-netty-common:$packeteventsmodern_version"

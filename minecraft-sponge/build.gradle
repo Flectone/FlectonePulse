@@ -50,7 +50,7 @@ dependencies {
     compileOnly libraries.platform
     compileOnly libraries.adventure
 
-    compileOnly "org.incendo:cloud-brigadier:${cloud_paper_version}"
+    compileOnly "org.incendo:cloud-brigadier:${cloud_minecraft_version}"
 
     compileOnly "org.spongepowered:spongeapi:${spongeapi_version}"
 

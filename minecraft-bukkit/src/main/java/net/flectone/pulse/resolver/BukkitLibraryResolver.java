@@ -113,7 +113,7 @@ public class BukkitLibraryResolver extends LibraryResolverImpl {
         loadLibrary(Library.builder()
                 .groupId("org{}incendo")
                 .artifactId("cloud-brigadier")
-                .version(BuildConfig.CLOUD_PAPER_VERSION)
+                .version(BuildConfig.CLOUD_MINECRAFT_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
