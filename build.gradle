@@ -260,9 +260,9 @@ configure(project(":api")) {
         coordinates(maven_group, project.name, project_version)
 
         pom {
-            name = "$project_name API"
-            description = project_description
-            url = "https://github.com/Flectone/$project_name"
+            name = "FlectonePulse API"
+            description = "Every Message Under Your Control! "
+            url = "https://github.com/Flectone/FlectonePulse"
 
             licenses {
                 license {
@@ -273,16 +273,16 @@ configure(project(":api")) {
 
             developers {
                 developer {
-                    id = project_author
-                    name = project_author
+                    id = "TheFaser"
+                    name = "TheFaser"
                     email = "artem.mochalin11@gmail.com"
                 }
             }
 
             scm {
-                connection = "scm:git:https://github.com/Flectone/${project_name}.git"
-                developerConnection = "scm:git:ssh://github.com/Flectone/${project_name}.git"
-                url = "https://github.com/Flectone/${project_name}"
+                connection = "scm:git:https://github.com/Flectone/FlectonePulse.git"
+                developerConnection = "scm:git:ssh://github.com/Flectone/FlectonePulse.git"
+                url = "https://github.com/Flectone/FlectonePulse"
             }
         }
 
