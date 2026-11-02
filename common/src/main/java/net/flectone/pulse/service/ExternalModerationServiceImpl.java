@@ -27,7 +27,12 @@ public class ExternalModerationServiceImpl implements ExternalModerationService 
         if (type != Moderation.Type.MUTE) return Optional.empty();
 
         ExternalModerationKey key = new ExternalModerationKey(fPlayer.uuid(), type);
-        return externalModerationCache.get(key, _ -> Optional.ofNullable(integrationModule.get().getMute(fPlayer)));
+        return externalModerationCache.get(key, _ -> {
+            IntegrationModule integration = integrationModule.get();
+            if (!integration.isMuted(fPlayer)) return Optional.empty();
+
+            return Optional.ofNullable(integration.getMute(fPlayer));
+        });
     }
 
     @Override
