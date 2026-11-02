@@ -261,7 +261,7 @@ configure(project(":api")) {
 
         pom {
             name = "FlectonePulse API"
-            description = "Every Message Under Your Control! "
+            description = "Every Message Under Your Control!"
             url = "https://github.com/Flectone/FlectonePulse"
 
             licenses {
