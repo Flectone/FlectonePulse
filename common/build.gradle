@@ -1,5 +1,5 @@
 dependencies {
-    compileOnly project(":api")
+    compileOnly project(module_api)
 
     compileOnly "org.mapstruct:mapstruct:$mapstruct_version"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"

@@ -1,17 +1,17 @@
 dependencies {
-    implementation project(":api")
+    implementation project(module_api)
 
     compileOnly "com.hypixel.hytale:Server:$hytale_server_version"
 }
 
 shadowJar {
-    from { project(":hytale").tasks.shadowJar.archiveFile }
+    from { project(module_hytale).tasks.shadowJar.archiveFile }
 
-    dependsOn(":hytale:shadowJar")
+    dependsOn("$module_hytale:shadowJar")
 }
 
 processResources {
-    def props = [version: "$project_version", author: "$project_author", description: "$project_description"]
+    def props = [version: "$project_version", author: "$project_author", description: "$project_name-${project_description.toLowerCase()}"]
     inputs.properties props
     filteringCharset "UTF-8"
     filesMatching("**/manifest.json") { expand props }

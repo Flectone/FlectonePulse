@@ -1,9 +1,9 @@
-name: FlectonePulse
+name: ${prefix}
 version: '${version}'
 main: net.flectone.pulse.BukkitFlectonePulseLoader
 api-version: '1.13'
 prefix: ${prefix}
-authors: [ TheFaser ]
+authors: [ ${author} ]
 description: ${description}
 website: ${website}
 folia-supported: true

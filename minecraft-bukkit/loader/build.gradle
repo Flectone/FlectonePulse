@@ -1,16 +1,16 @@
 dependencies {
-    implementation project(":api")
+    implementation project(module_api)
 
     compileOnly "org.spigotmc:spigot-api:$spigot_version"
 }
 
 shadowJar {
-    from { project(":minecraft-bukkit").tasks.named("jarInJarContent").get().archiveFile }
+    from { project(module_minecraft_bukkit).tasks.named("jarInJarContent").get().archiveFile }
     dependsOn(":minecraft-bukkit:jarInJarContent")
 }
 
 processResources {
-    def props = [version: "$project_version", prefix: "$project_name", author: "$project_author", description: "$project_description", website: "$project_website"]
+    def props = [version: "$project_version", prefix: "$project_name", author: "$project_author", description: "$project_name-${project_description.toLowerCase()}", website: "$project_website"]
     inputs.properties props
     filteringCharset "UTF-8"
     filesMatching("plugin.yml") { expand props }
