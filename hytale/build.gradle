@@ -1,8 +1,8 @@
 dependencies {
-    implementation project(":common")
+    implementation project(module_common)
 
-    compileOnly project(":hytale:loader")
-    compileOnly project(":api")
+    compileOnly project("$module_hytale:$module_loader")
+    compileOnly project(module_api)
 
     compileOnly libraries.platform
     compileOnly libraries.adventure
@@ -17,11 +17,11 @@ shadowJar {
 }
 
 tasks.named("buildFinalJar", Jar) {
-    archiveFileName = "FlectonePulse-Hytale-" + project_version + ".jar"
+    archiveFileName = "FlectonePulse-Hytale-${project_version}.jar"
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    from { zipTree(project(":hytale:loader").tasks.shadowJar.archiveFile) }
+    from { zipTree(project("$module_hytale:$module_loader").tasks.shadowJar.archiveFile) }
 
-    dependsOn(":hytale:loader:shadowJar")
+    dependsOn("$module_hytale:$module_loader:shadowJar")
 }
