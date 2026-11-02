@@ -1,10 +1,10 @@
 dependencies {
-    implementation project(":minecraft-common")
+    implementation project(module_minecraft_common)
 
-    compileOnly project(":api")
-    compileOnly project(":common")
-    compileOnly project(":minecraft-bukkit:loader")
-    compileOnly project(":minecraft-paper")
+    compileOnly project(module_api)
+    compileOnly project(module_common)
+    compileOnly project("$module_minecraft_bukkit:$module_loader")
+    compileOnly project(module_minecraft_paper)
 
     compileOnly libraries.platform
     compileOnly libraries.adventure
@@ -41,15 +41,15 @@ tasks.register("jarInJarContent", Jar) {
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    from { zipTree(project(":minecraft-bukkit").tasks.named("shadeDowngradedApi").get().archiveFile) }
-    from { zipTree(project(":minecraft-paper").tasks.named("shadeDowngradedApi").get().archiveFile) }
-    from { zipTree(project(":minecraft-velocity").tasks.named("shadeDowngradedApi").get().archiveFile) }
-    from { zipTree(project(":minecraft-bungeecord").tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project(module_minecraft_bukkit).tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project(module_minecraft_paper).tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project(module_minecraft_velocity).tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project(module_minecraft_bungeecord).tasks.named("shadeDowngradedApi").get().archiveFile) }
 
-    dependsOn(":minecraft-bukkit:shadeDowngradedApi")
-    dependsOn(":minecraft-paper:shadeDowngradedApi")
-    dependsOn(":minecraft-velocity:shadeDowngradedApi")
-    dependsOn(":minecraft-bungeecord:shadeDowngradedApi")
+    dependsOn("$module_minecraft_bukkit:shadeDowngradedApi")
+    dependsOn("$module_minecraft_paper:shadeDowngradedApi")
+    dependsOn("$module_minecraft_velocity:shadeDowngradedApi")
+    dependsOn("$module_minecraft_bungeecord:shadeDowngradedApi")
 }
 
 tasks.named("buildFinalJar", Jar) {
@@ -57,11 +57,11 @@ tasks.named("buildFinalJar", Jar) {
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    from { zipTree(project(":minecraft-bukkit:loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
-    from { zipTree(project(":minecraft-velocity:loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
-    from { zipTree(project(":minecraft-bungeecord:loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project("$module_minecraft_bukkit:$module_loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project("$module_minecraft_velocity:$module_loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
+    from { zipTree(project("$module_minecraft_bungeecord:$module_loader").tasks.named("shadeDowngradedApi").get().archiveFile) }
 
-    dependsOn(":minecraft-bukkit:loader:shadowJar")
-    dependsOn(":minecraft-velocity:shadeDowngradedApi")
-    dependsOn(":minecraft-bungeecord:shadeDowngradedApi")
+    dependsOn("$module_minecraft_bukkit:$module_loader:shadowJar")
+    dependsOn("$module_minecraft_velocity:shadeDowngradedApi")
+    dependsOn("$module_minecraft_bungeecord:shadeDowngradedApi")
 }
