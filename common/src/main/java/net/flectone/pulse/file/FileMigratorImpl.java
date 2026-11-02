@@ -9,8 +9,6 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.constant.CacheName;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.model.file.FilePack;
-import net.flectone.pulse.model.value.Destination;
-import net.flectone.pulse.model.value.HeadText;
 import net.flectone.pulse.model.value.Ticker;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.util.LazyInstance;
@@ -193,18 +191,9 @@ public class FileMigratorImpl implements FileMigrator {
 
     @Override
     public FilePack migration_1_14_2(FilePack files) {
-        boolean isHytale = platformServerAdapter.get().getPlatformType() == PlatformType.HYTALE;
-        Destination destination = files.message().bubble().destination();
-        HeadText headText = destination.headText().withModern(destination.headText().modern().withOffsetY(isHytale ? 1.8f : 0.2f));
-
         // disable nameplate module by default for old versions
         return files
                 .withMessage(files.message()
-                        .withBubble(files.message().bubble()
-                                .withDestination(destination
-                                        .withHeadText(headText)
-                                )
-                        )
                         .withNameplate(files.message().nameplate()
                                 .withEnable(false)
                         )
