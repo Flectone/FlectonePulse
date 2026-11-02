@@ -50,10 +50,10 @@ public class BukkitCMIIntegration implements FIntegration {
         if (cmi == null) return null;
 
         CMIUser user = cmi.getPlayerManager().getUser(fEntity.uuid());
-        if (user == null) return null;
+        if (user == null || !user.isMuted()) return null;
 
-        long mutedUntil = user.getMutedUntil();
-        boolean permanent = mutedUntil <= 0 || mutedUntil == Long.MAX_VALUE;
+        Long mutedUntil = user.getMutedUntil();
+        boolean permanent = mutedUntil == null || mutedUntil <= 0 || mutedUntil == Long.MAX_VALUE;
 
         return new ExternalModeration(
                 fEntity.name(),
