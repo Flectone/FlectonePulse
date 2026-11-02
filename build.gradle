@@ -1,11 +1,11 @@
 plugins {
     id "java"
     id "java-library"
-    id "com.gradleup.shadow" version "9.6.1"
-    id "xyz.wagyourtail.jvmdowngrader" version "2.0.1"
-    id "io.freefair.lombok" version "9.8.2"
-    id "com.github.gmazzo.buildconfig" version "6.1.2" apply false
-    id "com.vanniktech.maven.publish" version "0.37.0" apply false
+    id "com.gradleup.shadow" version "$shadowjar_version"
+    id "xyz.wagyourtail.jvmdowngrader" version "$jvmdowngrader_version"
+    id "io.freefair.lombok" version "$plugin_lombok_version"
+    id "com.github.gmazzo.buildconfig" version "$buildconfig_version" apply false
+    id "com.vanniktech.maven.publish" version "$maven_publish_version" apply false
 }
 
 group = maven_group
@@ -199,7 +199,7 @@ subprojects {
     }
 
     tasks.register("buildFinalJar", Jar) {
-        archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
+        archiveFileName = "$project_name-$project.name-${project_version}.jar"
         destinationDirectory = file("$rootDir/build/libs")
     }
 
