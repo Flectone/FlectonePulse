@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftTranslationService implements TranslationService {
 
-    private static final String MINECRAFT_TRANSLATION_API = "https://assets.mcasset.cloud/<version>/assets/minecraft/lang/<language>";
+    private static final String GITHUB_TRANSLATION_API = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/<version>/assets/minecraft/lang/<language>";
 
     private final Map<String, String> translations = new ConcurrentHashMap<>();
     private final @Named("defaultMapper") ObjectMapper objectMapper;
@@ -88,8 +88,10 @@ public class MinecraftTranslationService implements TranslationService {
         String formattedLanguage = isModern ? language : formatLegacyLanguage(language);
         if (formattedLanguage == null) return false;
 
-        String url = buildLocalizationUrl(getVersion(), formattedLanguage, isModern ? ".json" : ".lang");
-        return webUtil.downloadFile(url, outputPath, true) == HttpURLConnection.HTTP_OK;
+        String extension = isModern ? ".json" : ".lang";
+        String version = getVersion();
+
+        return webUtil.downloadFile(buildLocalizationUrl(version, formattedLanguage, extension), outputPath, true) == HttpURLConnection.HTTP_OK;
     }
 
     public void loadTranslations() {
@@ -149,7 +151,7 @@ public class MinecraftTranslationService implements TranslationService {
 
     private String buildLocalizationUrl(String version, String language, String extension) {
         return StringUtils.replaceEach(
-                MINECRAFT_TRANSLATION_API + extension,
+                GITHUB_TRANSLATION_API + extension,
                 new String[]{"<version>", "<language>"},
                 new String[]{version, language}
         );
