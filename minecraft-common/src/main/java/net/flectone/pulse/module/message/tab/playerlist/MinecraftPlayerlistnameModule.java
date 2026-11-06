@@ -23,7 +23,6 @@ import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.value.Pair;
 import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.model.value.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -163,16 +162,21 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     }
 
     private void sendPlayerInfos(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
-        List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfoList = onlinePlayers.stream().map(fSender -> {
+        List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> addPlayerInfoList = new ArrayList<>();
+        List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> updatePlayerInfoList = new ArrayList<>();
+        List<UUID> removeProfileList = new ArrayList<>();
+
+        for (FPlayer fSender : onlinePlayers) {
             if (!socialService.canSeeVanished(fSender, fReceiver)) {
                 forgetEntry(fReceiver.uuid(), fSender.uuid());
-                return null;
+                continue;
             }
 
-            Pair<UserProfile, Boolean> userProfilePair = createUserProfile(fSender, fReceiver);
-            if (userProfilePair == null) {
+            User user = packetProvider.getUser(fSender);
+            UserProfile userProfile = createUserProfile(fSender, fReceiver, user);
+            if (userProfile == null) {
                 forgetEntry(fReceiver.uuid(), fSender.uuid());
-                return null;
+                continue;
             }
 
             Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fSender, config().range(), name());
@@ -180,7 +184,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
             GameMode gameMode = GameMode.valueOf(platformPlayerAdapter.getGamemode(fSender));
 
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
-                    userProfilePair.getLeft(),
+                    userProfile,
                     isListed(fSender, fReceiver, gameMode) && listedFilter.test(fReceiver),
                     platformPlayerAdapter.getPing(fSender),
                     gameMode,
@@ -191,51 +195,82 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
 
             PlayerlistnameEntry entry = PlayerlistnameEntry.of(playerInfo);
             PlayerlistnameEntry sentEntry = rememberEntry(fReceiver, fSender, entry);
-            if (userProfilePair.getRight()) {
-                packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(ADD_ACTIONS, playerInfo), true);
-                return null;
+
+            boolean profileChanged = sentEntry == null || sentEntry.profile() != entry.profile();
+            if (user == null && profileChanged) {
+                removeProfileList.add(fSender.uuid());
+                addPlayerInfoList.add(playerInfo);
+                continue;
             }
 
-            return entry.equals(sentEntry) ? null : playerInfo;
-        }).filter(Objects::nonNull).toList();
+            if (!entry.equals(sentEntry)) {
+                updatePlayerInfoList.add(playerInfo);
+            }
+        }
 
-        if (!playerInfoList.isEmpty()) {
-            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(UPDATE_ACTIONS, playerInfoList), true);
+        if (!removeProfileList.isEmpty()) {
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoRemove(removeProfileList), true);
+        }
+
+        if (!addPlayerInfoList.isEmpty()) {
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(ADD_ACTIONS, addPlayerInfoList), true);
+        }
+
+        if (!updatePlayerInfoList.isEmpty()) {
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(UPDATE_ACTIONS, updatePlayerInfoList), true);
         }
     }
 
     private void sendPlayerData(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
-        List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList = onlinePlayers.stream().map(fSender -> {
+        List<WrapperPlayServerPlayerInfo.PlayerData> addPlayerDataList = new ArrayList<>();
+        List<WrapperPlayServerPlayerInfo.PlayerData> updatePlayerDataList = new ArrayList<>();
+        List<WrapperPlayServerPlayerInfo.PlayerData> removePlayerDataList = new ArrayList<>();
+
+        for (FPlayer fSender : onlinePlayers) {
             if (!socialService.canSeeVanished(fSender, fReceiver)) {
                 forgetEntry(fReceiver.uuid(), fSender.uuid());
-                return null;
+                continue;
             }
 
-            Pair<UserProfile, Boolean> userProfilePair = createUserProfile(fSender, fReceiver);
-            if (userProfilePair == null) {
+            User user = packetProvider.getUser(fSender);
+            UserProfile userProfile = createUserProfile(fSender, fReceiver, user);
+            if (userProfile == null) {
                 forgetEntry(fReceiver.uuid(), fSender.uuid());
-                return null;
+                continue;
             }
 
             WrapperPlayServerPlayerInfo.PlayerData playerData = new WrapperPlayServerPlayerInfo.PlayerData(
                     buildFPlayerName(fSender, fReceiver),
-                    userProfilePair.getLeft(),
+                    userProfile,
                     GameMode.valueOf(platformPlayerAdapter.getGamemode(fSender)),
                     platformPlayerAdapter.getPing(fSender)
             );
 
             PlayerlistnameEntry entry = PlayerlistnameEntry.of(playerData);
             PlayerlistnameEntry sentEntry = rememberEntry(fReceiver, fSender, entry);
-            if (userProfilePair.getRight()) {
-                packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, playerData), true);
-                return null;
+
+            boolean profileChanged = sentEntry == null || sentEntry.profile() != entry.profile();
+            if (user == null && profileChanged) {
+                removePlayerDataList.add(new WrapperPlayServerPlayerInfo.PlayerData(null, new UserProfile(fSender.uuid(), ""), null, 0));
+                addPlayerDataList.add(playerData);
+                continue;
             }
 
-            return entry.equals(sentEntry) ? null : playerData;
-        }).filter(Objects::nonNull).toList();
+            if (!entry.equals(sentEntry)) {
+                updatePlayerDataList.add(playerData);
+            }
+        }
 
-        if (!playerDataList.isEmpty()) {
-            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerDataList), true);
+        if (!removePlayerDataList.isEmpty()) {
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, removePlayerDataList), true);
+        }
+
+        if (!addPlayerDataList.isEmpty()) {
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, addPlayerDataList), true);
+        }
+
+        if (!updatePlayerDataList.isEmpty()) {
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, updatePlayerDataList), true);
         }
     }
 
@@ -311,35 +346,25 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     }
 
     @Nullable
-    private Pair<UserProfile, Boolean> createUserProfile(FPlayer fSender, FPlayer fReceiver) {
-        User user = packetProvider.getUser(fSender);
+    private UserProfile createUserProfile(FPlayer fSender, FPlayer fReceiver, @Nullable User user) {
         if (user != null) {
-            return Pair.of(user.getProfile(), false);
+            return user.getProfile();
         }
 
         if (!isProxyMode()) {
             return null;
         }
 
-        boolean addProxyPlayer = false;
-
-        Set<UUID> receiverProxyPlayers = proxyPlayers.getOrDefault(fReceiver.uuid(), new CopyOnWriteArraySet<>());
-        if (!receiverProxyPlayers.contains(fSender.uuid())) {
-            receiverProxyPlayers.add(fSender.uuid());
-            addProxyPlayer = true;
-        }
-
-        proxyPlayers.put(fReceiver.uuid(), receiverProxyPlayers);
+        proxyPlayers.computeIfAbsent(fReceiver.uuid(), _ -> new CopyOnWriteArraySet<>()).add(fSender.uuid());
 
         if (!scoreboardModule.hasTeam(fSender, fReceiver)) {
             scoreboardModule.createOrUpdate(fSender);
         }
 
         PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(fSender);
-        List<TextureProperty> textureProperties = List.of(new TextureProperty(profileProperty.name(), profileProperty.value(), null));
-        UserProfile userProfile = new UserProfile(fSender.uuid(), fSender.name(), textureProperties);
+        List<TextureProperty> textureProperties = List.of(new TextureProperty(profileProperty.name(), profileProperty.value(), profileProperty.signature()));
 
-        return Pair.of(userProfile, addProxyPlayer);
+        return new UserProfile(fSender.uuid(), fSender.name(), textureProperties);
     }
 
     private boolean isListed(FPlayer fPlayer, FPlayer fReceiver, GameMode gameMode) {
@@ -370,15 +395,41 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     private record PlayerlistnameEntry(
             int displayName,
             boolean listed,
-            int listOrder
+            int listOrder,
+            int profile
     ) {
 
         static PlayerlistnameEntry of(WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo) {
-            return new PlayerlistnameEntry(Objects.hashCode(playerInfo.getDisplayName()), playerInfo.isListed(), playerInfo.getListOrder());
+            return new PlayerlistnameEntry(
+                    Objects.hashCode(playerInfo.getDisplayName()),
+                    playerInfo.isListed(),
+                    playerInfo.getListOrder(),
+                    profileHash(playerInfo.getGameProfile())
+            );
         }
 
         static PlayerlistnameEntry of(WrapperPlayServerPlayerInfo.PlayerData playerData) {
-            return new PlayerlistnameEntry(Objects.hashCode(playerData.getDisplayName()), false, 0);
+            return new PlayerlistnameEntry(
+                    Objects.hashCode(playerData.getDisplayName()),
+                    false,
+                    0,
+                    profileHash(playerData.getUserProfile())
+            );
+        }
+
+        private static int profileHash(@Nullable UserProfile userProfile) {
+            if (userProfile == null) return 0;
+
+            int hash = Objects.hashCode(userProfile.getName());
+            for (TextureProperty textureProperty : userProfile.getTextureProperties()) {
+                hash = hash * 31 + Objects.hash(
+                        textureProperty.getName(),
+                        textureProperty.getValue(),
+                        textureProperty.getSignature()
+                );
+            }
+
+            return hash;
         }
 
     }
