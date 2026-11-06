@@ -10,11 +10,6 @@
       "registryUrls": ["https://maven.fabricmc.net/"]
     },
     {
-      "matchUpdateTypes": ["minor", "patch", "digest"],
-      "groupName": "all non-major dependencies",
-      "groupSlug": "all-minor-patch"
-    },
-    {
       "matchPackageNames": ["eu.pb4:placeholder-api", "maven.modrinth:vanish"],
       "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-(?<prerelease>[^+]+))?\\+(?<compatibility>.+)$"
     },
