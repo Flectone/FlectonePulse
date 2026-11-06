@@ -57,7 +57,7 @@ public class MinecraftSkinService implements SkinService {
             if (platformPlayerAdapter.isOnline(fPlayer)) {
                 taskScheduler.runAsyncLater(() -> minecraftPlayerlistnameModuleInstance.update(fPlayer), 2L);
             } else {
-                minecraftPlayerlistnameModuleInstance.update();
+                minecraftPlayerlistnameModuleInstance.update(fPlayer);
             }
         }
     }
@@ -128,7 +128,7 @@ public class MinecraftSkinService implements SkinService {
         }
 
         // empty textures
-        return PlayerHeadObjectContents.property(entity.name(), "");
+        return PlayerHeadObjectContents.property("textures", "");
     }
 
     public void sendToProxy(@NonNull FEntity sender, PlayerHeadObjectContents.@NonNull ProfileProperty profileProperty) {
