@@ -192,7 +192,8 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
         return PlayerHeadObjectContents.property(
                 "textures",
-                fabricVersionAdapter.getValue(textureProperty)
+                fabricVersionAdapter.getValue(textureProperty),
+                fabricVersionAdapter.getSignature(textureProperty)
         );
     }
 

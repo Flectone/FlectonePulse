@@ -122,7 +122,8 @@ public class MinecraftSkinService implements SkinService {
                 TextureProperty textureProperty = textureProperties.getFirst();
                 return PlayerHeadObjectContents.property(
                         "textures",
-                        textureProperty.getValue()
+                        textureProperty.getValue(),
+                        textureProperty.getSignature()
                 );
             }
         }

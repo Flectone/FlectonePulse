@@ -44,6 +44,8 @@ public interface FabricVersionAdapter {
 
     String getValue(Property property);
 
+    String getSignature(Property property);
+
     boolean isOperator(MinecraftServer minecraftServer, UUID uuid, String name);
 
     boolean hasPermission(ServerPlayer player);

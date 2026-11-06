@@ -62,6 +62,11 @@ public class FabricVersionAdapterV_1_20_2 extends FabricVersionAdapterV_1_19_4 {
     }
 
     @Override
+    public String getSignature(Property property) {
+        return property.signature();
+    }
+
+    @Override
     public @Nullable String getLanguage(ServerPlayer player) {
         return player.clientInformation().language();
     }

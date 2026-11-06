@@ -120,6 +120,11 @@ public class FabricVersionAdapterV_26_1 implements FabricVersionAdapter {
     }
 
     @Override
+    public String getSignature(Property property) {
+        return property.signature();
+    }
+
+    @Override
     public boolean isOperator(MinecraftServer minecraftServer, UUID uuid, String name) {
         return minecraftServer.getPlayerList().isOp(new NameAndId(uuid, name));
     }

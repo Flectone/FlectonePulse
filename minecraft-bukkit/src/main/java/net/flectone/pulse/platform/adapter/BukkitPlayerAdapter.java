@@ -209,7 +209,8 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             Property textureProperty = textures.iterator().next();
             return PlayerHeadObjectContents.property(
                     "textures",
-                    textureProperty.getValue()
+                    textureProperty.getValue(),
+                    textureProperty.getSignature()
             );
         } catch (Throwable _) {
             return null;

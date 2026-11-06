@@ -191,7 +191,8 @@ public class SpongePlayerAdapter implements PlatformPlayerAdapter {
 
         return PlayerHeadObjectContents.property(
                 "textures",
-                textureProperty.value()
+                textureProperty.value(),
+                textureProperty.signature()
         );
     }
 
