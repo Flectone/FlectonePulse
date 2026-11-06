@@ -200,7 +200,11 @@ public class MinecraftObjectModule extends ObjectModuleImpl {
         PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(fEntity);
 
         if (StringUtils.isNotEmpty(profileProperty.value())) {
-            playerHeadBuilder.profileProperty(profileProperty);
+            playerHeadBuilder.profileProperty(PlayerHeadObjectContents.property(
+                    profileProperty.name(),
+                    profileProperty.value()
+                    // signature is not required for display it in messages, and it may cause player to crash
+            ));
         } else {
             otherConsumer.accept(playerHeadBuilder);
         }
