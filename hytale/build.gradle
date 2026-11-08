@@ -13,11 +13,11 @@ dependencies {
 }
 
 shadowJar {
-    archiveFileName = "flectonepulse-hytale.jarinjar"
+    archiveFileName = "$project_mod_id-hytale.jarinjar"
 }
 
 tasks.named("buildFinalJar", Jar) {
-    archiveFileName = "FlectonePulse-Hytale-" + project_version + ".jar"
+    archiveFileName = "$project_name-Hytale-${project_version}.jar"
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 

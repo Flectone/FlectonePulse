@@ -3,7 +3,7 @@ plugins {
 }
 
 tasks.named("buildFinalJar", Jar) {
-	archiveFileName = "FlectonePulse-Fabric-" + project_version + ".jar"
+	archiveFileName = "$project_name-Fabric-${project_version}.jar"
 
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
@@ -22,17 +22,17 @@ tasks.named("buildFinalJar", Jar) {
 	from { zipTree(project(":api").tasks.named("shadeDowngradedApi").get().archiveFile) }
 
 	from({ project(":minecraft-common").tasks.named("shadeDowngradedApi").get().archiveFile }) {
-		rename { "flectonepulse-fabric.jarinjar" }
+		rename { "$project_mod_id-fabric.jarinjar" }
 	}
 
 	into("META-INF/jars") {
 		from { project(":minecraft-fabric:intermediary:loader").tasks.named("shadeDowngradedApi").get().archiveFile }
-		rename { "flectonepulse-intermediary.jar" }
+		rename { "$project_mod_id-intermediary.jar" }
 	}
 
 	into("META-INF/jars") {
 		from { project(":minecraft-fabric:official:loader").tasks.named("shadeDowngradedApi").get().archiveFile }
-		rename { "flectonepulse-official.jar" }
+		rename { "$project_mod_id-official.jar" }
 	}
 
 	dependsOn(":api:shadeDowngradedApi")

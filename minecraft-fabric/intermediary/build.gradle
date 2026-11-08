@@ -58,7 +58,7 @@ downgradeJar {
 }
 
 tasks.register("jarInJarContent", Jar) {
-	archiveFileName = "flectonepulse-fabric-platform.jarinjar"
+	archiveFileName = "$project_mod_id-fabric-platform.jarinjar"
 
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 

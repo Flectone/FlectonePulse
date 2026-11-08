@@ -29,7 +29,7 @@ shadowJar {
 }
 
 processResources {
-    def props = [version: "$project_version", author: "$project_author", description: "$project_description", id: "flectonepulse-official", name: "FlectonePulse (Official Mappings)", minecraft: ">=26.1"]
+    def props = [version: "$project_version", author: "$project_author", description: "$project_description", id: "$project_mod_id-official", name: "$project_name (Official Mappings)", minecraft: ">=26.1"]
     inputs.properties props
     filteringCharset "UTF-8"
     filesMatching("fabric.mod.json") { expand props }
