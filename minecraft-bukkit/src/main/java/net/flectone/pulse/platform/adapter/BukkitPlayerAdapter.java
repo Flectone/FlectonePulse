@@ -61,6 +61,8 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     private MethodHandle handleMethod;
     private MethodHandle gameProfileMethod;
     private MethodHandle propertiesMethod;
+    private MethodHandle propertyValueMethod;
+    private MethodHandle propertySignatureMethod;
     private boolean gameProfileMethodsInitialized;
 
     private void initGameProfileMethods(Player player) {
@@ -74,10 +76,19 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             if (gameProfileMethod == null) return;
 
             Object gameProfile = gameProfileMethod.invoke(entityPlayer);
-            try {
-                propertiesMethod = reflectionResolver.unreflectMethod(gameProfile.getClass().getMethod("properties"));
-            } catch (NoSuchMethodException _) {
-                propertiesMethod = reflectionResolver.unreflectMethod(gameProfile.getClass().getMethod("getProperties"));
+            propertiesMethod = reflectionResolver.unreflectMethod(gameProfile.getClass(), "properties");
+            if (propertiesMethod == null) {
+                propertiesMethod = reflectionResolver.unreflectMethod(gameProfile.getClass(), "getProperties");
+            }
+
+            propertyValueMethod = reflectionResolver.unreflectMethod(Property.class, "value");
+            if (propertyValueMethod == null) {
+                propertyValueMethod = reflectionResolver.unreflectMethod(Property.class, "getValue");
+            }
+
+            propertySignatureMethod = reflectionResolver.unreflectMethod(Property.class, "signature");
+            if (propertySignatureMethod == null) {
+                propertySignatureMethod = reflectionResolver.unreflectMethod(Property.class, "getSignature");
             }
         } catch (Throwable _) {
             // nothing
@@ -205,13 +216,13 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
             Collection<Property> textures = properties.get("textures");
             if (textures == null || textures.isEmpty()) return null;
+            if (propertyValueMethod == null) return null;
 
             Property textureProperty = textures.iterator().next();
-            return PlayerHeadObjectContents.property(
-                    "textures",
-                    textureProperty.getValue(),
-                    textureProperty.getSignature()
-            );
+            String value = (String) propertyValueMethod.invoke(textureProperty);
+            String signature = propertySignatureMethod == null ? null : (String) propertySignatureMethod.invoke(textureProperty);
+
+            return PlayerHeadObjectContents.property("textures", value, signature);
         } catch (Throwable _) {
             return null;
         }
