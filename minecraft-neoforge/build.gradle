@@ -55,7 +55,7 @@ shadowJar {
 }
 
 tasks.register("jarInJarContent", Jar) {
-    archiveFileName = "$project_mod_id-neoforge.jarinjar"
+    archiveFileName = "flectonepulse-neoforge.jarinjar"
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 

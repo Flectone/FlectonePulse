@@ -9,7 +9,7 @@ dependencies {
 }
 
 shadowJar {
-    archiveFileName = "$project_mod_id-bukkit.jarinjar"
+    archiveFileName = "flectonepulse-bukkit.jarinjar"
 }
 
 tasks.named("buildFinalJar", Jar) {

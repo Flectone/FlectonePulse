@@ -64,7 +64,7 @@ shadowJar {
 }
 
 tasks.register("jarInJarContent", Jar) {
-    archiveFileName = "$project_mod_id-sponge.jarinjar"
+    archiveFileName = "flectonepulse-sponge.jarinjar"
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 

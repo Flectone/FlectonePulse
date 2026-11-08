@@ -37,7 +37,7 @@ shadowJar {
 }
 
 tasks.register("jarInJarContent", Jar) {
-    archiveFileName = "$project_mod_id-bukkit.jarinjar"
+    archiveFileName = "flectonepulse-bukkit.jarinjar"
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 

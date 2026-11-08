@@ -22,17 +22,17 @@ tasks.named("buildFinalJar", Jar) {
 	from { zipTree(project(":api").tasks.named("shadeDowngradedApi").get().archiveFile) }
 
 	from({ project(":minecraft-common").tasks.named("shadeDowngradedApi").get().archiveFile }) {
-		rename { "$project_mod_id-fabric.jarinjar" }
+		rename { "flectonepulse-fabric.jarinjar" }
 	}
 
 	into("META-INF/jars") {
 		from { project(":minecraft-fabric:intermediary:loader").tasks.named("shadeDowngradedApi").get().archiveFile }
-		rename { "$project_mod_id-intermediary.jar" }
+		rename { "flectonepulse-intermediary.jar" }
 	}
 
 	into("META-INF/jars") {
 		from { project(":minecraft-fabric:official:loader").tasks.named("shadeDowngradedApi").get().archiveFile }
-		rename { "$project_mod_id-official.jar" }
+		rename { "flectonepulse-official.jar" }
 	}
 
 	dependsOn(":api:shadeDowngradedApi")
