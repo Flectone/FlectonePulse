@@ -17,10 +17,14 @@ import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.command.spy.model.SpyMessageContext;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.payload.ProxyPayload;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -30,6 +34,7 @@ public class SpyProxyMessageListener implements PulseListener {
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
     private final MessagePipeline messagePipeline;
+    private final FPlayerService fPlayerService;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -42,9 +47,15 @@ public class SpyProxyMessageListener implements PulseListener {
             String action = proxyPayload.readString();
             String message = proxyPayload.readString();
 
+            int receiversSize = proxyPayload.readInt();
+            Set<FPlayer> receivers = new HashSet<>(receiversSize);
+            for (int i = 0; i < receiversSize; i++) {
+                receivers.add(fPlayerService.getFPlayer(UUID.fromString(proxyPayload.readString())));
+            }
+
             messageDispatcher.dispatch(EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
-                    .filter(spyModule.createFilter(event.sender() instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN, Set.of()))
+                    .filter(spyModule.createFilter(event.sender() instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN, receivers))
                     .destination(spyModule.config().destination())
                     .messageContext(fResolver -> SpyMessageContext.builder()
                             .base(MessageContext.builder()
@@ -53,7 +64,10 @@ public class SpyProxyMessageListener implements PulseListener {
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(spyModule.localization(fResolver).formatLog())
-                                    .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                                    .tagResolvers(
+                                            messagePipeline.messageTag(event.sender(), fResolver, message),
+                                            Placeholder.parsed("action", spyModule.localization(fResolver).actions().getOrDefault(action, action))
+                                    )
                                     .build()
                             )
                             .string(message)

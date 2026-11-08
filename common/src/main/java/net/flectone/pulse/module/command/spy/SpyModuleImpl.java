@@ -234,6 +234,10 @@ public class SpyModuleImpl implements SpyModule {
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeUTF(action);
                     dataOutputStream.writeUTF(message);
+                    dataOutputStream.writeInt(receivers.size());
+                    for (FPlayer receiver : receivers) {
+                        dataOutputStream.writeUTF(receiver.uuid().toString());
+                    }
                 })
                 .integration(() -> IntegrationMessageFormat.builder()
                         .messageNames(List.of(name().name() + "_" + action.toUpperCase()))
