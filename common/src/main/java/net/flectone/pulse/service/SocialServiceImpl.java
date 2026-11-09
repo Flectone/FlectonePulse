@@ -178,7 +178,11 @@ public class SocialServiceImpl implements SocialService {
 
     @Override
     public boolean isIgnored(@NonNull FPlayer fPlayer, @NonNull FPlayer fTarget) {
-        return loadIgnores(fPlayer).stream().anyMatch(ignore -> ignore.target() == fTarget.id());
+        for (Ignore ignore : loadIgnores(fPlayer)) {
+            if (ignore.target() == fTarget.id()) return true;
+        }
+
+        return false;
     }
 
     @Override
