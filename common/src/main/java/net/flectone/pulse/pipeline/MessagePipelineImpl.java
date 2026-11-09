@@ -210,7 +210,7 @@ public class MessagePipelineImpl implements MessagePipeline {
 
     @Override
     public @NonNull TagResolver resolver(@TagPattern @NonNull String name, @NonNull BiFunction<ArgumentQueue, Context, Tag> handler) {
-        return resolver(Set.of(name), handler);
+        return new CachingTagResolver(name, handler, fLogger);
     }
 
     @Override

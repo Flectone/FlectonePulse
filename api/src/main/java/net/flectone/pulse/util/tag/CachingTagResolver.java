@@ -26,12 +26,29 @@ import java.util.function.BiFunction;
 public final class CachingTagResolver implements TagResolver {
 
     private final Set<String> names;
+    private final String singleName;
     private final BiFunction<ArgumentQueue, Context, Tag> handler;
     private final FLogger fLogger;
 
     private String cachedKey;
     private Tag cachedTag;
     private Map<String, Tag> cachedTags; // lazy map
+
+    /**
+     * Creates a resolver serving a single tag name
+     *
+     * @param name the tag name this resolver answers to
+     * @param handler builds the tag from the arguments it is written with
+     * @param fLogger logs a handler that failed to build its tag
+     */
+    public CachingTagResolver(@NonNull String name,
+                              @NonNull BiFunction<ArgumentQueue, Context, Tag> handler,
+                              @NonNull FLogger fLogger) {
+        this.names = null;
+        this.singleName = name;
+        this.handler = handler;
+        this.fLogger = fLogger;
+    }
 
     /**
      * Creates a resolver serving the given tag names.
@@ -44,13 +61,14 @@ public final class CachingTagResolver implements TagResolver {
                               @NonNull BiFunction<ArgumentQueue, Context, Tag> handler,
                               @NonNull FLogger fLogger) {
         this.names = names;
+        this.singleName = null;
         this.handler = handler;
         this.fLogger = fLogger;
     }
 
     @Override
     public @Nullable Tag resolve(@NonNull String name, @NonNull ArgumentQueue arguments, @NonNull Context context) throws ParsingException {
-        if (!names.contains(name)) return null;
+        if (!matches(name)) return null;
 
         // build cache key from tag name + all arguments
         // a tag without arguments is the common case and its name alone tells it apart
@@ -93,7 +111,11 @@ public final class CachingTagResolver implements TagResolver {
 
     @Override
     public boolean has(final @NonNull String name) {
-        return names.contains(name);
+        return matches(name);
+    }
+
+    private boolean matches(@NonNull String name) {
+        return singleName != null ? singleName.equals(name) : names.contains(name);
     }
 
 }
