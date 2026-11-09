@@ -196,10 +196,9 @@ public class ReplacementModuleImpl implements ReplacementModule {
     private String processMessage(FEntity sender, String message) {
         List<MatchInfo> matches = new ArrayList<>();
 
-        for (Map.Entry<String, Pattern> entry : triggerPatterns.entrySet()) {
-            String name = entry.getKey();
+        triggerPatterns.forEach((name, pattern) -> {
             boolean isUrl = name.equals("url") || name.equals("image");
-            Matcher matcher = entry.getValue().matcher(message);
+            Matcher matcher = pattern.matcher(message);
 
             while (matcher.find()) {
                 // format only url/image for unknown senders
@@ -208,7 +207,9 @@ public class ReplacementModuleImpl implements ReplacementModule {
                 String replacement = buildReplacement(name, matcher, isUrl);
                 matches.add(new MatchInfo(matcher.start(), matcher.end(), replacement));
             }
-        }
+        });
+
+        if (matches.isEmpty()) return message;
 
         matches.sort(Comparator.comparingInt(MatchInfo::start));
 
