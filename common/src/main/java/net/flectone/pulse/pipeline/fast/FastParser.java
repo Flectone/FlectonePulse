@@ -365,7 +365,7 @@ final class FastParser {
     }
 
     private void handleTag(@NonNull TagInfo info) {
-        if (isFastColorTag(info.name)) {
+        if (isFastColorTag(info.name) && resolver.has(info.name)) {
             if (info.closing) {
                 closeTag(info);
             } else {
