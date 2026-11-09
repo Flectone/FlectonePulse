@@ -123,9 +123,15 @@ public class FColorModuleImpl implements FColorModule {
     }
 
     private String getFColorOrDefault(FPlayer fPlayer, FColor.Type type, int index, String defaultColor) {
-        if (permissionChecker.check(fPlayer, permission().colors().get(type))) {
-            Map<Integer, String> colorMap = socialService.loadColors(fPlayer, type);
-            return colorMap.getOrDefault(index, defaultColor);
+        if (!permissionChecker.check(fPlayer, permission().colors().get(type))) {
+            return defaultColor;
+        }
+
+        Set<FColor> colors = socialService.loadColors(fPlayer).get(type);
+        if (colors == null) return defaultColor;
+
+        for (FColor color : colors) {
+            if (color.number() == index) return color.name();
         }
 
         return defaultColor;
