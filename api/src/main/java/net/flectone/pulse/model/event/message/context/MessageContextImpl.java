@@ -11,6 +11,7 @@ import net.flectone.pulse.util.tag.TagPresence;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
@@ -136,7 +137,7 @@ record MessageContextImpl(
         if (receiver == null) receiver = sender instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
         if (uuid == null) uuid = UUID.randomUUID();
 
-        flags = flags == null || flags.isEmpty() ? Map.of() : Map.copyOf(flags);
+        flags = flags == null || flags.isEmpty() ? Map.of() : Collections.unmodifiableMap(new EnumMap<>(flags));
         tagResolver = tagResolver == null ? TagResolver.empty() : tagResolver;
     }
 
