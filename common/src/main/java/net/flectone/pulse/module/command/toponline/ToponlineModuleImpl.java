@@ -173,6 +173,7 @@ public class ToponlineModuleImpl implements ToponlineModule {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer)) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.TOPONLINE.getTagName())) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.TOPONLINE.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();

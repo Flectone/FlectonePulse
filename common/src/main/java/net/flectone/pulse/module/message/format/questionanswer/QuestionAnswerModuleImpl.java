@@ -137,6 +137,7 @@ public class QuestionAnswerModuleImpl implements QuestionAnswerModule {
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.QUESTION.getTagName())) return messageContext;
 
         FEntity receiver = messageContext.receiver();
 

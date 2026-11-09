@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.pipeline.fast.FastMessageParser;
 import net.flectone.pulse.serializer.ComponentSerializer;
 import net.flectone.pulse.util.tag.CachingTagResolver;
 import net.kyori.adventure.text.Component;
@@ -39,6 +40,7 @@ public class MessagePipelineImpl implements MessagePipeline {
     private final MiniMessage miniMessage;
     private final EventDispatcher eventDispatcher;
     private final ComponentSerializer componentSerializer;
+    private final FastMessageParser fastMessageParser;
     private final @Named("messageContext") Cache<MessageContext.CacheKey, Component> messageContextCache;
 
     @NonNull
@@ -117,7 +119,8 @@ public class MessagePipelineImpl implements MessagePipeline {
         if (cachedComponent != null) return cachedComponent;
 
         // update context
-        messageContext = eventDispatcher.dispatch(new MessageFormattingEvent(messageContext)).context();
+        MessageContext formattingContext = new FormattingContext(messageContext);
+        messageContext = eventDispatcher.dispatch(new MessageFormattingEvent(formattingContext)).context();
 
         Component component = deserialize(messageContext);
 
@@ -142,12 +145,17 @@ public class MessagePipelineImpl implements MessagePipeline {
             messageContext = messageContext.addTagResolver(ReplacementTag.emptyResolver(messageContext.tagResolver()));
         }
 
+        // always need to replace legacy § with & to avoid MiniMessage problems
+        String message = messageContext.message();
+        if (message.indexOf('§') >= 0) {
+            message = message.replace('§', '&');
+        }
+
+        Component fastComponent = fastMessageParser.deserialize(message, messageContext.tagResolver());
+        if (fastComponent != null) return fastComponent;
+
         try {
-            return miniMessage.deserialize(
-                    // always need to replace legacy § with & to avoid MiniMessage problems
-                    Strings.CS.replace(messageContext.message(), "§", "&"),
-                    messageContext.tagResolver()
-            );
+            return miniMessage.deserialize(message, messageContext.tagResolver());
         } catch (Exception e) {
             fLogger.warning(e);
         }

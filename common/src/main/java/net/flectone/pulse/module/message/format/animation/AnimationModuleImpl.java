@@ -73,6 +73,7 @@ public class AnimationModuleImpl implements AnimationModule {
     @Override
     public MessageContext addTag(MessageContext messageContext) {
         if (moduleController.isDisabledFor(this, messageContext.sender())) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.ANIMATION.getTagName())) return messageContext;
 
         if (messageContext.message().contains("<animation:")) {
             messageContext = messageContext.addFlag(MessageFlag.USE_CACHE, false);

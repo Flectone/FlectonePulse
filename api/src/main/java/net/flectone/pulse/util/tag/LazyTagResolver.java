@@ -11,10 +11,11 @@ import org.jspecify.annotations.Nullable;
 import java.util.Arrays;
 
 /**
- * Stack of tag resolvers that is merged into a single resolver only when a tag is first looked up.
- * {@link TagResolver#resolver(TagResolver...)} merges every resolver it is given into a new map and
- * a new array, so merging on each addition copies the whole stack again and again, which is
- * quadratic in the number of formatting modules a message goes through
+ * Flat stack of tag resolvers.
+ *
+ * <p>{@link TagResolver#resolver(TagResolver...)} merges every resolver into a map on each
+ * addition. This class keeps one array instead and walks it from the newest resolver to the
+ * oldest one, so adding a resolver is one array copy and resolving a tag does not build a map.</p>
  *
  * @author TheFaser
  * @since 1.13.0
@@ -22,20 +23,14 @@ import java.util.Arrays;
  */
 public final class LazyTagResolver implements TagResolver {
 
-    private final TagResolver parent;
     private final TagResolver[] resolvers;
-    private final int size;
 
-    private @Nullable TagResolver merged;
-
-    private LazyTagResolver(@NonNull TagResolver parent, TagResolver @NonNull [] resolvers) {
-        this.parent = parent;
+    private LazyTagResolver(TagResolver @NonNull [] resolvers) {
         this.resolvers = resolvers;
-        this.size = (parent instanceof LazyTagResolver lazy ? lazy.size : 1) + resolvers.length;
     }
 
     /**
-     * Stacks a resolver on top of the current ones
+     * Stacks a resolver on top of the current ones.
      *
      * @param current the resolvers stacked so far
      * @param resolver the resolver to add
@@ -43,63 +38,94 @@ public final class LazyTagResolver implements TagResolver {
      */
     public static @NonNull TagResolver append(@Nullable TagResolver current, @Nullable TagResolver resolver) {
         if (resolver == null) return current == null ? TagResolver.empty() : current;
-        if (current == null) return resolver;
 
-        return new LazyTagResolver(current, new TagResolver[]{resolver});
+        return appendAll(current, resolver);
     }
 
     /**
-     * Stacks several resolvers on top of the current ones
+     * Stacks several resolvers on top of the current ones.
      *
      * @param current the resolvers stacked so far
-     * @param resolvers the resolvers to add
+     * @param added the resolvers to add
      * @return the stacked resolver, or an empty resolver if there is nothing to stack
      */
-    public static @NonNull TagResolver appendAll(@Nullable TagResolver current, TagResolver @NonNull ... resolvers) {
-        if (resolvers.length == 0) return current == null ? TagResolver.empty() : current;
+    public static @NonNull TagResolver appendAll(@Nullable TagResolver current, TagResolver @NonNull ... added) {
+        if (added.length == 0) return current == null ? TagResolver.empty() : current;
+
         if (current == null) {
-            return resolvers.length == 1
-                    ? resolvers[0]
-                    : new LazyTagResolver(resolvers[0], Arrays.copyOfRange(resolvers, 1, resolvers.length));
+            return added.length == 1 ? added[0] : new LazyTagResolver(Arrays.copyOfRange(added, 0, added.length));
         }
 
-        return new LazyTagResolver(current, resolvers.clone());
+        if (current instanceof LazyTagResolver lazy) {
+            TagResolver[] merged = Arrays.copyOfRange(lazy.resolvers, 0, lazy.resolvers.length + added.length);
+            System.arraycopy(added, 0, merged, lazy.resolvers.length, added.length);
+            return new LazyTagResolver(merged);
+        }
+
+        TagResolver[] merged = new TagResolver[added.length + 1];
+        merged[0] = current;
+        System.arraycopy(added, 0, merged, 1, added.length);
+        return new LazyTagResolver(merged);
+    }
+
+    /**
+     * Wraps an array the caller just built and will not mutate.
+     *
+     * @param resolvers the owned resolvers
+     * @return the resolver
+     */
+    public static @NonNull TagResolver of(TagResolver @NonNull [] resolvers) {
+        if (resolvers.length == 0) return TagResolver.empty();
+        if (resolvers.length == 1) return resolvers[0];
+
+        return new LazyTagResolver(resolvers);
     }
 
     @Override
     public @Nullable Tag resolve(@NonNull String name, @NonNull ArgumentQueue arguments, @NonNull Context ctx) throws ParsingException {
-        return merged().resolve(name, arguments, ctx);
+        ParsingException thrown = null;
+
+        // the newest resolver wins, so walk the flat stack backwards
+        for (int index = resolvers.length - 1; index >= 0; index--) {
+            TagResolver resolver = resolvers[index];
+            if (!resolver.has(name)) continue;
+
+            try {
+                Tag tag = resolver.resolve(name, arguments, ctx);
+                if (tag != null) return tag;
+            } catch (ParsingException e) {
+                arguments.reset();
+                if (thrown == null) {
+                    thrown = e;
+                } else {
+                    thrown.addSuppressed(e);
+                }
+            } catch (Exception e) {
+                arguments.reset();
+                ParsingException error = new TagParsingException("Exception thrown while parsing <" + name + ">", e);
+
+                if (thrown == null) {
+                    thrown = error;
+                } else {
+                    thrown.addSuppressed(error);
+                }
+            }
+        }
+
+        if (thrown != null) {
+            throw thrown;
+        }
+
+        return null;
     }
 
     @Override
     public boolean has(@NonNull String name) {
-        return merged().has(name);
-    }
-
-    /**
-     * Merges the whole stack into a single resolver on first use and keeps it for the calls after that.
-     *
-     * @return the merged resolver
-     */
-    public @NonNull TagResolver merged() {
-        if (merged == null) {
-            TagResolver[] parts = new TagResolver[size];
-
-            int index = size;
-            TagResolver current = this;
-
-            while (current instanceof LazyTagResolver lazy) {
-                index -= lazy.resolvers.length;
-                System.arraycopy(lazy.resolvers, 0, parts, index, lazy.resolvers.length);
-                current = lazy.parent;
-            }
-
-            parts[index - 1] = current;
-
-            this.merged = TagResolver.resolver(parts);
+        for (int index = resolvers.length - 1; index >= 0; index--) {
+            if (resolvers[index].has(name)) return true;
         }
 
-        return merged;
+        return false;
     }
 
 }

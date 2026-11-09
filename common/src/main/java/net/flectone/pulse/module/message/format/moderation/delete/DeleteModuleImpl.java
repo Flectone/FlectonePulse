@@ -91,6 +91,7 @@ public class DeleteModuleImpl implements DeleteModule {
         FEntity sender = messageContext.sender();
         FPlayer receiver = messageContext.receiver();
         if (moduleController.isDisabledFor(this, receiver)) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.DELETE.getTagName())) return messageContext;
 
         UUID messageUUID = messageContext.uuid();
 

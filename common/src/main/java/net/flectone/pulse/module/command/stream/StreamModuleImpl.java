@@ -223,6 +223,8 @@ public class StreamModuleImpl implements StreamModule {
         FEntity sender = messageContext.sender();
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
         if (moduleController.isDisabledFor(this, fPlayer)) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.STREAM.getTagName())
+                && !messageContext.hasTag("stream_prefix")) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.STREAM.getTagName(), "stream_prefix"), (_, _) -> {
             String streamPrefix = socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX);

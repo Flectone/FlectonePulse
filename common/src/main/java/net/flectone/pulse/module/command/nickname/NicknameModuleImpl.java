@@ -233,6 +233,8 @@ public class NicknameModuleImpl implements NicknameModule {
 
     @Override
     public MessageContext addTag(MessageContext messageContext) {
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.NICKNAME.getTagName())) return messageContext;
+
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.NICKNAME.getTagName(), (_, _) -> {
             // get nickname value
             String value = socialService.getSetting(fPlayerService.getFPlayer(messageContext.sender()), SettingText.NICKNAME);

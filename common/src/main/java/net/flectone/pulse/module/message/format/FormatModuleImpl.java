@@ -52,6 +52,8 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FormatModuleImpl implements FormatModule {
 
+    private static final AdventureTag[] ADVENTURE_TAGS = AdventureTag.values();
+
     private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
 
     private final FileFacade fileFacade;
@@ -150,27 +152,36 @@ public class FormatModuleImpl implements FormatModule {
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.PLAYER_MESSAGE);
 
-        if (sender instanceof FPlayer fPlayer && !isUserMessage) {
+        if (sender instanceof FPlayer fPlayer
+                && !isUserMessage
+                && messageContext.hasTag(MessagePipeline.ReplacementTag.SERVER.getTagName())) {
             messageContext = messageContext.addTagResolver(
                     Placeholder.unparsed("server", StringUtils.defaultString(socialService.getSetting(fPlayer, SettingText.SERVER)))
             );
         }
 
         FPlayer fReceiver = messageContext.receiver();
-        return messageContext.addTagResolvers(tagResolverMap
-                .entrySet()
-                .stream()
-                .filter(entry -> isCorrectTag(entry.getKey(), sender, isUserMessage))
-                .map(entry -> {
-                    if (entry.getKey() == AdventureTag.GRADIENT
-                            && integrationModule.isBedrockPlayer(fReceiver)) {
-                        return bedrockGradientTag();
-                    }
 
-                    return entry.getValue();
-                })
-                .toArray(TagResolver[]::new)
-        );
+        TagResolver[] resolvers = new TagResolver[tagResolverMap.size()];
+        int count = 0;
+
+        for (AdventureTag adventureTag : ADVENTURE_TAGS) {
+            TagResolver tagResolver = tagResolverMap.get(adventureTag);
+            if (tagResolver == null || !isCorrectTag(adventureTag, sender, isUserMessage)) continue;
+
+            if (adventureTag == AdventureTag.GRADIENT
+                    && integrationModule.isBedrockPlayer(fReceiver)) {
+                resolvers[count++] = bedrockGradientTag();
+            } else {
+                resolvers[count++] = tagResolver;
+            }
+        }
+
+        if (count < resolvers.length) {
+            resolvers = Arrays.copyOfRange(resolvers, 0, count);
+        }
+
+        return messageContext.addTagResolvers(resolvers);
     }
 
     @Override

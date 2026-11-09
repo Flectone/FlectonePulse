@@ -202,6 +202,16 @@ public interface MessageContext {
     }
 
     /**
+     * Whether the raw text uses the given MiniMessage tag.
+     *
+     * @param name the lowercased tag name
+     * @return true if the text uses the tag
+     */
+    default boolean hasTag(@NonNull String name) {
+        return base().hasTag(name);
+    }
+
+    /**
      * Returns a copy with one flag set, keeping the rest.
      *
      * @param flag the flag to set

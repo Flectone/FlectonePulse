@@ -31,9 +31,11 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -101,6 +103,8 @@ public class NamesModuleImpl implements NamesModule {
         FPlayer fReceiver = messageContext.receiver();
 
         if (!(sender instanceof FPlayer fPlayer)) {
+            if (!messageContext.hasTag(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName())) return messageContext;
+
             return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (_, _) -> {
                 Localization.Message.Format.Names localizationName = localization(fReceiver);
 
@@ -150,87 +154,107 @@ public class NamesModuleImpl implements NamesModule {
             }));
         }
 
-        return messageContext
-                .addTagResolvers(
-                        messagePipeline.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, _) -> {
-                            List<String> constants = localization(fPlayer).constant();
-                            if (constants.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
+        List<TagResolver> resolvers = new ArrayList<>(6);
 
-                            int constantIndex = 0;
-                            if (argumentQueue.hasNext()) {
-                                constantIndex = argumentQueue.pop().asInt().orElse(0);
-                                if (constantIndex >= constants.size()) {
-                                    constantIndex = 0;
-                                }
-                            }
+        if (messageContext.hasTag(MessagePipeline.ReplacementTag.CONSTANT.getTagName())) {
+            resolvers.add(messagePipeline.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, _) -> {
+                List<String> constants = localization(fPlayer).constant();
+                if (constants.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
-                            String constant = proxyRegistry.hasEnabledProxy()
-                                    ? socialService.getSetting(fPlayer, SettingText.CONSTANT.name() + "_" + constantIndex)
-                                    : constants.get(constantIndex);
+                int constantIndex = 0;
+                if (argumentQueue.hasNext()) {
+                    constantIndex = argumentQueue.pop().asInt().orElse(0);
+                    if (constantIndex >= constants.size()) {
+                        constantIndex = 0;
+                    }
+                }
 
-                            if (StringUtils.isEmpty(constant)) return MessagePipeline.ReplacementTag.emptyTag();
+                String constant = proxyRegistry.hasEnabledProxy()
+                        ? socialService.getSetting(fPlayer, SettingText.CONSTANT.name() + "_" + constantIndex)
+                        : constants.get(constantIndex);
 
-                            return Tag.inserting(messagePipeline.build(MessageContext.builder()
-                                    .module(this.name())
-                                    .sender(fPlayer)
-                                    .receiver(fReceiver)
-                                    .message(constant)
-                                    .flags(messageContext.flags())
-                                    .flag(MessageFlag.PLAYER_MESSAGE, false)
-                                    .build()
-                            ));
-                        }),
-                        messagePipeline.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, _) -> {
-                            Localization.Message.Format.Names localization = localization(fReceiver);
+                if (StringUtils.isEmpty(constant)) return MessagePipeline.ReplacementTag.emptyTag();
 
-                            int displayNameIndex = 0;
-                            if (argumentQueue.hasNext()) {
-                                displayNameIndex = argumentQueue.pop().asInt().orElse(0);
-                                if (displayNameIndex > localization.display().size()) {
-                                    displayNameIndex = 0;
-                                }
-                            }
+                return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                        .module(this.name())
+                        .sender(fPlayer)
+                        .receiver(fReceiver)
+                        .message(constant)
+                        .flags(messageContext.flags())
+                        .flag(MessageFlag.PLAYER_MESSAGE, false)
+                        .build()
+                ));
+            }));
+        }
 
-                            String displayName;
-                            if (fPlayer.isUnknown() || localization.display().isEmpty()) {
-                                displayName = Strings.CS.replace(localization.unknown(), "<name>", profileResolver.resolveName(fPlayer));
-                            } else if (fPlayer.isConsole()) {
-                                displayName = Strings.CS.replace(localization.console(), "<name>", profileResolver.resolveName(fPlayer));
-                            } else {
-                                displayName = localization.display().get(displayNameIndex);
-                            }
+        if (messageContext.hasTag(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName())) {
+            resolvers.add(messagePipeline.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, _) -> {
+                Localization.Message.Format.Names localization = localization(fReceiver);
 
-                            return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
-                                    .module(this.name())
-                                    .sender(sender)
-                                    .receiver(fReceiver)
-                                    .message(displayName)
-                                    .flags(messageContext.flags())
-                                    .flags(
-                                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
-                                            new boolean[]{false, false}
-                                    )
-                                    .build()
-                            ));
-                        }),
-                        messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.PREFIX.getTagName(), "vault_prefix"), (_, _) -> {
-                            String prefix = integrationModule.getPrefix(fPlayer);
-                            return buildVaultTag(fPlayer, fReceiver, prefix, messageContext);
-                        }),
-                        messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.SUFFIX.getTagName(), "vault_suffix"), (_, _) -> {
-                            String suffix = integrationModule.getSuffix(fPlayer);
-                            return buildVaultTag(fPlayer, fReceiver, suffix, messageContext);
-                        }),
-                        messagePipeline.resolver(getPlayerNameTags(messageContext), (_, _) ->
-                                Tag.preProcessParsed(profileResolver.resolveName(fPlayer))
+                int displayNameIndex = 0;
+                if (argumentQueue.hasNext()) {
+                    displayNameIndex = argumentQueue.pop().asInt().orElse(0);
+                    if (displayNameIndex > localization.display().size()) {
+                        displayNameIndex = 0;
+                    }
+                }
+
+                String displayName;
+                if (fPlayer.isUnknown() || localization.display().isEmpty()) {
+                    displayName = Strings.CS.replace(localization.unknown(), "<name>", profileResolver.resolveName(fPlayer));
+                } else if (fPlayer.isConsole()) {
+                    displayName = Strings.CS.replace(localization.console(), "<name>", profileResolver.resolveName(fPlayer));
+                } else {
+                    displayName = localization.display().get(displayNameIndex);
+                }
+
+                return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                        .module(this.name())
+                        .sender(sender)
+                        .receiver(fReceiver)
+                        .message(displayName)
+                        .flags(messageContext.flags())
+                        .flags(
+                                new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
+                                new boolean[]{false, false}
                         )
-                );
+                        .build()
+                ));
+            }));
+        }
+
+        if (messageContext.hasTag(MessagePipeline.ReplacementTag.PREFIX.getTagName())
+                || messageContext.hasTag("vault_prefix")) {
+            resolvers.add(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.PREFIX.getTagName(), "vault_prefix"), (_, _) -> {
+                String prefix = integrationModule.getPrefix(fPlayer);
+                return buildVaultTag(fPlayer, fReceiver, prefix, messageContext);
+            }));
+        }
+
+        if (messageContext.hasTag(MessagePipeline.ReplacementTag.SUFFIX.getTagName())
+                || messageContext.hasTag("vault_suffix")) {
+            resolvers.add(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.SUFFIX.getTagName(), "vault_suffix"), (_, _) -> {
+                String suffix = integrationModule.getSuffix(fPlayer);
+                return buildVaultTag(fPlayer, fReceiver, suffix, messageContext);
+            }));
+        }
+
+        Set<String> playerNameTags = getPlayerNameTags(messageContext);
+        if (hasAnyTag(messageContext, playerNameTags)) {
+            resolvers.add(messagePipeline.resolver(playerNameTags, (_, _) ->
+                    Tag.preProcessParsed(profileResolver.resolveName(fPlayer))
+            ));
+        }
+
+        return messageContext.addTagResolvers(resolvers.toArray(new TagResolver[0]));
     }
 
     @Override
     public MessageContext addInvisibleTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName())
+                && !messageContext.hasTag(MessagePipeline.ReplacementTag.PLAYER.getTagName())) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
         return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), MessagePipeline.ReplacementTag.PLAYER.getTagName()),
@@ -252,6 +276,14 @@ public class NamesModuleImpl implements NamesModule {
         return config().shouldCheckInvisibility()
                 && platformPlayerAdapter.hasPotionEffect(entity, PotionUtil.INVISIBILITY_POTION_NAME)
                 && permissionChecker.check(entity, permission().invisible());
+    }
+
+    private static boolean hasAnyTag(MessageContext messageContext, Set<String> names) {
+        for (String name : names) {
+            if (messageContext.hasTag(name)) return true;
+        }
+
+        return false;
     }
 
     private Set<String> getPlayerNameTags(MessageContext messageContext) {

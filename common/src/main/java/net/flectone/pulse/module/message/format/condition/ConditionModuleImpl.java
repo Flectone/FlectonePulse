@@ -80,6 +80,7 @@ public class ConditionModuleImpl implements ConditionModule {
     @Override
     public MessageContext addTag(MessageContext messageContext) {
         if (moduleController.isDisabledFor(this, messageContext.sender())) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.CONDITION.getTagName())) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.CONDITION.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();

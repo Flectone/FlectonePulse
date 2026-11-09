@@ -125,6 +125,7 @@ public class SwearModuleImpl implements SwearModule {
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.SWEAR.getTagName())) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.SWEAR.getTagName(), (argumentQueue, _) -> {

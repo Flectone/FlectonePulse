@@ -68,6 +68,8 @@ public class WorldModuleImpl implements WorldModule {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.WORLD.getTagName())
+                && !messageContext.hasTag("world_prefix")) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.WORLD.getTagName(), "world_prefix"), (_, _) -> {
             String worldPrefix = socialService.getSetting(fPlayer, SettingText.WORLD_PREFIX);

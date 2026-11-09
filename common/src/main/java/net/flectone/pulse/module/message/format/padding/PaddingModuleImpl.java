@@ -78,6 +78,7 @@ public class PaddingModuleImpl implements PaddingModule {
         FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)
                 && !permissionChecker.check(sender, permission())) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.PADDING.getTagName())) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.PADDING.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();

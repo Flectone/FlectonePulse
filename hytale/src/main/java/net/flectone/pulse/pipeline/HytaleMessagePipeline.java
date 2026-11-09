@@ -9,6 +9,7 @@ import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.pipeline.fast.FastMessageParser;
 import net.flectone.pulse.serializer.ComponentSerializer;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.LazyInstance;
@@ -34,8 +35,9 @@ public class HytaleMessagePipeline extends MessagePipelineImpl {
                                  EventDispatcher eventDispatcher,
                                  ComponentSerializer componentSerializer,
                                  LazyInstance<SocialService> socialService,
-                                 @Named("messageContext") Cache<MessageContext.CacheKey, Component> messageContextCache) {
-        super(fLogger, miniMessage, eventDispatcher, componentSerializer, messageContextCache);
+                                 @Named("messageContext") Cache<MessageContext.CacheKey, Component> messageContextCache,
+                                 FastMessageParser fastMessageParser) {
+        super(fLogger, miniMessage, eventDispatcher, componentSerializer, fastMessageParser, messageContextCache);
 
         this.socialService = socialService;
     }

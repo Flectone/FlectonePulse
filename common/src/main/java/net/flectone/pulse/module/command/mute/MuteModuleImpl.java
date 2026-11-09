@@ -232,6 +232,8 @@ public class MuteModuleImpl implements MuteModule {
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.MUTE.getTagName())
+                && !messageContext.hasTag("mute_suffix")) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.MUTE.getTagName(), "mute_suffix"), (_, _) -> {
             String suffix = getMuteSuffix(fPlayer, messageContext.receiver());

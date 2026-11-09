@@ -109,6 +109,8 @@ public class MinecraftObjectModule extends ObjectModuleImpl {
 
     public MessageContext addPlayerHeadTag(MessageContext messageContext) {
         if (!config().playerHeadTag().enable()) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName())
+                && !messageContext.hasTag(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName())) return messageContext;
 
         FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
@@ -212,6 +214,8 @@ public class MinecraftObjectModule extends ObjectModuleImpl {
 
     public MessageContext addSpriteTag(MessageContext messageContext) {
         if (!config().spriteTag().enable()) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.SPRITE.getTagName())
+                && !messageContext.hasTag(MessagePipeline.ReplacementTag.SPRITE_OR.getTagName())) return messageContext;
 
         FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
@@ -239,6 +243,8 @@ public class MinecraftObjectModule extends ObjectModuleImpl {
 
     public MessageContext addTextureTag(MessageContext messageContext) {
         if (!config().textureTag().enable()) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.TEXTURE.getTagName())
+                && !messageContext.hasTag(MessagePipeline.ReplacementTag.TEXTURE_OR.getTagName())) return messageContext;
 
         FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {

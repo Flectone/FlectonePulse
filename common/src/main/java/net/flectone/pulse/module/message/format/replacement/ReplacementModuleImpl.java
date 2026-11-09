@@ -125,6 +125,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
     public MessageContext addTags(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
+        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.REPLACEMENT.getTagName())) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
 

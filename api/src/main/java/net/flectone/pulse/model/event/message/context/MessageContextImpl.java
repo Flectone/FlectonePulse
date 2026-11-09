@@ -7,6 +7,7 @@ import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.tag.LazyTagResolver;
+import net.flectone.pulse.util.tag.TagPresence;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jspecify.annotations.NonNull;
 
@@ -142,6 +143,11 @@ record MessageContextImpl(
     @Override
     public MessageContextImpl base() {
         return this;
+    }
+
+    @Override
+    public boolean hasTag(@NonNull String name) {
+        return TagPresence.contains(message, name);
     }
 
     @Override
