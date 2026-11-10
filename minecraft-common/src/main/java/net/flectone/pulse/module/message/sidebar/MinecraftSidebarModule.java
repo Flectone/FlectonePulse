@@ -71,6 +71,8 @@ public class MinecraftSidebarModule extends SidebarModuleImpl {
 
     @Override
     public void remove(FPlayer fPlayer) {
+        playerSidebarContent.remove(fPlayer.uuid());
+
         if (!playerSidebars.contains(fPlayer.uuid())) return;
 
         playerSidebars.remove(fPlayer.uuid());
