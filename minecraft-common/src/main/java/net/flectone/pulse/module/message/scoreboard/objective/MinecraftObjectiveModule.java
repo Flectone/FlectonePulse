@@ -43,6 +43,12 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
     }
 
     @Override
+    public void onEnable() {
+        objectives.clear();
+        sentScores.clear();
+    }
+
+    @Override
     public Set<@NonNull Class<? extends ModuleSimple>> children() {
         Set<Class<? extends ModuleSimple>> children = new LinkedHashSet<>(super.children());
         children.add(MinecraftBelownameModule.class);
@@ -82,7 +88,7 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
                 WrapperPlayServerUpdateScore.Action.CREATE_OR_UPDATE_ITEM,
                 objectiveName,
                 -1,
-                Component.text(fPlayer.name()),
+                Component.text(fObjective.name()),
                 ScoreFormat.fixedScore(scoreFormat)
         ));
     }
