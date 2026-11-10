@@ -222,7 +222,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NonNull Component translateItemName(@NonNull Object item, @NonNull UUID messageUUID, boolean translatable) {
+    public @NonNull Component translateItemName(@NonNull Object item, boolean translatable) {
         if (!(item instanceof net.minecraft.world.item.ItemStack itemStack)) return Component.empty();
         if (getItemName(item).equalsIgnoreCase("air")) return Component.translatable("block.minecraft.air");
 

@@ -440,7 +440,7 @@ public class ReplacementModuleImpl implements ReplacementModule {
 
     private Tag itemTag(MessageContext messageContext) {
         Object itemStackObject = platformPlayerAdapter.getItem(messageContext.sender().uuid());
-        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.uuid(), messageContext.isFlag(MessageFlag.ITEM_DETECTION));
+        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.isFlag(MessageFlag.ITEM_DETECTION));
 
         return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
                 .base(MessageContext.builder()

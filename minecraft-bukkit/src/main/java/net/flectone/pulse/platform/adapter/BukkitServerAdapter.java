@@ -353,7 +353,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NonNull Component translateItemName(@NonNull Object item, @NonNull UUID messageUUID, boolean translatable) {
+    public @NonNull Component translateItemName(@NonNull Object item, boolean translatable) {
         if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
 
         Component component = itemStack.getItemMeta() == null

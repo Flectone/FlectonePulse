@@ -192,11 +192,10 @@ public interface PlatformServerAdapter {
      * Translates an item name with optional localization.
      *
      * @param item the platform-specific item object
-     * @param messageUUID the message UUID for caching
      * @param translatable whether the name should be translated
      * @return translated item name component
      */
-    @NonNull Component translateItemName(@NonNull Object item, @NonNull UUID messageUUID, boolean translatable);
+    @NonNull Component translateItemName(@NonNull Object item, boolean translatable);
 
     /**
      * Builds an item stack with lore.
