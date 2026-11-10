@@ -421,10 +421,10 @@ command:
     name: "flectonepulse.module.command.sprite"
     type: "TRUE"
     cooldown_bypass:
-      name: "flectonepulse.module.command.spy.cooldown.bypass"
+      name: "flectonepulse.module.command.sprite.cooldown.bypass"
       type: "OP"
     sound:
-      name: "flectonepulse.module.command.spy.sound"
+      name: "flectonepulse.module.command.sprite.sound"
       type: "TRUE"
   spy:
     name: "flectonepulse.module.command.spy"
@@ -683,7 +683,7 @@ message:
     type: "TRUE"
     types:
       announcement:
-        name: "flectonepulse.module.message.auto.sound"
+        name: "flectonepulse.module.message.auto.announcement"
         type: "TRUE"
   book:
     name: "flectonepulse.module.message.book"
