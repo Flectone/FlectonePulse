@@ -35,8 +35,8 @@ final class GradientColorizer implements Colorizer {
     public @NonNull TextColor color() {
         double position = (index * multiplier) + phase;
         int lowUnclamped = (int) Math.floor(position);
-        int high = (int) Math.ceil(position) % colors.length;
-        int low = lowUnclamped % colors.length;
+        int high = Math.floorMod((int) Math.ceil(position), colors.length);
+        int low = Math.floorMod(lowUnclamped, colors.length);
 
         return TextColor.lerp((float) position - lowUnclamped, colors[low], colors[high]);
     }

@@ -569,6 +569,11 @@ final class FastParser {
                 } catch (NumberFormatException _) {
                     return null;
                 }
+
+                if (phase < -1 || phase > 1) {
+                    return null;
+                }
+
                 break;
             }
 
