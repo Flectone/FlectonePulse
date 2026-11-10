@@ -118,12 +118,19 @@ public class MinecraftServerlinkModule implements ModuleLocalization {
         packetSender.send(fPlayer, new WrapperPlayServerServerLinks(serverLinks));
     }
 
+    public void remove(UUID uuid) {
+        cachedLinks.remove(uuid);
+    }
+
     @Override
     public void onDisable() {
         cachedLinks.clear();
     }
 
-    private record CachedLinks(int hash, long builtAtTick) {
+    private record CachedLinks(
+            int hash,
+            long builtAtTick
+    ) {
     }
 
 }

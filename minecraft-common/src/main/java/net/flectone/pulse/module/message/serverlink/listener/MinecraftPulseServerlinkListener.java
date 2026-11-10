@@ -8,6 +8,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
+import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.serverlink.MinecraftServerlinkModule;
 
 @Singleton
@@ -27,6 +28,11 @@ public class MinecraftPulseServerlinkListener implements PulseListener {
 
         FPlayer fPlayer = event.player();
         linkModule.sendLinks(fPlayer);
+    }
+
+    @Pulse
+    public void onPlayerQuitEvent(PlayerQuitEvent event) {
+        linkModule.remove(event.player().uuid());
     }
 
 }
