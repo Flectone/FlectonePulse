@@ -23,7 +23,6 @@ import java.util.UUID;
  * @param tagResolver the MiniMessage tags in scope
  * @param sender who sent the message
  * @param receiver who reads this copy
- * @param uuid the shared message id
  * @param message the raw text
  */
 @With
@@ -34,7 +33,6 @@ record MessageContextImpl(
         @NonNull ModuleName module,
         @NonNull FEntity sender,
         @NonNull FPlayer receiver,
-        @NonNull UUID uuid,
         @NonNull String message
 ) implements MessageContext {
 
@@ -135,7 +133,6 @@ record MessageContextImpl(
         if (module == null) module = ModuleName.UNKNOWN;
         if (sender == null) sender = FPlayer.UNKNOWN;
         if (receiver == null) receiver = sender instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
-        if (uuid == null) uuid = UUID.randomUUID();
 
         flags = flags == null || flags.isEmpty() ? Map.of() : Collections.unmodifiableMap(new EnumMap<>(flags));
         tagResolver = tagResolver == null ? TagResolver.empty() : tagResolver;

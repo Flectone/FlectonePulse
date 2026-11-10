@@ -87,13 +87,11 @@ public class DeleteModuleImpl implements DeleteModule {
     }
 
     @Override
-    public MessageContext addTag(MessageContext messageContext) {
+    public MessageContext addTag(MessageContext messageContext, UUID messageUUID) {
         FEntity sender = messageContext.sender();
         FPlayer receiver = messageContext.receiver();
         if (moduleController.isDisabledFor(this, receiver)) return messageContext;
         if (!messageContext.hasTag(MessagePipeline.ReplacementTag.DELETE.getTagName())) return messageContext;
-
-        UUID messageUUID = messageContext.uuid();
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.DELETE.getTagName(), (_, _) -> {
             String placeholder = Strings.CS.replace(

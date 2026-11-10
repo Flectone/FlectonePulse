@@ -37,9 +37,10 @@ public interface DeleteModule extends ModuleLocalization {
      * Registers the tag that draws the withdraw button.
      *
      * @param messageContext the message being formatted
+     * @param messageUUID the id shared by every copy of the message
      * @return the context with the tag added
      */
-    MessageContext addTag(MessageContext messageContext);
+    MessageContext addTag(MessageContext messageContext, UUID messageUUID);
 
     /**
      * Remembers a delivered message so it can be withdrawn later.

@@ -2,6 +2,7 @@ package net.flectone.pulse.pipeline;
 
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.Context;
@@ -74,7 +75,18 @@ public interface MessagePipeline {
      * @param messageContext the message
      * @return the rendered component
      */
-    @NonNull Component build(MessageContext messageContext);
+    default @NonNull Component build(MessageContext messageContext) {
+        return build(null, messageContext);
+    }
+
+    /**
+     * Renders the message as a component, which is what the other build methods serialize.
+     *
+     * @param eventMetadata the metadata of the message, or null
+     * @param messageContext the message
+     * @return the rendered component
+     */
+    @NonNull Component build(@Nullable EventMetadata eventMetadata, @NonNull MessageContext messageContext);
 
     /**
      * Runs the formatting modules over a message and hands back the text they produced, stopping

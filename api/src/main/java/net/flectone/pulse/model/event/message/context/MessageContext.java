@@ -11,7 +11,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * One message on its way to one receiver, carrying the raw text, who sent it, who reads it,
@@ -94,15 +93,6 @@ public interface MessageContext {
     }
 
     /**
-     * The id shared by every per-receiver copy of the same message.
-     *
-     * @return the message id
-     */
-    default @NonNull UUID uuid() {
-        return base().uuid();
-    }
-
-    /**
      * The raw, unrendered text.
      *
      * @return the message text
@@ -169,16 +159,6 @@ public interface MessageContext {
      */
     default MessageContext withReceiver(@NonNull FPlayer receiver) {
         return withBase(base().withReceiver(receiver));
-    }
-
-    /**
-     * Returns a copy with a different message id.
-     *
-     * @param uuid the new id
-     * @return the copy
-     */
-    default MessageContext withUuid(@NonNull UUID uuid) {
-        return withBase(base().withUuid(uuid));
     }
 
     /**

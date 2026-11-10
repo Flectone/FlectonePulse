@@ -32,7 +32,10 @@ public class PulseDeleteListener implements PulseListener {
         if (!messageContext.isFlag(MessageFlag.DELETE_MODULE)) return event;
         if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) return event;
 
-        return event.withContext(deleteModule.addTag(messageContext));
+        EventMetadata eventMetadata = event.eventMetadata();
+        if (eventMetadata == null) return event;
+
+        return event.withContext(deleteModule.addTag(messageContext, eventMetadata.uuid()));
     }
 
     @Pulse(priority = Event.Priority.MONITOR)
@@ -66,7 +69,7 @@ public class PulseDeleteListener implements PulseListener {
         if (eventMetadata.destination().type() != Destination.Type.CHAT) return;
 
         FPlayer fReceiver = event.messageContext().receiver();
-        UUID messageUUID = event.messageContext().uuid();
+        UUID messageUUID = event.eventMetadata().uuid();
         Component component = event.message();
 
         deleteModule.save(fReceiver, messageUUID, component, true);

@@ -75,7 +75,7 @@ public class ProxySenderImpl implements ProxySender {
         Range range = eventMetadata.range();
         if (!range.is(Range.Type.PROXY)) return false;
 
-        return send(messageContext.sender(), moduleName, proxyConsumer, messageContext.uuid());
+        return send(messageContext.sender(), moduleName, proxyConsumer, eventMetadata.uuid());
     }
 
     @Override

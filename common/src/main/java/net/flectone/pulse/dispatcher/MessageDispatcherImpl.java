@@ -77,14 +77,14 @@ public class MessageDispatcherImpl implements MessageDispatcher {
     public MessageSendEvent createMessageEvent(FPlayer fReceiver, EventMetadata eventMetadata) {
         MessageContext messageContext = eventMetadata.resolveMessageContext(fReceiver);
 
-        Component messageComponent = messagePipeline.build(messageContext);
+        Component messageComponent = messagePipeline.build(eventMetadata, messageContext);
 
         Destination destination = eventMetadata.destination();
 
         // destination subtext
         Component messageSubComponent = StringUtils.isEmpty(destination.subtext())
                 ? Component.empty()
-                : messagePipeline.build(messageContext.withMessage(destination.subtext()));
+                : messagePipeline.build(eventMetadata, messageContext.withMessage(destination.subtext()));
 
         return new MessageSendEvent(
                 messageContext.module(),

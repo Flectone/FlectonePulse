@@ -52,7 +52,7 @@ public record EventMetadataImpl(
 
     @Override
     public @NonNull MessageContext resolveMessageContext(FPlayer fPlayer) {
-        return messageContext.apply(fPlayer).withUuid(uuid);
+        return messageContext.apply(fPlayer);
     }
 
     @Override

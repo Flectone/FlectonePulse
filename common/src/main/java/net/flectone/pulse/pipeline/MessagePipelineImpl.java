@@ -11,6 +11,7 @@ import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.pipeline.fast.FastMessageParser;
@@ -108,7 +109,7 @@ public class MessagePipelineImpl implements MessagePipeline {
 
     @NonNull
     @Override
-    public Component build(MessageContext messageContext) {
+    public Component build(@Nullable EventMetadata eventMetadata, MessageContext messageContext) {
         // no need to build empty message
         if (StringUtils.isEmpty(messageContext.message())) return Component.empty();
 
@@ -120,7 +121,7 @@ public class MessagePipelineImpl implements MessagePipeline {
 
         // update context
         MessageContext formattingContext = new FormattingContext(messageContext);
-        messageContext = eventDispatcher.dispatch(new MessageFormattingEvent(formattingContext)).context();
+        messageContext = eventDispatcher.dispatch(new MessageFormattingEvent(eventMetadata, formattingContext)).context();
 
         Component component = deserialize(messageContext);
 
