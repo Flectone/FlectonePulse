@@ -31,6 +31,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -88,8 +89,11 @@ public class UnmuteModuleImpl implements UnmuteModule {
 
         int id = -1;
         if (reasonWords.length > 0 && StringUtils.isNumeric(reasonWords[0])) {
-            id = Integer.parseInt(reasonWords[0]);
-            reason = StringUtils.join(reasonWords, " ", 1, reasonWords.length);
+            int parsedId = NumberUtils.toInt(reasonWords[0], -1);
+            if (parsedId >= 0) {
+                id = parsedId;
+                reason = StringUtils.join(reasonWords, " ", 1, reasonWords.length);
+            }
         }
 
         unmute(fPlayer, target, id, StringUtils.isEmpty(reason) ? null : reason);

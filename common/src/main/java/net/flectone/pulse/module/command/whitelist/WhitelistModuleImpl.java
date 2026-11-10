@@ -47,6 +47,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.jspecify.annotations.NonNull;
@@ -464,12 +465,13 @@ public class WhitelistModuleImpl implements WhitelistModule {
 
         String[] reasonWords = reason.split(" ");
 
-        int id;
+        int id = -1;
         if (reasonWords.length > 0 && StringUtils.isNumeric(reasonWords[0])) {
-            id = Integer.parseInt(reasonWords[0]);
-            reason = StringUtils.join(reasonWords, " ", 1, reasonWords.length);
-        } else {
-            id = -1;
+            int parsedId = NumberUtils.toInt(reasonWords[0], -1);
+            if (parsedId >= 0) {
+                id = parsedId;
+                reason = StringUtils.join(reasonWords, " ", 1, reasonWords.length);
+            }
         }
 
         if (!moderationService.hasValid(fTarget, Moderation.Type.WHITELIST, id)) {
