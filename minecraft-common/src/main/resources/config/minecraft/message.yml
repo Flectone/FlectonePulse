@@ -266,6 +266,7 @@ format:
         example: ""
   padding:
     enable: true
+    max_length: 512
     values:
       example_left_5:
         type: LEFT

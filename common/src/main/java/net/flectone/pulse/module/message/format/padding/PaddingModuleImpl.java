@@ -158,6 +158,7 @@ public class PaddingModuleImpl implements PaddingModule {
         String end = paddingLocalization.end() != null ? paddingLocalization.end() : "";
 
         int count = paddingValue.length() != null ? Math.max(0, paddingValue.length()) : 0;
+        count = Math.min(count, config().maxLength());
         Message.Format.Padding.Type type = paddingValue.type() != null ? paddingValue.type() : Message.Format.Padding.Type.CENTER;
 
         Pair<Integer, Integer> paddingCount = calculatePadding(type, count);

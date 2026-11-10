@@ -501,6 +501,7 @@ public record Message(
         @Builder(toBuilder = true)
         public record Padding(
                 Boolean enable,
+                Integer maxLength,
                 Map<String, Value> values
         ) implements EnableSetting {
 
