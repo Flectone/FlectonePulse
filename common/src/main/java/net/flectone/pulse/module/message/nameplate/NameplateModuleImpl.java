@@ -15,9 +15,11 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.value.Destination;
 import net.flectone.pulse.model.value.HeadText;
 import net.flectone.pulse.model.value.Ticker;
+import net.flectone.pulse.module.message.nameplate.listener.NameplatePulseListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
@@ -46,6 +48,7 @@ public class NameplateModuleImpl implements NameplateModule {
     private final NearbyService nearbyService;
     private final ModuleController moduleController;
     private final FPlayerService fPlayerService;
+    private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
@@ -53,11 +56,18 @@ public class NameplateModuleImpl implements NameplateModule {
         if (ticker.enable()) {
             taskScheduler.runPlayerAsyncTimer(this::show, ticker.period());
         }
+
+        listenerRegistry.register(NameplatePulseListener.class);
     }
 
     @Override
     public void onDisable() {
         lastRefreshTicks.clear();
+    }
+
+    @Override
+    public void remove(UUID uuid) {
+        lastRefreshTicks.remove(uuid);
     }
 
     @Override

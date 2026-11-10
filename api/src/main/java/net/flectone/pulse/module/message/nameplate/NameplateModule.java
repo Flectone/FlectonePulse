@@ -6,6 +6,8 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 
+import java.util.UUID;
+
 /**
  * Displays nameplates above players' heads for nearby viewers.
  * @author TheFaser
@@ -27,5 +29,12 @@ public interface NameplateModule extends ModuleLocalization {
      * @param fPlayer the player whose nameplate is shown
      */
     void show(FPlayer fPlayer);
+
+    /**
+     * Drops the cached refresh time for the given player.
+     *
+     * @param uuid the player
+     */
+    void remove(UUID uuid);
 
 }
