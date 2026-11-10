@@ -21,6 +21,7 @@ import net.flectone.pulse.service.ModerationService;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -178,7 +179,7 @@ public class ModerationListSenderImpl implements ModerationListSender {
 
         String playerName = optionalPlayer.get();
         if (StringUtils.isNumeric(playerName)) {
-            int page = Integer.parseInt(playerName);
+            int page = NumberUtils.toInt(playerName, 1);
             return Optional.of(new ListArgument(null, page));
         }
 
@@ -201,7 +202,7 @@ public class ModerationListSenderImpl implements ModerationListSender {
         try {
             Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptNumber);
 
-            int page = optionalTime.map(pair -> StringUtils.isNumeric(pair.getRight().trim()) ? Integer.parseInt(pair.getRight().trim()) : 1).orElse(1);
+            int page = optionalTime.map(pair -> StringUtils.isNumeric(pair.getRight().trim()) ? NumberUtils.toInt(pair.getRight().trim(), 1) : 1).orElse(1);
             return Optional.of(new ListArgument(fTarget, page));
         } catch (ClassCastException _) {
             return Optional.empty();
