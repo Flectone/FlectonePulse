@@ -32,6 +32,7 @@ import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
@@ -169,24 +170,33 @@ public class ReplacementModuleImpl implements ReplacementModule {
                     yield spoilerTag(messageContext, values.get(1));
                 }
                 default -> {
-                    String[] searchList = new String[values.size()];
-                    String[] replacementList = new String[values.size()];
+                    TagResolver[] resolvers = new TagResolver[values.size()];
 
                     for (int i = 0; i < values.size(); i++) {
-                        searchList[i] = "<message_" + i + ">";
-                        replacementList[i] = values.get(i);
+                        Component value = messagePipeline.build(MessageContext.builder()
+                                .module(this.name())
+                                .sender(sender)
+                                .receiver(receiver)
+                                .message(values.get(i))
+                                .flags(messageContext.flags())
+                                .flag(MessageFlag.PLAYER_MESSAGE, true)
+                                .build()
+                        );
+
+                        resolvers[i] = messagePipeline.resolver("message_" + i, value);
                     }
 
                     yield Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                             .module(this.name())
                             .sender(sender)
                             .receiver(receiver)
-                            .message(StringUtils.replaceEach(replacement, searchList, replacementList))
+                            .message(replacement)
                             .flags(messageContext.flags())
                             .flags(
                                     new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                                     new boolean[]{false, false}
                             )
+                            .tagResolvers(resolvers)
                             .build()
                     ));
                 }
@@ -247,6 +257,16 @@ public class ReplacementModuleImpl implements ReplacementModule {
         // skip deprecated issue <spoiler:\>
         if (spoilerText.equals("\\")) return MessagePipeline.ReplacementTag.emptyTag();
 
+        Component parsedSpoiler = messagePipeline.build(MessageContext.builder()
+                .module(this.name())
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(spoilerText)
+                .flags(messageContext.flags())
+                .flag(MessageFlag.PLAYER_MESSAGE, true)
+                .build()
+        );
+
         // "." to have the original context like ||%stats%||
         int length = componentSerializer.toPlain(messagePipeline.build(MessageContext.builder()
                 .module(this.name())
@@ -254,28 +274,25 @@ public class ReplacementModuleImpl implements ReplacementModule {
                 .receiver(messageContext.receiver())
                 .message("." + spoilerText)
                 .flags(messageContext.flags())
-                .flags(
-                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.ITEM_DETECTION},
-                        new boolean[]{false, false} // we don't need to double format "|| %item% ||"
-                )
+                .flag(MessageFlag.PLAYER_MESSAGE, true)
                 .build()
         )).length();
         length = spoilerText.endsWith(" ") ? length : Math.max(1, length - 1);
 
         Localization.Message.Format.Replacement replacement = localization(messageContext.receiver());
-        String format = StringUtils.replaceEach(
-                replacement.values().getOrDefault("spoiler", ""),
-                new String[]{"<message_1>", "<symbols>"},
-                new String[]{spoilerText, StringUtils.repeat(replacement.spoilerSymbol(), length)}
-        );
+        String symbols = StringUtils.repeat(replacement.spoilerSymbol(), length);
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                 .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
-                .message(format)
+                .message(replacement.values().getOrDefault("spoiler", ""))
                 .flags(messageContext.flags())
-                .flag(MessageFlag.PLAYER_MESSAGE, false) // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
+                .flag(MessageFlag.PLAYER_MESSAGE, false)
+                .tagResolvers(
+                        messagePipeline.resolver("message_1", parsedSpoiler),
+                        messagePipeline.resolver("symbols", Component.text(symbols))
+                )
                 .build()
         ));
     }
