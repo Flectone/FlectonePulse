@@ -58,12 +58,12 @@ public class MaintenanceProxyMessageListener implements PulseListener {
             boolean turned = proxyPayload.readBoolean();
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .destination(maintenanceModule.config().destination())
                     .sound(maintenanceModule.soundOrThrow())
                     .messageContext(fResolver -> MaintenanceMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(maintenanceModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(moderationMessageFormatter.replacePlaceholders(turned

@@ -193,12 +193,12 @@ public class TictactoeModuleImpl implements TictactoeModule {
                 || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
 
         messageDispatcher.dispatch(EventMetadata.builder()
+                .uuid(metadataUUID)
                 .filter(fReceiver)
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> TicTacToeMessageContext.builder()
                         .base(MessageContext.builder()
                                 .module(this.name())
-                                .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
@@ -239,11 +239,11 @@ public class TictactoeModuleImpl implements TictactoeModule {
         );
 
         messageDispatcher.dispatch(EventMetadata.builder()
+                .uuid(metadataUUID)
                 .filter(fReceiver)
                 .messageContext(fResolver -> TicTacToeMessageContext.builder()
                         .base(MessageContext.builder()
                                 .module(this.name())
-                                .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)

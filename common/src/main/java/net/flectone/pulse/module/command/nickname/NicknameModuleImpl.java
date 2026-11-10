@@ -211,6 +211,7 @@ public class NicknameModuleImpl implements NicknameModule {
                 : Set.of(fPlayer);
         
         messageDispatcher.dispatch(EventMetadata.builder()
+                .uuid(metadataUUID)
                 .destination(config().destination())
                 .range(Range.Type.SERVER)
                 .filter(receivers)
@@ -218,7 +219,6 @@ public class NicknameModuleImpl implements NicknameModule {
                 .messageContext(fResolver -> NicknameMessageContext.builder()
                         .base(MessageContext.builder()
                                 .module(this.name())
-                                .uuid(metadataUUID)
                                 .sender(fTarget)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).format())

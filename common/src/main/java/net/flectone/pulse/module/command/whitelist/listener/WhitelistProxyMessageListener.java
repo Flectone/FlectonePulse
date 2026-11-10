@@ -79,13 +79,13 @@ public class WhitelistProxyMessageListener implements PulseListener {
                     if (moduleController.isDisabledFor(whitelistModule, fModerator)) return event.withProcessed(true);
 
                     messageDispatcher.dispatch(EventMetadata.builder()
+                            .uuid(event.uuid())
                             .range(Range.Type.SERVER)
                             .destination(whitelistModule.config().destination())
                             .sound(whitelistModule.soundOrThrow())
                             .messageContext(fResolver -> WhitelistMessageContext.builder()
                                     .base(MessageContext.builder()
                                             .module(whitelistModule.name())
-                                            .uuid(event.uuid())
                                             .sender(event.sender())
                                             .receiver(fResolver)
                                             .message(moderationMessageFormatter.replacePlaceholders(whitelistModule.localization(fResolver).formatAdd(), fResolver, whitelist))
@@ -105,13 +105,13 @@ public class WhitelistProxyMessageListener implements PulseListener {
                     if (moduleController.isDisabledFor(whitelistModule, fModerator)) return event.withProcessed(true);
 
                     messageDispatcher.dispatch(EventMetadata.builder()
+                            .uuid(event.uuid())
                             .range(Range.Type.SERVER)
                             .destination(whitelistModule.config().destination())
                             .sound(whitelistModule.soundOrThrow())
                             .messageContext(fResolver -> WhitelistMessageContext.builder()
                                     .base(MessageContext.builder()
                                             .module(whitelistModule.name())
-                                            .uuid(event.uuid())
                                             .sender(event.sender())
                                             .receiver(fResolver)
                                             .message(moderationMessageFormatter.replacePlaceholders(whitelistModule.localization(fResolver).formatRemove(), fResolver, unwhitelist))

@@ -298,9 +298,9 @@ public class RockpaperscissorsModuleImpl implements RockpaperscissorsModule {
             );
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(metadataUUID)
                     .messageContext(fResolver -> MessageContext.builder()
                             .module(this.name())
-                            .uuid(metadataUUID)
                             .sender(fPlayer)
                             .receiver(fResolver)
                             .message(message.apply(fResolver))
@@ -310,9 +310,9 @@ public class RockpaperscissorsModuleImpl implements RockpaperscissorsModule {
             );
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(metadataUUID)
                     .messageContext(fResolver -> MessageContext.builder()
                             .module(this.name())
-                            .uuid(metadataUUID)
                             .sender(fReceiver)
                             .receiver(fResolver)
                             .message(message.apply(fResolver))
@@ -327,11 +327,11 @@ public class RockpaperscissorsModuleImpl implements RockpaperscissorsModule {
         FEntity winFPlayer = config().strategies().get(move).contains(senderMove) ? fPlayer : fReceiver;
 
         messageDispatcher.dispatch(EventMetadata.builder()
+                .uuid(metadataUUID)
                 .filter(List.of(fPlayer, fReceiver))
                 .messageContext(fResolver -> RockPaperScissorsMessageContext.builder()
                         .base(MessageContext.builder()
                                 .module(this.name())
-                                .uuid(metadataUUID)
                                 .sender(winFPlayer)
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(
@@ -379,11 +379,11 @@ public class RockpaperscissorsModuleImpl implements RockpaperscissorsModule {
         );
 
         messageDispatcher.dispatch(EventMetadata.builder()
+                .uuid(metadataUUID)
                 .filter(fReceiver)
                 .messageContext(fResolver -> RockPaperScissorsMessageContext.builder()
                         .base(MessageContext.builder()
                                 .module(this.name())
-                                .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)

@@ -53,13 +53,13 @@ public class WarnProxyMessageListener implements PulseListener {
             if (moduleController.isDisabledFor(warnModule, fModerator)) return event.withProcessed(true);
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .destination(warnModule.config().destination())
                     .sound(warnModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(warnModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(moderationMessageFormatter.replacePlaceholders(warnModule.localization(fResolver).server(), fResolver, warn))

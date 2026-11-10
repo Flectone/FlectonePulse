@@ -40,6 +40,7 @@ public class HelperProxyMessageListener implements PulseListener {
             String message = proxyPayload.readString();
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .filter(helperModule.getFilterSee())
                     .destination(helperModule.config().destination())
@@ -47,7 +48,6 @@ public class HelperProxyMessageListener implements PulseListener {
                     .messageContext(fResolver -> StringMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(helperModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(helperModule.localization(fResolver).global())

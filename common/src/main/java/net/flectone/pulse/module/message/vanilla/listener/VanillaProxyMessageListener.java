@@ -64,6 +64,7 @@ public class VanillaProxyMessageListener implements PulseListener {
             boolean vanished = proxyPayload.readBoolean();
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
                     .filter(fResolver -> socialService.canSeeVanished(event.sender(), fResolver, vanished))
@@ -71,7 +72,6 @@ public class VanillaProxyMessageListener implements PulseListener {
                     .messageContext(fResolver -> VanillaMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(vanillaModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(StringUtils.defaultString(vanillaModule.localization(fResolver).types().get(parsedComponent.translationKey())))

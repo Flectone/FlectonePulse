@@ -53,13 +53,13 @@ public class KickProxyMessageListener implements PulseListener {
             if (moduleController.isDisabledFor(kickModule, fModerator)) return event.withProcessed(true);
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .destination(kickModule.config().destination())
                     .sound(kickModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(kickModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(moderationMessageFormatter.replacePlaceholders(kickModule.localization(fResolver).server(), fResolver, kick))

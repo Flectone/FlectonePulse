@@ -15,6 +15,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.DataOutputStream;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -26,6 +27,7 @@ import java.util.function.Supplier;
  * @param destination where the message is drawn
  * @param range how far it travels
  * @param sound the sound and the permission to hear it, or null
+ * @param uuid the id shared by every per-receiver copy of this message
  * @param messageContext builds the context for a given receiver
  * @param proxy writes the extra proxy payload, or null
  * @param integration supplies the mirroring format, or null
@@ -37,6 +39,7 @@ public record EventMetadataImpl(
         @NonNull Destination destination,
         @NonNull Range range,
         @Nullable Pair<Sound, PermissionSetting> sound,
+        @NonNull UUID uuid,
         @NonNull Function<FPlayer, MessageContext> messageContext,
         @Nullable ProxyDataConsumer<DataOutputStream> proxy,
         @Nullable Supplier<IntegrationMessageFormat> integration
@@ -49,7 +52,7 @@ public record EventMetadataImpl(
 
     @Override
     public @NonNull MessageContext resolveMessageContext(FPlayer fPlayer) {
-        return messageContext.apply(fPlayer);
+        return messageContext.apply(fPlayer).withUuid(uuid);
     }
 
     @Override

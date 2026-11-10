@@ -191,13 +191,13 @@ public class TellModuleImpl implements TellModule {
         boolean isSenderToSender = sender.equals(fReceiver);
 
         messageDispatcher.dispatch(EventMetadata.builder()
+                .uuid(metadataUUID)
                 .filter(fReceiver)
                 .destination(config().destination())
                 .sound(isSenderToSender ? null : soundOrThrow())
                 .messageContext(fResolver -> TellMessageContext.builder()
                         .base(MessageContext.builder()
                                 .module(this.name())
-                                .uuid(metadataUUID)
                                 .sender(sender)
                                 .receiver(fResolver)
                                 .message(format.apply(localization(fResolver)))

@@ -55,13 +55,13 @@ public class UnmuteProxyMessageListener implements PulseListener {
             if (moduleController.isDisabledFor(unmuteModule, fModerator)) return event.withProcessed(true);
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .destination(unmuteModule.config().destination())
                     .range(Range.get(Range.Type.SERVER))
                     .sound(unmuteModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(unmuteModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(moderationMessageFormatter.replacePlaceholders(unmuteModule.localization(fResolver).format(), fResolver, unmute))

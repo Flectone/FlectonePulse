@@ -54,13 +54,13 @@ public class SpyProxyMessageListener implements PulseListener {
             }
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .filter(spyModule.createFilter(event.sender() instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN, receivers))
                     .destination(spyModule.config().destination())
                     .messageContext(fResolver -> SpyMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(spyModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(spyModule.localization(fResolver).formatLog())

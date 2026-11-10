@@ -52,13 +52,13 @@ public class EmitProxyMessageListener implements PulseListener {
 
             if (fTarget.isConsole()) {
                 messageDispatcher.dispatch(EventMetadata.builder()
+                        .uuid(event.uuid())
                         .range(Range.get(Range.Type.SERVER))
                         .destination(destination)
                         .sound(emitModule.soundOrThrow())
                         .messageContext(fResolver -> StringMessageContext.builder()
                                 .base(MessageContext.builder()
                                         .module(emitModule.name())
-                                        .uuid(event.uuid())
                                         .sender(event.sender())
                                         .receiver(fResolver)
                                         .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
@@ -73,13 +73,13 @@ public class EmitProxyMessageListener implements PulseListener {
                 );
             } else {
                 messageDispatcher.dispatch(EventMetadata.builder()
+                        .uuid(event.uuid())
                         .filter(fTarget)
                         .destination(destination)
                         .sound(emitModule.soundOrThrow())
                         .messageContext(fResolver -> StringMessageContext.builder()
                                 .base(MessageContext.builder()
                                         .module(emitModule.name())
-                                        .uuid(event.uuid())
                                         .sender(event.sender())
                                         .receiver(fResolver)
                                         .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)

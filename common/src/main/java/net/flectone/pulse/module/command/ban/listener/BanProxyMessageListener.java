@@ -52,13 +52,13 @@ public class BanProxyMessageListener implements PulseListener {
             if (moduleController.isDisabledFor(banModule, fModerator)) return event.withProcessed(true);
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .destination(banModule.config().destination())
                     .sound(banModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(banModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(moderationMessageFormatter.replacePlaceholders(banModule.localization(fResolver).server(), fResolver, ban))

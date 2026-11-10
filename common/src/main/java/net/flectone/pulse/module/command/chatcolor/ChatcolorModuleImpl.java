@@ -222,11 +222,11 @@ public class ChatcolorModuleImpl implements ChatcolorModule {
     @Override
     public void sendMessageWithUpdatedColors(FPlayer fPlayer, UUID metadataUUID) {
         messageDispatcher.dispatch(EventMetadata.builder()
+                .uuid(metadataUUID)
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .messageContext(fResolver -> MessageContext.builder()
                         .module(this.name())
-                        .uuid(metadataUUID)
                         .sender(fPlayer)
                         .receiver(fResolver)
                         .message(localization(fResolver).format())

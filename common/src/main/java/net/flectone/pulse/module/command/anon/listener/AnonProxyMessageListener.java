@@ -40,13 +40,13 @@ public class AnonProxyMessageListener implements PulseListener {
             String message = proxyPayload.readString();
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .destination(anonModule.config().destination())
                     .sound(anonModule.soundOrThrow())
                     .messageContext(fResolver -> StringMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(anonModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(anonModule.localization(fResolver).format())

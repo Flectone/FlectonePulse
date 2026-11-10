@@ -53,13 +53,13 @@ public class MuteProxyMessageListener implements PulseListener {
             if (moduleController.isDisabledFor(muteModule, fModerator)) return event.withProcessed(true);
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .destination(muteModule.config().destination())
                     .sound(muteModule.soundOrThrow())
                     .messageContext(fResolver -> ModerationMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(muteModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(moderationMessageFormatter.replacePlaceholders(muteModule.localization(fResolver).server(), fResolver, mute))

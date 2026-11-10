@@ -41,6 +41,7 @@ public class QuitProxyMessageListener implements PulseListener {
             boolean vanished = proxyPayload.readBoolean();
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(event.sender(), fReceiver, vanished))
                     .destination(quitModule.config().destination())
@@ -48,7 +49,6 @@ public class QuitProxyMessageListener implements PulseListener {
                     .messageContext(fResolver -> VanishMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(quitModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(quitModule.localization(fResolver).format())

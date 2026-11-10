@@ -41,6 +41,7 @@ public class AfkProxyMessageListener implements PulseListener {
             boolean vanished = proxyPayload.readBoolean();
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .filter(fReceiver -> socialService.canSeeVanished(event.sender(), fReceiver, vanished))
                     .destination(afkModule.config().destination())
@@ -48,7 +49,6 @@ public class AfkProxyMessageListener implements PulseListener {
                     .messageContext(fResolver -> AFKMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(afkModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(afkModule.localizationFormat(event.sender(), fResolver, isAfk))

@@ -353,10 +353,10 @@ public class PollModuleImpl implements PollModule {
         int pollID = poll.getId();
 
         messageDispatcher.dispatch(EventMetadata.builder()
+                .uuid(metadataUUID)
                 .messageContext(fResolver -> PollMessageContext.builder()
                         .base(MessageContext.builder()
                                 .module(this.name())
-                                .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(resolveVote(fResolver, voteType, numberVote, pollID, count))

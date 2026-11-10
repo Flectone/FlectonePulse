@@ -48,12 +48,12 @@ public class PollProxyMessageListener implements PulseListener {
                     pollModule.saveAndUpdateLast(poll);
 
                     messageDispatcher.dispatch(EventMetadata.builder()
+                            .uuid(event.uuid())
                             .range(Range.get(Range.Type.SERVER))
                             .sound(pollModule.soundOrThrow())
                             .messageContext(fResolver -> PollMessageContext.builder()
                                     .base(MessageContext.builder()
                                             .module(pollModule.name())
-                                            .uuid(event.uuid())
                                             .sender(event.sender())
                                             .receiver(fResolver)
                                             .message(pollModule.resolvePollFormat(fResolver, poll, PollModule.Status.START))

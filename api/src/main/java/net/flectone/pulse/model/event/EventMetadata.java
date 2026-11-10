@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.DataOutputStream;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -67,6 +68,15 @@ public interface EventMetadata {
      */
     default @NonNull Range range() {
         return base().range();
+    }
+
+    /**
+     * The id shared by every per-receiver copy of this message.
+     *
+     * @return the message id
+     */
+    default @NonNull UUID uuid() {
+        return base().uuid();
     }
 
     /**
@@ -137,11 +147,23 @@ public interface EventMetadata {
         private Destination destination = Destination.EMPTY_CHAT;
         private Range range = Range.get(Range.Type.PLAYER);
         private Pair<Sound, PermissionSetting> sound;
+        private UUID uuid = UUID.randomUUID();
         private Function<FPlayer, MessageContext> messageContext;
         private ProxyDataConsumer<DataOutputStream> proxy;
         private Supplier<IntegrationMessageFormat> integration;
 
         private Builder() {
+        }
+
+        /**
+         * Sets the id shared by every per-receiver copy of the message. Defaults to a new random id.
+         *
+         * @param uuid the message id
+         * @return this builder
+         */
+        public Builder uuid(@NonNull UUID uuid) {
+            this.uuid = uuid;
+            return this;
         }
 
         /**
@@ -286,6 +308,7 @@ public interface EventMetadata {
                     destination,
                     range,
                     sound,
+                    uuid,
                     messageContext,
                     proxy,
                     integration

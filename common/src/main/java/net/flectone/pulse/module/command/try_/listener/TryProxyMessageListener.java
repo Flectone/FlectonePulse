@@ -41,13 +41,13 @@ public class TryProxyMessageListener implements PulseListener {
             String message = proxyPayload.readString();
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .destination(tryModule.config().destination())
                     .sound(tryModule.soundOrThrow())
                     .messageContext(fResolver -> TryMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(tryModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(tryModule.replacePercent(fResolver, value))

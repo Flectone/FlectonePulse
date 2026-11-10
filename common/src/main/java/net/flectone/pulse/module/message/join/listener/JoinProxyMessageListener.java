@@ -42,6 +42,7 @@ public class JoinProxyMessageListener implements PulseListener {
             boolean vanished = proxyPayload.readBoolean();
 
             messageDispatcher.dispatch(EventMetadata.builder()
+                    .uuid(event.uuid())
                     .range(Range.get(Range.Type.SERVER))
                     .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(event.sender(), fReceiver, vanished))
                     .destination(joinModule.config().destination())
@@ -49,7 +50,6 @@ public class JoinProxyMessageListener implements PulseListener {
                     .messageContext(fResolver -> JoinMessageContext.builder()
                             .base(MessageContext.builder()
                                     .module(joinModule.name())
-                                    .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(hasPlayedBefore || !joinModule.config().first() ? joinModule.localization(fResolver).format() : joinModule.localization(fResolver).formatFirstTime())
