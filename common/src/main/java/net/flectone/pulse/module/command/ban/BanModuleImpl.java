@@ -177,21 +177,26 @@ public class BanModuleImpl implements BanModule {
 
         if (config().checkDuplicate()) {
             Optional<Moderation> moderation = moderationService.getValid(fTarget, Moderation.Type.BAN);
-            moderation.ifPresent(value -> messageDispatcher.dispatch(EventMetadata.builder()
-                    .messageContext(fResolver -> ModerationMessageContext.builder()
-                            .base(MessageContext.builder()
-                                    .module(ModuleName.ERROR)
-                                    .sender(fPlayer)
-                                    .receiver(fResolver)
-                                    .message(Strings.CS.replace(localization(fResolver).alreadyBanned(), "<command>", "/" + commandModuleController.getCommandName(unbanModule) + " " + fTarget.name()))
-                                    .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
-                                    .build()
-                            )
-                            .moderation(value)
-                            .build()
-                    )
-                    .build()
-            ));
+
+            if (moderation.isPresent()) {
+                messageDispatcher.dispatch(EventMetadata.builder()
+                        .messageContext(fResolver -> ModerationMessageContext.builder()
+                                .base(MessageContext.builder()
+                                        .module(ModuleName.ERROR)
+                                        .sender(fPlayer)
+                                        .receiver(fResolver)
+                                        .message(Strings.CS.replace(localization(fResolver).alreadyBanned(), "<command>", "/" + commandModuleController.getCommandName(unbanModule) + " " + fTarget.name()))
+                                        .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
+                                        .build()
+                                )
+                                .moderation(moderation.get())
+                                .build()
+                        )
+                        .build()
+                );
+
+                return;
+            }
         }
 
         long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;

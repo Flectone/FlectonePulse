@@ -150,21 +150,25 @@ public class MuteModuleImpl implements MuteModule {
 
         if (config().checkDuplicate()) {
             Optional<Moderation> moderation = moderationService.getValid(fTarget, Moderation.Type.MUTE);
-            moderation.ifPresent(value -> messageDispatcher.dispatch(EventMetadata.builder()
-                    .messageContext(fResolver -> ModerationMessageContext.builder()
-                            .base(MessageContext.builder()
-                                    .module(ModuleName.ERROR)
-                                    .sender(fPlayer)
-                                    .receiver(fResolver)
-                                    .message(Strings.CS.replace(localization(fResolver).alreadyMuted(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " " + fTarget.name()))
-                                    .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
-                                    .build()
-                            )
-                            .moderation(value)
-                            .build()
-                    )
-                    .build()
-            ));
+            if (moderation.isPresent()) {
+                messageDispatcher.dispatch(EventMetadata.builder()
+                        .messageContext(fResolver -> ModerationMessageContext.builder()
+                                .base(MessageContext.builder()
+                                        .module(ModuleName.ERROR)
+                                        .sender(fPlayer)
+                                        .receiver(fResolver)
+                                        .message(Strings.CS.replace(localization(fResolver).alreadyMuted(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " " + fTarget.name()))
+                                        .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
+                                        .build()
+                                )
+                                .moderation(moderation.get())
+                                .build()
+                        )
+                        .build()
+                );
+
+                return;
+            }
         }
 
         long databaseTime = time + System.currentTimeMillis();
