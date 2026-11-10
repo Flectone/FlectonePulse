@@ -20,6 +20,7 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -33,6 +34,7 @@ public class HytaleFlectonePulse implements FlectonePulse {
     private FLogger fLogger;
     private Injector injector;
     private FileFacade fileFacade;
+    private ScheduledFuture<?> tickTask;
 
     public HytaleFlectonePulse(Supplier<HytaleFlectonePulseLoader> loader) {
         this.loader = loader;
@@ -81,7 +83,7 @@ public class HytaleFlectonePulse implements FlectonePulse {
         taskScheduler.start();
 
         // update tick
-        HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(taskScheduler::onTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        tickTask = HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(taskScheduler::onTick, 50L, 50L, TimeUnit.MILLISECONDS);
 
         get(FlectonePulseAPIImpl.class).onEnable();
     }
@@ -90,7 +92,14 @@ public class HytaleFlectonePulse implements FlectonePulse {
     public void onDisable() {
         if (!isReady()) return;
 
-        get(FlectonePulseAPIImpl.class).onDisable();
+        try {
+            get(FlectonePulseAPIImpl.class).onDisable();
+        } finally {
+            if (tickTask != null) {
+                tickTask.cancel(false);
+                tickTask = null;
+            }
+        }
     }
 
     @Override
