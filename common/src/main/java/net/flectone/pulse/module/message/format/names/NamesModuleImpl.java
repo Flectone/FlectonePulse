@@ -164,7 +164,7 @@ public class NamesModuleImpl implements NamesModule {
                 int constantIndex = 0;
                 if (argumentQueue.hasNext()) {
                     constantIndex = argumentQueue.pop().asInt().orElse(0);
-                    if (constantIndex >= constants.size()) {
+                    if (constantIndex < 0 || constantIndex >= constants.size()) {
                         constantIndex = 0;
                     }
                 }
@@ -194,7 +194,7 @@ public class NamesModuleImpl implements NamesModule {
                 int displayNameIndex = 0;
                 if (argumentQueue.hasNext()) {
                     displayNameIndex = argumentQueue.pop().asInt().orElse(0);
-                    if (displayNameIndex > localization.display().size()) {
+                    if (displayNameIndex < 0 || displayNameIndex >= localization.display().size()) {
                         displayNameIndex = 0;
                     }
                 }
