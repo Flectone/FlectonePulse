@@ -260,6 +260,7 @@ import net.flectone.pulse.util.random.RandomGeneratorImpl;
 import net.flectone.pulse.util.version.VersionComparator;
 import net.flectone.pulse.util.version.VersionComparatorImpl;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -511,6 +512,13 @@ public abstract class PlatformInjector extends AbstractModule {
     @Named("animation")
     public Cache<AnimationModule.AnimationKey, AtomicInteger> provideAnimationCache(CacheRegistryImpl cacheRegistry) {
         return cacheRegistry.getCache(CacheName.ANIMATION);
+    }
+
+    @Provides
+    @Singleton
+    @Named("argument")
+    public Cache<String, Tag.Argument> provideArgumentCache(CacheRegistryImpl cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.ARGUMENT);
     }
 
     @Provides

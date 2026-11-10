@@ -21,8 +21,6 @@ import java.util.function.Supplier;
  */
 final class FastArgumentQueue implements ArgumentQueue {
 
-    private static final TokenParser.TagProvider NO_PREPROCESS = (_, _, _) -> null;
-
     private final List<String> arguments;
     private final Function<String, Tag.Argument> argumentFactory;
     private int index;
@@ -32,8 +30,8 @@ final class FastArgumentQueue implements ArgumentQueue {
         this.argumentFactory = argumentFactory;
     }
 
-    static Tag.@NonNull Argument createArgument(@NonNull String value) {
-        return new TagPart(value, new Token(0, value.length(), TokenType.TAG_VALUE), NO_PREPROCESS);
+    static Tag.@NonNull Argument createArgument(@NonNull String value, TokenParser.@NonNull TagProvider provider) {
+        return new TagPart(value, new Token(0, value.length(), TokenType.TAG_VALUE), provider);
     }
 
     @Override

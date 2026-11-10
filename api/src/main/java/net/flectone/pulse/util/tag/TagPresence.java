@@ -1,7 +1,6 @@
 package net.flectone.pulse.util.tag;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -35,38 +34,30 @@ public final class TagPresence {
             if (message.charAt(index) != '<') continue;
 
             int nameStart = index + 1;
-            int tagEnd = -1;
-            char quote = 0;
+            while (nameStart < length) {
+                char character = message.charAt(nameStart);
+                if (character != '/' && character != '!') break;
 
-            for (int cursor = nameStart; cursor < length; cursor++) {
-                char character = message.charAt(cursor);
-
-                if (quote != 0) {
-                    if (character == quote) quote = 0;
-                    continue;
-                }
-
-                if ((character == '\'' || character == '"')
-                        && message.indexOf(character, cursor + 1) != -1) {
-                    quote = character;
-                } else if (character == '<') {
-                    // the MiniMessage tokenizer restarts a tag at a nested '<'
-                    nameStart = cursor + 1;
-                } else if (character == '>') {
-                    tagEnd = cursor;
-                    break;
-                }
+                nameStart++;
             }
 
-            if (tagEnd < 0) break;
+            int nameEnd = nameStart;
+            while (nameEnd < length) {
+                char character = message.charAt(nameEnd);
+                if (character == ':' || character == '/'
+                        || character == '>' || character == '\''
+                        || character == '"' || Character.isWhitespace(character)) break;
 
-            String name = readName(message, nameStart, tagEnd);
-            if (name != null) {
-                if (names == null) names = new HashSet<>(4);
-                names.add(name);
+                nameEnd++;
             }
 
-            index = tagEnd;
+            if (nameStart == nameEnd) continue;
+
+            if (names == null) {
+                names = new HashSet<>(4);
+            }
+
+            names.add(message.substring(nameStart, nameEnd).toLowerCase(Locale.ROOT));
         }
 
         return names == null ? Set.of() : names;
@@ -81,27 +72,6 @@ public final class TagPresence {
      */
     public static boolean contains(@NonNull String message, @NonNull String name) {
         return scan(message).contains(name);
-    }
-
-    private static @Nullable String readName(@NonNull String message, int start, int end) {
-        // closing tags start with '/', reverting tags with '!'
-        while (start < end) {
-            char character = message.charAt(start);
-            if (character != '/' && character != '!') break;
-            start++;
-        }
-
-        int nameStart = start;
-        while (start < end) {
-            char character = message.charAt(start);
-            if (character == ':' || character == '/' || character == ' '
-                    || character == '\t' || character == '\'' || character == '"') break;
-            start++;
-        }
-
-        if (nameStart == start) return null;
-
-        return message.substring(nameStart, start).toLowerCase(Locale.ROOT);
     }
 
 }

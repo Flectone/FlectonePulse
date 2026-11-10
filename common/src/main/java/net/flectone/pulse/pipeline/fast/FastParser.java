@@ -653,7 +653,7 @@ final class FastParser {
         if (arguments.size() < 2) return null;
 
         String action = asciiLowercase(arguments.getFirst());
-        String value = arguments.get(1);
+        String value = argumentFactory.apply(arguments.get(1)).value();
 
         try {
             return switch (action) {

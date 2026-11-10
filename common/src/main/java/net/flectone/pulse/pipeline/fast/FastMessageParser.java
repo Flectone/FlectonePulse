@@ -1,20 +1,19 @@
 package net.flectone.pulse.pipeline.fast;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.internal.parser.TokenParser;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.time.Duration;
 
 @Singleton
 public class FastMessageParser {
@@ -24,15 +23,28 @@ public class FastMessageParser {
     private final MiniMessage miniMessage;
     private final Context context;
     private final ThreadLocal<TagResolver> currentResolver = new ThreadLocal<>();
-    private final Cache<String, Tag.Argument> argumentCache = Caffeine.newBuilder()
-            .maximumSize(4096)
-            .expireAfterAccess(Duration.ofMinutes(10))
-            .build();
+    private final Cache<String, Tag.Argument> argumentCache;
+    private final TokenParser.TagProvider preProcess;
 
     @Inject
-    public FastMessageParser(@NonNull MiniMessage miniMessage) {
+    public FastMessageParser(@NonNull MiniMessage miniMessage,
+                             @Named("argument") @NonNull Cache<String, Tag.Argument> argumentCache) {
         this.miniMessage = miniMessage;
+        this.argumentCache = argumentCache;
         this.context = captureContext();
+        this.preProcess = (name, arguments, _) -> {
+            TagResolver resolver = currentResolver.get();
+            if (resolver == null) return null;
+
+            try {
+                return resolver.resolve(name, new FastArgumentQueue(
+                        arguments.stream().map(Tag.Argument::value).toList(),
+                        this::argument
+                ), context);
+            } catch (Exception _) {
+                return null;
+            }
+        };
     }
 
     public @Nullable Component deserialize(@NonNull String message, @NonNull TagResolver resolver) {
@@ -56,10 +68,10 @@ public class FastMessageParser {
 
     private Tag.@NonNull Argument argument(@NonNull String value) {
         if (value.indexOf('<') >= 0) {
-            return FastArgumentQueue.createArgument(value);
+            return FastArgumentQueue.createArgument(value, preProcess);
         }
 
-        return argumentCache.get(value, FastArgumentQueue::createArgument);
+        return argumentCache.get(value, argument -> FastArgumentQueue.createArgument(argument, preProcess));
     }
 
     static @NonNull Component compact(@NonNull Component component) {
