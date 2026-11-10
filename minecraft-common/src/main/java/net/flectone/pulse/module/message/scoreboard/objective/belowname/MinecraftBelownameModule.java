@@ -126,8 +126,6 @@ public class MinecraftBelownameModule implements ModuleLocalization {
     }
 
     public void remove(FPlayer fPlayer) {
-        if (moduleController.isDisabledFor(this, fPlayer)) return;
-
         objectiveModule.removeObjective(fPlayer, ScoreboardPosition.BELOWNAME);
     }
 
