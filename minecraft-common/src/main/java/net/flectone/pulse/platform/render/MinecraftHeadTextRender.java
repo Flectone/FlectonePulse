@@ -109,6 +109,7 @@ public class MinecraftHeadTextRender implements HeadTextRender {
                 boolean isSneaking = platformPlayerAdapter.isSneaking(holder);
                 boolean strictHolder = isCorrectHolder(holder);
                 String holderWorld = platformPlayerAdapter.getWorldName(holder);
+                FPlayer holderPlayer = fPlayerService.getFPlayer(holder);
 
                 viewerEntities.forEach((viewer, entities) -> {
                     PlatformPlayerAdapter.Coordinates viewerCoordinates = platformPlayerAdapter.getCoordinates(viewer);
@@ -121,8 +122,9 @@ public class MinecraftHeadTextRender implements HeadTextRender {
                         return;
                     }
 
+                    FPlayer viewerPlayer = fPlayerService.getFPlayer(viewer);
                     double distanceSquared = holderCoordinates.distanceSquared(viewerCoordinates);
-                    if (!hasExpired(entities, holderWorld, distanceSquared, isSneaking, strictHolder, now)) return;
+                    if (!hasExpired(entities, holderPlayer, viewerPlayer, holderWorld, distanceSquared, isSneaking, strictHolder, now)) return;
 
                     List<HolderViewerEntity> expired = new ArrayList<>();
 
@@ -130,7 +132,7 @@ public class MinecraftHeadTextRender implements HeadTextRender {
                         List<HolderViewerEntity> alive = new ArrayList<>(current.size());
 
                         for (HolderViewerEntity entity : current) {
-                            if (isExpired(entity, holderWorld, distanceSquared, isSneaking, strictHolder, now)) {
+                            if (isExpired(entity, holderPlayer, viewerPlayer, holderWorld, distanceSquared, isSneaking, strictHolder, now)) {
                                 expired.add(entity);
                             } else {
                                 alive.add(entity.toBuilder()
@@ -441,13 +443,15 @@ public class MinecraftHeadTextRender implements HeadTextRender {
     }
 
     private boolean hasExpired(@NonNull List<HolderViewerEntity> entities,
+                               @NonNull FPlayer holder,
+                               @NonNull FPlayer viewer,
                                @NonNull String holderWorld,
                                double distanceSquared,
                                boolean isSneaking,
                                boolean strictHolder,
                                long now) {
         for (HolderViewerEntity entity : entities) {
-            if (isExpired(entity, holderWorld, distanceSquared, isSneaking, strictHolder, now)) {
+            if (isExpired(entity, holder, viewer, holderWorld, distanceSquared, isSneaking, strictHolder, now)) {
                 return true;
             }
         }
@@ -456,11 +460,17 @@ public class MinecraftHeadTextRender implements HeadTextRender {
     }
 
     private boolean isExpired(@NonNull HolderViewerEntity entity,
+                              @NonNull FPlayer holder,
+                              @NonNull FPlayer viewer,
                               @NonNull String holderWorld,
                               double distanceSquared,
                               boolean isSneaking,
                               boolean strictHolder,
                               long now) {
+        if (!entity.headText().visibleToSelf() && viewer.equals(holder)) return true;
+        if (entity.headText().filterIgnores() && socialService.isIgnored(viewer, holder)) return true;
+        if (!socialService.canSeeVanished(holder, viewer)) return true;
+
         double distance = entity.headText().distance();
         return distanceSquared > distance * distance
                 || entity.isEnd(now)
