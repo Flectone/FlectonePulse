@@ -6,7 +6,9 @@ import net.flectone.pulse.model.value.HeadText;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -65,6 +67,23 @@ public interface HeadTextRender {
      * @param holderWorld the holder's current world name
      */
     void render(@NonNull ModuleName moduleName, @NonNull FPlayer holder, @NonNull FPlayer viewer, @NonNull Function<FPlayer, Component> component, @NonNull HeadText headText, PlatformPlayerAdapter.@NonNull Coordinates holderCoordinates, @NonNull String holderWorld);
+
+    /**
+     * Renders the head text for a single viewer, reusing components that were already built
+     * for an identical previous component during this update.
+     *
+     * @param moduleName the module that owns the head text
+     * @param holder the player who holds the head text
+     * @param viewer the player who may see the head text
+     * @param component the component resolver for the viewer
+     * @param headText the head text settings
+     * @param holderCoordinates the holder's current coordinates
+     * @param holderWorld the holder's current world name
+     * @param groupCache components already built during this update, or null to always resolve
+     */
+    default void render(@NonNull ModuleName moduleName, @NonNull FPlayer holder, @NonNull FPlayer viewer, @NonNull Function<FPlayer, Component> component, @NonNull HeadText headText, PlatformPlayerAdapter.@NonNull Coordinates holderCoordinates, @NonNull String holderWorld, @Nullable Map<Long, Component> groupCache) {
+        render(moduleName, holder, viewer, component, headText, holderCoordinates, holderWorld);
+    }
 
     /**
      * Removes the head text for the specified holder from all viewers.

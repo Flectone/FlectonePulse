@@ -23,13 +23,19 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.NearbyService;
 import net.flectone.pulse.service.SocialService;
+import net.kyori.adventure.text.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NameplateModuleImpl implements NameplateModule {
+
+    private final Map<UUID, Long> lastRefreshTicks = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final SocialService socialService;
@@ -47,6 +53,11 @@ public class NameplateModuleImpl implements NameplateModule {
         if (ticker.enable()) {
             taskScheduler.runPlayerAsyncTimer(this::show, ticker.period());
         }
+    }
+
+    @Override
+    public void onDisable() {
+        lastRefreshTicks.clear();
     }
 
     @Override
@@ -86,6 +97,8 @@ public class NameplateModuleImpl implements NameplateModule {
 
         String holderWorld = platformPlayerAdapter.getWorldName(fPlayer);
 
+        Map<Long, Component> groupCache = isFullRefresh(fPlayer) ? null : new HashMap<>();
+
         for (UUID player : nearbyService.getNearbyPlayers(fPlayer.uuid(), headText.distance())) {
             FPlayer viewer = fPlayerService.getFPlayer(player);
             if (viewer.isUnknown()) continue;
@@ -107,9 +120,22 @@ public class NameplateModuleImpl implements NameplateModule {
                         .message(line)
                         .flags(flags, states)
                         .build()
-                ), headTextBuilder.row(headText.row() + i).build(), holderCoordinates, holderWorld);
+                ), headTextBuilder.row(headText.row() + i).build(), holderCoordinates, holderWorld, groupCache);
             }
         }
+    }
+
+    private boolean isFullRefresh(FPlayer fPlayer) {
+        long refreshTicks = config().refresh();
+        if (refreshTicks <= 0) return false;
+
+        long currentTick = taskScheduler.getCurrentTick();
+        Long lastRefreshTick = lastRefreshTicks.get(fPlayer.uuid());
+        if (lastRefreshTick != null && currentTick - lastRefreshTick < refreshTicks) return false;
+
+        lastRefreshTicks.put(fPlayer.uuid(), currentTick);
+
+        return true;
     }
 
 }

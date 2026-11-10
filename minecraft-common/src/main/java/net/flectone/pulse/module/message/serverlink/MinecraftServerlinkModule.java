@@ -29,11 +29,16 @@ import net.kyori.adventure.text.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftServerlinkModule implements ModuleLocalization {
+
+    private final Map<UUID, CachedLinks> cachedLinks = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
@@ -87,6 +92,14 @@ public class MinecraftServerlinkModule implements ModuleLocalization {
         Map<String, String> links = config().values();
         Map<String, String> linksMessages = localization(fPlayer).values();
 
+        int hash = Objects.hash(links, linksMessages, fPlayer.name());
+        long refreshTicks = config().refresh();
+        long currentTick = taskScheduler.getCurrentTick();
+        CachedLinks cached = cachedLinks.get(fPlayer.uuid());
+        if (cached != null
+                && cached.hash() == hash
+                && (refreshTicks <= 0 || currentTick - cached.builtAtTick() < refreshTicks)) return;
+
         List<WrapperCommonServerServerLinks.ServerLink> serverLinks = links.entrySet().stream()
                 .map(entry -> {
                     String link = entry.getValue();
@@ -101,7 +114,16 @@ public class MinecraftServerlinkModule implements ModuleLocalization {
                     return new WrapperCommonServerServerLinks.ServerLink(linkComponent, link);
                 }).toList();
 
+        cachedLinks.put(fPlayer.uuid(), new CachedLinks(hash, currentTick));
         packetSender.send(fPlayer, new WrapperPlayServerServerLinks(serverLinks));
+    }
+
+    @Override
+    public void onDisable() {
+        cachedLinks.clear();
+    }
+
+    private record CachedLinks(int hash, long builtAtTick) {
     }
 
 }

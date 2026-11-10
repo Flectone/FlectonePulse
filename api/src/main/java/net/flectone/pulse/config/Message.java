@@ -589,6 +589,7 @@ public record Message(
     @Builder(toBuilder = true)
     public record Nameplate(
             Boolean enable,
+            Long refresh,
             Destination destination,
             Ticker ticker
     ) implements EnableSetting {
@@ -598,6 +599,7 @@ public record Message(
     @Builder(toBuilder = true)
     public record Serverlink(
             Boolean enable,
+            Long refresh,
             Map<String, String> values,
             Ticker ticker
     ) implements EnableSetting {
@@ -630,6 +632,7 @@ public record Message(
     @Builder(toBuilder = true)
     public record Scoreboard(
             Boolean enable,
+            Long refresh,
             Boolean nameVisible,
             double nameDistance,
             Boolean playerCollisions,
@@ -794,6 +797,7 @@ public record Message(
         @Builder(toBuilder = true)
         public record Playerlistname(
                 Boolean enable,
+                Long refresh,
                 Boolean hideInvisible,
                 Boolean hideSpectator,
                 Boolean spectatorListOrder,

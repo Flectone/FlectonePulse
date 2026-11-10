@@ -363,6 +363,7 @@ join:
     enable: false
 nameplate:
   enable: true
+  refresh: 100
   destination:
     type: "HEAD_TEXT"
     visible_to_self: true
@@ -412,6 +413,7 @@ rightclick:
     enable: false
 scoreboard:
   enable: true
+  refresh: 600
   name_visible: false
   name_distance: -1
   player_collisions: true
@@ -434,6 +436,7 @@ scoreboard:
         period: 100
 serverlink:
   enable: false
+  refresh: 600
   values:
     example1: "https://flectone.net/pulse"
     example2: "https://boosty.to/thefaser"
@@ -495,6 +498,7 @@ tab:
       period: 100
   playerlistname:
     enable: true
+    refresh: 600
     hide_invisible: false
     hide_spectator: false
     spectator_list_order: false

@@ -95,6 +95,11 @@ public class TaskSchedulerImpl implements TaskScheduler {
     }
 
     @Override
+    public long getCurrentTick() {
+        return currentTick.get();
+    }
+
+    @Override
     public CompletableFuture<Void> runAsync(SchedulerRunnable runnable) {
         if (isDisabled()) return runImmediately(runnable);
         if (isAsyncThread()) return runImmediately(runnable);

@@ -78,6 +78,13 @@ public interface TaskScheduler {
     void shutdown();
 
     /**
+     * The current server tick.
+     *
+     * @return the tick
+     */
+    long getCurrentTick();
+
+    /**
      * Schedules a task to run asynchronously on the thread pool.
      *
      * @param runnable the task to execute

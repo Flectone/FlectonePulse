@@ -32,6 +32,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,6 +43,8 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
     private static final int ATTRIBUTE_BASE_VALUE = 64;
 
     private final Map<UUID, Map<UUID, Team>> playerReceiverTeamMap = new ConcurrentHashMap<>();
+
+    private volatile long lastRefreshTick = 0L;
 
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
@@ -122,8 +125,10 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
         taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
+            Map<Integer, Team> groupCache = isFullRefresh() ? null : new HashMap<>();
+
             fPlayerService.getPlatformFPlayers().forEach(fReceiver -> {
-                createOrUpdate(fPlayer, fReceiver);
+                createOrUpdate(fPlayer, fReceiver, groupCache);
 
                 if (!hasTeam(fReceiver, fPlayer)) {
                     createOrUpdate(fReceiver, fPlayer);
@@ -207,10 +212,16 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
     }
 
     private void createOrUpdate(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver) {
-        // new info
-        Team newTeam = create(fPlayer, fReceiver);
+        createOrUpdate(fPlayer, fReceiver, null);
+    }
 
+    private void createOrUpdate(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver, @Nullable Map<Integer, Team> groupCache) {
         Optional<Team> optionalTeam = getTeam(fPlayer, fReceiver);
+        Integer previousContents = optionalTeam.map(Team::contents).orElse(null);
+
+        // new info
+        Team newTeam = create(fPlayer, fReceiver, previousContents, groupCache);
+
         if (optionalTeam.isPresent()) {
             Team oldTeam = optionalTeam.get();
             if (newTeam.contents() == oldTeam.contents()) return;
@@ -227,6 +238,34 @@ public class MinecraftScoreboardModule extends ScoreboardModuleImpl {
 
         // update info
         playerReceiverTeamMap.computeIfAbsent(fPlayer.uuid(), _ -> new ConcurrentHashMap<>()).put(fReceiver.uuid(), newTeam);
+    }
+
+    @NonNull
+    private Team create(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver, @Nullable Integer previousContents, @Nullable Map<Integer, Team> groupCache) {
+        if (groupCache != null && previousContents != null) {
+            Team cached = groupCache.get(previousContents);
+            if (cached != null) return cached;
+        }
+
+        Team team = create(fPlayer, fReceiver);
+
+        if (groupCache != null && previousContents != null) {
+            groupCache.put(previousContents, team);
+        }
+
+        return team;
+    }
+
+    private boolean isFullRefresh() {
+        long refreshTicks = config().refresh();
+        if (refreshTicks <= 0) return false;
+
+        long currentTick = taskScheduler.getCurrentTick();
+        if (currentTick - lastRefreshTick < refreshTicks) return false;
+
+        lastRefreshTick = currentTick;
+
+        return true;
     }
 
     @NonNull

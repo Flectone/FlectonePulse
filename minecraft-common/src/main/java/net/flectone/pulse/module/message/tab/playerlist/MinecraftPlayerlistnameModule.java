@@ -49,7 +49,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 @Singleton
@@ -71,6 +70,8 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
 
     private final Map<UUID, Set<UUID>> proxyPlayers = new ConcurrentHashMap<>();
     private final Map<UUID, Map<UUID, PlayerlistnameEntry>> sentEntries = new ConcurrentHashMap<>();
+
+    private volatile long lastRefreshTick = 0L;
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -138,11 +139,17 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         if (!moduleController.isEnable(this)) return;
 
         taskScheduler.runAsync(() -> {
-            BiConsumer<FPlayer, List<FPlayer>> receiversConsumer = isNewerThanOrEqualsV_1_19_3 ? this::sendPlayerInfos : this::sendPlayerData;
+            Map<UUID, Map<Integer, Component>> groupCache = isFullRefresh() ? null : new HashMap<>();
 
             List<FPlayer> onlinePlayers = fPlayerService.getOnlineFPlayers();
 
-            fPlayerService.getPlatformFPlayers().forEach(fReceiver -> receiversConsumer.accept(fReceiver, onlinePlayers));
+            for (FPlayer fReceiver : fPlayerService.getPlatformFPlayers()) {
+                if (isNewerThanOrEqualsV_1_19_3) {
+                    sendPlayerInfos(fReceiver, onlinePlayers, groupCache);
+                } else {
+                    sendPlayerData(fReceiver, onlinePlayers, groupCache);
+                }
+            }
 
             removeOfflineProxyPlayers();
         });
@@ -151,17 +158,22 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     public void update(FPlayer fSender) {
         if (!moduleController.isEnable(this)) return;
 
-        BiConsumer<FPlayer, List<FPlayer>> receiversConsumer = isNewerThanOrEqualsV_1_19_3 ? this::sendPlayerInfos : this::sendPlayerData;
+        Map<UUID, Map<Integer, Component>> groupCache = new HashMap<>();
 
-        fPlayerService.getPlatformFPlayers()
-                .forEach(fReceiver -> receiversConsumer.accept(fReceiver, fReceiver.equals(fSender)
-                                ? fPlayerService.getOnlineFPlayers()
-                                : List.of(fSender)
-                        )
-                );
+        for (FPlayer fReceiver : fPlayerService.getPlatformFPlayers()) {
+            List<FPlayer> onlinePlayers = fReceiver.equals(fSender)
+                    ? fPlayerService.getOnlineFPlayers()
+                    : List.of(fSender);
+
+            if (isNewerThanOrEqualsV_1_19_3) {
+                sendPlayerInfos(fReceiver, onlinePlayers, groupCache);
+            } else {
+                sendPlayerData(fReceiver, onlinePlayers, groupCache);
+            }
+        }
     }
 
-    private void sendPlayerInfos(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
+    private void sendPlayerInfos(FPlayer fReceiver, List<FPlayer> onlinePlayers, @Nullable Map<UUID, Map<Integer, Component>> groupCache) {
         List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> addPlayerInfoList = new ArrayList<>();
         List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> updatePlayerInfoList = new ArrayList<>();
         List<UUID> removeProfileList = new ArrayList<>();
@@ -182,19 +194,20 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
             Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fSender, config().range(), name());
 
             GameMode gameMode = GameMode.valueOf(platformPlayerAdapter.getGamemode(fSender));
+            PlayerlistnameEntry sentEntry = getEntry(fReceiver, fSender);
 
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                     userProfile,
                     isListed(fSender, fReceiver, gameMode) && listedFilter.test(fReceiver),
                     platformPlayerAdapter.getPing(fSender),
                     gameMode,
-                    buildFPlayerName(fSender, fReceiver),
+                    buildFPlayerName(fSender, fReceiver, sentEntry, groupCache),
                     null,
                     gameMode != GameMode.SPECTATOR || config().spectatorListOrder() ? integrationModule.getSortWeight(fSender) : 0
             );
 
             PlayerlistnameEntry entry = PlayerlistnameEntry.of(playerInfo);
-            PlayerlistnameEntry sentEntry = rememberEntry(fReceiver, fSender, entry);
+            rememberEntry(fReceiver, fSender, entry);
 
             boolean profileChanged = sentEntry == null || sentEntry.profile() != entry.profile();
             if (user == null && profileChanged) {
@@ -221,7 +234,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         }
     }
 
-    private void sendPlayerData(FPlayer fReceiver, List<FPlayer> onlinePlayers) {
+    private void sendPlayerData(FPlayer fReceiver, List<FPlayer> onlinePlayers, @Nullable Map<UUID, Map<Integer, Component>> groupCache) {
         List<WrapperPlayServerPlayerInfo.PlayerData> addPlayerDataList = new ArrayList<>();
         List<WrapperPlayServerPlayerInfo.PlayerData> updatePlayerDataList = new ArrayList<>();
         List<WrapperPlayServerPlayerInfo.PlayerData> removePlayerDataList = new ArrayList<>();
@@ -239,15 +252,17 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                 continue;
             }
 
+            PlayerlistnameEntry sentEntry = getEntry(fReceiver, fSender);
+
             WrapperPlayServerPlayerInfo.PlayerData playerData = new WrapperPlayServerPlayerInfo.PlayerData(
-                    buildFPlayerName(fSender, fReceiver),
+                    buildFPlayerName(fSender, fReceiver, sentEntry, groupCache),
                     userProfile,
                     GameMode.valueOf(platformPlayerAdapter.getGamemode(fSender)),
                     platformPlayerAdapter.getPing(fSender)
             );
 
             PlayerlistnameEntry entry = PlayerlistnameEntry.of(playerData);
-            PlayerlistnameEntry sentEntry = rememberEntry(fReceiver, fSender, entry);
+            rememberEntry(fReceiver, fSender, entry);
 
             boolean profileChanged = sentEntry == null || sentEntry.profile() != entry.profile();
             if (user == null && profileChanged) {
@@ -333,9 +348,16 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         return moduleController.isEnable(this) && config().range().is(Range.Type.PROXY) && proxyRegistry.hasEnabledProxy();
     }
 
-    private MinecraftPlayerlistnameModule.@Nullable PlayerlistnameEntry rememberEntry(FPlayer fReceiver, FPlayer fSender, PlayerlistnameEntry entry) {
-        return sentEntries.computeIfAbsent(fReceiver.uuid(), _ -> new ConcurrentHashMap<>())
+    private void rememberEntry(FPlayer fReceiver, FPlayer fSender, PlayerlistnameEntry entry) {
+        sentEntries.computeIfAbsent(fReceiver.uuid(), _ -> new ConcurrentHashMap<>())
                 .put(fSender.uuid(), entry);
+    }
+
+    private @Nullable PlayerlistnameEntry getEntry(FPlayer fReceiver, FPlayer fSender) {
+        Map<UUID, PlayerlistnameEntry> receiverEntries = sentEntries.get(fReceiver.uuid());
+        if (receiverEntries == null) return null;
+
+        return receiverEntries.get(fSender.uuid());
     }
 
     public void forgetEntry(UUID receiver, UUID sender) {
@@ -379,6 +401,22 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         return socialService.canSeeVanished(fPlayer, fReceiver);
     }
 
+    private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver, @Nullable PlayerlistnameEntry sentEntry, @Nullable Map<UUID, Map<Integer, Component>> groupCache) {
+        if (groupCache == null || sentEntry == null) {
+            return buildFPlayerName(fPlayer, fReceiver);
+        }
+
+        Map<Integer, Component> senderCache = groupCache.computeIfAbsent(fPlayer.uuid(), _ -> new HashMap<>());
+
+        Component component = senderCache.get(sentEntry.displayName());
+        if (component != null) return component;
+
+        component = buildFPlayerName(fPlayer, fReceiver);
+        senderCache.put(sentEntry.displayName(), component);
+
+        return component;
+    }
+
     private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver) {
         return messagePipeline.build(MessageContext.builder()
                 .module(this.name())
@@ -390,6 +428,18 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
                 .flag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, fReceiver.uuid().version() == 3)
                 .build()
         );
+    }
+
+    private boolean isFullRefresh() {
+        long refreshTicks = config().refresh();
+        if (refreshTicks <= 0) return false;
+
+        long currentTick = taskScheduler.getCurrentTick();
+        if (currentTick - lastRefreshTick < refreshTicks) return false;
+
+        lastRefreshTick = currentTick;
+
+        return true;
     }
 
     private record PlayerlistnameEntry(

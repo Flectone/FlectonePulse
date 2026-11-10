@@ -204,6 +204,18 @@ public class MinecraftHeadTextRender implements HeadTextRender {
                        @NonNull HeadText headText,
                        PlatformPlayerAdapter.@NonNull Coordinates holderCoordinates,
                        @NonNull String holderWorld) {
+        render(moduleName, holder, viewer, component, headText, holderCoordinates, holderWorld, null);
+    }
+
+    @Override
+    public void render(@NonNull ModuleName moduleName,
+                        @NonNull FPlayer holder,
+                        @NonNull FPlayer viewer,
+                        @NonNull Function<FPlayer, Component> component,
+                        @NonNull HeadText headText,
+                        PlatformPlayerAdapter.@NonNull Coordinates holderCoordinates,
+                        @NonNull String holderWorld,
+                        @Nullable Map<Long, Component> groupCache) {
         if (FlectonePulseAPI.isDisabling()) return;
 
         if (!headText.visibleToSelf() && viewer.equals(holder)) return;
@@ -234,10 +246,37 @@ public class MinecraftHeadTextRender implements HeadTextRender {
                     for (int i = 0; i < entities.size(); i++) {
                         HolderViewerEntity entity = entities.get(i);
                         if (entity.moduleName() == moduleName && entity.row() == targetRow) {
+                            int previousHash = entity.componentHash();
+                            long groupKey = groupKey(targetRow, previousHash);
+
+                            if (groupCache != null) {
+                                Component grouped = groupCache.get(groupKey);
+                                if (grouped != null) {
+                                    int groupedHash = grouped.hashCode();
+                                    if (groupedHash == previousHash) {
+                                        return existingList;
+                                    }
+
+                                    entity = entity.toBuilder()
+                                            .headText(headText)
+                                            .coordinates(holderCoordinates)
+                                            .endTime(headText.calculateEndTime())
+                                            .componentHash(groupedHash)
+                                            .build();
+
+                                    entities.set(i, entity);
+                                    updateEntityComponent(holder.uuid(), viewer.uuid(), entity, grouped);
+                                    return List.copyOf(entities);
+                                }
+                            }
 
                             Component message = component.apply(viewer);
                             int componentHash = message.hashCode();
-                            if (entity.componentHash() == componentHash){
+                            if (groupCache != null) {
+                                groupCache.put(groupKey, message);
+                            }
+
+                            if (previousHash == componentHash){
                                 return existingList;
                             }
 
@@ -428,6 +467,10 @@ public class MinecraftHeadTextRender implements HeadTextRender {
                 || isSneaking && entity.headText().hideWhenSneaking()
                 || !holderWorld.equals(entity.world())
                 || !strictHolder;
+    }
+
+    private long groupKey(int row, int componentHash) {
+        return ((long) row << 32) | (componentHash & 0xFFFFFFFFL);
     }
 
     private @Nullable HolderViewerEntity spawn(@NonNull ModuleName moduleName,
