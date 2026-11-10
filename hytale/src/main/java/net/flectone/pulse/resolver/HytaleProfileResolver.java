@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,6 +39,13 @@ public class HytaleProfileResolver extends ProfileResolverImpl {
     public UUID resolveOnlineUUID(@NonNull String username) {
         String url = HYTALE_API + username;
         return fetchProfile(url).map(PlayerData::id).orElse(null);
+    }
+
+    @NonNull
+    @Override
+    public UUID resolveOfflineUUID(@NonNull String name) {
+        // not correct for hytale
+        return UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8));
     }
 
     private Optional<PlayerData> fetchProfile(String url) {
