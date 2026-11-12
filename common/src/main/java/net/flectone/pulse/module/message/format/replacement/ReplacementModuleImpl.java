@@ -267,17 +267,18 @@ public class ReplacementModuleImpl implements ReplacementModule {
                 .build()
         );
 
-        // "." to have the original context like ||%stats%||
-        int length = componentSerializer.toPlain(messagePipeline.build(MessageContext.builder()
+        int length = Math.max(1, componentSerializer.toPlain(messagePipeline.build(MessageContext.builder()
                 .module(this.name())
                 .sender(messageContext.sender())
                 .receiver(messageContext.receiver())
-                .message("." + spoilerText)
+                .message(spoilerText)
                 .flags(messageContext.flags())
-                .flag(MessageFlag.PLAYER_MESSAGE, true)
+                .flags(
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.ITEM_DETECTION},
+                        new boolean[]{false, false} // we don't need to double format "|| %item% ||"
+                )
                 .build()
-        )).length();
-        length = spoilerText.endsWith(" ") ? length : Math.max(1, length - 1);
+        )).length());
 
         Localization.Message.Format.Replacement replacement = localization(messageContext.receiver());
         String symbols = StringUtils.repeat(replacement.spoilerSymbol(), length);
