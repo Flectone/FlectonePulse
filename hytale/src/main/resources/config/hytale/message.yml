@@ -305,6 +305,22 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
+  uniform:
+    enable: false
+    types:
+      action_bar: false
+      advancement: false
+      boss_bar: false
+      entity_name: false
+      inventory_title: false
+      player_chat: false
+      playerlistname: false
+      scoreboard: false
+      system_chat: false
+      tab_footer: false
+      tab_header: false
+      team: false
+      title: false
   world:
     enable: true
     mode: "TYPE"

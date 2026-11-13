@@ -345,6 +345,7 @@ public interface PermissionMerger {
     @Mapping(target = "questionAnswer", expression = "java(mergeMessageFormatQuestionAnswer(target.build().questionAnswer().toBuilder(), source.questionAnswer()))")
     @Mapping(target = "replacement", expression = "java(mergeMessageFormatReplacement(target.build().replacement().toBuilder(), source.replacement()))")
     @Mapping(target = "translate", expression = "java(mergeMessageFormatTranslate(target.build().translate().toBuilder(), source.translate()))")
+    @Mapping(target = "uniform", expression = "java(mergeMessageFormatUniform(target.build().uniform().toBuilder(), source.uniform()))")
     @Mapping(target = "world", expression = "java(mergeMessageFormatWorld(target.build().world().toBuilder(), source.world()))")
     Permission.Message.Format mergeMessageFormat(@MappingTarget Permission.Message.Format.FormatBuilder target, Permission.Message.Format source);
 
@@ -391,6 +392,8 @@ public interface PermissionMerger {
     Permission.Message.Format.Replacement mergeMessageFormatReplacement(@MappingTarget Permission.Message.Format.Replacement.ReplacementBuilder target, Permission.Message.Format.Replacement source);
 
     Permission.Message.Format.Translate mergeMessageFormatTranslate(@MappingTarget Permission.Message.Format.Translate.TranslateBuilder target, Permission.Message.Format.Translate source);
+
+    Permission.Message.Format.Uniform mergeMessageFormatUniform(@MappingTarget Permission.Message.Format.Uniform.UniformBuilder target, Permission.Message.Format.Uniform source);
 
     Permission.Message.Format.World mergeMessageFormatWorld(@MappingTarget Permission.Message.Format.World.WorldBuilder target, Permission.Message.Format.World source);
 

@@ -207,6 +207,8 @@ import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.module.message.format.replacement.ReplacementModuleImpl;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModuleImpl;
+import net.flectone.pulse.module.message.format.uniform.UniformModule;
+import net.flectone.pulse.module.message.format.uniform.UniformModuleImpl;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.format.world.WorldModuleImpl;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
@@ -483,6 +485,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(SwearModule.class).to(SwearModuleImpl.class);
         bind(TabModule.class).to(TabModuleImpl.class);
         bind(TranslateModule.class).to(TranslateModuleImpl.class);
+        bind(UniformModule.class).to(UniformModuleImpl.class);
         bind(VanillaModule.class).to(VanillaModuleImpl.class);
         bind(VersionModule.class).to(VersionModuleImpl.class);
         bind(WorldModule.class).to(WorldModuleImpl.class);
@@ -614,6 +617,13 @@ public abstract class PlatformInjector extends AbstractModule {
     @Named("messageContext")
     public Cache<MessageContext.CacheKey, Component> provideMessageContextCache(CacheRegistryImpl cacheRegistry) {
         return cacheRegistry.getCache(CacheName.MESSAGE_CONTEXT);
+    }
+
+    @Provides
+    @Singleton
+    @Named("uniformMessage")
+    public Cache<Component, Boolean> provideUniformMessageCache(CacheRegistryImpl cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.UNIFORM_MESSAGE);
     }
 
     @Provides

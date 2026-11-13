@@ -1232,6 +1232,9 @@ public record Permission(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/translate")
                 Translate translate,
 
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/uniform")
+                Uniform uniform,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/world")
                 World world
         ) implements PermissionSetting {
@@ -1432,6 +1435,14 @@ public record Permission(
             @With
             @Builder(toBuilder = true)
             public record Translate(
+                    String name,
+                    Permission.Type type
+            ) implements PermissionSetting {
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            public record Uniform(
                     String name,
                     Permission.Type type
             ) implements PermissionSetting {

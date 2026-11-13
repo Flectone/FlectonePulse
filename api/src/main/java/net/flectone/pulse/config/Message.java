@@ -272,6 +272,9 @@ public record Message(
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/translate")
             Translate translate,
 
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/uniform")
+            Uniform uniform,
+
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/world")
             World world
 
@@ -553,6 +556,33 @@ public record Message(
         @With
         @Builder(toBuilder = true)
         public record Translate(Boolean enable) implements EnableSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        public record Uniform(
+                Boolean enable,
+                Types types
+        ) implements EnableSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            public record Types(
+                    Boolean actionBar,
+                    Boolean advancement,
+                    Boolean bossBar,
+                    Boolean entityName,
+                    Boolean inventoryTitle,
+                    Boolean playerChat,
+                    Boolean playerlistname,
+                    Boolean scoreboard,
+                    Boolean systemChat,
+                    Boolean tabFooter,
+                    Boolean tabHeader,
+                    Boolean team,
+                    Boolean title
+            ) {
+            }
         }
 
         @With

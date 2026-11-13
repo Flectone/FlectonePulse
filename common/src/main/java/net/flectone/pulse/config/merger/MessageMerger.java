@@ -71,6 +71,7 @@ public interface MessageMerger {
     @Mapping(target = "questionAnswer", expression = "java(mergeFormatQuestionAnswer(target.build().questionAnswer().toBuilder(), source.questionAnswer()))")
     @Mapping(target = "replacement", expression = "java(mergeFormatReplacement(target.build().replacement().toBuilder(), source.replacement()))")
     @Mapping(target = "translate", expression = "java(mergeFormatTranslate(target.build().translate().toBuilder(), source.translate()))")
+    @Mapping(target = "uniform", expression = "java(mergeFormatUniform(target.build().uniform().toBuilder(), source.uniform()))")
     @Mapping(target = "world", expression = "java(mergeFormatWorld(target.build().world().toBuilder(), source.world()))")
     Message.Format mergeFormat(@MappingTarget Message.Format.FormatBuilder target, Message.Format source);
 
@@ -117,6 +118,11 @@ public interface MessageMerger {
     Message.Format.Replacement mergeFormatReplacement(@MappingTarget Message.Format.Replacement.ReplacementBuilder target, Message.Format.Replacement source);
 
     Message.Format.Translate mergeFormatTranslate(@MappingTarget Message.Format.Translate.TranslateBuilder target, Message.Format.Translate source);
+
+    @Mapping(target = "types", expression = "java(mergeFormatUniformTypes(target.build().types().toBuilder(), source.types()))")
+    Message.Format.Uniform mergeFormatUniform(@MappingTarget Message.Format.Uniform.UniformBuilder target, Message.Format.Uniform source);
+
+    Message.Format.Uniform.Types mergeFormatUniformTypes(@MappingTarget Message.Format.Uniform.Types.TypesBuilder target, Message.Format.Uniform.Types source);
 
     Message.Format.World mergeFormatWorld(@MappingTarget Message.Format.World.WorldBuilder target, Message.Format.World source);
 

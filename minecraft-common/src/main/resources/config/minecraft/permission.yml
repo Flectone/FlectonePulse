@@ -1030,6 +1030,9 @@ message:
     translate:
       name: "flectonepulse.module.message.format.translate"
       type: "TRUE"
+    uniform:
+      name: "flectonepulse.module.message.format.uniform"
+      type: "TRUE"
     world:
       name: "flectonepulse.module.message.format.world"
       type: "TRUE"

@@ -27,6 +27,8 @@ import net.flectone.pulse.module.message.format.moderation.delete.DeleteModuleIm
 import net.flectone.pulse.module.message.format.moderation.delete.MinecraftDeleteModule;
 import net.flectone.pulse.module.message.format.object.MinecraftObjectModule;
 import net.flectone.pulse.module.message.format.object.ObjectModuleImpl;
+import net.flectone.pulse.module.message.format.uniform.MinecraftUniformModule;
+import net.flectone.pulse.module.message.format.uniform.UniformModuleImpl;
 import net.flectone.pulse.module.message.join.JoinModuleImpl;
 import net.flectone.pulse.module.message.join.MinecraftJoinModule;
 import net.flectone.pulse.module.message.quit.MinecraftQuitModule;
@@ -146,6 +148,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(FooterModuleImpl.class).to(MinecraftFooterModule.class);
         bind(HeaderModuleImpl.class).to(MinecraftHeaderModule.class);
         bind(PlayerlistnameModuleImpl.class).to(MinecraftPlayerlistnameModule.class);
+        bind(UniformModuleImpl.class).to(MinecraftUniformModule.class);
         bind(VanillaModuleImpl.class).to(MinecraftVanillaModule.class);
 
         // registers

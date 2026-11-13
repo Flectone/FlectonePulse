@@ -33,6 +33,7 @@ import net.flectone.pulse.module.message.format.padding.PaddingModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
+import net.flectone.pulse.module.message.format.uniform.UniformModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -79,6 +80,7 @@ public class FormatModuleImpl implements FormatModule {
         children.add(QuestionAnswerModule.class);
         children.add(ReplacementModule.class);
         children.add(TranslateModule.class);
+        children.add(UniformModule.class);
         children.add(WorldModule.class);
         return Collections.unmodifiableSet(children);
     }
