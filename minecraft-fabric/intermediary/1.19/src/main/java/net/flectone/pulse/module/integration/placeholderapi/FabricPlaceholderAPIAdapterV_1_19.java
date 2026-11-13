@@ -1,11 +1,13 @@
 package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.inject.Singleton;
+import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
-import eu.pb4.placeholders.api.TextParserUtils;
+import eu.pb4.placeholders.api.node.TextNode;
 import net.flectone.pulse.BuildConfig;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -16,7 +18,9 @@ public class FabricPlaceholderAPIAdapterV_1_19 implements FabricPlaceholderAPIAd
 
     @Override
     public String parse(String message, ServerPlayer player) {
-        return Placeholders.parseText(TextParserUtils.formatText(message), PlaceholderContext.of(player)).getString();
+        return Placeholders.parseNodes(TextNode.convert(Component.literal(message)))
+                .toText(ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(player)), false)
+                .getString();
     }
 
     @Override

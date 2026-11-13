@@ -101,6 +101,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
         if (!(player instanceof ServerPlayer playerEntity)) return event;
 
         String message = messageContext.message();
+        if (!message.contains("%")) return event;
 
         String text = fabricPlaceholderAPIAdapter.parse(message, playerEntity);
 

@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.inject.Singleton;
+import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
@@ -15,14 +16,18 @@ import java.util.function.BiFunction;
 @Singleton
 public class FabricPlaceholderAPIAdapterV_26_1 implements FabricPlaceholderAPIAdapter {
 
+    private static final NodeParser PARSER = NodeParser.builder()
+            .serverPlaceholders()
+            .build();
+
     @Override
     public String parse(String message, ServerPlayer player) {
-        return NodeParser.builder()
-                .serverPlaceholders()
-                .commonPlaceholders()
-                .simplifiedTextFormat()
-                .build()
-                .parseComponent(message, ServerPlaceholderContext.of(player).asParserContext())
+        ServerPlaceholderContext serverContext = ServerPlaceholderContext.of(player);
+        ParserContext parserContext = serverContext.asParserContext()
+                .with(ServerPlaceholderContext.SERVER_KEY, serverContext);
+
+        return PARSER.parseNode(message)
+                .toComponent(parserContext, false)
                 .getString();
     }
 
