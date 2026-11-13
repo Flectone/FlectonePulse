@@ -21,6 +21,7 @@ import net.flectone.pulse.model.value.PlayTime;
 import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.NearbyService;
@@ -52,6 +53,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     private final FLogger fLogger;
     private final LazyInstance<MinecraftHeaderModule> headerModule;
     private final LazyInstance<MinecraftFooterModule> footerModule;
+    private final LazyInstance<ModuleController> moduleController;
     private final LazyInstance<NearbyService> nearbyService;
 
     @Override
@@ -212,7 +214,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
         MinecraftHeaderModule headerModuleInstance = headerModule.get();
 
-        if (!headerModuleInstance.isDisabledFor(fPlayer)) {
+        if (!moduleController.get().isDisabledFor(headerModuleInstance, fPlayer)) {
             String header = headerModuleInstance.getCurrentMessage(fPlayer);
             if (header != null) {
                 return messagePipeline.build(MessageContext.builder()
@@ -231,7 +233,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
         MinecraftFooterModule footerModuleInstance = footerModule.get();
 
-        if (!footerModuleInstance.isDisabledFor(fPlayer)) {
+        if (!moduleController.get().isDisabledFor(footerModuleInstance, fPlayer)) {
             String footer = footerModuleInstance.getCurrentMessage(fPlayer);
             if (footer != null) {
                 return messagePipeline.build(MessageContext.builder()

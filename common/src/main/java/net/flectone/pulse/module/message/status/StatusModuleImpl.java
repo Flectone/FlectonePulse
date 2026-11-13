@@ -7,12 +7,32 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.message.status.icon.IconModule;
+import net.flectone.pulse.module.message.status.motd.MotdModule;
+import net.flectone.pulse.module.message.status.players.PlayersModule;
+import net.flectone.pulse.module.message.status.version.VersionModule;
+import org.jspecify.annotations.NonNull;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class StatusModuleImpl implements StatusModule {
 
     private final FileFacade fileFacade;
+
+    @Override
+    public Set<@NonNull Class<? extends ModuleSimple>> children() {
+        Set<@NonNull Class<? extends ModuleSimple>> children = new LinkedHashSet<>(StatusModule.super.children());
+        children.add(IconModule.class);
+        children.add(MotdModule.class);
+        children.add(PlayersModule.class);
+        children.add(VersionModule.class);
+        return Collections.unmodifiableSet(children);
+    }
 
     @Override
     public ModuleName name() {

@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.sidebar;
 
-import lombok.AccessLevel;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -24,8 +25,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class SidebarModuleImpl implements SidebarModule {
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class SidebarModuleImpl implements SidebarModule {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
@@ -98,6 +100,21 @@ public abstract class SidebarModuleImpl implements SidebarModule {
     public void create(UUID uuid) {
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
         create(fPlayer);
+    }
+
+    @Override
+    public void create(FPlayer fPlayer) {
+        // sidebars are a platform feature, nothing to do by default
+    }
+
+    @Override
+    public void update(FPlayer fPlayer) {
+        // sidebars are a platform feature, nothing to do by default
+    }
+
+    @Override
+    public void remove(FPlayer fPlayer) {
+        // sidebars are a platform feature, nothing to do by default
     }
 
     protected @Nullable String getNextFormat(FPlayer fPlayer) {

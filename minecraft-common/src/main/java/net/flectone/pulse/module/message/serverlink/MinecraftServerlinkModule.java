@@ -6,17 +6,10 @@ import com.github.retrooper.packetevents.wrapper.common.server.WrapperCommonServ
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerServerLinks;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
-import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.serverlink.listener.MinecraftPulseServerlinkListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -35,19 +28,35 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftServerlinkModule implements ModuleLocalization {
+public class MinecraftServerlinkModule extends ServerlinkModuleImpl {
 
     private final Map<UUID, CachedLinks> cachedLinks = new ConcurrentHashMap<>();
 
-    private final FileFacade fileFacade;
     private final ModuleController moduleController;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final MinecraftPacketSender packetSender;
     private final MessagePipeline messagePipeline;
-    private final SocialService socialService;
     private final MinecraftPacketProvider packetProvider;
+
+    @Inject
+    public MinecraftServerlinkModule(FileFacade fileFacade,
+                                     SocialService socialService,
+                                     ModuleController moduleController,
+                                     ListenerRegistry listenerRegistry,
+                                     TaskScheduler taskScheduler,
+                                     MinecraftPacketSender packetSender,
+                                     MessagePipeline messagePipeline,
+                                     MinecraftPacketProvider packetProvider) {
+        super(fileFacade, socialService);
+
+        this.moduleController = moduleController;
+        this.listenerRegistry = listenerRegistry;
+        this.taskScheduler = taskScheduler;
+        this.packetSender = packetSender;
+        this.messagePipeline = messagePipeline;
+        this.packetProvider = packetProvider;
+    }
 
     @Override
     public void onEnable() {
@@ -59,33 +68,19 @@ public class MinecraftServerlinkModule implements ModuleLocalization {
     }
 
     @Override
-    public ModuleName name() {
-        return ModuleName.MESSAGE_SERVERLINK;
-    }
-
-    @Override
-    public Localization.Message.Serverlink localization(FPlayer fPlayer) {
-        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().serverlink();
-    }
-
-    @Override
-    public Message.Serverlink config() {
-        return fileFacade.message().serverlink();
-    }
-
-    @Override
-    public Permission.Message.Serverlink permission() {
-        return fileFacade.permission().message().serverlink();
+    public void onDisable() {
+        cachedLinks.clear();
     }
 
     @Override
     public BiPredicate<FEntity, Boolean> isDisable() {
-        return ModuleLocalization.super.isDisable().or((fEntity, _) -> {
+        return super.isDisable().or((fEntity, _) -> {
             User user = packetProvider.getUser(fEntity.uuid());
             return user == null || user.getClientVersion().isOlderThan(ClientVersion.V_1_21);
         });
     }
 
+    @Override
     public void sendLinks(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
@@ -103,7 +98,6 @@ public class MinecraftServerlinkModule implements ModuleLocalization {
         List<WrapperCommonServerServerLinks.ServerLink> serverLinks = links.entrySet().stream()
                 .map(entry -> {
                     String link = entry.getValue();
-
                     Component linkComponent = messagePipeline.build(MessageContext.builder()
                             .module(this.name())
                             .sender(fPlayer)
@@ -118,13 +112,9 @@ public class MinecraftServerlinkModule implements ModuleLocalization {
         packetSender.send(fPlayer, new WrapperPlayServerServerLinks(serverLinks));
     }
 
+    @Override
     public void remove(UUID uuid) {
         cachedLinks.remove(uuid);
-    }
-
-    @Override
-    public void onDisable() {
-        cachedLinks.clear();
     }
 
     private record CachedLinks(

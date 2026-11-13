@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.chatsetting;
 
-import lombok.AccessLevel;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
@@ -11,6 +12,8 @@ import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.command.chatsetting.builder.DummyMenuBuilder;
+import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.listener.ChatsettingProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -31,8 +34,9 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class ChatsettingModuleImpl implements ChatsettingModule {
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class ChatsettingModuleImpl implements ChatsettingModule {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -123,6 +127,11 @@ public abstract class ChatsettingModuleImpl implements ChatsettingModule {
     @Override
     public Localization.Command.Chatsetting localization(FPlayer fPlayer) {
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().chatsetting();
+    }
+
+    @Override
+    public MenuBuilder getMenuBuilder() {
+        return DummyMenuBuilder.INSTANCE;
     }
 
     private void executeOther(FPlayer fPlayer, String target, CommandContext<FPlayer> commandContext) {

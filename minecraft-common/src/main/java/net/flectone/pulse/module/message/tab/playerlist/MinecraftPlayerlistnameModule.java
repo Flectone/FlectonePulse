@@ -11,21 +11,13 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.constant.MessageFlag;
-import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.PotionUtil;
-import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.value.Range;
 import net.flectone.pulse.model.value.Ticker;
-import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.scoreboard.MinecraftScoreboardModule;
 import net.flectone.pulse.module.message.tab.playerlist.listener.MinecraftPacketPlayerlistnameListener;
@@ -52,8 +44,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Predicate;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftPlayerlistnameModule implements ModuleLocalization {
+public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
 
     private static final EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> ADD_ACTIONS = EnumSet.of(
             WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
@@ -73,7 +64,6 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
 
     private volatile long lastRefreshTick = 0L;
 
-    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -88,7 +78,43 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     private final MinecraftScoreboardModule scoreboardModule;
     private final IntegrationModule integrationModule;
     private final RangeFilter rangeFilter;
-    private final @Named("isNewerThanOrEqualsV_1_19_3") boolean isNewerThanOrEqualsV_1_19_3;
+    private final boolean isNewerThanOrEqualsV_1_19_3;
+
+    @Inject
+    public MinecraftPlayerlistnameModule(FileFacade fileFacade,
+                                         SocialService socialService,
+                                         FPlayerService fPlayerService,
+                                         PlatformPlayerAdapter platformPlayerAdapter,
+                                         MessagePipeline messagePipeline,
+                                         MinecraftPacketSender packetSender,
+                                         MinecraftPacketProvider packetProvider,
+                                         TaskScheduler taskScheduler,
+                                         ListenerRegistry listenerRegistry,
+                                         MinecraftSkinService skinService,
+                                         ProxyRegistry proxyRegistry,
+                                         ModuleController moduleController,
+                                         MinecraftScoreboardModule scoreboardModule,
+                                         IntegrationModule integrationModule,
+                                         RangeFilter rangeFilter,
+                                         @Named("isNewerThanOrEqualsV_1_19_3") boolean isNewerThanOrEqualsV_1_19_3) {
+        super(fileFacade, socialService);
+
+        this.fPlayerService = fPlayerService;
+        this.socialService = socialService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
+        this.messagePipeline = messagePipeline;
+        this.packetSender = packetSender;
+        this.packetProvider = packetProvider;
+        this.taskScheduler = taskScheduler;
+        this.listenerRegistry = listenerRegistry;
+        this.skinService = skinService;
+        this.proxyRegistry = proxyRegistry;
+        this.moduleController = moduleController;
+        this.scoreboardModule = scoreboardModule;
+        this.integrationModule = integrationModule;
+        this.rangeFilter = rangeFilter;
+        this.isNewerThanOrEqualsV_1_19_3 = isNewerThanOrEqualsV_1_19_3;
+    }
 
     @Override
     public void onEnable() {
@@ -107,34 +133,6 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
     }
 
     @Override
-    public Set<PermissionSetting> permissions() {
-        Set<PermissionSetting> permissions = new LinkedHashSet<>(ModuleLocalization.super.permissions());
-        permissions.add(permission().hideInvisible());
-        permissions.add(permission().hideSpectator());
-
-        return Collections.unmodifiableSet(permissions);
-    }
-
-    @Override
-    public ModuleName name() {
-        return ModuleName.MESSAGE_TAB_PLAYERLISTNAME;
-    }
-
-    @Override
-    public Message.Tab.Playerlistname config() {
-        return fileFacade.message().tab().playerlistname();
-    }
-
-    @Override
-    public Permission.Message.Tab.Playerlistname permission() {
-        return fileFacade.permission().message().tab().playerlistname();
-    }
-
-    @Override
-    public Localization.Message.Tab.Playerlistname localization(FPlayer fPlayer) {
-        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().tab().playerlistname();
-    }
-
     public void update() {
         if (!moduleController.isEnable(this)) return;
 
@@ -155,6 +153,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization {
         });
     }
 
+    @Override
     public void update(FPlayer fSender) {
         if (!moduleController.isEnable(this)) return;
 

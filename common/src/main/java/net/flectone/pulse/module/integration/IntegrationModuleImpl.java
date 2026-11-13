@@ -1,12 +1,15 @@
 package net.flectone.pulse.module.integration;
 
-import lombok.AccessLevel;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.file.FileFacade;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.value.ExternalModeration;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
@@ -20,6 +23,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.LazyInstance;
+import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -27,8 +31,9 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class IntegrationModuleImpl implements IntegrationModule {
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class IntegrationModuleImpl implements IntegrationModule {
 
     private final FileFacade fileFacade;
     private final LazyInstance<PlatformServerAdapter> platformServerAdapter;
@@ -74,6 +79,51 @@ public abstract class IntegrationModuleImpl implements IntegrationModule {
     @Override
     public Permission.Integration permission() {
         return fileFacade.permission().integration();
+    }
+
+    @Override
+    public String checkMention(FEntity fPlayer, String message) {
+        return message;
+    }
+
+    @Override
+    public boolean isVanished(FEntity sender) {
+        return false;
+    }
+
+    @Override
+    public boolean hasVanishIntegration() {
+        return false;
+    }
+
+    @Override
+    public boolean hasSeeVanishPermission(FEntity sender) {
+        return false;
+    }
+
+    @Override
+    public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
+        return false;
+    }
+
+    @Override
+    public boolean isMuted(FPlayer fPlayer) {
+        return false;
+    }
+
+    @Override
+    public boolean isBedrockPlayer(FEntity fPlayer) {
+        return false;
+    }
+
+    @Override
+    public ExternalModeration getMute(FPlayer fPlayer) {
+        return null;
+    }
+
+    @Override
+    public String getTritonLocale(FPlayer fPlayer) {
+        return null;
     }
 
     @Override

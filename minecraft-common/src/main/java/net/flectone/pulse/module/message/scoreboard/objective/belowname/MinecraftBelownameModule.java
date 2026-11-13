@@ -7,19 +7,9 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUp
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FlectonePulseAPI;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.constant.ModuleName;
-import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
-import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.value.Ticker;
-import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.scoreboard.objective.MinecraftObjectiveModule;
-import net.flectone.pulse.module.message.scoreboard.objective.ScoreboardPosition;
+import net.flectone.pulse.module.message.scoreboard.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.scoreboard.objective.belowname.listener.MinecraftPacketBelownameListener;
 import net.flectone.pulse.module.message.scoreboard.objective.belowname.listener.MinecraftPulseBelownameListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -30,35 +20,45 @@ import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.kyori.adventure.text.Component;
 
 import java.util.List;
 import java.util.UUID;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftBelownameModule implements ModuleLocalization {
+public class MinecraftBelownameModule extends BelownameModuleImpl {
 
     private static final int ATTRIBUTE_BASE_VALUE = 10;
 
-    private final FileFacade fileFacade;
-    private final FPlayerService fPlayerService;
-    private final TaskScheduler taskScheduler;
-    private final MinecraftObjectiveModule objectiveModule;
     private final ListenerRegistry listenerRegistry;
-    private final ModuleController moduleController;
-    private final SocialService socialService;
     private final MinecraftPacketSender packetSender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MinecraftPacketProvider packetProvider;
-    private final @Named("isNewerThanOrEqualsV_26_2") boolean isNewerThanOrEqualsV262;
+    private final boolean isNewerThanOrEqualsV262;
+
+    @Inject
+    public MinecraftBelownameModule(FileFacade fileFacade,
+                                    SocialService socialService,
+                                    FPlayerService fPlayerService,
+                                    TaskScheduler taskScheduler,
+                                    ModuleController moduleController,
+                                    ObjectiveModule objectiveModule,
+                                    ListenerRegistry listenerRegistry,
+                                    MinecraftPacketSender packetSender,
+                                    PlatformPlayerAdapter platformPlayerAdapter,
+                                    MinecraftPacketProvider packetProvider,
+                                    @Named("isNewerThanOrEqualsV_26_2") boolean isNewerThanOrEqualsV262) {
+        super(fileFacade, socialService, fPlayerService, taskScheduler, moduleController, objectiveModule);
+
+        this.listenerRegistry = listenerRegistry;
+        this.packetSender = packetSender;
+        this.platformPlayerAdapter = platformPlayerAdapter;
+        this.packetProvider = packetProvider;
+        this.isNewerThanOrEqualsV262 = isNewerThanOrEqualsV262;
+    }
 
     @Override
     public void onEnable() {
-        Ticker ticker = config().ticker();
-        if (ticker.enable()) {
-            taskScheduler.runPlayerAsyncTimer(this::updateScore, ticker.period());
-        }
+        super.onEnable();
 
         listenerRegistry.register(MinecraftPulseBelownameListener.class);
 
@@ -71,62 +71,11 @@ public class MinecraftBelownameModule implements ModuleLocalization {
 
     @Override
     public void onDisable() {
-        fPlayerService.getPlatformFPlayers().forEach(this::remove);
+        super.onDisable();
 
         if (!FlectonePulseAPI.isDisabling() && isNewerThanOrEqualsV262) {
             sendForAll(true);
         }
-    }
-
-    @Override
-    public ModuleName name() {
-        return ModuleName.MESSAGE_SCOREBOARD_OBJECTIVE_BELOWNAME;
-    }
-
-    @Override
-    public Message.Scoreboard.Objective.Belowname config() {
-        return fileFacade.message().scoreboard().objective().belowname();
-    }
-
-    @Override
-    public Permission.Message.Scoreboard.Objective.Belowname permission() {
-        return fileFacade.permission().message().scoreboard().objective().belowname();
-    }
-
-    @Override
-    public Localization.Message.Scoreboard.Objective.Belowname localization(FPlayer fPlayer) {
-        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().scoreboard().objective().belowname();
-    }
-
-    public void create(FPlayer fPlayer) {
-        if (moduleController.isDisabledFor(this, fPlayer)) return;
-
-        Localization.Message.Scoreboard.Objective.Belowname localization = localization(fPlayer);
-        Component displayFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.score(), localization.displayFormat());
-        Component scoreFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.score(), localization.scoreFormat());
-
-        objectiveModule.createObjective(fPlayer, displayFormat, scoreFormat, ScoreboardPosition.BELOWNAME);
-        updateScore(fPlayer);
-    }
-
-    public void updateScore(FPlayer fPlayer) {
-        if (moduleController.isDisabledFor(this, fPlayer)) return;
-
-        fPlayerService.getOnlineFPlayers().forEach(fObjective -> {
-            if (!socialService.canSeeVanished(fObjective, fPlayer)) {
-                objectiveModule.forgetScore(fPlayer, fObjective, ScoreboardPosition.BELOWNAME);
-                return;
-            }
-
-            Localization.Message.Scoreboard.Objective.Belowname localization = localization(fPlayer);
-            Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat(), false);
-
-            objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.BELOWNAME);
-        });
-    }
-
-    public void remove(FPlayer fPlayer) {
-        objectiveModule.removeObjective(fPlayer, ScoreboardPosition.BELOWNAME);
     }
 
     public boolean isModernPlayer(UUID uuid) {
@@ -154,6 +103,5 @@ public class MinecraftBelownameModule implements ModuleLocalization {
                 List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.BELOW_NAME_DISTANCE, baseValue ? ATTRIBUTE_BASE_VALUE : config().distance(), List.of())))
         );
     }
-
 
 }

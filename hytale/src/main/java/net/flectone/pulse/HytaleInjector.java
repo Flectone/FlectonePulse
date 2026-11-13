@@ -6,20 +6,20 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import net.flectone.pulse.checker.HytalePermissionChecker;
 import net.flectone.pulse.checker.PermissionCheckerImpl;
 import net.flectone.pulse.logging.FLogger;
-import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
+import net.flectone.pulse.module.command.chatsetting.ChatsettingModuleImpl;
 import net.flectone.pulse.module.command.chatsetting.HytaleChatsettingModule;
 import net.flectone.pulse.module.integration.HytaleIntegrationModule;
-import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.module.integration.IntegrationModuleImpl;
+import net.flectone.pulse.module.message.bubble.BubbleModuleImpl;
 import net.flectone.pulse.module.message.bubble.HytaleBubbleModule;
-import net.flectone.pulse.module.message.chat.ChatModule;
+import net.flectone.pulse.module.message.chat.ChatModuleImpl;
 import net.flectone.pulse.module.message.chat.HytaleChatModule;
 import net.flectone.pulse.module.message.scoreboard.HytaleScoreboardModule;
-import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
+import net.flectone.pulse.module.message.scoreboard.ScoreboardModuleImpl;
 import net.flectone.pulse.module.message.sidebar.HytaleSidebarModule;
-import net.flectone.pulse.module.message.sidebar.SidebarModule;
+import net.flectone.pulse.module.message.sidebar.SidebarModuleImpl;
 import net.flectone.pulse.module.message.vanilla.HytaleVanillaModule;
-import net.flectone.pulse.module.message.vanilla.VanillaModule;
+import net.flectone.pulse.module.message.vanilla.VanillaModuleImpl;
 import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.extractor.HytaleComponentExtractor;
 import net.flectone.pulse.pipeline.HytaleMessagePipeline;
@@ -82,17 +82,17 @@ public class HytaleInjector extends PlatformInjector {
         bind(MessagePipelineImpl.class).to(HytaleMessagePipeline.class);
 
         // integrations
-        bind(IntegrationModule.class).to(HytaleIntegrationModule.class);
+        bind(IntegrationModuleImpl.class).to(HytaleIntegrationModule.class);
 
         // commands
-        bind(ChatsettingModule.class).to(HytaleChatsettingModule.class);
+        bind(ChatsettingModuleImpl.class).to(HytaleChatsettingModule.class);
 
         // messages
-        bind(BubbleModule.class).to(HytaleBubbleModule.class);
-        bind(ChatModule.class).to(HytaleChatModule.class);
-        bind(ScoreboardModule.class).to(HytaleScoreboardModule.class);
-        bind(SidebarModule.class).to(HytaleSidebarModule.class);
-        bind(VanillaModule.class).to(HytaleVanillaModule.class);
+        bind(BubbleModuleImpl.class).to(HytaleBubbleModule.class);
+        bind(ChatModuleImpl.class).to(HytaleChatModule.class);
+        bind(ScoreboardModuleImpl.class).to(HytaleScoreboardModule.class);
+        bind(SidebarModuleImpl.class).to(HytaleSidebarModule.class);
+        bind(VanillaModuleImpl.class).to(HytaleVanillaModule.class);
 
         // renders
         bind(ActionBarRender.class).to(HytalyActionBarRender.class);

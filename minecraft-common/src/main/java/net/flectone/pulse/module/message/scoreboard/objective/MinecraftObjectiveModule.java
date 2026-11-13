@@ -6,19 +6,11 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSc
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.event.message.context.StringMessageContext;
-import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.scoreboard.objective.belowname.MinecraftBelownameModule;
-import net.flectone.pulse.module.message.scoreboard.objective.tabname.MinecraftTabnameModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
@@ -31,15 +23,13 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
     private final Map<String, Map<String, Integer>> sentScores = new ConcurrentHashMap<>();
 
     private final MinecraftPacketSender packetSender;
-    private final MessagePipeline messagePipeline;
 
     @Inject
     public MinecraftObjectiveModule(FileFacade fileFacade,
-                                    MinecraftPacketSender packetSender,
-                                    MessagePipeline messagePipeline) {
-        super(fileFacade);
+                                    MessagePipeline messagePipeline,
+                                    MinecraftPacketSender packetSender) {
+        super(fileFacade, messagePipeline);
         this.packetSender = packetSender;
-        this.messagePipeline = messagePipeline;
     }
 
     @Override
@@ -49,13 +39,6 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
     }
 
     @Override
-    public Set<@NonNull Class<? extends ModuleSimple>> children() {
-        Set<Class<? extends ModuleSimple>> children = new LinkedHashSet<>(super.children());
-        children.add(MinecraftBelownameModule.class);
-        children.add(MinecraftTabnameModule.class);
-        return Collections.unmodifiableSet(children);
-    }
-
     public void createObjective(FPlayer fPlayer, Component displayName, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
         String objectiveName = getObjectiveName(fPlayer, scoreboardPosition);
         if (!objectives.add(objectiveName)) return;
@@ -76,6 +59,7 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
         ));
     }
 
+    @Override
     public void updateObjective(FPlayer fPlayer, FPlayer fObjective, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
         String objectiveName = getObjectiveName(fPlayer, scoreboardPosition);
 
@@ -93,6 +77,7 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
         ));
     }
 
+    @Override
     public void removeObjective(FPlayer fPlayer, ScoreboardPosition scoreboardPosition) {
         String objectiveName = getObjectiveName(fPlayer, scoreboardPosition);
 
@@ -110,36 +95,7 @@ public class MinecraftObjectiveModule extends ObjectiveModuleImpl {
         ));
     }
 
-    public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String score, String format) {
-        return buildFormat(fPlayer, fReceiver, score, format, true);
-    }
-
-    public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String score, String format, boolean colorContextSender) {
-        return messagePipeline.build(StringMessageContext.builder()
-                .base(MessageContext.builder()
-                        .module(this.name())
-                        .sender(fPlayer)
-                        .receiver(fReceiver)
-                        .message(format)
-                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, colorContextSender)
-                        .tagResolver(messagePipeline.resolver("score", (_, _) ->
-                                Tag.inserting(messagePipeline.build(MessageContext.builder()
-                                                .module(this.name())
-                                                .sender(fPlayer)
-                                                .receiver(fReceiver)
-                                                .message(score)
-                                                .flag(MessageFlag.COLOR_CONTEXT_SENDER, colorContextSender)
-                                                .build()
-                                        )
-                                )
-                        ))
-                        .build()
-                )
-                .string(score)
-                .build()
-        );
-    }
-
+    @Override
     public void forgetScore(FPlayer fPlayer, FPlayer fObjective, ScoreboardPosition scoreboardPosition) {
         Map<String, Integer> scores = sentScores.get(getObjectiveName(fPlayer, scoreboardPosition));
         if (scores != null) {

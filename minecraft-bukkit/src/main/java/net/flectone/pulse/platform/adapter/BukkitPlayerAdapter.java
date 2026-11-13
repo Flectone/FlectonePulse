@@ -20,6 +20,7 @@ import net.flectone.pulse.model.value.PlayTime;
 import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.BukkitAttributesProvider;
 import net.flectone.pulse.platform.provider.BukkitPassengersProvider;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
@@ -56,6 +57,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     private final FLogger fLogger;
     private final LazyInstance<MinecraftHeaderModule> headerModule;
     private final LazyInstance<MinecraftFooterModule> footerModule;
+    private final LazyInstance<ModuleController> moduleController;
     private final LazyInstance<NearbyService> nearbyService;
 
     private MethodHandle handleMethod;
@@ -297,7 +299,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         MinecraftHeaderModule headerModuleInstance = headerModule.get();
 
         String header;
-        if (!headerModuleInstance.isDisabledFor(fPlayer)) {
+        if (!moduleController.get().isDisabledFor(headerModuleInstance, fPlayer)) {
             header = headerModuleInstance.getCurrentMessage(fPlayer);
             if (header != null) {
                 return messagePipeline.build(MessageContext.builder()
@@ -323,7 +325,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         MinecraftFooterModule footerModuleInstance = footerModule.get();
 
         String footer;
-        if (!footerModuleInstance.isDisabledFor(fPlayer)) {
+        if (!moduleController.get().isDisabledFor(footerModuleInstance, fPlayer)) {
             footer = footerModuleInstance.getCurrentMessage(fPlayer);
             if (footer != null) {
                 return messagePipeline.build(MessageContext.builder()

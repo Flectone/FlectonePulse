@@ -10,17 +10,23 @@ import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.SocialService;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftVersionModule implements ModuleLocalization {
+public class VersionModuleImpl implements VersionModule {
 
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
     private final SocialService socialService;
+
+    @Override
+    public String get(FPlayer fPlayer) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
+
+        return localization(fPlayer).name();
+    }
 
     @Override
     public ModuleName name() {
@@ -42,9 +48,4 @@ public class MinecraftVersionModule implements ModuleLocalization {
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().status().version();
     }
 
-    public String get(FPlayer fPlayer) {
-        if (moduleController.isDisabledFor(this, fPlayer)) return null;
-
-        return localization(fPlayer).name();
-    }
 }

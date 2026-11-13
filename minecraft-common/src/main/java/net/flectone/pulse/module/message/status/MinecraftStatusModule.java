@@ -14,12 +14,11 @@ import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.StatusResponseEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.status.icon.MinecraftIconModule;
 import net.flectone.pulse.module.message.status.listener.MinecraftPacketStatusListener;
 import net.flectone.pulse.module.message.status.motd.MinecraftMOTDModule;
-import net.flectone.pulse.module.message.status.players.MinecraftPlayersModule;
-import net.flectone.pulse.module.message.status.version.MinecraftVersionModule;
+import net.flectone.pulse.module.message.status.players.PlayersModule;
+import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
@@ -29,7 +28,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -38,8 +36,8 @@ public class MinecraftStatusModule extends StatusModuleImpl {
 
     private final MinecraftMOTDModule MOTDModule;
     private final MinecraftIconModule iconModule;
-    private final MinecraftPlayersModule playersModule;
-    private final MinecraftVersionModule versionModule;
+    private final PlayersModule playersModule;
+    private final VersionModule versionModule;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
@@ -53,8 +51,8 @@ public class MinecraftStatusModule extends StatusModuleImpl {
     public MinecraftStatusModule(FileFacade fileFacade,
                                  MinecraftMOTDModule motdModule,
                                  MinecraftIconModule iconModule,
-                                 MinecraftPlayersModule playersModule,
-                                 MinecraftVersionModule versionModule,
+                                 PlayersModule playersModule,
+                                 VersionModule versionModule,
                                  MessagePipeline messagePipeline,
                                  FPlayerService fPlayerService,
                                  ListenerRegistry listenerRegistry,
@@ -77,16 +75,6 @@ public class MinecraftStatusModule extends StatusModuleImpl {
         this.moduleController = moduleController;
         this.statusUtil = statusUtil;
         this.socialService = socialService;
-    }
-
-    @Override
-    public Set<@NonNull Class<? extends ModuleSimple>> children() {
-        Set<Class<? extends ModuleSimple>> children = new LinkedHashSet<>(super.children());
-        children.add(MinecraftMOTDModule.class);
-        children.add(MinecraftIconModule.class);
-        children.add(MinecraftPlayersModule.class);
-        children.add(MinecraftVersionModule.class);
-        return Collections.unmodifiableSet(children);
     }
 
     @Override

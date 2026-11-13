@@ -23,6 +23,7 @@ import net.flectone.pulse.module.message.nameplate.NameplateModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
 import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
+import net.flectone.pulse.module.message.serverlink.ServerlinkModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.module.message.status.StatusModule;
@@ -59,6 +60,7 @@ public class MessageModuleImpl implements MessageModule {
         children.add(QuitModule.class);
         children.add(RightclickModule.class);
         children.add(ScoreboardModule.class);
+        children.add(ServerlinkModule.class);
         children.add(SidebarModule.class);
         children.add(SignModule.class);
         children.add(StatusModule.class);

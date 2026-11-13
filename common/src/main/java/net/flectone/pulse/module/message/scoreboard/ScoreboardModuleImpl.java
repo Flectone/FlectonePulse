@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.scoreboard;
 
-import lombok.AccessLevel;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -21,8 +22,9 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class ScoreboardModuleImpl implements ScoreboardModule {
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class ScoreboardModuleImpl implements ScoreboardModule {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
@@ -59,6 +61,16 @@ public abstract class ScoreboardModuleImpl implements ScoreboardModule {
     @Override
     public void onEnable() {
         listenerRegistry.register(PulseScoreboardListener.class);
+    }
+
+    @Override
+    public void createOrUpdate(FPlayer fPlayer) {
+        // scoreboards are a platform feature, nothing to do by default
+    }
+
+    @Override
+    public void remove(FPlayer fPlayer) {
+        // scoreboards are a platform feature, nothing to do by default
     }
 
     protected boolean isInvisibleNameFor(@NonNull FPlayer fPlayer) {
