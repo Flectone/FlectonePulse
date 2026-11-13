@@ -12,6 +12,7 @@ import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.MessageFormattedEvent;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.pipeline.fast.FastMessageParser;
@@ -116,20 +117,37 @@ public class MessagePipelineImpl implements MessagePipeline {
         // if a message is created very often, it can be retrieved from the cache
         // because it is only 1 second and context of placeholders will be correct
         MessageContext.CacheKey messageContextCacheKey = messageContext.createCacheKey();
-        Component cachedComponent = messageContextCache.getIfPresent(messageContextCacheKey);
-        if (cachedComponent != null) return cachedComponent;
+        Optional<Component> cachedComponent = getCachedComponent(eventMetadata, messageContext, messageContextCacheKey);
+        if (cachedComponent.isPresent()) return cachedComponent.get();
 
-        // update context
         MessageContext formattingContext = new FormattingContext(messageContext);
-        messageContext = eventDispatcher.dispatch(new MessageFormattingEvent(eventMetadata, formattingContext)).context();
+        MessageFormattingEvent messageFormattingEvent = eventDispatcher.dispatch(new MessageFormattingEvent(eventMetadata, formattingContext));
+        if (messageFormattingEvent.cancelled()) return Component.empty();
 
-        Component component = deserialize(messageContext);
+        MessageContext formattedContext = messageFormattingEvent.context();
 
-        if (messageContext.isFlag(MessageFlag.USE_CACHE)) {
+        Component component = deserialize(formattedContext);
+
+        MessageFormattedEvent messageFormattedEvent = eventDispatcher.dispatch(new MessageFormattedEvent(eventMetadata, formattedContext, component));
+        if (messageFormattedEvent.cancelled()) return Component.empty();
+
+        component = messageFormattedEvent.component();
+
+        if (formattedContext.isFlag(MessageFlag.USE_CACHE)) {
             messageContextCache.put(messageContextCacheKey, component);
         }
 
         return component;
+    }
+
+    private Optional<Component> getCachedComponent(@Nullable EventMetadata eventMetadata, MessageContext messageContext, MessageContext.CacheKey messageContextCacheKey) {
+        Component cachedComponent = messageContextCache.getIfPresent(messageContextCacheKey);
+        if (cachedComponent == null) return Optional.empty();
+
+        MessageFormattedEvent messageFormattedEvent = eventDispatcher.dispatch(new MessageFormattedEvent(eventMetadata, messageContext, cachedComponent));
+        if (messageFormattedEvent.cancelled()) return Optional.of(Component.empty());
+
+        return Optional.of(messageFormattedEvent.component());
     }
 
     @Override
