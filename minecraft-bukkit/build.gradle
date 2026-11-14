@@ -53,7 +53,7 @@ tasks.register("jarInJarContent", Jar) {
 }
 
 tasks.named("buildFinalJar", Jar) {
-    archiveFileName = "FlectonePulse-Bukkit-" + project_version + ".jar"
+    archiveFileName = "$project_name-Bukkit-${project_version}.jar"
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 

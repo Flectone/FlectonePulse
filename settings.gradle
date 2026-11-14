@@ -3,8 +3,8 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         maven {
-            name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
+            name = "Fabric"
+            url = "https://maven.fabricmc.net/"
         }
     }
 }

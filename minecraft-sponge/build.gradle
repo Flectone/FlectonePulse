@@ -74,7 +74,7 @@ tasks.register("jarInJarContent", Jar) {
 }
 
 tasks.named("buildFinalJar", Jar) {
-    archiveFileName = "FlectonePulse-Sponge-" + project_version + ".jar"
+    archiveFileName = "$project_name-Sponge-${project_version}.jar"
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 

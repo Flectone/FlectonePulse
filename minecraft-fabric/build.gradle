@@ -1,9 +1,9 @@
 plugins {
-	id "net.fabricmc.fabric-loom" version "${fabric_loom_version}" apply false
+	id "net.fabricmc.fabric-loom" version "$fabric_loom_version" apply false
 }
 
 tasks.named("buildFinalJar", Jar) {
-	archiveFileName = "FlectonePulse-Fabric-" + project_version + ".jar"
+	archiveFileName = "$project_name-Fabric-${project_version}.jar"
 
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
