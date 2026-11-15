@@ -234,6 +234,12 @@ public class FPlayerServiceImpl implements FPlayerService {
 
     @Override
     @NonNull
+    public FPlayer getFPlayerFromDatabase(@NonNull UUID uuid) {
+        return fPlayerRepository.getFromDatabase(uuid);
+    }
+
+    @Override
+    @NonNull
     public FPlayer getFPlayer(FEntity fEntity) {
         return getFPlayer(fEntity.uuid());
     }

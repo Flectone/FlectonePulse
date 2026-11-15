@@ -167,6 +167,15 @@ public interface FPlayerService {
     FPlayer getFPlayer(UUID uuid);
 
     /**
+     * Gets a player straight from the database, bypassing the in-memory cache.
+     *
+     * @param uuid the player's UUID
+     * @return the player from the database, or UNKNOWN if not found
+     */
+    @NonNull
+    FPlayer getFPlayerFromDatabase(@NonNull UUID uuid);
+
+    /**
      * Gets a player from an FEntity by extracting its UUID.
      *
      * @param fEntity the entity to get the player for
