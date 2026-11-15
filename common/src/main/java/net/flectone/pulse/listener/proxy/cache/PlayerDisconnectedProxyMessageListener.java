@@ -42,7 +42,12 @@ public class PlayerDisconnectedProxyMessageListener implements PulseListener {
             UUID playerUUID = fEntity.uuid();
 
             // online -> offline player
-            fPlayerService.invalidateOnlineCache(playerUUID);
+            FPlayer databaseFPlayer = fPlayerService.getFPlayerFromDatabase(playerUUID);
+            if (databaseFPlayer.isOnline()) {
+                fPlayerService.clearAndSave(databaseFPlayer);
+            } else {
+                fPlayerService.invalidateOnlineCache(playerUUID);
+            }
 
             // clear playtime cache
             playtimeService.invalidate(playerUUID);
