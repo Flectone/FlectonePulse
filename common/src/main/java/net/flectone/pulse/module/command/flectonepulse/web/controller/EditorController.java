@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.constant.FilePath;
 import net.flectone.pulse.exception.FileLoadException;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.file.FilePathProvider;
@@ -34,23 +35,25 @@ public class EditorController {
     private final FileFacade fileFacade;
     private final FilePathProvider filePathProvider;
 
+    private final String LOCALIZATIONS_PATH = FilePath.LOCALIZATION_FOLDER.getPath().replace("/", "");
+
     public void initConfigFiles() {
         configFiles.clear();
         localizationFiles.clear();
 
-        configFiles.put("config.yml", fileFacade.config());
-        configFiles.put("command.yml", fileFacade.command());
-        configFiles.put("integration.yml", fileFacade.integration());
-        configFiles.put("message.yml", fileFacade.message());
-        configFiles.put("permission.yml", fileFacade.permission());
+        configFiles.put(FilePath.CONFIG.getPath(), fileFacade.config());
+        configFiles.put(FilePath.COMMAND.getPath(), fileFacade.command());
+        configFiles.put(FilePath.INTEGRATION.getPath(), fileFacade.integration());
+        configFiles.put(FilePath.MESSAGE.getPath(), fileFacade.message());
+        configFiles.put(FilePath.PERMISSION.getPath(), fileFacade.permission());
 
         Map<String, Localization> localizationMap = fileFacade.localizations();
-        localizationFiles.put("localizations", new ArrayList<>());
+        localizationFiles.put(LOCALIZATIONS_PATH, new ArrayList<>());
 
         for (Map.Entry<String, Localization> entry : localizationMap.entrySet()) {
             String lang = entry.getKey();
             Localization localization = entry.getValue();
-            localizationFiles.get("localizations").add(new LocalizationFile(lang + ".yml", localization));
+            localizationFiles.get(LOCALIZATIONS_PATH).add(new LocalizationFile(lang + ".yml", localization));
         }
     }
 
@@ -138,7 +141,7 @@ public class EditorController {
                 return Files.readString(filePathProvider.get(file));
             }
 
-        } else if ("localizations".equals(fileType)) {
+        } else if (LOCALIZATIONS_PATH.equals(fileType)) {
             List<LocalizationFile> files = localizationFiles.get(fileType);
             for (LocalizationFile file : files) {
                 if (file.fileName.equals(fileName)) {
@@ -158,7 +161,7 @@ public class EditorController {
                 return;
             }
 
-        } else if ("localizations".equals(fileType)) {
+        } else if (LOCALIZATIONS_PATH.equals(fileType)) {
             List<LocalizationFile> files = localizationFiles.get(fileType);
             for (LocalizationFile file : files) {
                 if (file.fileName.equals(fileName)) {
