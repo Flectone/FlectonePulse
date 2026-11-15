@@ -135,10 +135,6 @@ public class ReplacementModuleImpl implements ReplacementModule {
             if (argument == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             String name = argument.value();
-            if (!permissionChecker.check(sender, permission().values().get(name))) return MessagePipeline.ReplacementTag.emptyTag();
-
-            String replacement = localization(receiver).values().get(name);
-            if (replacement == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             List<String> values = new ArrayList<>();
             while (argumentQueue.hasNext()) {
@@ -146,26 +142,38 @@ public class ReplacementModuleImpl implements ReplacementModule {
                 values.add(StringEscapeUtils.unescapeJava(groupArg.value()));
             }
 
+            String original = values.isEmpty() ? "" : values.removeLast();
+            if (isUrl(name)) {
+                original = urlFormatter.unescapeAmpersand(original);
+            }
+
+            if (!permissionChecker.check(sender, permission().values().get(name))) {
+                return originalTag(original);
+            }
+
+            String replacement = localization(receiver).values().get(name);
+            if (replacement == null) return originalTag(original);
+
             return switch (name) {
-                case "ping" -> pingTag(messageContext);
+                case "ping" -> pingTag(messageContext, original);
                 case "tps" -> tpsTag(messageContext);
                 case "online" -> onlineTag(messageContext);
-                case "coords" -> coordsTag(messageContext);
-                case "stats" -> statsTag(messageContext);
-                case "skin" -> skinTag(messageContext);
-                case "item" -> itemTag(messageContext);
+                case "coords" -> coordsTag(messageContext, original);
+                case "stats" -> statsTag(messageContext, original);
+                case "skin" -> skinTag(messageContext, original);
+                case "item" -> itemTag(messageContext, original);
                 case "url" -> {
-                    if (values.size() < 2) yield MessagePipeline.ReplacementTag.emptyTag();
+                    if (values.size() < 2) yield originalTag(original);
 
-                    yield urlTag(messageContext, values.get(1));
+                    yield urlTag(messageContext, values.get(1), original);
                 }
                 case "image" -> {
-                    if (values.size() < 2) yield MessagePipeline.ReplacementTag.emptyTag();
+                    if (values.size() < 2) yield originalTag(original);
 
-                    yield imageTag(messageContext, values.get(1));
+                    yield imageTag(messageContext, values.get(1), original);
                 }
                 case "spoiler" -> {
-                    if (values.size() < 2) yield MessagePipeline.ReplacementTag.emptyTag();
+                    if (values.size() < 2) yield originalTag(original);
 
                     yield spoilerTag(messageContext, values.get(1));
                 }
@@ -204,11 +212,15 @@ public class ReplacementModuleImpl implements ReplacementModule {
         }));
     }
 
+    private Tag originalTag(String original) {
+        return Tag.selfClosingInserting(Component.text(original));
+    }
+
     private String processMessage(FEntity sender, String message) {
         List<MatchInfo> matches = new ArrayList<>();
 
         triggerPatterns.forEach((name, pattern) -> {
-            boolean isUrl = name.equals("url") || name.equals("image");
+            boolean isUrl = isUrl(name);
             Matcher matcher = pattern.matcher(message);
 
             while (matcher.find()) {
@@ -250,7 +262,18 @@ public class ReplacementModuleImpl implements ReplacementModule {
                     ));
         }
 
+        String original = matcher.group();
+        stringBuilder
+                .append("':'")
+                .append(StringEscapeUtils.escapeJava(
+                        isUrl ? urlFormatter.escapeAmpersand(original) : original
+                ));
+
         return stringBuilder.append("'>").toString();
+    }
+
+    private boolean isUrl(String name) {
+        return name.equals("url") || name.equals("image");
     }
 
     private Tag spoilerTag(MessageContext messageContext, String spoilerText) {
@@ -298,8 +321,8 @@ public class ReplacementModuleImpl implements ReplacementModule {
         ));
     }
 
-    private Tag pingTag(MessageContext messageContext) {
-        if (!(messageContext.sender() instanceof FPlayer fPlayer)) return MessagePipeline.ReplacementTag.emptyTag();
+    private Tag pingTag(MessageContext messageContext, String original) {
+        if (!(messageContext.sender() instanceof FPlayer fPlayer)) return originalTag(original);
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                 .module(this.name())
@@ -357,9 +380,9 @@ public class ReplacementModuleImpl implements ReplacementModule {
         ));
     }
 
-    private Tag coordsTag(MessageContext messageContext) {
+    private Tag coordsTag(MessageContext messageContext, String original) {
         PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(messageContext.sender());
-        if (coordinates == null) return MessagePipeline.ReplacementTag.emptyTag();
+        if (coordinates == null) return originalTag(original);
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                 .module(this.name())
@@ -383,9 +406,9 @@ public class ReplacementModuleImpl implements ReplacementModule {
         ));
     }
 
-    private Tag statsTag(MessageContext messageContext) {
+    private Tag statsTag(MessageContext messageContext, String original) {
         PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(messageContext.sender());
-        if (statistics == null) return MessagePipeline.ReplacementTag.emptyTag();
+        if (statistics == null) return originalTag(original);
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                 .module(this.name())
@@ -411,8 +434,9 @@ public class ReplacementModuleImpl implements ReplacementModule {
         ));
     }
 
-    private Tag skinTag(MessageContext messageContext) {
+    private Tag skinTag(MessageContext messageContext, String original) {
         String url = skinService.getBodyUrl(messageContext.sender());
+        if (StringUtils.isEmpty(url)) return originalTag(original);
 
         Component componentPixels = createImageComponent(url);
 
@@ -439,8 +463,10 @@ public class ReplacementModuleImpl implements ReplacementModule {
         ));
     }
 
-    private Tag itemTag(MessageContext messageContext) {
+    private Tag itemTag(MessageContext messageContext, String original) {
         Object itemStackObject = platformPlayerAdapter.getItem(messageContext.sender().uuid());
+        if (itemStackObject == null) return originalTag(original);
+
         Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.isFlag(MessageFlag.ITEM_DETECTION));
 
         return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
@@ -462,10 +488,10 @@ public class ReplacementModuleImpl implements ReplacementModule {
         ));
     }
 
-    private Tag urlTag(MessageContext messageContext, String url) {
+    private Tag urlTag(MessageContext messageContext, String url, String original) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
-        if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
-        if (messageContext.receiver().isUnknown() || messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
+        if (url.isEmpty()) return originalTag(original);
+        if (messageContext.receiver().isUnknown() || messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return originalTag(original);
 
         String domain = urlFormatter.getDomainName(url);
 
@@ -487,10 +513,10 @@ public class ReplacementModuleImpl implements ReplacementModule {
         ));
     }
 
-    private Tag imageTag(MessageContext messageContext, String url) {
+    private Tag imageTag(MessageContext messageContext, String url, String original) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
-        if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
-        if (messageContext.receiver().isUnknown() || messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
+        if (url.isEmpty()) return originalTag(original);
+        if (messageContext.receiver().isUnknown() || messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return originalTag(original);
 
         Component componentPixels = createImageComponent(url);
 
