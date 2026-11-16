@@ -384,6 +384,7 @@ final class FastParser {
             }
 
             if (tag == ParserDirective.RESET) return;
+            if (tag instanceof Inserting inserting && !inserting.allowsChildren()) return;
 
             closeTag(info);
             return;
