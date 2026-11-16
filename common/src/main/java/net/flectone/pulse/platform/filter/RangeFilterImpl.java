@@ -58,6 +58,7 @@ public class RangeFilterImpl implements RangeFilter {
                 case WORLD_NAME -> checkWorldNamePermission(fPlayer, fReceiver);
                 case WORLD_TYPE -> checkWorldTypePermission(fPlayer, fReceiver);
                 case PERMISSION -> checkRangePermission(fReceiver, range.isCustomPermission() ? (String) range.value() : null, moduleName);
+                case SERVER -> platformPlayerAdapter.isOnline(fReceiver);
                 default -> true;
             };
         };
