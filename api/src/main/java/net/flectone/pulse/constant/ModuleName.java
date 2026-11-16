@@ -158,6 +158,7 @@ public enum ModuleName {
     // only for invalidation cache
     PLAYER_CONNECTED,
     PLAYER_DISCONNECTED,
+    PLAYER_SWITCHING,
     UPDATE_CACHE_COOLDOWN,
     UPDATE_CACHE_BAN,
     UPDATE_CACHE_MUTE,

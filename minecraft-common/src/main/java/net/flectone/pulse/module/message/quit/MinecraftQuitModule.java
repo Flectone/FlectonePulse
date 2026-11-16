@@ -9,8 +9,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
-import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlayerSwitchService;
 import net.flectone.pulse.service.SocialService;
 
 @Singleton
@@ -20,15 +19,14 @@ public class MinecraftQuitModule extends QuitModuleImpl {
 
     @Inject
     public MinecraftQuitModule(FileFacade fileFacade,
-                               TaskScheduler taskScheduler,
                                MessageDispatcher messageDispatcher,
                                ModuleController moduleController,
                                PlatformServerAdapter platformServerAdapter,
                                ProxyRegistry proxyRegistry,
-                               FPlayerService fPlayerService,
+                               PlayerSwitchService playerSwitchService,
                                SocialService socialService,
                                ListenerRegistry listenerRegistry) {
-        super(fileFacade, taskScheduler, messageDispatcher, moduleController, platformServerAdapter, proxyRegistry, fPlayerService, socialService, listenerRegistry);
+        super(fileFacade, messageDispatcher, moduleController, platformServerAdapter, proxyRegistry, playerSwitchService, socialService, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

@@ -5,10 +5,12 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.flectone.pulse.constant.HookType;
 import net.flectone.pulse.constant.LoginStatus;
@@ -79,9 +81,27 @@ public class VelocityFlectonePulse implements LoaderBootstrap {
 
     @Subscribe(order = PostOrder.LAST)
     public void onServerPreConnectEvent(ServerPreConnectEvent event) {
-        if (event.getPreviousServer() != null) return;
+        UUID playerUUID = event.getPlayer().getUniqueId();
 
-        pendingConnections.add(event.getPlayer().getUniqueId());
+        if (event.getPreviousServer() == null) {
+            pendingConnections.add(playerUUID);
+            return;
+        }
+
+        if (event.getResult().isAllowed()) {
+            sendPlayerSwitchingEvent(playerUUID, event.getPreviousServer(), true);
+        }
+    }
+
+    @Subscribe
+    public void onKickedFromServerEvent(KickedFromServerEvent event) {
+        if (!event.kickedDuringServerConnect()) return;
+
+        UUID playerUUID = event.getPlayer().getUniqueId();
+
+        proxyServer.getAllServers().stream()
+                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                .forEach(registeredServer -> sendPlayerSwitchingEvent(playerUUID, registeredServer, false));
     }
 
     @Subscribe
@@ -134,6 +154,17 @@ public class VelocityFlectonePulse implements LoaderBootstrap {
                             bytes -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)
                     ));
         }
+    }
+
+    private void sendPlayerSwitchingEvent(UUID playerUUID, RegisteredServer registeredServer, boolean switching) {
+        ProxySender.send(
+                ModuleName.PLAYER_SWITCHING,
+                outputStream -> {
+                    outputStream.writeUTF(playerUUID.toString());
+                    outputStream.writeBoolean(switching);
+                },
+                bytes -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)
+        );
     }
 
     private void sendPlayerConnectedEvent(UUID playerUUID, boolean firstTime) {

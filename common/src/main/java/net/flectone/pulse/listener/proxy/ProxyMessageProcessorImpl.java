@@ -18,8 +18,10 @@ import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlayerSwitchService;
 import net.flectone.pulse.util.payload.ProxyPayload;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -30,6 +32,7 @@ public class ProxyMessageProcessorImpl implements ProxyMessageProcessor {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final PlayerSwitchService playerSwitchService;
     private final FLogger fLogger;
     private final Gson gson;
     private final TaskScheduler taskScheduler;
@@ -40,62 +43,67 @@ public class ProxyMessageProcessorImpl implements ProxyMessageProcessor {
     public void process(byte[] bytes) {
         taskScheduler.runAsync(() -> {
             try (ProxyPayload proxyPayload = new ProxyPayload(bytes)) {
-
                 ModuleName name = ModuleName.fromProxyString(proxyPayload.readString());
                 if (name == null) return;
 
                 UUID uuid = UUID.fromString(proxyPayload.readString());
-                if (name == ModuleName.PLAYER_CONNECTED || name == ModuleName.PLAYER_DISCONNECTED) {
-                    // if player is unknown, it means he is not in database
-                    // message may have been sent from a server where FlectonePulse is not installed
-                    FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-                    if (fPlayer.isUnknown()) {
-                        fPlayer = fPlayerService.getFPlayerFromDatabase(uuid);
-                    }
-
-                    if (fPlayer.isUnknown()) {
-                        if (name == ModuleName.PLAYER_CONNECTED) return;
-
-                        fPlayer = FPlayer.builder()
-                                .uuid(uuid)
-                                .name(FEntity.UNKNOWN_NAME)
-                                .build();
-                    }
-
-                    ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayer, uuid, proxyPayload.readAllBytes()));
-                    if (proxyMessageEvent.cancelled()) {
-                        // nothing
-                    }
-                    return;
+                switch (name) {
+                    case PLAYER_SWITCHING -> playerSwitchService.setSwitching(uuid, proxyPayload.readBoolean());
+                    case PLAYER_CONNECTED, PLAYER_DISCONNECTED -> processPlayerState(name, uuid, proxyPayload);
+                    default -> processMessage(name, uuid, proxyPayload);
                 }
-
-                String server = proxyPayload.readString();
-
-                // this parameter is always different from config value, because it is taken relative to worlds.
-                // this is to prevent user from creating two identical server
-                boolean sentByThisServer = platformServerAdapter.getServerUUID().equals(proxyPayload.readString());
-
-                Set<String> proxyClusters = gson.fromJson(proxyPayload.readString(), new TypeToken<Set<String>>() {}.getType());
-                Set<String> configClusters = fileFacade.config().proxy().clusters();
-                if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains) && !configClusters.contains(server)) {
-                    return;
-                }
-
-                Optional<FEntity> optionalFEntity = parseFEntity(gson.fromJson(proxyPayload.readString(), JsonObject.class));
-                if (optionalFEntity.isEmpty()) return;
-
-                byte[] payload = proxyPayload.readAllBytes();
-                FEntity fEntity = optionalFEntity.get();
-
-                ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(sentByThisServer, server, name, fEntity, uuid, payload));
-                if (proxyMessageEvent.cancelled()) {
-                    // nothing
-                }
-            } catch (Exception e) {
-                fLogger.warning(e);
+            } catch (Exception exception) {
+                fLogger.warning(exception);
             }
         });
+    }
+
+    private void processPlayerState(ModuleName name, UUID uuid, ProxyPayload proxyPayload) throws IOException {
+        boolean connected = name == ModuleName.PLAYER_CONNECTED;
+
+        // a switch is only finished when the player actually leaves the network
+        if (!connected) {
+            playerSwitchService.setSwitching(uuid, false);
+        }
+
+        // if player is unknown, it means he is not in database
+        // message may have been sent from a server where FlectonePulse is not installed
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+
+        if (fPlayer.isUnknown()) {
+            fPlayer = fPlayerService.getFPlayerFromDatabase(uuid);
+        }
+
+        if (fPlayer.isUnknown()) {
+            if (connected) return;
+
+            fPlayer = FPlayer.builder()
+                    .uuid(uuid)
+                    .name(FEntity.UNKNOWN_NAME)
+                    .build();
+        }
+
+        eventDispatcher.dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayer, uuid, proxyPayload.readAllBytes()));
+    }
+
+    private void processMessage(ModuleName name, UUID uuid, ProxyPayload proxyPayload) throws IOException {
+        String server = proxyPayload.readString();
+
+        // this parameter is always different from config value, because it is taken relative to worlds.
+        // this is to prevent user from creating two identical server
+        boolean sentByThisServer = platformServerAdapter.getServerUUID().equals(proxyPayload.readString());
+
+        Set<String> proxyClusters = gson.fromJson(proxyPayload.readString(), new TypeToken<Set<String>>() {}.getType());
+        Set<String> configClusters = fileFacade.config().proxy().clusters();
+        if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains) && !configClusters.contains(server)) {
+            return;
+        }
+
+        Optional<FEntity> optionalFEntity = parseFEntity(gson.fromJson(proxyPayload.readString(), JsonObject.class));
+        if (optionalFEntity.isEmpty()) return;
+
+        eventDispatcher.dispatch(new ProxyMessageEvent(sentByThisServer, server, name, optionalFEntity.get(), uuid, proxyPayload.readAllBytes()));
     }
 
     public Optional<FEntity> parseFEntity(JsonObject jsonObject) {

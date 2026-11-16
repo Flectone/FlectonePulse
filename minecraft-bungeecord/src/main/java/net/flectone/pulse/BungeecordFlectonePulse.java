@@ -9,11 +9,13 @@ import net.flectone.pulse.platform.adapter.JavaLogAdapter;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
+import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
@@ -78,13 +80,29 @@ public final class BungeecordFlectonePulse implements LoaderBootstrap, Listener 
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerConnectEvent(ServerConnectEvent event) {
+        if (event.isCancelled()) return;
+
         ProxiedPlayer player = event.getPlayer();
-        if (player.getServer() != null) {
-            sendPlayerConnectedEvent(event.getPlayer().getUniqueId(), false);
+        Server oldServer = player.getServer();
+        if (oldServer != null) {
+            if (!oldServer.getInfo().getName().equals(event.getTarget().getName())) {
+                sendPlayerSwitchingEvent(player.getUniqueId(), oldServer.getInfo(), true);
+            }
+
+            sendPlayerConnectedEvent(player.getUniqueId(), false);
             return;
         }
 
         pendingConnections.add(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onServerKickEvent(ServerKickEvent event) {
+        if (event.getState() != ServerKickEvent.State.CONNECTING) return;
+
+        ProxyServer.getInstance().getServers().values().stream()
+                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                .forEach(serverInfo -> sendPlayerSwitchingEvent(event.getPlayer().getUniqueId(), serverInfo, false));
     }
 
     @EventHandler
@@ -129,6 +147,17 @@ public final class BungeecordFlectonePulse implements LoaderBootstrap, Listener 
                             bytes -> serverInfo.sendData(CHANNEL, bytes)
                     ));
         }
+    }
+
+    private void sendPlayerSwitchingEvent(UUID playerUUID, ServerInfo serverInfo, boolean switching) {
+        ProxySender.send(
+                ModuleName.PLAYER_SWITCHING,
+                outputStream -> {
+                    outputStream.writeUTF(playerUUID.toString());
+                    outputStream.writeBoolean(switching);
+                },
+                bytes -> serverInfo.sendData(CHANNEL, bytes)
+        );
     }
 
     private void sendPlayerConnectedEvent(UUID playerUUID, boolean firstTime) {

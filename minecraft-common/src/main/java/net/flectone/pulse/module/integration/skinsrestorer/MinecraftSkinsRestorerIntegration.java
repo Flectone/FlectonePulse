@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.service.PlayerSwitchService;
 import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.skinsrestorer.api.PropertyUtils;
@@ -36,6 +37,7 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
     private final FileFacade fileFacade;
     private final FlectonePulse flectonePulse;
     private final FPlayerService fPlayerService;
+    private final PlayerSwitchService playerSwitchService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final LazyInstance<MinecraftSkinService> skinService;
@@ -62,6 +64,9 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer(platformPlayerAdapter.getPlayerClass()));
                     if (fPlayer.isUnknown()) return;
+
+                    // SkinsRestorer sends its own remove and add for skin
+                    playerSwitchService.setSwitching(fPlayer.uuid(), false);
 
                     // update skin cache
                     PlayerHeadObjectContents.ProfileProperty profileProperty = convertToProfileProperty(event.getProperty());

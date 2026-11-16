@@ -33,6 +33,7 @@ import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.service.PlayerSwitchService;
 import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -78,6 +79,7 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
     private final MinecraftScoreboardModule scoreboardModule;
     private final IntegrationModule integrationModule;
     private final RangeFilter rangeFilter;
+    private final PlayerSwitchService playerSwitchService;
     private final boolean isNewerThanOrEqualsV_1_19_3;
 
     @Inject
@@ -96,6 +98,7 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
                                          MinecraftScoreboardModule scoreboardModule,
                                          IntegrationModule integrationModule,
                                          RangeFilter rangeFilter,
+                                         PlayerSwitchService playerSwitchService,
                                          @Named("isNewerThanOrEqualsV_1_19_3") boolean isNewerThanOrEqualsV_1_19_3) {
         super(fileFacade, socialService);
 
@@ -113,6 +116,7 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
         this.scoreboardModule = scoreboardModule;
         this.integrationModule = integrationModule;
         this.rangeFilter = rangeFilter;
+        this.playerSwitchService = playerSwitchService;
         this.isNewerThanOrEqualsV_1_19_3 = isNewerThanOrEqualsV_1_19_3;
     }
 
@@ -209,7 +213,7 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
             rememberEntry(fReceiver, fSender, entry);
 
             boolean profileChanged = sentEntry == null || sentEntry.profile() != entry.profile();
-            if (user == null && profileChanged) {
+            if (profileChanged) {
                 removeProfileList.add(fSender.uuid());
                 addPlayerInfoList.add(playerInfo);
                 continue;
@@ -292,6 +296,7 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
         if (proxyPlayers.isEmpty()) return;
 
         proxyPlayers.forEach((key, value) -> value.stream()
+                .filter(uuid -> !playerSwitchService.isSwitching(uuid))
                 .filter(uuid -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
                     FPlayer fReceiver = fPlayerService.getFPlayer(key);
@@ -368,22 +373,22 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
 
     @Nullable
     private UserProfile createUserProfile(FPlayer fSender, FPlayer fReceiver, @Nullable User user) {
-        if (user != null) {
-            return user.getProfile();
-        }
+        if (user == null) {
+            if (!isProxyMode()) {
+                return null;
+            }
 
-        if (!isProxyMode()) {
-            return null;
-        }
+            proxyPlayers.computeIfAbsent(fReceiver.uuid(), _ -> new CopyOnWriteArraySet<>()).add(fSender.uuid());
 
-        proxyPlayers.computeIfAbsent(fReceiver.uuid(), _ -> new CopyOnWriteArraySet<>()).add(fSender.uuid());
-
-        if (!scoreboardModule.hasTeam(fSender, fReceiver)) {
-            scoreboardModule.createOrUpdate(fSender);
+            if (!scoreboardModule.hasTeam(fSender, fReceiver)) {
+                scoreboardModule.createOrUpdate(fSender);
+            }
         }
 
         PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(fSender);
-        List<TextureProperty> textureProperties = List.of(new TextureProperty(profileProperty.name(), profileProperty.value(), profileProperty.signature()));
+        List<TextureProperty> textureProperties = profileProperty.value().isEmpty()
+                ? List.of()
+                : List.of(new TextureProperty(profileProperty.name(), profileProperty.value(), profileProperty.signature()));
 
         return new UserProfile(fSender.uuid(), fSender.name(), textureProperties);
     }

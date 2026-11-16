@@ -22,23 +22,19 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.proxy.RedisProxy;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
-import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlayerSwitchService;
 import net.flectone.pulse.service.SocialService;
-
-import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuitModuleImpl implements QuitModule {
 
     private final FileFacade fileFacade;
-    private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final PlatformServerAdapter platformServerAdapter;
     private final ProxyRegistry proxyRegistry;
-    private final FPlayerService fPlayerService;
+    private final PlayerSwitchService playerSwitchService;
     private final SocialService socialService;
     private final ListenerRegistry listenerRegistry;
 
@@ -79,6 +75,7 @@ public class QuitModuleImpl implements QuitModule {
     @Override
     public void send(FPlayer fPlayer, boolean fakeMessage) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
+        if (!fakeMessage && playerSwitchService.isSwitching(fPlayer.uuid())) return;
 
         boolean vanished = socialService.isVanished(fPlayer);
         if (!isProxyMode() || fakeMessage) {
@@ -86,17 +83,9 @@ public class QuitModuleImpl implements QuitModule {
             return;
         }
 
-        UUID playerUUID = fPlayer.uuid();
-
         // server does not accept requests from proxy, if there are no players
-        if (platformServerAdapter.isOnlyPlayerOnline(playerUUID)) {
-            // server can check player is offline (and has not reconnected to another server) only from database
-            taskScheduler.runAsyncLater(() -> {
-                FPlayer cacheFPlayer = fPlayerService.getFPlayer(playerUUID);
-                if (!cacheFPlayer.isOnline()) {
-                    send(cacheFPlayer, false, vanished);
-                }
-            }, 100L);
+        if (platformServerAdapter.isOnlyPlayerOnline(fPlayer.uuid())) {
+            send(fPlayer, false, vanished);
         }
     }
 

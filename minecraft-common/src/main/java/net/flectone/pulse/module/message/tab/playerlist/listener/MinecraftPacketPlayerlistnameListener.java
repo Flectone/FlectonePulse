@@ -11,10 +11,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
+import net.flectone.pulse.service.PlayerSwitchService;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -29,6 +32,7 @@ public class MinecraftPacketPlayerlistnameListener implements PacketListener {
     );
 
     private final MinecraftPlayerlistnameModule playerlistnameModule;
+    private final PlayerSwitchService playerSwitchService;
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
@@ -45,7 +49,29 @@ public class MinecraftPacketPlayerlistnameListener implements PacketListener {
             case PacketType.Play.Server.PLAYER_INFO_REMOVE -> {
                 WrapperPlayServerPlayerInfoRemove wrapper = new WrapperPlayServerPlayerInfoRemove(event);
 
-                wrapper.getProfileIds().forEach(uuid -> playerlistnameModule.forgetEntry(receiver, uuid));
+                List<UUID> profileIds = wrapper.getProfileIds();
+                if (!playerlistnameModule.isProxyMode()) {
+                    profileIds.forEach(uuid -> playerlistnameModule.forgetEntry(receiver, uuid));
+                    return;
+                }
+
+                List<UUID> removeIds = new ArrayList<>(profileIds.size());
+                for (UUID uuid : profileIds) {
+                    if (playerSwitchService.isSwitching(uuid)) {
+                        // the proxy reported a server switch, keep the entry
+                        continue;
+                    }
+
+                    removeIds.add(uuid);
+                    playerlistnameModule.forgetEntry(receiver, uuid);
+                }
+
+                if (removeIds.isEmpty()) {
+                    event.setCancelled(true);
+                } else if (removeIds.size() != profileIds.size()) {
+                    wrapper.setProfileIds(removeIds);
+                    event.markForReEncode(true);
+                }
             }
             case PacketType.Play.Server.PLAYER_INFO -> {
                 WrapperPlayServerPlayerInfo wrapper = new WrapperPlayServerPlayerInfo(event);
