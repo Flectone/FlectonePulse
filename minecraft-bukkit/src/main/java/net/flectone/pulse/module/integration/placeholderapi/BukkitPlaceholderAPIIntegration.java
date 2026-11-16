@@ -11,6 +11,7 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.ModuleName;
 import net.flectone.pulse.constant.SettingText;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.listener.PulseListener;
@@ -28,6 +29,7 @@ import net.flectone.pulse.module.command.toponline.ToponlineModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -69,6 +71,7 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
     private final LazyInstance<ToponlineModule> toponlineModule;
     private final LazyInstance<ModerationService> moderationService;
     private final ReflectionResolver reflectionResolver;
+    private final MessagePipeline messagePipeline;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -109,7 +112,8 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
                 "%flectonepulse_ip%",
                 "%flectonepulse_ping%",
                 "%flectonepulse_online%",
-                "%flectonepulse_tps%"
+                "%flectonepulse_tps%",
+                "%flectonepulse_format_<text>%"
         );
     }
 
@@ -144,7 +148,22 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
 
         FPlayer fPlayer = fPlayerService.getFPlayer(player.getUniqueId());
 
+        String originalParams = params;
+
         params = params.toLowerCase();
+
+        if (params.startsWith("format_")) {
+            String format = originalParams.substring(7);
+            if (StringUtils.isEmpty(format)) return null;
+
+            return messagePipeline.buildStandard(MessageContext.builder()
+                    .module(ModuleName.INTEGRATION_PLACEHOLDERAPI)
+                    .sender(fPlayer)
+                    .message(format)
+                    .build()
+            );
+        }
+
         if (params.equalsIgnoreCase("mute_suffix")) {
             return muteModule.get().getMuteSuffix(fPlayer, fPlayer);
         }
