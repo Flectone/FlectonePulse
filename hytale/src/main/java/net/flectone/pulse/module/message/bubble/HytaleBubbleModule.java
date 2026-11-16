@@ -5,11 +5,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.file.FileFacade;
 import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.module.message.bubble.listener.HytaleBubbleListener;
+import net.flectone.pulse.module.message.bubble.splitter.BubbleMessageSplitter;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.serializer.ComponentSerializer;
+import net.flectone.pulse.service.NearbyService;
 import net.flectone.pulse.service.SocialService;
 
 @Singleton
@@ -23,10 +26,13 @@ public class HytaleBubbleModule extends BubbleModuleImpl {
                               ModuleController moduleController,
                               HeadTextRender headTextRender,
                               SocialService socialService,
+                              NearbyService nearbyService,
                               MessagePipeline messagePipeline,
+                              ComponentSerializer componentSerializer,
+                              BubbleMessageSplitter bubbleMessageSplitter,
                               FLogger fLogger,
                               ListenerRegistry listenerRegistry) {
-        super(fileFacade, taskScheduler, moduleController, headTextRender, socialService, messagePipeline, fLogger);
+        super(fileFacade, taskScheduler, moduleController, headTextRender, socialService, nearbyService, messagePipeline, componentSerializer, bubbleMessageSplitter, fLogger);
 
         this.listenerRegistry = listenerRegistry;
     }
