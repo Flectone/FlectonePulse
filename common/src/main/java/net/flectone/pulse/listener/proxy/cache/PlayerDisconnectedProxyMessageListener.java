@@ -34,7 +34,7 @@ public class PlayerDisconnectedProxyMessageListener implements PulseListener {
         if (event.name() != ModuleName.PLAYER_DISCONNECTED) return event;
 
         FEntity fEntity = event.sender();
-        if (fEntity instanceof FPlayer fPlayer && quitModule.isProxyMode()) {
+        if (fEntity instanceof FPlayer fPlayer && !fPlayer.isUnknown() && quitModule.isProxyMode()) {
             quitModule.send(fPlayer, false, false, event.sentByThisServer());
         }
 

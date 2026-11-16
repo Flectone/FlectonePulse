@@ -49,7 +49,19 @@ public class ProxyMessageProcessorImpl implements ProxyMessageProcessor {
                     // if player is unknown, it means he is not in database
                     // message may have been sent from a server where FlectonePulse is not installed
                     FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-                    if (fPlayer.isUnknown()) return;
+
+                    if (fPlayer.isUnknown()) {
+                        fPlayer = fPlayerService.getFPlayerFromDatabase(uuid);
+                    }
+
+                    if (fPlayer.isUnknown()) {
+                        if (name == ModuleName.PLAYER_CONNECTED) return;
+
+                        fPlayer = FPlayer.builder()
+                                .uuid(uuid)
+                                .name(FEntity.UNKNOWN_NAME)
+                                .build();
+                    }
 
                     ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayer, uuid, proxyPayload.readAllBytes()));
                     if (proxyMessageEvent.cancelled()) {
