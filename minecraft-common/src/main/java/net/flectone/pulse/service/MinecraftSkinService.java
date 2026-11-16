@@ -58,7 +58,7 @@ public class MinecraftSkinService implements SkinService {
             }
         }
 
-        if (updatePlayerlistname && !sameProfileProperty) {
+        if (updatePlayerlistname) {
             MinecraftPlayerlistnameModule minecraftPlayerlistnameModuleInstance = playerlistnameModule.get();
 
             if (platformPlayerAdapter.isOnline(fPlayer)) {
