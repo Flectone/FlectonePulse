@@ -202,7 +202,7 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
                     gameMode,
                     buildFPlayerName(fSender, fReceiver, sentEntry, groupCache),
                     null,
-                    gameMode != GameMode.SPECTATOR || config().spectatorListOrder() ? integrationModule.getSortWeight(fSender) : 0
+                    gameMode != GameMode.SPECTATOR || config().spectatorListOrder() ? getListOrder(fSender) : 0
             );
 
             PlayerlistnameEntry entry = PlayerlistnameEntry.of(playerInfo);
@@ -427,6 +427,14 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
                 .flag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, fReceiver.uuid().version() == 3)
                 .build()
         );
+    }
+
+    private int getListOrder(FPlayer fPlayer) {
+        int weight = integrationModule.getSortWeight(fPlayer);
+
+        int tieBreaker = Math.floorMod(fPlayer.name().toLowerCase(Locale.ROOT).hashCode(), 1000);
+
+        return weight * 1000 + tieBreaker;
     }
 
     private boolean isFullRefresh() {
