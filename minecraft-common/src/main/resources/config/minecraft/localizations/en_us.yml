@@ -225,7 +225,7 @@ command:
   ignore:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     myself: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't ignore yourself"
-    he: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't write to him because he ignore you"
+    he: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't write to him because he ignores you"
     you: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't write to him because you ignore him"
     format_true: "<color:#ff7171>☹ You ignore <target>"
     format_false: "<color:#98FB98>☺ You unignore <target>"
@@ -460,7 +460,7 @@ command:
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unmute a player with equal or higher permissions"
     reasons:
       default: "You have been unmuted on the server"
-    format: "<color:#98FB98>🔓 <moderator> unmutted the player <display_name> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    format: "<color:#98FB98>🔓 <moderator> unmuted the player <display_name> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
   unwarn:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     null_id: "<color:#ff7171><sprite_or:!?:gui:icon/chat_modified>Warn with this id not found"
@@ -476,7 +476,7 @@ command:
     reasons:
       default: "You have been warned on this server"
     server: "<color:#ff7171>🔒 <moderator> <fcolor:1>gave a warning to <display_name> <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
-    person: "<color:#ff7171>🔒 You are warned a <time>"
+    person: "<color:#ff7171>🔒 You are warned for <time>"
   warnlist:
     empty: "<color:#98FB98>☺ No warns found"
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page doesn't exist"
