@@ -10,6 +10,7 @@ import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.render.HeadTextRender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
@@ -20,6 +21,7 @@ import net.skinsrestorer.api.PropertyUtils;
 import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
 import net.skinsrestorer.api.event.SkinApplyEvent;
+import net.skinsrestorer.api.exception.DataRequestException;
 import net.skinsrestorer.api.property.MojangSkinDataResult;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.storage.PlayerStorage;
@@ -35,6 +37,7 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
     private final FlectonePulse flectonePulse;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final PlatformServerAdapter platformServerAdapter;
     private final LazyInstance<MinecraftSkinService> skinService;
     private final LazyInstance<HeadTextRender> headTextRender;
     private final TaskScheduler taskScheduler;
@@ -105,6 +108,16 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
         try {
             Optional<SkinProperty> skinProperty = playerStorage.getSkinOfPlayer(fPlayer.uuid());
             if (skinProperty.isPresent()) return skinProperty.get();
+
+            if (fPlayer.isOnline()) {
+                try {
+                    Optional<SkinProperty> joinSkin = playerStorage.getSkinForPlayer(fPlayer.uuid(), fPlayer.name(), platformServerAdapter.isOnlineMode());
+                    if (joinSkin.isPresent()) return joinSkin.get();
+                } catch (DataRequestException _) {
+                    // try the Mojang fallback below
+                }
+            }
+
             if (fileFacade.integration().skinsrestorer().loadMojangSkin()) {
                 SkinStorage skinStorage = skinsRestorer.getSkinStorage();
                 Optional<MojangSkinDataResult> skinDataResult = skinStorage.getPlayerSkin(fPlayer.uuid().toString(), true);
