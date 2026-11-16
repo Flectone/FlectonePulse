@@ -36,6 +36,7 @@ import net.kyori.adventure.text.object.SpriteObjectContents;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -110,7 +111,8 @@ public class MinecraftObjectModule extends ObjectModuleImpl {
     public MessageContext addPlayerHeadTag(MessageContext messageContext) {
         if (!config().playerHeadTag().enable()) return messageContext;
         if (!messageContext.hasTag(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName())
-                && !messageContext.hasTag(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName())) return messageContext;
+                && !messageContext.hasTag(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName())
+                && !messageContext.hasTag("head")) return messageContext;
 
         FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
@@ -119,7 +121,7 @@ public class MinecraftObjectModule extends ObjectModuleImpl {
         }
 
         return messageContext.addTagResolvers(
-                messagePipeline.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName(), (argumentQueue, _) ->
+                messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName(), "head"), (argumentQueue, _) ->
                         createPlayerHeadTag(
                                 messageContext,
                                 localization(messageContext.receiver()).defaultSymbol(),
