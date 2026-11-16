@@ -19,11 +19,13 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.LazyInstance;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents.ProfileProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Singleton
@@ -45,13 +47,18 @@ public class MinecraftSkinService implements SkinService {
     }
 
     public void updateProfileProperty(@NonNull FPlayer fPlayer, PlayerHeadObjectContents.@NonNull ProfileProperty profileProperty, boolean updatePlayerlistname) {
-        if (profileProperty.value().isEmpty() && !platformPlayerAdapter.isOnline(fPlayer)) {
-            profilePropertyCache.invalidate(fPlayer.uuid());
-        } else {
-            profilePropertyCache.put(fPlayer.uuid(), profileProperty);
+        ProfileProperty cachedProfileProperty = profilePropertyCache.getIfPresent(fPlayer.uuid());
+        boolean sameProfileProperty = Objects.equals(cachedProfileProperty, profileProperty);
+
+        if (!sameProfileProperty) {
+            if (profileProperty.value().isEmpty() && !platformPlayerAdapter.isOnline(fPlayer)) {
+                profilePropertyCache.invalidate(fPlayer.uuid());
+            } else {
+                profilePropertyCache.put(fPlayer.uuid(), profileProperty);
+            }
         }
 
-        if (updatePlayerlistname) {
+        if (updatePlayerlistname && !sameProfileProperty) {
             MinecraftPlayerlistnameModule minecraftPlayerlistnameModuleInstance = playerlistnameModule.get();
 
             if (platformPlayerAdapter.isOnline(fPlayer)) {
