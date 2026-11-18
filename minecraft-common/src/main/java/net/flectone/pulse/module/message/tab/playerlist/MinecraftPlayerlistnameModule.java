@@ -213,8 +213,9 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
             PlayerlistnameEntry entry = PlayerlistnameEntry.of(playerInfo);
             rememberEntry(fReceiver, fSender, entry);
 
+            boolean self = fSender.uuid().equals(fReceiver.uuid());
             boolean profileChanged = sentEntry == null || sentEntry.profile() != entry.profile();
-            if (profileChanged) {
+            if (profileChanged && !self) {
                 removeProfileList.add(fSender.uuid());
                 addPlayerInfoList.add(playerInfo);
                 continue;
