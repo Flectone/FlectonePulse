@@ -12,7 +12,6 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.service.PlayerSwitchService;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -20,7 +19,6 @@ public class MinecraftPulsePlayerlistnameListener implements PulseListener {
 
     private final MinecraftPlayerlistnameModule playerlistnameModule;
     private final FPlayerService fPlayerService;
-    private final PlayerSwitchService playerSwitchService;
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
@@ -46,7 +44,7 @@ public class MinecraftPulsePlayerlistnameListener implements PulseListener {
 
             if (event.name() == ModuleName.PLAYER_DISCONNECTED) {
                 playerlistnameModule.remove(event.sender().uuid());
-            } else if (!playerSwitchService.isSwitching(event.sender().uuid())) {
+            } else {
                 // do not wait for ticker, update it
                 playerlistnameModule.update(fPlayerService.getFPlayer(event.sender().uuid()));
             }

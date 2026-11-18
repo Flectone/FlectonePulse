@@ -49,6 +49,7 @@ public class MinecraftPlayerlistnameModule extends PlayerlistnameModuleImpl {
 
     private static final EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> ADD_ACTIONS = EnumSet.of(
             WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
+            WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_GAME_MODE,
             WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LISTED,
             WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_DISPLAY_NAME,
             WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LIST_ORDER
