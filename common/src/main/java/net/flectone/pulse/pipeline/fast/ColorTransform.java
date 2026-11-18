@@ -71,8 +71,9 @@ final class ColorTransform {
         List<Component> children = component.children();
         if (content.isEmpty() && children.isEmpty()) return component;
 
-        TextComponent.Builder builder = Component.text();
         Style style = component.style();
+
+        TextComponent.Builder builder = Component.text().style(style);
 
         if (!content.isEmpty()) {
             int index = 0;
