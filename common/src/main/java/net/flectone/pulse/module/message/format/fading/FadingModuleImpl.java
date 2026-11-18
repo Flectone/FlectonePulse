@@ -76,36 +76,39 @@ public class FadingModuleImpl implements FadingModule {
     }
 
     @Override
-    public MessageContext addTag(StringMessageContext messageContext) {
+    public MessageContext addTag(MessageContext messageContext) {
+        StringMessageContext stringContext = messageContext instanceof StringMessageContext current
+                ? current
+                : messageContext.base() instanceof StringMessageContext base ? base : null;
+        if (stringContext == null) return messageContext;
+
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!messageContext.hasTag(MessagePipeline.ReplacementTag.FADING.getTagName())) return messageContext;
 
+        String string = stringContext.string();
+
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.FADING.getTagName(), (_, _) -> {
             FPlayer receiver = messageContext.receiver();
-            if (permissionChecker.check(sender, permission().bypassSend())) return createTag(messageContext);
-            if (permissionChecker.check(receiver, permission().bypassView())) return createTag(messageContext);
+            if (permissionChecker.check(sender, permission().bypassSend())) return createTag(messageContext, string);
+            if (permissionChecker.check(receiver, permission().bypassView())) return createTag(messageContext, string);
 
             double distance = platformPlayerAdapter.distance(sender, receiver);
             double minDistance = config().minDistance();
 
             if (distance == -1.0 && config().hideDifferentWorld()) {
-                String message = garble(messageContext.string(), 1.0, localization(receiver).symbol());
+                String message = garble(string, 1.0, localization(receiver).symbol());
                 return createTag(messageContext, message);
             }
 
-            if (distance < minDistance) return createTag(messageContext);
+            if (distance < minDistance) return createTag(messageContext, string);
 
             double maxDistance = Math.max(config().maxDistance(), config().minDistance() + 1);
             double ratio = Math.min(1.0, (distance - minDistance) / (maxDistance - minDistance));
 
-            String message = garble(messageContext.string(), ratio, localization(receiver).symbol());
+            String message = garble(string, ratio, localization(receiver).symbol());
             return createTag(messageContext, message);
         }));
-    }
-
-    private Tag createTag(@NonNull StringMessageContext messageContext) {
-        return createTag(messageContext, messageContext.string());
     }
 
     private Tag createTag(@NonNull MessageContext messageContext, @NonNull String message) {

@@ -77,7 +77,12 @@ public class TranslateModuleImpl implements TranslateModule {
     }
 
     @Override
-    public MessageContext addTag(StringMessageContext messageContext) {
+    public MessageContext addTag(MessageContext messageContext) {
+        StringMessageContext stringContext = messageContext instanceof StringMessageContext current
+                ? current
+                : messageContext.base() instanceof StringMessageContext base ? base : null;
+        if (stringContext == null) return messageContext;
+
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!messageContext.hasTag(MessagePipeline.ReplacementTag.TRANSLATION.getTagName())) return messageContext;
@@ -108,7 +113,7 @@ public class TranslateModuleImpl implements TranslateModule {
             String action = localization(receiver).action();
             action = Strings.CS.replaceOnce(action, "<language>", firstLang);
             action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
-            action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.string()).toString());
+            action = Strings.CS.replace(action, "<message>", saveMessage(stringContext.string()).toString());
 
             return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                     .module(this.name())

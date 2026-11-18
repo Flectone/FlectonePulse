@@ -8,7 +8,7 @@ import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
-import net.flectone.pulse.model.event.message.context.StringMessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 
 @Singleton
@@ -19,7 +19,7 @@ public class PulseTranslateListener implements PulseListener {
 
     @Pulse
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
-        if (!(event.context() instanceof StringMessageContext messageContext)) return event;
+        MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.TRANSLATE_MODULE)) return event;
         if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) return event;
 

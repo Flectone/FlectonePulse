@@ -5,7 +5,6 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import org.jspecify.annotations.Nullable;
 
@@ -40,7 +39,7 @@ public interface TranslateModule extends ModuleLocalization {
      * @param messageContext the message being formatted
      * @return the context with the tag added
      */
-    MessageContext addTag(StringMessageContext messageContext);
+    MessageContext addTag(MessageContext messageContext);
 
     /**
      * The stored text behind a translate button.
