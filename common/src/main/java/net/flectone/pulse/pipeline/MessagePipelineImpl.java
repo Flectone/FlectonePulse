@@ -16,7 +16,9 @@ import net.flectone.pulse.model.event.message.MessageFormattedEvent;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.pipeline.fast.FastMessageParser;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.serializer.ComponentSerializer;
+import net.flectone.pulse.util.LazyInstance;
 import net.flectone.pulse.util.tag.CachingTagResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.Context;
@@ -43,6 +45,7 @@ public class MessagePipelineImpl implements MessagePipeline {
     private final EventDispatcher eventDispatcher;
     private final ComponentSerializer componentSerializer;
     private final FastMessageParser fastMessageParser;
+    private final LazyInstance<PlatformPlayerAdapter> platformPlayerAdapter;
     private final @Named("messageContext") Cache<MessageContext.CacheKey, Component> messageContextCache;
 
     @NonNull
@@ -170,7 +173,8 @@ public class MessagePipelineImpl implements MessagePipeline {
             message = message.replace('§', '&');
         }
 
-        Component fastComponent = fastMessageParser.deserialize(message, messageContext.tagResolver());
+        boolean customClick = platformPlayerAdapter.get().supportsCustomClick(messageContext.receiver().uuid());
+        Component fastComponent = fastMessageParser.deserialize(message, messageContext.tagResolver(), customClick);
         if (fastComponent != null) return fastComponent;
 
         try {

@@ -1,6 +1,9 @@
 package net.flectone.pulse.platform.adapter;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
@@ -200,6 +203,14 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         return player != null
                 ? SpigotConversionUtil.fromBukkitGameMode(player.getGameMode()).name()
                 : GameMode.SURVIVAL.name();
+    }
+
+    @Override
+    public boolean supportsCustomClick(@NonNull UUID uuid) {
+        if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_21_5)) return false;
+
+        User user = packetProvider.getUser(uuid);
+        return user != null && user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_6);
     }
 
     @Override

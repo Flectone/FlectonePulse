@@ -173,6 +173,16 @@ public interface PlatformPlayerAdapter {
     }
 
     /**
+     * Checks if the player's client supports the custom click action.
+     *
+     * @param uuid the player UUID
+     * @return true if the client supports the custom click action
+     */
+    default boolean supportsCustomClick(@NonNull UUID uuid) {
+        return false;
+    }
+
+    /**
      * Gets the player list header.
      *
      * @param fPlayer the player

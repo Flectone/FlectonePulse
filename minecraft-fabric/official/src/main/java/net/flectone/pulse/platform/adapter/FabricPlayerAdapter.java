@@ -1,6 +1,8 @@
 package net.flectone.pulse.platform.adapter;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
@@ -208,6 +210,14 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (gameType == null) return GameMode.SURVIVAL.name();
 
         return GameMode.getById(gameType.getId()).name();
+    }
+
+    @Override
+    public boolean supportsCustomClick(@NonNull UUID uuid) {
+        if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_21_5)) return false;
+
+        User user = packetProvider.getUser(uuid);
+        return user != null && user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_6);
     }
 
     @Override

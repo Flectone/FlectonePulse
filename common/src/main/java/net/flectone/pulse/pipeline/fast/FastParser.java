@@ -2,6 +2,8 @@ package net.flectone.pulse.pipeline.fast;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -30,6 +32,7 @@ import java.util.function.Function;
 // https://github.com/MrLarkyy/QuickMiniMessage
 final class FastParser {
 
+    private static final Key CLICK_KEY = Key.key("flectonepulse", "command");
     private static final Cache<String, TextColor> COLOR_CACHE = Caffeine.newBuilder()
             .maximumSize(512)
             .build();
@@ -39,6 +42,7 @@ final class FastParser {
     private final MiniMessage miniMessage;
     private final Context context;
     private final Function<String, Tag.Argument> argumentFactory;
+    private final boolean customClick;
 
     private final Deque<Frame> frames = new ArrayDeque<>(4);
     private final StringBuilder text = new StringBuilder(64);
@@ -48,12 +52,14 @@ final class FastParser {
                @NonNull TagResolver resolver,
                @NonNull MiniMessage miniMessage,
                @NonNull Context context,
-               @NonNull Function<String, Tag.Argument> argumentFactory) {
+               @NonNull Function<String, Tag.Argument> argumentFactory,
+               boolean customClick) {
         this.input = input;
         this.resolver = resolver;
         this.miniMessage = miniMessage;
         this.context = context;
         this.argumentFactory = argumentFactory;
+        this.customClick = customClick;
     }
 
     @Nullable Component parse() {
@@ -665,7 +671,10 @@ final class FastParser {
             return switch (action) {
                 case "open_url" -> Tag.styling(ClickEvent.openUrl(value));
                 case "open_file" -> Tag.styling(ClickEvent.openFile(value));
-                case "run_command" -> Tag.styling(ClickEvent.runCommand(value));
+                case "run_command" -> Tag.styling(customClick
+                        ? ClickEvent.custom(CLICK_KEY, BinaryTagHolder.binaryTagHolder(toSnbt(value)))
+                        : ClickEvent.runCommand(value)
+                );
                 case "suggest_command" -> Tag.styling(ClickEvent.suggestCommand(value));
                 case "change_page" -> Tag.styling(ClickEvent.changePage(Integer.parseInt(value)));
                 case "copy_to_clipboard" -> Tag.styling(ClickEvent.copyToClipboard(value));
@@ -676,6 +685,10 @@ final class FastParser {
         }
     }
 
+    private String toSnbt(String command) {
+        return "{command:\"" + command.replace("\\", "\\\\").replace("\"", "\\\"") + "\"}";
+    }
+
     private @Nullable Tag createHoverTag(@NonNull List<String> arguments) {
         if (arguments.size() < 2) return null;
         if (!arguments.getFirst().equalsIgnoreCase("show_text")) return null;
@@ -683,7 +696,7 @@ final class FastParser {
         String value = arguments.get(1);
 
         try {
-            Component parsed = new FastParser(value, resolver, miniMessage, context, argumentFactory).parse();
+            Component parsed = new FastParser(value, resolver, miniMessage, context, argumentFactory, customClick).parse();
             Component text = parsed == null ? miniMessage.deserialize(value, resolver) : FastMessageParser.compact(parsed);
 
             return Tag.styling(HoverEvent.showText(text));

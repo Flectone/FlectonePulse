@@ -11,6 +11,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.listener.dialog.MinecraftPacketDialogListener;
 import net.flectone.pulse.listener.inventory.MinecraftPacketInventoryListener;
 import net.flectone.pulse.listener.module.MinecraftPulseModuleEnableListener;
+import net.flectone.pulse.listener.player.MinecraftPacketClickCommandListener;
 import net.flectone.pulse.listener.player.MinecraftPacketPlayerConnectionListener;
 import net.flectone.pulse.listener.proxy.cache.MinecraftSkinprofileCacheProxyMessageListener;
 import net.flectone.pulse.logging.FLogger;
@@ -47,6 +48,7 @@ public class MinecraftListenerRegistry extends ListenerRegistryImpl {
 
         register(MinecraftPulseModuleEnableListener.class);
         register(MinecraftPacketPlayerConnectionListener.class);
+        register(MinecraftPacketClickCommandListener.class);
         register(MinecraftPacketInventoryListener.class);
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {

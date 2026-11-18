@@ -86,6 +86,23 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public void dispatchCommand(@NonNull UUID uuid, @NonNull String command) {
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return;
+
+        ServerPlayer player = minecraftServer.getPlayerList().getPlayer(uuid);
+        if (player == null) return;
+
+        minecraftServer.execute(() -> {
+            try {
+                minecraftServer.getCommands().getDispatcher().execute(command, fabricVersionAdapter.createCommandSourceStack(player));
+            } catch (CommandSyntaxException e) {
+                fLogger.warning(e);
+            }
+        });
+    }
+
+    @Override
     public @NonNull String getTPS(FEntity entity) {
         return String.format("%.2f", tpsTracker.getTPS());
     }

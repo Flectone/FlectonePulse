@@ -47,12 +47,12 @@ public class FastMessageParser {
         };
     }
 
-    public @Nullable Component deserialize(@NonNull String message, @NonNull TagResolver resolver) {
+    public @Nullable Component deserialize(@NonNull String message, @NonNull TagResolver resolver, boolean customClick) {
         TagResolver previous = currentResolver.get();
         currentResolver.set(resolver);
 
         try {
-            Component component = new FastParser(message, resolver, miniMessage, context, this::argument).parse();
+            Component component = new FastParser(message, resolver, miniMessage, context, this::argument, customClick).parse();
             return component == null ? null : compact(component);
         } catch (Exception _) {
             // the regular parser will either render the message or log the real error
@@ -64,6 +64,10 @@ public class FastMessageParser {
                 currentResolver.set(previous);
             }
         }
+    }
+
+    public @Nullable Component deserialize(@NonNull String message, @NonNull TagResolver resolver) {
+        return deserialize(message, resolver, false);
     }
 
     private Tag.@NonNull Argument argument(@NonNull String value) {

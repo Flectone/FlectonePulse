@@ -42,6 +42,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.CachedServerIcon;
 import org.jspecify.annotations.NonNull;
@@ -79,6 +80,14 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     @Override
     public void dispatchCommand(@NonNull String command) {
         taskScheduler.runSync(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+    }
+
+    @Override
+    public void dispatchCommand(@NonNull UUID uuid, @NonNull String command) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return;
+
+        taskScheduler.runSync(() -> Bukkit.dispatchCommand(player, command));
     }
 
     @Override

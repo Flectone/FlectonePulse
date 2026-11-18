@@ -32,6 +32,16 @@ public interface PlatformServerAdapter {
     void dispatchCommand(@NonNull String command);
 
     /**
+     * Dispatches a command as the given player, so the server checks their permissions.
+     *
+     * @param uuid the player to execute the command as
+     * @param command the command string to execute
+     */
+    default void dispatchCommand(@NonNull UUID uuid, @NonNull String command) {
+        dispatchCommand(command);
+    }
+
+    /**
      * Gets the current server TPS (ticks per second) for a specific entity.
      *
      * @param entity the entity for which to retrieve TPS information
