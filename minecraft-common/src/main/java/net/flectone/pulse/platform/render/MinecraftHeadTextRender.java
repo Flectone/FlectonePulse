@@ -382,6 +382,18 @@ public class MinecraftHeadTextRender implements HeadTextRender {
     }
 
     @Override
+    public void removeViewer(@NonNull UUID viewer) {
+        holderViewerEntities.forEach((holder, viewerEntities) -> {
+            List<HolderViewerEntity> entities = viewerEntities.remove(viewer);
+            if (entities != null) {
+                destroy(holder, viewer, entities);
+            }
+        });
+
+        holderViewerEntities.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+    }
+
+    @Override
     public void dispose(@NonNull UUID holder) {
         holderScales.remove(holder);
         platformPlayerPassengers.remove(holder);

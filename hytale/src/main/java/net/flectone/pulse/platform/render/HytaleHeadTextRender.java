@@ -277,6 +277,11 @@ public class HytaleHeadTextRender implements HeadTextRender {
     }
 
     @Override
+    public void removeViewer(@NonNull UUID viewer) {
+        // entities are common for all viewers in Hytale
+    }
+
+    @Override
     public void dispose(@NonNull UUID holder) {
         remove(holder);
     }

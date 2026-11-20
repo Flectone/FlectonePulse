@@ -106,6 +106,12 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
                 UUID playerUUID = event.getUser().getUUID();
                 headTextRender.remove(playerUUID);
             }
+            case PacketType.Play.Server.RESPAWN -> {
+                UUID playerUUID = event.getUser().getUUID();
+                if (playerUUID == null) return;
+
+                headTextRender.removeViewer(playerUUID);
+            }
             case PacketType.Play.Server.SET_PASSENGERS -> {
                 WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
                 UUID playerUUID = platformPlayerAdapter.getPlayerByEntityId(wrapper.getEntityId());

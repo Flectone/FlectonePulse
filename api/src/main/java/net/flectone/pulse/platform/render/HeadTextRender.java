@@ -101,6 +101,13 @@ public interface HeadTextRender {
     void remove(@NonNull UUID holder, @NonNull UUID viewer);
 
     /**
+     * Removes every head text visible to the specified viewer.
+     *
+     * @param viewer the UUID of the viewer
+     */
+    void removeViewer(@NonNull UUID viewer);
+
+    /**
      * Removes the head text and all stored data for the specified holder.
      *
      * @param holder the UUID of the holder
