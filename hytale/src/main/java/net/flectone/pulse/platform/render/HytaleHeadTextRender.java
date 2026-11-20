@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.builtin.mounts.MountedComponent;
 import com.hypixel.hytale.component.*;
+import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.protocol.MountController;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -13,7 +14,9 @@ import com.hypixel.hytale.server.core.modules.entity.DespawnComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.Intangible;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
+import com.hypixel.hytale.server.core.modules.time.TimeResource;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import lombok.Builder;
@@ -32,8 +35,8 @@ import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -43,6 +46,7 @@ import java.util.function.Function;
 public class HytaleHeadTextRender implements HeadTextRender {
 
     private static final double SQUARED_UPDATE_RADIUS = 32 * 32;
+    private static final double SQUARED_TELEPORT_DISTANCE = 128 * 128;
 
     private final Map<UUID, List<HolderEntity>> activeBubbles = new ConcurrentHashMap<>();
 
@@ -72,6 +76,7 @@ public class HytaleHeadTextRender implements HeadTextRender {
     @Override
     public void reload() {
         removeAll();
+        taskScheduler.runAsyncLater(this::cleanupLegacyBubbles, 20L);
 
         taskScheduler.runAsyncTimer(() -> {
             if (activeBubbles.isEmpty()) return;
@@ -89,14 +94,19 @@ public class HytaleHeadTextRender implements HeadTextRender {
                     return;
                 }
 
+                World holderWorld = playerRef.getReference().getStore().getExternalData().getWorld();
+                if (hasTeleported(current, coordinates, holderWorld)) {
+                    remove(holder);
+                    return;
+                }
+
                 boolean isSneaking = platformPlayerAdapter.isSneaking(holder);
 
                 boolean needUpdate = current.stream()
                         .anyMatch(entity -> isExpired(entity, isSneaking, now) || needsPositionSync(entity, coordinates));
                 if (!needUpdate) return;
 
-                World world = playerRef.getReference().getStore().getExternalData().getWorld();
-                world.execute(() -> {
+                holderWorld.execute(() -> {
                     List<HolderEntity> expired = new ArrayList<>();
 
                     activeBubbles.computeIfPresent(holder, (uuid, existing) -> {
@@ -110,6 +120,7 @@ public class HytaleHeadTextRender implements HeadTextRender {
                                 if (needsPositionSync(entity, coordinates)) {
                                     entity = entity.withCoordinates(coordinates);
                                     syncPosition(entity, playerRef);
+                                    updateEntityPosition(entity, playerRef);
                                     synced = true;
                                 }
 
@@ -141,6 +152,44 @@ public class HytaleHeadTextRender implements HeadTextRender {
     @Override
     public void removeAll() {
         activeBubbles.keySet().forEach(this::remove);
+    }
+
+    private void cleanupLegacyBubbles() {
+        Universe universe = Universe.get();
+        if (universe == null) return;
+
+        for (World world : List.copyOf(universe.getWorlds().values())) {
+            try {
+                world.execute(() -> cleanupLegacyBubbles(world));
+            } catch (RuntimeException _) {
+            }
+        }
+    }
+
+    private void cleanupLegacyBubbles(@NonNull World world) {
+        Store<EntityStore> store = world.getEntityStore().getStore();
+        TimeResource timeResource = store.getResource(TimeResource.getResourceType());
+        if (timeResource == null) return;
+
+        Instant threshold = timeResource.getNow().plus(Duration.ofDays(1));
+        Query<EntityStore> query = Query.and(
+                ProjectileComponent.getComponentType(),
+                Nameplate.getComponentType(),
+                MountedComponent.getComponentType()
+        );
+
+        store.forEachChunk(query, (chunk, buffer) -> {
+            for (int index = 0; index < chunk.size(); index++) {
+                ProjectileComponent projectile = chunk.getComponent(index, ProjectileComponent.getComponentType());
+                if (projectile == null || !"Projectile".equals(projectile.getProjectileAssetName())) continue;
+
+                DespawnComponent despawn = chunk.getComponent(index, DespawnComponent.getComponentType());
+                if (despawn == null || despawn.getDespawn() == null) continue;
+                if (!despawn.getDespawn().isAfter(threshold)) continue;
+
+                buffer.removeEntity(chunk.getReferenceTo(index), RemoveReason.REMOVE);
+            }
+        });
     }
 
     @Override
@@ -318,6 +367,14 @@ public class HytaleHeadTextRender implements HeadTextRender {
         return entity.coordinates().distanceSquared(holderCoordinates) > SQUARED_UPDATE_RADIUS;
     }
 
+    private boolean hasTeleported(@NonNull List<HolderEntity> entities,
+                                  PlatformPlayerAdapter.@NonNull Coordinates holderCoordinates,
+                                  @NonNull World holderWorld) {
+        return entities.stream().anyMatch(entity ->
+                entity.world() != holderWorld || entity.coordinates().distanceSquared(holderCoordinates) > SQUARED_TELEPORT_DISTANCE
+        );
+    }
+
     private @Nullable Ref<EntityStore> spawn(@NonNull World world,
                                              @NonNull PlayerRef playerRef,
                                              @NonNull Transform playerTransform,
@@ -350,7 +407,11 @@ public class HytaleHeadTextRender implements HeadTextRender {
 
         // we will add despawn component automatically if our removal does not work correctly
         if (!text.isPermanent()) {
-            entityStoreHolder.putComponent(DespawnComponent.getComponentType(), new DespawnComponent(Instant.ofEpochMilli(endTime).plus(5, ChronoUnit.SECONDS)));
+            TimeResource timeResource = world.getEntityStore().getStore().getResource(TimeResource.getResourceType());
+            if (timeResource != null) {
+                long remaining = Math.max(0L, endTime - System.currentTimeMillis()) + 5000L;
+                entityStoreHolder.putComponent(DespawnComponent.getComponentType(), DespawnComponent.despawnInMilliseconds(timeResource, remaining));
+            }
         }
 
         entityStoreHolder.putComponent(NetworkId.getComponentType(), new NetworkId((world.getEntityStore().getStore().getExternalData()).takeNextNetworkId()));
@@ -435,7 +496,10 @@ public class HytaleHeadTextRender implements HeadTextRender {
     private void removeEntities(@NonNull List<HolderEntity> holderEntities) {
         for (HolderEntity holderEntity : holderEntities) {
             Ref<EntityStore> ref = holderEntity.entityRef();
-            holderEntity.world().execute(() -> removeEntityNow(ref));
+            try {
+                holderEntity.world().execute(() -> removeEntityNow(ref));
+            } catch (RuntimeException _) {
+            }
         }
     }
 
