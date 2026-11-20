@@ -92,25 +92,23 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
         switch (packetType) {
             case PacketType.Play.Server.SPAWN_PLAYER -> {
                 WrapperPlayServerSpawnPlayer wrapperPlayServerSpawnPlayer = new WrapperPlayServerSpawnPlayer(event);
-                headTextRender.remove(wrapperPlayServerSpawnPlayer.getUUID(), event.getUser().getUUID());
+                UUID holderUUID = wrapperPlayServerSpawnPlayer.getUUID();
+                UUID viewerUUID = event.getUser().getUUID();
+
+                event.getTasksAfterSend().add(() -> headTextRender.remove(holderUUID, viewerUUID));
             }
             case PacketType.Play.Server.SPAWN_ENTITY -> {
                 WrapperPlayServerSpawnEntity wrapperPlayServerSpawnEntity = new WrapperPlayServerSpawnEntity(event);
-                if (wrapperPlayServerSpawnEntity.getEntityType() == EntityTypes.PLAYER) {
-                    wrapperPlayServerSpawnEntity.getUUID().ifPresent(uuid ->
-                            headTextRender.remove(uuid, event.getUser().getUUID())
-                    );
-                }
+                if (wrapperPlayServerSpawnEntity.getEntityType() != EntityTypes.PLAYER) return;
+
+                UUID viewerUUID = event.getUser().getUUID();
+                wrapperPlayServerSpawnEntity.getUUID().ifPresent(holderUUID ->
+                        event.getTasksAfterSend().add(() -> headTextRender.remove(holderUUID, viewerUUID))
+                );
             }
             case PacketType.Play.Server.DEATH_COMBAT_EVENT -> {
                 UUID playerUUID = event.getUser().getUUID();
                 headTextRender.remove(playerUUID);
-            }
-            case PacketType.Play.Server.RESPAWN -> {
-                UUID playerUUID = event.getUser().getUUID();
-                if (playerUUID == null) return;
-
-                headTextRender.removeViewer(playerUUID);
             }
             case PacketType.Play.Server.SET_PASSENGERS -> {
                 WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);

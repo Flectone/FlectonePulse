@@ -371,7 +371,11 @@ public class MinecraftHeadTextRender implements HeadTextRender {
                 return holderCoordinates.distanceSquared(holderViewerEntity.coordinates()) > distance * distance;
             }).toList();
 
-            if (entitiesToDelete.isEmpty()) return existing;
+            if (entitiesToDelete.isEmpty()) {
+                // holder entity is spawned for viewer again, so restore ride
+                sendPassengers(holder, viewer, existing);
+                return existing;
+            }
 
             destroy(holder, viewer, entitiesToDelete);
 
