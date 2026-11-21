@@ -35,8 +35,6 @@ import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -76,7 +74,7 @@ public class HytaleHeadTextRender implements HeadTextRender {
     @Override
     public void reload() {
         removeAll();
-        taskScheduler.runAsyncLater(this::cleanupLegacyBubbles, 20L);
+        cleanupLegacyBubbles();
 
         taskScheduler.runAsyncTimer(() -> {
             if (activeBubbles.isEmpty()) return;
@@ -168,10 +166,7 @@ public class HytaleHeadTextRender implements HeadTextRender {
 
     private void cleanupLegacyBubbles(@NonNull World world) {
         Store<EntityStore> store = world.getEntityStore().getStore();
-        TimeResource timeResource = store.getResource(TimeResource.getResourceType());
-        if (timeResource == null) return;
 
-        Instant threshold = timeResource.getNow().plus(Duration.ofDays(1));
         Query<EntityStore> query = Query.and(
                 ProjectileComponent.getComponentType(),
                 Nameplate.getComponentType(),
@@ -182,10 +177,6 @@ public class HytaleHeadTextRender implements HeadTextRender {
             for (int index = 0; index < chunk.size(); index++) {
                 ProjectileComponent projectile = chunk.getComponent(index, ProjectileComponent.getComponentType());
                 if (projectile == null || !"Projectile".equals(projectile.getProjectileAssetName())) continue;
-
-                DespawnComponent despawn = chunk.getComponent(index, DespawnComponent.getComponentType());
-                if (despawn == null || despawn.getDespawn() == null) continue;
-                if (!despawn.getDespawn().isAfter(threshold)) continue;
 
                 buffer.removeEntity(chunk.getReferenceTo(index), RemoveReason.REMOVE);
             }
