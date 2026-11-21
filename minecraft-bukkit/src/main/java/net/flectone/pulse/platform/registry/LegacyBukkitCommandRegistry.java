@@ -53,7 +53,7 @@ public class LegacyBukkitCommandRegistry extends CommandRegistryImpl<CommandSend
 
     @Override
     protected PlatformRegistrationHandler<CommandSender> createRegistrationHandler() {
-        this.bukkitRegistrationHandler = new BukkitRegistrationHandler(plugin, commandMap, knownCommands, taskScheduler, reflectionResolver);
+        this.bukkitRegistrationHandler = new BukkitRegistrationHandler(plugin, commandMap, knownCommands, taskScheduler, reflectionResolver, this::removeVanillaAliases);
         return bukkitRegistrationHandler;
     }
 
@@ -103,6 +103,18 @@ public class LegacyBukkitCommandRegistry extends CommandRegistryImpl<CommandSend
                 bukkitCommand.unregister(commandMap);
             }
         });
+    }
+
+    protected void removeVanillaAliases(String label) {
+        unregisterVanillaCommand(knownCommands.remove(label));
+        unregisterVanillaCommand(knownCommands.remove("minecraft:" + label));
+        unregisterVanillaCommand(knownCommands.remove("bukkit:" + label));
+    }
+
+    private void unregisterVanillaCommand(org.bukkit.command.Command command) {
+        if (command != null) {
+            command.unregister(commandMap);
+        }
     }
 
     @SuppressWarnings("unchecked")

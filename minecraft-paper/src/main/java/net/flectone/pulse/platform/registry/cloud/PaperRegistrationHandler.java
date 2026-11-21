@@ -25,12 +25,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 @SuppressWarnings("UnstableApiUsage")
 public class PaperRegistrationHandler extends PlatformRegistrationHandler<CommandSender> {
 
     private final Map<String, Set<String>> registeredLabels = new ConcurrentHashMap<>();
     private final Plugin plugin;
+    private final Consumer<String> vanillaRemover;
 
     private CloudBrigadierManager<FPlayer, CommandSourceStack> brigadierManager;
 
@@ -39,8 +41,9 @@ public class PaperRegistrationHandler extends PlatformRegistrationHandler<Comman
     private Field invalidField;
     private Method removeCommandMethod;
 
-    public PaperRegistrationHandler(Plugin plugin) {
+    public PaperRegistrationHandler(Plugin plugin, Consumer<String> vanillaRemover) {
         this.plugin = plugin;
+        this.vanillaRemover = vanillaRemover;
     }
 
     @Override
@@ -99,6 +102,9 @@ public class PaperRegistrationHandler extends PlatformRegistrationHandler<Comman
         if (component == null) return;
 
         String name = component.name();
+        vanillaRemover.accept(name);
+        component.alternativeAliases().forEach(vanillaRemover);
+
         LiteralCommandNode<CommandSourceStack> node = brigadierManager.literalBrigadierNodeFactory().createNode(
                 name,
                 rootNode,

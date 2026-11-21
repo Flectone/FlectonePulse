@@ -19,6 +19,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 public class BukkitRegistrationHandler extends PlatformRegistrationHandler<CommandSender> {
 
@@ -30,18 +31,21 @@ public class BukkitRegistrationHandler extends PlatformRegistrationHandler<Comma
 
     private final CommandMap commandMap;
     private final Map<String, org.bukkit.command.Command> knownCommands;
+    private final Consumer<String> vanillaRemover;
 
     public BukkitRegistrationHandler(Plugin plugin,
                                      CommandMap commandMap,
                                      Map<String, org.bukkit.command.Command> knownCommands,
                                      TaskScheduler taskScheduler,
-                                     ReflectionResolver reflectionResolver) {
+                                     ReflectionResolver reflectionResolver,
+                                     Consumer<String> vanillaRemover) {
         this.plugin = plugin;
         this.commandMap = commandMap;
         this.knownCommands = knownCommands;
         this.taskScheduler = taskScheduler;
         this.isPaper = reflectionResolver.isPaper();
         this.canUpdateCommands = reflectionResolver.hasMethod(Player.class, "updateCommands");
+        this.vanillaRemover = vanillaRemover;
     }
 
     @Override
@@ -56,6 +60,9 @@ public class BukkitRegistrationHandler extends PlatformRegistrationHandler<Comma
 
         runSync(() -> {
             if (manager.settings().get(ManagerSetting.OVERRIDE_EXISTING_COMMANDS)) {
+                vanillaRemover.accept(label);
+                aliases.forEach(vanillaRemover);
+
                 knownCommands.remove(label);
                 aliases.forEach(knownCommands::remove);
             }

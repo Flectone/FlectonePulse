@@ -34,7 +34,7 @@ public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry imp
     @Override
     protected PlatformRegistrationHandler<CommandSender> createRegistrationHandler() {
         if (reflectionResolver.hasClass("io.papermc.paper.command.brigadier.CommandSourceStack")) {
-            this.paperRegistrationHandler = new PaperRegistrationHandler(plugin);
+            this.paperRegistrationHandler = new PaperRegistrationHandler(plugin, this::removeVanillaAliases);
             return paperRegistrationHandler;
         }
 
