@@ -92,7 +92,7 @@ public class BukkitRegistrationHandler extends PlatformRegistrationHandler<Comma
     }
 
     private void runSync(Runnable runnable) {
-        if (isPaper) {
+        if (isPaper || Bukkit.isPrimaryThread()) {
             runnable.run();
         } else {
             taskScheduler.runSync(runnable::run);
