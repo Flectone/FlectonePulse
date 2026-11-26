@@ -84,6 +84,17 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Override
     public void dispatchCommand(@NonNull UUID uuid, @NonNull String command) {
+        if (reflectionResolver.isFolia()) {
+            FPlayer fPlayer = fPlayerService.get().getFPlayer(uuid);
+            taskScheduler.runRegion(fPlayer, () -> {
+                Player regionPlayer = Bukkit.getPlayer(uuid);
+                if (regionPlayer == null) return;
+
+                Bukkit.dispatchCommand(regionPlayer, command);
+            });
+            return;
+        }
+
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;
 
