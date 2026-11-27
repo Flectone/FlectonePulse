@@ -316,19 +316,24 @@ final class FastParser {
 
         StringBuilder current = new StringBuilder(end - start);
         char quote = 0;
-        boolean escaped = false;
 
         for (int index = start; index < end; index++) {
             char value = source.charAt(index);
 
-            if (escaped) {
-                current.append(value);
-                escaped = false;
-                continue;
-            }
+            if (value == '\\' && index + 1 < end) {
+                char next = source.charAt(index + 1);
 
-            if (value == '\\') {
-                escaped = true;
+                boolean escapes = quote != 0
+                        ? next == quote || next == '\\'
+                        : next == ':' || next == '\\';
+
+                if (escapes) {
+                    current.append(next);
+                    index++;
+                    continue;
+                }
+
+                current.append(value);
                 continue;
             }
 
