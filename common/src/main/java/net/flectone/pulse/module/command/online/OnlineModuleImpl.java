@@ -169,7 +169,6 @@ public class OnlineModuleImpl implements OnlineModule {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
-        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.ONLINE.getTagName())) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.ONLINE.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();

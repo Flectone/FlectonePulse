@@ -85,7 +85,6 @@ public class TranslateModuleImpl implements TranslateModule {
 
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
-        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.TRANSLATION.getTagName())) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
 

@@ -104,8 +104,6 @@ public class AfkModuleImpl implements AfkModule {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer)) return messageContext;
-        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.AFK.getTagName())
-                && !messageContext.hasTag("afk_suffix")) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.AFK.getTagName(), "afk_suffix"), (_, _) -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(sender.uuid());

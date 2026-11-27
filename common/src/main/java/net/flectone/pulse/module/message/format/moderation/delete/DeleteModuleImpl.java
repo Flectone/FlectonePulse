@@ -91,7 +91,6 @@ public class DeleteModuleImpl implements DeleteModule {
         FEntity sender = messageContext.sender();
         FPlayer receiver = messageContext.receiver();
         if (moduleController.isDisabledFor(this, receiver)) return messageContext;
-        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.DELETE.getTagName())) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.DELETE.getTagName(), (_, _) -> {
             String placeholder = Strings.CS.replace(

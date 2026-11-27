@@ -84,7 +84,6 @@ public class FadingModuleImpl implements FadingModule {
 
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
-        if (!messageContext.hasTag(MessagePipeline.ReplacementTag.FADING.getTagName())) return messageContext;
 
         String string = stringContext.string();
 

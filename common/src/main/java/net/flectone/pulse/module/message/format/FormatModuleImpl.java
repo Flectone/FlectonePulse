@@ -154,9 +154,7 @@ public class FormatModuleImpl implements FormatModule {
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.PLAYER_MESSAGE);
 
-        if (sender instanceof FPlayer fPlayer
-                && !isUserMessage
-                && messageContext.hasTag(MessagePipeline.ReplacementTag.SERVER.getTagName())) {
+        if (sender instanceof FPlayer fPlayer && !isUserMessage) {
             messageContext = messageContext.addTagResolver(
                     Placeholder.unparsed("server", StringUtils.defaultString(socialService.getSetting(fPlayer, SettingText.SERVER)))
             );
